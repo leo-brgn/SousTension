@@ -62,6 +62,7 @@ namespace SousTension.Spikes.MovingFrame
             _model.ApplyServerState(snapshot, _clock.Now);
             _model.SetInterlock(snapshot.Interlock);
             _model.ApplyCargo(snapshot.Cargo, snapshot.ServerTime);
+            _model.SetReactor(snapshot.Reactor);
 
             foreach (var p in snapshot.Players)
             {

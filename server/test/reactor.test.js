@@ -191,3 +191,21 @@ test("match integration: the reactor advances one tick per match tick and is bro
   assert.ok(sent[sent.length - 1].rx && sent[sent.length - 1].rx.T > K.tIn);
   assert.strictEqual(sent[sent.length - 1].rx.reg, "veille");
 });
+
+test("noise follows the real rod position: 0 in veille, rising with the rods, 4 at full power, 0 after a SCRAM", () => {
+  const r = m.newReactor(1, "veille");
+  r.driftEnabled = false;
+  assert.ok(m.reactorNoise(r) < 0.05, "veille noise " + m.reactorNoise(r));
+  m.reactorSetRegime(r, "pleine");
+  run(r, 10);
+  const early = m.reactorNoise(r);
+  assert.ok(early > 0.2 && early < 3, "noise follows the rods, not the selector: " + early);   // rods travel 0.02/s
+  run(r, 60);
+  assert.ok(m.reactorNoise(r) > 3.95, "full power noise " + m.reactorNoise(r));
+  m.reactorScram(r);
+  run(r, 5);
+  assert.ok(m.reactorNoise(r) < 0.05, "after the SCRAM the rods are in: " + m.reactorNoise(r));
+  const mid = m.newReactor(1, "croisiere");
+  assert.ok(Math.abs(m.reactorNoise(mid) - 1.75) < 0.1, "cruise ~ two dots: " + m.reactorNoise(mid));
+  assert.ok("nz" in m.reactorView(mid));
+});

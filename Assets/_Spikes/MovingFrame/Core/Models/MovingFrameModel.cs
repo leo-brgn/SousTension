@@ -93,6 +93,10 @@ namespace SousTension.Spikes.MovingFrame
         public InterlockState Interlock { get; private set; }
         public void SetInterlock(InterlockState state) { Interlock = state; }
 
+        /// <summary>Latest authoritative reactor gauges (Valid = false until the server has sent them).</summary>
+        public ReactorState Reactor { get; private set; }
+        public void SetReactor(ReactorState state) { if (state.Valid) Reactor = state; }
+
         public void SetLocal(float x, float z) { LocalX = x; LocalZ = z; }
 
         public void ApplyServerState(StateSnapshot snapshot, double localNow)

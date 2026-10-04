@@ -66,7 +66,7 @@ var matchLoop = function (ctx, logger, nk, dispatcher, tick, state, messages) {
     while (pl.allowance >= 1 && pl.queue.length > 0) {
       var next = pl.queue.shift();
       stepPlayer(pl, next.mx, next.mz);
-      if (next.act) tryActivate(state.il, state.order[k], pl, tick);
+      if (next.act) tryAct(state, state.order[k], pl, tick);
       if (next.grab) tryGrab(state.cargo, state.order[k], pl, tick);
       pl.seq = next.seq;
       pl.applied += 1;
@@ -138,7 +138,8 @@ if (typeof module !== "undefined" && module.exports) {
     InitModule: InitModule, stepPlayer: stepPlayer,
     TICK_RATE: TICK_RATE, DT: DT, STATIONS: STATIONS, STATION_REACH: STATION_REACH, INTERLOCK_WINDOW_TICKS: INTERLOCK_WINDOW_TICKS, MAX_ALLOWANCE: MAX_ALLOWANCE, MOVE_SPEED: MOVE_SPEED, HALF_X: HALF_X, HALF_Z: HALF_Z,
     OP_INPUT: OP_INPUT, OP_STATE: OP_STATE,
-    REACTOR_K: REACTOR_K, newReactor: newReactor, reactorStep: reactorStep, reactorView: reactorView, reactorScram: reactorScram,
+    CONTROLS: CONTROLS, REGIME_ORDER: REGIME_ORDER, tryAct: tryAct,
+    reactorNoise: reactorNoise, REACTOR_K: REACTOR_K, newReactor: newReactor, reactorStep: reactorStep, reactorView: reactorView, reactorScram: reactorScram,
     reactorRestart: reactorRestart, reactorSetRegime: reactorSetRegime, reactorSetValve: reactorSetValve, reactorSetPump: reactorSetPump,
     GRAB_REACH: GRAB_REACH, GRAVITY: GRAVITY, FRICTION: FRICTION, boatUpHorizontal: boatUpHorizontal,
     handlers: { matchInit: matchInit, matchJoinAttempt: matchJoinAttempt, matchJoin: matchJoin, matchLeave: matchLeave, matchLoop: matchLoop }

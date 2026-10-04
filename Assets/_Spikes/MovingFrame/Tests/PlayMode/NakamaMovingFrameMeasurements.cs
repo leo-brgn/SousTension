@@ -441,6 +441,142 @@ namespace SousTension.Spikes.MovingFrame.Tests
             File.WriteAllText("Logs/e1-01-cargo.json", "[\n  " + string.Join(",\n  ", results) + "\n]\n");
         }
 
+        /// <summary>
+        /// Walks to the RK-1 selector, turns it to Veille, then to Pleine (the cycle wraps, so it presses until the regime it sees
+        /// matches), stays 25 s, then returns to Veille so it never leaves the shared reactor at full power.
+        /// </summary>
+        private sealed class RegimeBot : IInputSource
+        {
+            private enum Phase { Walk, ToVeille, SettleVeille, ToPleine, Measure, BackToVeille, Done }
+            private readonly IClockService _clock; private readonly MovingFrameModel _model;
+            private Phase _phase = Phase.Walk; private double _phaseStart, _pressUntil, _lastPress = -10;
+            public double PleineReachedAt, PleinePhaseStart, LastPressAt; public int Presses;
+            public bool InPleinePhase => _phase >= Phase.ToPleine;
+            public bool InMeasure => _phase == Phase.Measure;
+            public bool Done => _phase == Phase.Done;
+
+            public RegimeBot(IClockService clock, MovingFrameModel model) { _clock = clock; _model = model; _phaseStart = clock.Now; }
+
+            private void Go(Phase p) { _phase = p; _phaseStart = _clock.Now; }
+
+            public void Read(out float moveX, out float moveZ, out bool act, out bool grab)
+            {
+                moveX = moveZ = 0f; grab = false;
+                string regime = _model.Reactor.Regime;
+                switch (_phase)
+                {
+                    case Phase.Walk:
+                    {
+                        float dx = -2.0f - _model.LocalX, dz = -1.7f - _model.LocalZ, d = (float)Math.Sqrt(dx * dx + dz * dz);
+                        if (d < 0.3f) Go(Phase.ToVeille); else { moveX = dx / d; moveZ = dz / d; }
+                        break;
+                    }
+                    case Phase.ToVeille: if (_model.Reactor.Valid && regime == "veille") Go(Phase.SettleVeille); else Press(); break;
+                    case Phase.SettleVeille: if (_clock.Now - _phaseStart > 2.0) { Go(Phase.ToPleine); PleinePhaseStart = _clock.Now; } break;
+                    case Phase.ToPleine: if (regime == "pleine") { PleineReachedAt = _clock.Now; Go(Phase.Measure); } else Press(); break;
+                    case Phase.Measure: if (_clock.Now - _phaseStart >= 25.0) Go(Phase.BackToVeille); break;
+                    case Phase.BackToVeille: if (regime == "veille") Go(Phase.Done); else Press(); break;
+                }
+                act = _clock.Now < _pressUntil;
+            }
+
+            private void Press()
+            {
+                if (_clock.Now - _lastPress < 1.5) return;      // longer than the worst simulated round trip (RTT 200 ms + retransmission)
+                _lastPress = _clock.Now; _pressUntil = _clock.Now + 0.25; LastPressAt = _clock.Now; Presses++;
+            }
+        }
+
+        private struct RegimeScenario { public string Name; public double RttMs, LossPct; }
+
+        private static readonly RegimeScenario[] RegimeScenarios =
+        {
+            new RegimeScenario { Name = "regime-rtt0",         RttMs = 0,   LossPct = 0 },
+            new RegimeScenario { Name = "regime-rtt200-loss2", RttMs = 200, LossPct = 2 },
+        };
+
+        [UnityTest, Timeout(600000)]
+        public IEnumerator Measure_RegimeSelector()
+        {
+            Application.targetFrameRate = 60;
+            Thread.CurrentThread.CurrentCulture = CultureInfo.InvariantCulture;
+            var results = new List<string>();
+            foreach (var sc in RegimeScenarios)
+            {
+                var clock = new RealClock();
+                var cts = new CancellationTokenSource();
+                var clients = new List<Client>();
+                string run = Guid.NewGuid().ToString("N").Substring(0, 8);
+                var models = new MovingFrameModel[ClientCount];
+                for (int i = 0; i < ClientCount; i++) models[i] = new MovingFrameModel();
+                var bot = new RegimeBot(clock, models[0]);
+                var inputs = new IInputSource[] { bot, new IdleInput(), new IdleInput(), new IdleInput() };
+                for (int i = 0; i < ClientCount; i++)
+                {
+                    INetworkService net = new NakamaNetworkService($"e3-03-{sc.Name}-{run}-{i}");
+                    if (sc.RttMs > 0 || sc.LossPct > 0)
+                        net = new SimulatedLatencyNetworkService(net, clock, sc.RttMs / 2000.0, 0.01, sc.LossPct / 100.0, seed: 400 + i);
+                    clients.Add(new Client { Net = net, Model = models[i], Controller = new MovingFrameController(net, inputs[i], clock, models[i]) });
+                }
+
+                double observedPleineAt = 0; float noiseAt = 0, rodsAt = 0, tempAtPleine = 0, tempAfter = 0, maxNoiseEarly = 0;
+                bool latched = false, finished = false; int presses = 0; double pressToVisibleMs = double.NaN;
+                try
+                {
+                    foreach (var c in clients)
+                    {
+                        var t = c.Net.ConnectAsync(cts.Token);
+                        double deadline = clock.Now + 10;
+                        while (!t.IsCompleted && clock.Now < deadline) yield return null;
+                        if (!t.IsCompleted || t.IsFaulted)
+                            Assert.Ignore("Nakama unreachable (docker compose -f server/docker-compose.yml up -d): " + (t.IsFaulted ? t.Exception?.GetBaseException().Message : "timeout"));
+                    }
+                    double warm = clock.Now + 3;
+                    while (clock.Now < warm && !models.All(m => m.Reactor.Valid)) { foreach (var c in clients) c.Controller.Tick(0f); yield return null; }
+                    var observer = models[3];
+                    if (observer.Reactor.Scram) { latched = true; }
+                    else
+                    {
+                        double end = clock.Now + 120.0, last = clock.Now;
+                        while (clock.Now < end && !bot.Done)
+                        {
+                            float dt = (float)(clock.Now - last); last = clock.Now;
+                            foreach (var c in clients) c.Controller.Tick(dt);
+                            var rx = observer.Reactor;
+                            if (bot.InPleinePhase && observedPleineAt == 0 && rx.Regime == "pleine")
+                            {
+                                observedPleineAt = clock.Now; tempAtPleine = rx.Temp;
+                                pressToVisibleMs = (clock.Now - bot.LastPressAt) * 1000.0;
+                            }
+                            if (observedPleineAt > 0 && clock.Now - observedPleineAt < 3.0) maxNoiseEarly = Math.Max(maxNoiseEarly, rx.Noise);   // rods have barely moved yet
+                            if (observedPleineAt > 0 && clock.Now - observedPleineAt >= 24.0 && noiseAt == 0) { noiseAt = rx.Noise; rodsAt = rx.Rods; tempAfter = rx.Temp; }
+                            yield return null;
+                        }
+                        finished = bot.Done; presses = bot.Presses;
+                    }
+                }
+                finally { Cleanup(clients, cts); }
+
+                if (latched) Assert.Ignore("The shared reactor is SCRAM-latched (restart is E3-05): restart the Nakama container (docker compose -f server/docker-compose.yml restart nakama).");
+                results.Add("{\"scenario\":\"" + sc.Name + "\",\"rttMs\":" + sc.RttMs.ToString("F0") + ",\"lossPct\":" + sc.LossPct.ToString("F0")
+                    + ",\"presses\":" + presses + ",\"pressToVisibleMs\":" + (double.IsNaN(pressToVisibleMs) ? "null" : pressToVisibleMs.ToString("F0"))
+                    + ",\"noiseJustAfterPleine\":" + maxNoiseEarly.ToString("F2") + ",\"noiseAfter24s\":" + noiseAt.ToString("F2")
+                    + ",\"rodsAfter24s\":" + rodsAt.ToString("F2") + ",\"tempAtPleine\":" + tempAtPleine.ToString("F1") + ",\"tempAfter24s\":" + tempAfter.ToString("F1")
+                    + ",\"returnedToVeille\":" + finished.ToString().ToLower() + "}");
+                Debug.Log("[E3-03] " + results[results.Count - 1]);
+
+                Assert.IsTrue(observedPleineAt > 0, sc.Name + ": the observer must see the selector reach Pleine");
+                Assert.Less(pressToVisibleMs, 2000, sc.Name + ": the selector change must be visible to an observer within 2 s of the press");
+                Assert.Less(maxNoiseEarly, 1.5f, sc.Name + ": noise follows the rods, not the selector (it must not jump to 4 at once)");
+                Assert.Greater(noiseAt, 1.5f, sc.Name + ": after ~24 s at Pleine the rods are well out and the plant is noisy");
+                Assert.Greater(tempAfter, tempAtPleine, sc.Name + ": the core must heat up after the selector goes to Pleine");
+                Assert.IsTrue(finished, sc.Name + ": the bot must be able to return the selector to Veille (wrap-around)");
+                yield return new WaitForSeconds(1.0f);
+            }
+            Directory.CreateDirectory("Logs");
+            File.WriteAllText("Logs/e3-03-regime.json", "[\n  " + string.Join(",\n  ", results) + "\n]\n");
+        }
+
         private static void Cleanup(List<Client> clients, CancellationTokenSource cts)
         {
             cts.Cancel();
