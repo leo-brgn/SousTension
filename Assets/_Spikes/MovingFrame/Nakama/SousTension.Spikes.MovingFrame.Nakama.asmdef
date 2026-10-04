@@ -1,0 +1,17 @@
+{
+    "name": "SousTension.Spikes.MovingFrame.Nakama",
+    "rootNamespace": "SousTension.Spikes.MovingFrame",
+    "references": [
+        "SousTension.Spikes.MovingFrame.Core",
+        "NakamaRuntime"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": false,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

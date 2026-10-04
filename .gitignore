@@ -91,3 +91,5 @@ moodboard/references/
 
 # CI output
 test-results/
+results-*.xml
+*.slnx

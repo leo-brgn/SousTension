@@ -1,0 +1,25 @@
+{
+    "name": "SousTension.Spikes.MovingFrame.Tests",
+    "rootNamespace": "SousTension.Spikes.MovingFrame.Tests",
+    "references": [
+        "UnityEngine.TestRunner",
+        "UnityEditor.TestRunner",
+        "SousTension.Sim",
+        "SousTension.Spikes.MovingFrame.Core"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": true,
+    "precompiledReferences": [
+        "nunit.framework.dll"
+    ],
+    "autoReferenced": false,
+    "defineConstraints": [
+        "UNITY_INCLUDE_TESTS"
+    ],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
