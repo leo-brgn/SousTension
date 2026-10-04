@@ -46,6 +46,27 @@ namespace SousTension.Tests
         }
 
         [Test]
+        public void TiltProjection_MatchesServerGoldenValues()
+        {
+            // Horizontal part of world "up" in boat-local axes. The same golden values are asserted in
+            // server/test/match.test.js against boatUpHorizontal() (the server uses it to slide loose cargo).
+            var golden = new[]
+            {
+                (t: 0.0,   x: 0.289523314f,  z: 0.0f),
+                (t: 1.5,   x: 0.0856205745f, z: -0.252473316f),
+                (t: 3.7,   x: -0.204979999f, z: 0.0467290627f),
+                (t: 10.25, x: 0.330693301f,  z: -0.0582228990f),
+            };
+            var motion = new BoatMotion();
+            foreach (var g in golden)
+            {
+                var upLocal = Vector3.Transform(Vector3.UnitY, Quaternion.Inverse(motion.Evaluate(g.t).Rotation));
+                Assert.AreEqual(g.x, upLocal.X, 1e-5f, $"t={g.t} x");
+                Assert.AreEqual(g.z, upLocal.Z, 1e-5f, $"t={g.t} z");
+            }
+        }
+
+        [Test]
         public void LocalPositionIsStable_WhileWorldPositionMoves()
         {
             // A character standing still in boat-local space must move in world space as the boat moves.

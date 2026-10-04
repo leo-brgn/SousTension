@@ -14,8 +14,8 @@ namespace SousTension.Spikes.MovingFrame.Tests
 
     internal sealed class ConstantInput : IInputSource
     {
-        public float Mx, Mz; public bool Act;
-        public void Read(out float moveX, out float moveZ, out bool act) { moveX = Mx; moveZ = Mz; act = Act; }
+        public float Mx, Mz; public bool Act, Grab;
+        public void Read(out float moveX, out float moveZ, out bool act, out bool grab) { moveX = Mx; moveZ = Mz; act = Act; grab = Grab; }
     }
 
     /// <summary>Fake authoritative server: echoes each input back as a snapshot after applying CharacterMotion.</summary>
@@ -25,11 +25,11 @@ namespace SousTension.Spikes.MovingFrame.Tests
         public long BytesSent { get; private set; }
         public long BytesReceived { get; private set; }
         public event Action<StateSnapshot> StateReceived;
-        public readonly List<(int seq, float mx, float mz, bool act)> Sent = new List<(int, float, float, bool)>();
+        public readonly List<(int seq, float mx, float mz, bool act, bool grab)> Sent = new List<(int, float, float, bool, bool)>();
         private readonly Queue<StateSnapshot> _incoming = new Queue<StateSnapshot>();
 
         public Task ConnectAsync(CancellationToken ct) => Task.CompletedTask;
-        public void SendInput(int seq, float moveX, float moveZ, bool act) { Sent.Add((seq, moveX, moveZ, act)); BytesSent += 24; }
+        public void SendInput(int seq, float moveX, float moveZ, bool act, bool grab) { Sent.Add((seq, moveX, moveZ, act, grab)); BytesSent += 24; }
         public void Enqueue(StateSnapshot s) => _incoming.Enqueue(s);
         public void Poll() { while (_incoming.Count > 0) StateReceived?.Invoke(_incoming.Dequeue()); }
         public void Dispose() { }
@@ -129,6 +129,52 @@ namespace SousTension.Spikes.MovingFrame.Tests
         }
 
         [Test]
+        public void Grab_IsSentOncePerKeyPress_AndIndependentFromAct()
+        {
+            var net = new FakeNetwork(); var clock = new FakeClock(); var model = new MovingFrameModel();
+            var input = new ConstantInput();
+            var c = new MovingFrameController(net, input, clock, model);
+            net.Enqueue(Snapshot(1, new PlayerState("me", 0, 0, 0)));
+            c.Tick(0.0f);
+            input.Grab = true; c.Tick(0.25f);      // held for 2 ticks
+            input.Grab = false; c.Tick(0.1f);
+            input.Grab = true; input.Act = true; c.Tick(0.1f);
+            Assert.AreEqual(new[] { true, false, false, true }, net.Sent.ConvertAll(s => s.grab).ToArray());
+            Assert.AreEqual(new[] { false, false, false, true }, net.Sent.ConvertAll(s => s.act).ToArray());
+        }
+
+        [Test]
+        public void Cargo_CarriedByLocal_UsesPrediction_OthersUseInterpolatedSnapshots()
+        {
+            var net = new FakeNetwork(); var clock = new FakeClock(); var model = new MovingFrameModel();
+            var c = new MovingFrameController(net, new ConstantInput { Mx = 1 }, clock, model);
+            var me = new PlayerState("me", 0, 0, 0);
+            net.Enqueue(new StateSnapshot(1, 0.1, new[] { me }, default, new[]
+            {
+                new CargoState("mine", 0, 0, false, new[] { "me" }, ""),
+                new CargoState("loose", 2, 3, false, new string[0], ""),
+            }));
+            c.Tick(0f);
+            c.Tick(0.35f);                                       // local prediction moves 3 steps: x = 0.9
+            Assert.IsTrue(model.TryGetCargoRenderPosition("mine", 0.1, out float x, out float z));
+            Assert.AreEqual(0.9f, x, 1e-5f);                     // follows the prediction, not the stale snapshot
+            Assert.IsTrue(model.TryGetCargoRenderPosition("loose", 0.1, out x, out z));
+            Assert.AreEqual(2f, x); Assert.AreEqual(3f, z);
+        }
+
+        [Test]
+        public void Cargo_HeavyShared_DrawnAtMidpointOfLocalAndPartner()
+        {
+            var net = new FakeNetwork(); var clock = new FakeClock(); var model = new MovingFrameModel();
+            var c = new MovingFrameController(net, new ConstantInput(), clock, model);
+            net.Enqueue(new StateSnapshot(1, 0.1, new[] { new PlayerState("me", 0, 0, 0), new PlayerState("pal", 4, 2, 0) }, default,
+                new[] { new CargoState("fuel", 2, 1, true, new[] { "me", "pal" }, "") }));
+            c.Tick(0f);
+            Assert.IsTrue(model.TryGetCargoRenderPosition("fuel", 0.1, out float x, out float z));
+            Assert.AreEqual(2f, x, 1e-5f); Assert.AreEqual(1f, z, 1e-5f);
+        }
+
+        [Test]
         public void Snapshot_StoresAuthoritativeInterlockState_WithoutPredicting()
         {
             var net = new FakeNetwork(); var clock = new FakeClock(); var model = new MovingFrameModel();
@@ -165,7 +211,7 @@ namespace SousTension.Spikes.MovingFrame.Tests
             var clock = new FakeClock { Now = 0 };
             var inner = new FakeNetwork();
             var net = new SimulatedLatencyNetworkService(inner, clock, oneWayLatencySeconds: 0.1);
-            net.SendInput(1, 1, 0, false);
+            net.SendInput(1, 1, 0, false, false);
             net.Poll();
             Assert.AreEqual(0, inner.Sent.Count);        // still in flight
             clock.Now = 0.11; net.Poll();
@@ -187,8 +233,8 @@ namespace SousTension.Spikes.MovingFrame.Tests
             var clock = new FakeClock { Now = 0 };
             var inner = new FakeNetwork();
             var net = new SimulatedLatencyNetworkService(inner, clock, 0.0, lossRate: 1.0, retransmitDelaySeconds: 0.2);
-            net.SendInput(1, 1, 0, false);
-            net.SendInput(2, 1, 0, false);
+            net.SendInput(1, 1, 0, false, false);
+            net.SendInput(2, 1, 0, false, false);
             clock.Now = 0.1; net.Poll();
             Assert.AreEqual(0, inner.Sent.Count);                       // still waiting for the retransmission
             clock.Now = 0.25; net.Poll();

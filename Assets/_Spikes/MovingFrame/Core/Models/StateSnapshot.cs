@@ -29,6 +29,21 @@ namespace SousTension.Spikes.MovingFrame
         }
     }
 
+    /// <summary>Authoritative state of one piece of cargo, in boat-local space.</summary>
+    public readonly struct CargoState
+    {
+        public readonly string Id;
+        public readonly float X, Z;
+        public readonly bool Heavy;          // needs two carriers
+        public readonly string[] Carriers;   // 0 = loose (slides), 1 = carried, 2 = heavy carried
+        public readonly string Pending;      // first carrier of a heavy item, waiting for the second one
+
+        public CargoState(string id, float x, float z, bool heavy, string[] carriers, string pending)
+        {
+            Id = id; X = x; Z = z; Heavy = heavy; Carriers = carriers ?? new string[0]; Pending = pending ?? "";
+        }
+    }
+
     /// <summary>One authoritative broadcast from the match (10 Hz).</summary>
     public sealed class StateSnapshot
     {
@@ -36,10 +51,11 @@ namespace SousTension.Spikes.MovingFrame
         public readonly double ServerTime; // seconds = tick * 0.1
         public readonly PlayerState[] Players;
         public readonly InterlockState Interlock;
+        public readonly CargoState[] Cargo;
 
-        public StateSnapshot(int tick, double serverTime, PlayerState[] players, InterlockState interlock = default)
+        public StateSnapshot(int tick, double serverTime, PlayerState[] players, InterlockState interlock = default, CargoState[] cargo = null)
         {
-            Tick = tick; ServerTime = serverTime; Players = players; Interlock = interlock;
+            Tick = tick; ServerTime = serverTime; Players = players; Interlock = interlock; Cargo = cargo ?? new CargoState[0];
         }
     }
 }

@@ -31,12 +31,14 @@ namespace SousTension.Spikes.MovingFrame
                 _lastSent = _net.BytesSent; _lastRecv = _net.BytesReceived; _lastSample = now;
             }
             var il = _model.Interlock;
-            GUI.Label(new Rect(10, 10, 560, 140),
+            int carried = 0; foreach (var c in _model.Cargo) if (_model.IsCarriedByLocal(c.Id)) carried++;
+            GUI.Label(new Rect(10, 10, 560, 160),
                 $"E1-01 moving frame | {_status}\n" +
                 $"ack latency: {_model.LastAckLatencyMs:F0} ms | pending inputs: {_controller.PendingInputs}\n" +
                 $"correction: last {_model.LastCorrection * 100f:F1} cm, max {_model.MaxCorrection * 100f:F1} cm\n" +
                 $"bandwidth: up {_kbSent:F2} kB/s, down {_kbRecv:F2} kB/s | players: {_model.RemoteCountPlusLocal()}\n" +
-                $"interlock: A {il.RemainingA / 10f:F1}s B {il.RemainingB / 10f:F1}s | last: {il.Result} | successes: {il.Count}");
+                $"interlock: A {il.RemainingA / 10f:F1}s B {il.RemainingB / 10f:F1}s | last: {il.Result} | successes: {il.Count}\n" +
+                $"cargo: {carried} carried by you");
         }
     }
 

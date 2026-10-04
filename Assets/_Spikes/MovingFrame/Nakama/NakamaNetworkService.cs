@@ -18,10 +18,11 @@ namespace SousTension.Spikes.MovingFrame
         private const long OpInput = 1;
         private const long OpState = 2;
 
-        [Serializable] private class InputDto { public int seq; public float mx; public float mz; public bool act; }
+        [Serializable] private class InputDto { public int seq; public float mx; public float mz; public bool act; public bool grab; }
         [Serializable] private class PlayerDto { public string id; public float x; public float z; public int seq; }
         [Serializable] private class InterlockDto { public int a; public int b; public string ab; public string bb; public string result; public int rt; public int n; }
-        [Serializable] private class StateDto { public int tick; public double t; public PlayerDto[] players; public InterlockDto il; }
+        [Serializable] private class CargoDto { public string id; public float x; public float z; public int h; public string[] c; public string p; }
+        [Serializable] private class StateDto { public int tick; public double t; public PlayerDto[] players; public InterlockDto il; public CargoDto[] cargo; }
         [Serializable] private class MatchDto { public string matchId; }
 
         private readonly string _scheme, _host, _serverKey, _deviceId;
@@ -58,10 +59,10 @@ namespace SousTension.Spikes.MovingFrame
             await _socket.JoinMatchAsync(_matchId);
         }
 
-        public void SendInput(int seq, float moveX, float moveZ, bool act)
+        public void SendInput(int seq, float moveX, float moveZ, bool act, bool grab)
         {
             if (_socket == null || !_socket.IsConnected) return;
-            var json = JsonUtility.ToJson(new InputDto { seq = seq, mx = moveX, mz = moveZ, act = act });
+            var json = JsonUtility.ToJson(new InputDto { seq = seq, mx = moveX, mz = moveZ, act = act, grab = grab });
             var bytes = Encoding.UTF8.GetBytes(json);
             Interlocked.Add(ref _bytesSent, bytes.Length);
             _ = SendAsync(bytes);
@@ -85,7 +86,13 @@ namespace SousTension.Spikes.MovingFrame
                 players[i] = new PlayerState(p.id, p.x, p.z, p.seq);
             }
             var il = dto.il == null ? default : new InterlockState(dto.il.a, dto.il.b, dto.il.ab, dto.il.bb, dto.il.result, dto.il.rt, dto.il.n);
-            _queue.Enqueue(new StateSnapshot(dto.tick, dto.t, players, il));
+            var cargo = new CargoState[dto.cargo == null ? 0 : dto.cargo.Length];
+            for (int i = 0; i < cargo.Length; i++)
+            {
+                var c = dto.cargo[i];
+                cargo[i] = new CargoState(c.id, c.x, c.z, c.h == 1, c.c, c.p);
+            }
+            _queue.Enqueue(new StateSnapshot(dto.tick, dto.t, players, il, cargo));
         }
 
         public void Poll()

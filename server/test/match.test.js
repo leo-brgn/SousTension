@@ -169,3 +169,128 @@ test("interlock: remaining time counts down and leaving the match releases the s
   il = tickWith(c, []);
   assert.strictEqual(il.ab, "");
 });
+
+// ---- Carried and sliding cargo ----
+function inputGrab(ctx, id) {
+  ctx.seq[id] = (ctx.seq[id] || 0) + 1;
+  return { opCode: m.OP_INPUT, sender: presence(id), data: JSON.stringify({ seq: ctx.seq[id], mx: 0, mz: 0, grab: true }) };
+}
+function cargoOf(ctx, id) { return ctx.d.sent[ctx.d.sent.length - 1].data.cargo.find((c) => c.id === id); }
+function tickN(ctx, n) { for (let i = 0; i < n; i++) tickWith(ctx, []); }
+// Park the cargo at a given spot with a flat floor assumption: tests that need stillness run at a calm tick.
+function calmTick(maxTilt) { // first tick whose tilt keeps loose cargo pinned by static friction
+  for (let t = 0; t < 2000; t++) {
+    const u = m.boatUpHorizontal(t * m.DT);
+    if (Math.sqrt(u.x * u.x + u.z * u.z) * m.GRAVITY < maxTilt) return t;
+  }
+  throw new Error("no calm tick");
+}
+
+test("cargo: grab within reach, follows the carrier, drop leaves it where released", () => {
+  const c = lockSetup(["a"]);
+  c.tick = calmTick(m.FRICTION * m.GRAVITY * 0.5);
+  place(c, "a", 2.0, -3.0);                                 // on top of crate1
+  tickWith(c, [inputGrab(c, "a")]);
+  assert.deepStrictEqual(cargoOf(c, "crate1").c, ["a"]);
+  place(c, "a", -1, 1);
+  tickN(c, 1);
+  assert.ok(Math.abs(cargoOf(c, "crate1").x - (-1)) < 1e-9 && Math.abs(cargoOf(c, "crate1").z - 1) < 1e-9);
+  tickWith(c, [inputGrab(c, "a")]);                         // drop
+  assert.deepStrictEqual(cargoOf(c, "crate1").c, []);
+});
+
+test("cargo: out of reach cannot be grabbed (reach 1.5 m)", () => {
+  const c = lockSetup(["a"]);
+  place(c, "a", 2.0, -1.0);                                 // 2 m from crate1
+  tickWith(c, [inputGrab(c, "a")]);
+  assert.deepStrictEqual(cargoOf(c, "crate1").c, []);
+  place(c, "a", 2.0, -1.8);                                 // 1.2 m
+  tickWith(c, [inputGrab(c, "a")]);
+  assert.deepStrictEqual(cargoOf(c, "crate1").c, ["a"]);
+});
+
+test("cargo: loose cargo slides when the boat tilts past the friction angle, and stays inside the boat", () => {
+  const c = lockSetup(["a"]);
+  let moved = 0, start = null;
+  for (let i = 0; i < 700; i++) {                           // 70 s covers several roll/pitch cycles
+    tickWith(c, []);
+    const o = cargoOf(c, "crate2");
+    if (!start) start = { x: o.x, z: o.z };
+    moved = Math.max(moved, Math.abs(o.x - start.x) + Math.abs(o.z - start.z));
+    assert.ok(Math.abs(o.x) <= m.HALF_X + 1e-9 && Math.abs(o.z) <= m.HALF_Z + 1e-9, "cargo left the boat");
+  }
+  assert.ok(moved > 0.5, "crate never slid (moved " + moved + " m)");
+});
+
+// First tick from which the tilt stays under 90 % of the static-friction limit for the next n ticks.
+function calmWindow(n) {
+  for (let t = 0; t < 5000; t++) {
+    let ok = true;
+    for (let k = 0; k <= n && ok; k++) { const u = m.boatUpHorizontal((t + k) * m.DT); ok = Math.sqrt(u.x * u.x + u.z * u.z) * m.GRAVITY < m.FRICTION * m.GRAVITY * 0.9; }
+    if (ok) return t;
+  }
+  throw new Error("no calm window of " + n + " ticks");
+}
+
+test("cargo: static friction pins loose cargo on a nearly flat floor", () => {
+  const c = lockSetup(["a"]);
+  c.tick = calmWindow(6);
+  tickWith(c, []);
+  const o1 = cargoOf(c, "crate2");
+  tickN(c, 4);
+  const o2 = cargoOf(c, "crate2");
+  assert.ok(Math.abs(o1.x - o2.x) < 1e-9 && Math.abs(o1.z - o2.z) < 1e-9);
+});
+
+test("cargo: the heavy flask needs two players grabbing within 3 s", () => {
+  const c = lockSetup(["a", "b"]);
+  c.tick = calmTick(m.FRICTION * m.GRAVITY * 0.5);
+  place(c, "a", -2.0, -5.0); place(c, "b", -1.0, -5.0);
+  tickWith(c, [inputGrab(c, "a")]);
+  assert.strictEqual(cargoOf(c, "fuel").p, "a");
+  assert.deepStrictEqual(cargoOf(c, "fuel").c, []);          // one player alone cannot lift it
+  tickN(c, 10);
+  tickWith(c, [inputGrab(c, "b")]);
+  assert.deepStrictEqual(cargoOf(c, "fuel").c, ["a", "b"]);
+  place(c, "a", 0, 0); place(c, "b", 2, 2);
+  tickN(c, 1);
+  assert.ok(Math.abs(cargoOf(c, "fuel").x - 1) < 1e-9 && Math.abs(cargoOf(c, "fuel").z - 1) < 1e-9); // midpoint
+  tickWith(c, [inputGrab(c, "b")]);                          // one lets go: both release
+  assert.deepStrictEqual(cargoOf(c, "fuel").c, []);
+});
+
+test("cargo: a second carrier arriving after the window does not lift the heavy flask", () => {
+  const c = lockSetup(["a", "b"]);
+  c.tick = calmTick(m.FRICTION * m.GRAVITY * 0.5);
+  place(c, "a", -2.0, -5.0); place(c, "b", -1.0, -5.0);
+  tickWith(c, [inputGrab(c, "a")]);
+  tickN(c, m.INTERLOCK_WINDOW_TICKS);
+  assert.strictEqual(cargoOf(c, "fuel").p, "");              // first grab expired
+  const f = cargoOf(c, "fuel"); place(c, "b", f.x, f.z);     // the flask may have slid meanwhile: stand next to it
+  tickWith(c, [inputGrab(c, "b")]);
+  assert.deepStrictEqual(cargoOf(c, "fuel").c, []);
+  assert.strictEqual(cargoOf(c, "fuel").p, "b");             // b is now the first carrier, waiting for a second one
+});
+
+test("cargo: a carrier leaving the match releases the cargo", () => {
+  const c = lockSetup(["a", "b"]);
+  c.tick = calmTick(m.FRICTION * m.GRAVITY * 0.5);
+  place(c, "a", 2.0, -3.0);
+  tickWith(c, [inputGrab(c, "a")]);
+  c.state = h.matchLeave({}, logger, nk, null, 0, c.state, [presence("a")]).state;
+  tickN(c, 1);
+  assert.deepStrictEqual(cargoOf(c, "crate1").c, []);
+});
+
+test("cargo: tilt projection golden values (same numbers asserted in C#: BoatMotionTests)", () => {
+  const golden = [
+    [0, 0.289523314, 0.0],
+    [1.5, 0.0856205745, -0.252473316],
+    [3.7, -0.204979999, 0.0467290627],
+    [10.25, 0.330693301, -0.0582228990]
+  ];
+  for (const [t, ux, uz] of golden) {
+    const u = m.boatUpHorizontal(t);
+    assert.ok(Math.abs(u.x - ux) < 1e-8 && Math.abs(u.z - uz) < 1e-8, "t=" + t + " got " + u.x + "," + u.z);
+  }
+});
