@@ -1,0 +1,90 @@
+# Unity project assumed at the repository root (Assets/, Packages/, ProjectSettings/).
+# If the Unity project lives in a subfolder, move these rules there or prefix the paths.
+
+# --- Unity generated ---
+/[Ll]ibrary/
+/[Tt]emp/
+/[Oo]bj/
+/[Bb]uild/
+/[Bb]uilds/
+/[Ll]ogs/
+/[Uu]ser[Ss]ettings/
+/[Mm]emoryCaptures/
+/[Rr]ecordings/
+
+# Asset meta data should always be committed with its asset. Do NOT ignore *.meta.
+# Exception: meta files of ignored folders are not needed.
+
+# Uncomment if you use Addressables / StreamingAssets build output
+# /[Aa]ssets/[Aa]ddressable[Aa]ssets[Dd]ata/*/*.bin*
+# /[Aa]ssets/[Ss]treamingAssets/aa.meta
+# /[Aa]ssets/[Ss]treamingAssets/aa/*
+
+# --- Auto-generated project/solution files ---
+*.csproj
+*.unityproj
+*.sln
+*.suo
+*.tmp
+*.user
+*.userprefs
+*.pidb
+*.booproj
+*.svd
+*.pdb
+*.mdb
+*.opendb
+*.VC.db
+.vscode/
+.idea/
+.vs/
+*.DotSettings.user
+.utmp/
+/[Aa]ssets/Plugins/Editor/JetBrains*
+.consulo/
+*.stackdump
+
+# --- Build outputs ---
+*.apk
+*.aab
+*.unitypackage
+*.unitypackage.meta
+*.app
+*.exe
+!/tools/**/*.exe
+
+# --- Unity crash / profiler dumps ---
+sysinfo.txt
+crashlytics-build.properties
+/[Aa]ssets/[Ss]treamingAssets/[Bb]uild[Rr]eports*
+/[Aa]ssets/[Ss]treamingAssets/[Bb]uild[Rr]eports*.meta
+
+# --- Rider / Visual Studio caches ---
+*.orig
+*.rej
+
+# --- Test results ---
+results.xml
+TestResults/
+
+# --- FMOD / Wwise generated caches (adapt once the audio middleware is chosen) ---
+# /[Aa]ssets/StreamingAssets/*.bank        <- keep banks if you ship from the repo; otherwise ignore
+# /[Aa]ssets/Plugins/FMOD/Cache/
+# /[Aa]ssets/Wwise/Generated*/
+
+# --- OS junk ---
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+Desktop.ini
+
+# --- Local tooling output (project-specific) ---
+tools/apply.out
+.claude/settings.local.json
+
+# Third-party game screenshots (moodboard references): keep local, not for the public repo
+moodboard/references/
