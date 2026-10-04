@@ -20,10 +20,11 @@ namespace SousTension.Spikes.MovingFrame
 
         private const float Sensitivity = 0.0025f;
 
-        public void Read(out float moveX, out float moveZ)
+        public void Read(out float moveX, out float moveZ, out bool act)
         {
             var kb = Keyboard.current;
             float f = 0f, r = 0f;
+            act = kb != null && kb.eKey.isPressed;
             if (kb != null)
             {
                 if (kb.wKey.isPressed || kb.zKey.isPressed) f += 1f;

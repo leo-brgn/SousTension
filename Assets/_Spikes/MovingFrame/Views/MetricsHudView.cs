@@ -30,11 +30,13 @@ namespace SousTension.Spikes.MovingFrame
                 _kbSent = (_net.BytesSent - _lastSent) / 1024f; _kbRecv = (_net.BytesReceived - _lastRecv) / 1024f;
                 _lastSent = _net.BytesSent; _lastRecv = _net.BytesReceived; _lastSample = now;
             }
-            GUI.Label(new Rect(10, 10, 520, 120),
+            var il = _model.Interlock;
+            GUI.Label(new Rect(10, 10, 560, 140),
                 $"E1-01 moving frame | {_status}\n" +
                 $"ack latency: {_model.LastAckLatencyMs:F0} ms | pending inputs: {_controller.PendingInputs}\n" +
                 $"correction: last {_model.LastCorrection * 100f:F1} cm, max {_model.MaxCorrection * 100f:F1} cm\n" +
-                $"bandwidth: up {_kbSent:F2} kB/s, down {_kbRecv:F2} kB/s | players: {_model.RemoteCountPlusLocal()}");
+                $"bandwidth: up {_kbSent:F2} kB/s, down {_kbRecv:F2} kB/s | players: {_model.RemoteCountPlusLocal()}\n" +
+                $"interlock: A {il.RemainingA / 10f:F1}s B {il.RemainingB / 10f:F1}s | last: {il.Result} | successes: {il.Count}");
         }
     }
 

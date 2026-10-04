@@ -26,8 +26,9 @@ namespace SousTension.Spikes.MovingFrame.Tests
         {
             private readonly IClockService _clock; private readonly double _offset;
             public ScriptedInput(IClockService clock, int index) { _clock = clock; _offset = index * 0.5; }
-            public void Read(out float moveX, out float moveZ)
+            public void Read(out float moveX, out float moveZ, out bool act)
             {
+                act = false;
                 int phase = (int)Math.Floor((_clock.Now + _offset) / 2.0) % 4;
                 moveX = phase == 1 ? 1f : phase == 3 ? -1f : 0f;
                 moveZ = phase == 0 ? 1f : phase == 2 ? -1f : 0f;
@@ -140,6 +141,126 @@ namespace SousTension.Spikes.MovingFrame.Tests
 
             Directory.CreateDirectory("Logs");
             File.WriteAllText("Logs/e1-01-metrics.json", "[\n  " + string.Join(",\n  ", results) + "\n]\n");
+        }
+
+        /// <summary>Walks to a station (boat-local z) then presses the interact key during [pressAt, pressAt + 0.25 s] (seconds since start).</summary>
+        private sealed class StationBot : IInputSource
+        {
+            private readonly IClockService _clock; private readonly Func<float> _z; private readonly float _targetZ;
+            private readonly Func<double> _start; private readonly double _pressAt;
+            public StationBot(IClockService clock, Func<float> z, float targetZ, Func<double> start, double pressAt)
+            { _clock = clock; _z = z; _targetZ = targetZ; _start = start; _pressAt = pressAt; }
+            public void Read(out float moveX, out float moveZ, out bool act)
+            {
+                moveX = 0f;
+                float dz = _targetZ - _z();
+                moveZ = Math.Abs(dz) > 0.3f ? Math.Sign(dz) : 0f;
+                double t = _clock.Now - _start();
+                act = t >= _pressAt && t < _pressAt + 0.25;
+            }
+        }
+
+        private sealed class IdleInput : IInputSource
+        {
+            public void Read(out float moveX, out float moveZ, out bool act) { moveX = 0f; moveZ = 0f; act = false; }
+        }
+
+        private struct LockScenario { public string Name; public double RttMs, LossPct, PressA, PressB; public bool ExpectSuccess; }
+
+        private static readonly LockScenario[] LockScenarios =
+        {
+            new LockScenario { Name = "interlock-rtt0-1s-apart",        RttMs = 0,   LossPct = 0, PressA = 6.0, PressB = 7.0, ExpectSuccess = true },
+            new LockScenario { Name = "interlock-rtt200-loss2-2s-apart", RttMs = 200, LossPct = 2, PressA = 6.0, PressB = 8.0, ExpectSuccess = true },
+            new LockScenario { Name = "interlock-rtt0-3.6s-apart",       RttMs = 0,   LossPct = 0, PressA = 6.0, PressB = 9.6, ExpectSuccess = false },
+        };
+
+        [UnityTest, Timeout(300000)]
+        public IEnumerator Measure_TwoPlayerInterlock()
+        {
+            Application.targetFrameRate = 60;
+            Thread.CurrentThread.CurrentCulture = CultureInfo.InvariantCulture;
+            var results = new List<string>();
+            foreach (var sc in LockScenarios)
+            {
+                var clock = new RealClock();
+                var cts = new CancellationTokenSource();
+                var clients = new List<Client>();
+                string run = Guid.NewGuid().ToString("N").Substring(0, 8);
+                double start = double.MaxValue;
+                var models = new MovingFrameModel[ClientCount];
+                for (int i = 0; i < ClientCount; i++) models[i] = new MovingFrameModel();
+
+                for (int i = 0; i < ClientCount; i++)
+                {
+                    int idx = i;
+                    INetworkService net = new NakamaNetworkService($"e1-01-{sc.Name}-{run}-{i}");
+                    if (sc.RttMs > 0 || sc.LossPct > 0)
+                        net = new SimulatedLatencyNetworkService(net, clock, sc.RttMs / 2000.0, 0.01, sc.LossPct / 100.0, seed: 200 + i);
+                    IInputSource input = i == 0 ? new StationBot(clock, () => models[idx].LocalZ, -9f, () => start, sc.PressA)
+                                       : i == 1 ? new StationBot(clock, () => models[idx].LocalZ, 9f, () => start, sc.PressB)
+                                       : (IInputSource)new IdleInput();
+                    clients.Add(new Client { Net = net, Model = models[i], Controller = new MovingFrameController(net, input, clock, models[i]) });
+                }
+
+                double[] seenSuccessAt = new double[ClientCount], seenTimeoutAt = new double[ClientCount];
+                string[] lastResult = new string[ClientCount];
+                int[] baseCount = new int[ClientCount], baseTick = new int[ClientCount];
+                try
+                {
+                    foreach (var c in clients)
+                    {
+                        var t = c.Net.ConnectAsync(cts.Token);
+                        double deadline = clock.Now + 10;
+                        while (!t.IsCompleted && clock.Now < deadline) yield return null;
+                        if (!t.IsCompleted || t.IsFaulted)
+                            Assert.Ignore("Nakama unreachable (docker compose -f server/docker-compose.yml up -d): " + (t.IsFaulted ? t.Exception?.GetBaseException().Message : "timeout"));
+                    }
+                    // The match persists across scenarios: take a baseline once every client has a first snapshot.
+                    double warm = clock.Now + 3;
+                    while (clock.Now < warm && !models.All(m => m.HasServerTime)) { foreach (var c in clients) c.Controller.Tick(0f); yield return null; }
+                    for (int i = 0; i < ClientCount; i++) { baseCount[i] = models[i].Interlock.Count; baseTick[i] = models[i].Interlock.ResultTick; }
+                    start = clock.Now;
+                    double end = start + sc.PressB + 7.0, last = start;
+                    while (clock.Now < end)
+                    {
+                        float dt = (float)(clock.Now - last); last = clock.Now;
+                        for (int i = 0; i < ClientCount; i++)
+                        {
+                            clients[i].Controller.Tick(dt);
+                            var il = clients[i].Model.Interlock;
+                            if (il.Count > baseCount[i] && seenSuccessAt[i] == 0) seenSuccessAt[i] = clock.Now;
+                            if (il.Result == "timeout" && il.ResultTick > baseTick[i] && seenTimeoutAt[i] == 0) seenTimeoutAt[i] = clock.Now;
+                            lastResult[i] = il.Result;
+                        }
+                        yield return null;
+                    }
+                }
+                finally { Cleanup(clients, cts); }
+
+                bool allSawSuccess = seenSuccessAt.All(x => x > 0);
+                bool anySuccess = seenSuccessAt.Any(x => x > 0);
+                bool anyTimeout = seenTimeoutAt.Any(x => x > 0);
+                double lat = allSawSuccess ? (seenSuccessAt.Max() - (start + sc.PressB)) * 1000.0 : double.NaN;
+                results.Add("{\"scenario\":\"" + sc.Name + "\",\"rttMs\":" + sc.RttMs.ToString("F0") + ",\"lossPct\":" + sc.LossPct.ToString("F0")
+                    + ",\"pressGapSec\":" + (sc.PressB - sc.PressA).ToString("F1") + ",\"expectSuccess\":" + sc.ExpectSuccess.ToString().ToLower()
+                    + ",\"success\":" + anySuccess.ToString().ToLower() + ",\"timeoutSeen\":" + anyTimeout.ToString().ToLower()
+                    + ",\"secondPressToResultMs\":" + (double.IsNaN(lat) ? "null" : lat.ToString("F0")) + "}");
+                Debug.Log("[E1-01-LOCK] " + results[results.Count - 1]);
+
+                if (sc.ExpectSuccess)
+                {
+                    Assert.IsTrue(allSawSuccess, sc.Name + ": every client must see the interlock succeed");
+                    Assert.Less(lat, 1500, sc.Name + ": result should reach all clients within 1.5 s of the second press");
+                }
+                else
+                {
+                    Assert.IsFalse(anySuccess, sc.Name + ": a press outside the 3 s window must not succeed");
+                    Assert.IsTrue(anyTimeout, sc.Name + ": the first press must time out");
+                }
+                yield return new WaitForSeconds(1.0f);
+            }
+            Directory.CreateDirectory("Logs");
+            File.WriteAllText("Logs/e1-01-interlock.json", "[\n  " + string.Join(",\n  ", results) + "\n]\n");
         }
 
         private static void Cleanup(List<Client> clients, CancellationTokenSource cts)

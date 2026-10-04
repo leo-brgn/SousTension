@@ -7,6 +7,7 @@ namespace SousTension.Spikes.MovingFrame
 {
     /// <summary>
     /// Composition root of the spike (the only place that wires services, model, controller and views).
+    /// Controls: WASD move, mouse look, E = press the interlock key (two players, one at each end, within 3 s).
     /// Add this component to an empty GameObject in an empty scene and press Play (Nakama must be running: server/docker-compose.yml).
     ///
     /// Command-line / environment options (for several instances on one machine):
@@ -58,6 +59,7 @@ namespace SousTension.Spikes.MovingFrame
             var cam = BuildCamera();
             var characters = new GameObject("Characters").AddComponent<CharactersView>();
             characters.Bind(model, clock, input, boat.transform, cam);
+            new GameObject("Stations").AddComponent<StationsView>().Bind(model, boat.transform);
             _hud = new GameObject("MetricsHud").AddComponent<MetricsHudView>();
             _hud.Bind(model, network, _controller, clock);
             Cursor.lockState = CursorLockMode.Locked;

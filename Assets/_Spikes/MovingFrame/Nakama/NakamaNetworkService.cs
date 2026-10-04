@@ -18,9 +18,10 @@ namespace SousTension.Spikes.MovingFrame
         private const long OpInput = 1;
         private const long OpState = 2;
 
-        [Serializable] private class InputDto { public int seq; public float mx; public float mz; }
+        [Serializable] private class InputDto { public int seq; public float mx; public float mz; public bool act; }
         [Serializable] private class PlayerDto { public string id; public float x; public float z; public int seq; }
-        [Serializable] private class StateDto { public int tick; public double t; public PlayerDto[] players; }
+        [Serializable] private class InterlockDto { public int a; public int b; public string ab; public string bb; public string result; public int rt; public int n; }
+        [Serializable] private class StateDto { public int tick; public double t; public PlayerDto[] players; public InterlockDto il; }
         [Serializable] private class MatchDto { public string matchId; }
 
         private readonly string _scheme, _host, _serverKey, _deviceId;
@@ -57,10 +58,10 @@ namespace SousTension.Spikes.MovingFrame
             await _socket.JoinMatchAsync(_matchId);
         }
 
-        public void SendInput(int seq, float moveX, float moveZ)
+        public void SendInput(int seq, float moveX, float moveZ, bool act)
         {
             if (_socket == null || !_socket.IsConnected) return;
-            var json = JsonUtility.ToJson(new InputDto { seq = seq, mx = moveX, mz = moveZ });
+            var json = JsonUtility.ToJson(new InputDto { seq = seq, mx = moveX, mz = moveZ, act = act });
             var bytes = Encoding.UTF8.GetBytes(json);
             Interlocked.Add(ref _bytesSent, bytes.Length);
             _ = SendAsync(bytes);
@@ -83,7 +84,8 @@ namespace SousTension.Spikes.MovingFrame
                 var p = dto.players[i];
                 players[i] = new PlayerState(p.id, p.x, p.z, p.seq);
             }
-            _queue.Enqueue(new StateSnapshot(dto.tick, dto.t, players));
+            var il = dto.il == null ? default : new InterlockState(dto.il.a, dto.il.b, dto.il.ab, dto.il.bb, dto.il.result, dto.il.rt, dto.il.n);
+            _queue.Enqueue(new StateSnapshot(dto.tick, dto.t, players, il));
         }
 
         public void Poll()

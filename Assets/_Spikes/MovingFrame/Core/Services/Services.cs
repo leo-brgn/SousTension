@@ -15,7 +15,7 @@ namespace SousTension.Spikes.MovingFrame
         event Action<StateSnapshot> StateReceived;
 
         Task ConnectAsync(CancellationToken cancellationToken);
-        void SendInput(int seq, float moveX, float moveZ);
+        void SendInput(int seq, float moveX, float moveZ, bool act);
 
         /// <summary>Deliver queued network events on the calling thread.</summary>
         void Poll();
@@ -27,10 +27,10 @@ namespace SousTension.Spikes.MovingFrame
         double Now { get; }
     }
 
-    /// <summary>Movement intent in boat-local axes (x = right, z = forward), each in [-1, 1].</summary>
+    /// <summary>Movement intent in boat-local axes (x = right, z = forward), each in [-1, 1], plus the interact key (held state).</summary>
     public interface IInputSource
     {
-        void Read(out float moveX, out float moveZ);
+        void Read(out float moveX, out float moveZ, out bool act);
     }
 
     /// <summary>Anything advanced once per frame by the composition root.</summary>
