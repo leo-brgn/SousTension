@@ -28,19 +28,43 @@ Co-op 2–4 joueurs, première personne, parodie de sous-marin nucléaire (Steam
 ## Moteur et statut
 
 - **Moteur : Unity** (D-02 tranché). Langage C#.
-- **Encore à décider** (ne choisis pas à la place de l'utilisateur) : version exacte d'Unity (LTS recommandée), netcode (NGO ou Fish-Net, à trancher via le spike E1-01 #16 sur le référentiel mobile), audio (FMOD ou Wwise), voix (Vivox ou Dissonance).
+- **Unity 6000.3.25f1** (URP). **Backend et réseau de gameplay : Nakama** (décision utilisateur : « Nakama pour tout ») — comptes, salons, persistance, **et** matches autoritatifs en temps réel (serveur dans `server/`, JavaScript, 10 Hz ; SDK `nakama-unity` v3.10.1). NGO et Fish-Net sont écartés. Le spike E1-01 (#16) valide ce choix pour le référentiel mobile ; sa conclusion peut le remettre en cause.
+- **Encore à décider** (ne choisis pas à la place de l'utilisateur) : audio (FMOD ou Wwise), voix (Vivox ou Dissonance, à confronter à Nakama).
 - **Pressenti, à confirmer avant d'installer :** URP, Input System, package Localization, Steamworks.NET.
 
 ## Règles d'architecture (issues du GDD §8 — non négociables)
 
 1. **Simulation à pas fixe, 10 Hz, déterministe.** Réacteur, électricité, eau, bruit = logique pure, indépendante du framerate et du rendu. Pas de `Time.deltaTime`, `Random` non seedé ni ordre d'itération non déterministe dans la simulation.
 2. **Simulation séparée du moteur.** Le modèle du réacteur (barres → chaleur → vapeur → turbine → électricité ; refroidissement alimenté par l'électricité produite) vit dans du code C# pur, sans `MonoBehaviour`, testable en headless (E3-10).
-3. **Autorité serveur** sur bateau, eau, réacteur. Les clients prédisent seulement leur propre déplacement. Host-client.
+3. **Autorité serveur (match autoritatif Nakama)** sur bateau, eau, réacteur. Les clients envoient des entrées à cadence fixe (10 Hz) et prédisent seulement leur propre déplacement, avec réconciliation sur l'état serveur. Toute règle de simulation existe en double (serveur JS, client C#) : garde-les identiques et couvre-les par des tests des deux côtés.
 4. **Référentiel mobile** : les joueurs marchent dans un bateau qui bouge et s'incline. Tout code de mouvement/physique/réseau doit en tenir compte (risque n°1).
 5. **Règle des Deux Joueurs** : une action critique = deux commandes éloignées activées dans une fenêtre de 3 s, validée par le serveur avec tolérance à la latence. Jamais d'action critique exécutable seul. Pas de partie en solo (minimum 2 joueurs).
 6. **Reconnexion en cours de partie** obligatoire : tout état de partie doit pouvoir être resynchronisé.
 7. **Données dans des assets de données** (ScriptableObject ou équivalent), pas codées en dur : régimes, alarmes (~40), procédures, missions, notes de patrouille, cargo.
 8. **Persistance** : les dégâts du bateau persistent d'une run à l'autre ; la dose de radiation et l'état du joueur sont réinitialisés entre les runs (D-06 à confirmer).
+
+## Architecture client : MVCS (Model · View · Controller · Service)
+
+Chaque fonctionnalité est un module organisé en quatre couches, avec une dépendance **à sens unique**.
+
+| Couche | Rôle | Contient | Interdit |
+|---|---|---|---|
+| **Model** | État et règles du domaine | classes C# pures (POCO), propriétés observables, événements C# ; le code de simulation vit dans `Sim` | `UnityEngine`, E/S, réseau, connaissance du Controller ou de la View |
+| **View** | Affichage et capture d'entrées | `MonoBehaviour` passifs : lisent un Model (ou un état) et se mettent à jour ; exposent des **événements** pour les entrées | logique de jeu, appel direct à un Service, état de jeu propre |
+| **Controller** | Orchestration | classes C# pures (avec `ITickable`/`IDisposable`) qui relient Models, Services et Views ; s'abonnent/se désabonnent proprement | accès direct à l'API d'une bibliothèque externe (Nakama, Steam…) |
+| **Service** | Accès au monde extérieur | **interface d'abord** (`INetworkService`, `IClockService`, `IInputService`, `ISaveService`…) + implémentation (Nakama, Steam, fichiers, audio) | dépendre d'une View ou d'un Controller |
+
+**Sens des dépendances** : `View → (événements) → Controller → Model` et `Controller → Service (interface)`. Les Models ne connaissent personne ; les Services ne connaissent que les Models (types de données).
+
+**Règles d'implémentation**
+- **Composition root unique par scène** : un `MonoBehaviour` de bootstrap construit services → models → controllers → views par **injection par constructeur** (pas de singleton, pas de `static` mutable, pas de `FindObjectOfType`). Aucun conteneur DI tiers sans accord (VContainer est le candidat si le câblage manuel devient pénible).
+- **Les Controllers ne sont pas des `MonoBehaviour`** (sauf adaptateur de cycle de vie très fin) : ils sont testables en EditMode avec de faux Services.
+- **Communication** : événements C# (`event Action<T>`) ou petits objets de commande ; pas de messages chaînés par chaînes de caractères.
+- **Asynchronisme** : `Awaitable` (Unity 6) ou `Task` ; jamais de bloquant sur le thread principal ; annulation via `CancellationToken` liée à la durée de vie du Controller.
+- **Données** : configuration en `ScriptableObject` injectée dans le composition root, jamais lue directement par un Model.
+- **Assemblies** : `Sim` ← `Gameplay` (Models/Controllers/Services interfaces) ← `Net`/`Views`/`Bootstrap`. Les implémentations de Services tiers (Nakama) sont isolées dans leur propre assembly pour que `Gameplay` reste testable sans SDK.
+- **Organisation par fonctionnalité** : `Features/<Nom>/{Models,Views,Controllers,Services}/` (ou l'équivalent dans l'arborescence `_Spikes` pour un spike).
+- **Tests** : Models et Controllers en EditMode avec des Services factices ; Views seulement en PlayMode si nécessaire.
 
 ## Règles de design à respecter dans tout le code et le contenu
 

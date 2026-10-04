@@ -1,0 +1,103 @@
+using System;
+using System.Collections.Concurrent;
+using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
+using Nakama;
+using UnityEngine;
+
+namespace SousTension.Spikes.MovingFrame
+{
+    /// <summary>
+    /// <see cref="INetworkService"/> backed by a Nakama authoritative match (server/modules/index.js).
+    /// Protocol: opcode 1 = input {seq, mx, mz} (client -> server), opcode 2 = state {tick, t, players[]} (server -> clients).
+    /// Socket callbacks may run off the main thread, so snapshots are queued and delivered from <see cref="Poll"/>.
+    /// </summary>
+    public sealed class NakamaNetworkService : INetworkService
+    {
+        private const long OpInput = 1;
+        private const long OpState = 2;
+
+        [Serializable] private class InputDto { public int seq; public float mx; public float mz; }
+        [Serializable] private class PlayerDto { public string id; public float x; public float z; public int seq; }
+        [Serializable] private class StateDto { public int tick; public double t; public PlayerDto[] players; }
+        [Serializable] private class MatchDto { public string matchId; }
+
+        private readonly string _scheme, _host, _serverKey, _deviceId;
+        private readonly int _port;
+        private readonly ConcurrentQueue<StateSnapshot> _queue = new ConcurrentQueue<StateSnapshot>();
+
+        private IClient _client;
+        private ISession _session;
+        private ISocket _socket;
+        private string _matchId;
+        private long _bytesSent, _bytesReceived;
+
+        public event Action<StateSnapshot> StateReceived;
+        public string LocalUserId => _session?.UserId;
+        public long BytesSent => Interlocked.Read(ref _bytesSent);
+        public long BytesReceived => Interlocked.Read(ref _bytesReceived);
+
+        public NakamaNetworkService(string deviceId, string host = "127.0.0.1", int port = 7350,
+            string scheme = "http", string serverKey = "defaultkey")
+        {
+            _deviceId = deviceId; _host = host; _port = port; _scheme = scheme; _serverKey = serverKey;
+        }
+
+        public async Task ConnectAsync(CancellationToken cancellationToken)
+        {
+            _client = new Client(_scheme, _host, _port, _serverKey, UnityWebRequestAdapter.Instance);
+            _session = await _client.AuthenticateDeviceAsync(_deviceId);
+            var rpc = await _client.RpcAsync(_session, "get_moving_frame_match", "{}");
+            _matchId = JsonUtility.FromJson<MatchDto>(rpc.Payload).matchId;
+
+            _socket = _client.NewSocket();
+            _socket.ReceivedMatchState += OnMatchState;
+            await _socket.ConnectAsync(_session, true);
+            await _socket.JoinMatchAsync(_matchId);
+        }
+
+        public void SendInput(int seq, float moveX, float moveZ)
+        {
+            if (_socket == null || !_socket.IsConnected) return;
+            var json = JsonUtility.ToJson(new InputDto { seq = seq, mx = moveX, mz = moveZ });
+            var bytes = Encoding.UTF8.GetBytes(json);
+            Interlocked.Add(ref _bytesSent, bytes.Length);
+            _ = SendAsync(bytes);
+        }
+
+        private async Task SendAsync(byte[] bytes)
+        {
+            try { await _socket.SendMatchStateAsync(_matchId, OpInput, bytes); }
+            catch (Exception e) { Debug.LogWarning("[Nakama] send failed: " + e.Message); }
+        }
+
+        private void OnMatchState(IMatchState state)
+        {
+            if (state.OpCode != OpState) return;
+            Interlocked.Add(ref _bytesReceived, state.State.Length);
+            var dto = JsonUtility.FromJson<StateDto>(Encoding.UTF8.GetString(state.State));
+            var players = new PlayerState[dto.players.Length];
+            for (int i = 0; i < players.Length; i++)
+            {
+                var p = dto.players[i];
+                players[i] = new PlayerState(p.id, p.x, p.z, p.seq);
+            }
+            _queue.Enqueue(new StateSnapshot(dto.tick, dto.t, players));
+        }
+
+        public void Poll()
+        {
+            while (_queue.TryDequeue(out var snapshot)) StateReceived?.Invoke(snapshot);
+        }
+
+        public void Dispose()
+        {
+            if (_socket != null)
+            {
+                _socket.ReceivedMatchState -= OnMatchState;
+                _ = _socket.CloseAsync();
+            }
+        }
+    }
+}
