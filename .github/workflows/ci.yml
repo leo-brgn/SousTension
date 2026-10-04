@@ -32,6 +32,17 @@ jobs:
       - name: Gitleaks
         run: docker run --rm -v "$PWD:/repo" zricethezav/gitleaks:latest detect --source /repo --no-banner --redact --exit-code 1
 
+  server-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22 }
+      - name: Le fichier assemblé server/modules/index.js est à jour avec server/src/
+        run: node server/build.js --check
+      - name: Tests du serveur Nakama (logique du match, réacteur)
+        run: node --test server/test/match.test.js server/test/reactor.test.js
+
   deps-lock-check:
     runs-on: ubuntu-latest
     steps:
@@ -90,7 +101,7 @@ jobs:
   build-windows:
     # Sur main ou à la demande ; après les contrôles et les tests
     if: github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && inputs.build)
-    needs: [secrets-scan, deps-lock-check, test-editmode]
+    needs: [secrets-scan, deps-lock-check, server-tests, test-editmode]
     runs-on: [self-hosted, unity]
     timeout-minutes: 90
     steps:

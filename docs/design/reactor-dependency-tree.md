@@ -2,7 +2,7 @@
 
 Issue : [#36](https://github.com/leo-brgn/SousTension/issues/36) · Alimente [#37](https://github.com/leo-brgn/SousTension/issues/37) (E3-02, modèle de simulation) · Source : GDD §3.3, §3.2, §1.4.
 
-> **Statut : hypothèses de départ.** Toutes les constantes ci-dessous sont des valeurs initiales vérifiées sur un prototype jetable (`docs/design/reactor-prototype.js`). Elles seront ajustées en jouant (E3-02, puis les playtests). Ce qui compte pour la conception, ce sont la **structure** (qui dépend de quoi), le **signe** de chaque lien et les **ordres de grandeur des délais**.
+> **Statut : hypothèses de départ — implémenté dans `server/src/reactor.js` (E3-02, constantes finales ci-dessous).** Toutes les constantes ci-dessous sont des valeurs initiales vérifiées sur un prototype jetable (`docs/design/reactor-prototype.js`). Elles seront ajustées en jouant (E3-02, puis les playtests). Ce qui compte pour la conception, ce sont la **structure** (qui dépend de quoi), le **signe** de chaque lien et les **ordres de grandeur des délais**.
 
 ## 1. Principes
 1. **Chaîne longue et différée** (GDD §3.2) : toucher aux barres maintenant → problème de vapeur dans ~90 s → problème électrique dans ~2 à 3 min. Les joueurs apprennent à lire l'avenir du bateau.
@@ -80,8 +80,8 @@ S             += (max(0, (T − 280)·100/30) − S)·dt / τS            τS = 
 
 ### Dérive du refroidissement (« surveillance active »)
 Un générateur pseudo-aléatoire à graine ferme au hasard une vanne de 0,05 à 0,15 à intervalles aléatoires :
-`prochain_délai = 6,5 s / max(0,01, R²) × U(0,5 ; 1,5)` (première dérive à 30 s).
-→ à pleine puissance (`R` = 0,9) une dérive toutes les ~8 s ; en croisière (0,45) toutes les ~32 s ; en veille presque jamais. **Le joueur doit rouvrir les vannes** (action physique au tableau, voir E3-06) ; sans surveillance la température monte jusqu'à la protection automatique.
+`prochain_délai = 5,0 s / max(0,01, R²) × U(0,5 ; 1,5)` (première dérive à 30 s).
+→ à pleine puissance (`R` = 0,9) une dérive toutes les ~6 s ; en croisière (0,45) toutes les ~25 s ; en veille presque jamais. **Le joueur doit rouvrir les vannes** (action physique au tableau, voir E3-06) ; sans surveillance la température monte jusqu'à la protection automatique.
 
 ## 5. Régimes (GDD §3.3) : ce qui est attendu et vérifié sur le prototype
 
@@ -89,7 +89,7 @@ Un générateur pseudo-aléatoire à graine ferme au hasard une vanne de 0,05 à
 |---|---|---|---|---|---|
 | **Veille** | 0,10 | minimum vital | ○ | l'air et la lumière déclinent lentement | stable, `T` ≈ 291 °C, `E` ≈ 4,8 MWe (couverture des pompes ≈ 60 %) |
 | **Croisière** | 0,45 | confortable | ●● | dérives lentes, gérable | stable, `T` ≈ 312 °C ; sans surveillance 10 min : ≈ 329 °C (proche de l'alerte) |
-| **Pleine puissance** | 0,90 | tout, vite | ●●●● | **surchauffe en ~4 min sans surveillance active** | avertissement à 165–187 s, **seuil critique à 237–275 s** (6 graines) |
+| **Pleine puissance** | 0,90 | tout, vite | ●●●● | **surchauffe en ~4 min sans surveillance active** | **seuil critique à 226–256 s, moyenne 241 s** (30 graines, test `reactor.test.js`) |
 
 Seuils : **alerte 350 °C**, **critique 370 °C**. À pleine puissance, vannes toutes ouvertes, `T` se stabilise vers 345 °C : tenable par un bon opérateur, mais sans marge.
 
@@ -101,7 +101,7 @@ Seuils : **alerte 350 °C**, **critique 370 °C**. À pleine puissance, vannes t
 | `E` +25 % (« problème électrique », cible GDD ~3 min) | **140 s** |
 
 ### SCRAM
-`E` tombe à 0 (la turbine s'arrête, les pompes aussi) ; les barres descendent 20× plus vite ; il ne reste que la circulation naturelle. Depuis la pleine puissance, `T` **ne dépasse pas 340 °C** sur 30 min : le SCRAM **sauve le réacteur** (GDD) ; le coût est le noir total et le redémarrage à deux joueurs.
+`E` tombe à 0 **instantanément** (GDD : « tue instantanément toute l'électricité ») ; la turbine et les pompes s'arrêtent ; les barres descendent 20× plus vite ; il ne reste que la circulation naturelle. La coupure brutale des pompes fait **dépasser le cœur de ~4 à 5 °C** avant qu'il ne redescende : un SCRAM déclenché à 355 °C (alerte) ou 365 °C (juste sous le seuil critique) **sauve le réacteur sans fuite** ; le coût est le noir total et le redémarrage à deux joueurs. Un SCRAM trop tardif (cœur déjà au-dessus du seuil critique depuis plus de 30 s) déclenche la protection automatique et la fuite du circuit primaire.
 
 ## 6. Pannes et conséquences (lien avec les alarmes, E3-09)
 
@@ -116,7 +116,7 @@ Seuils : **alerte 350 °C**, **critique 370 °C**. À pleine puissance, vannes t
 
 Aucune de ces conséquences n'est létale (règle de ton n°2) : au pire, fuite primaire → radiation → contamination (E7), puis évanouissement théâtral.
 
-## 7. Ce que E3-02 doit livrer (critères d'acceptation)
+## 7. Critères d'acceptation d'E3-02 — **faits** (`server/test/reactor.test.js`, 15 tests)
 1. À pleine puissance sans intervention, surchauffe (≥ critique) en 4 min ± 40 s.
 2. Veille stable ; l'air et la lumière déclinent lentement.
 3. SCRAM : coupe l'électricité immédiatement ; le cœur reste sûr.
