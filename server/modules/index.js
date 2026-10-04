@@ -15,6 +15,7 @@ var MOVE_SPEED = 3.0;  // m/s
 var HALF_X = 3.0;      // boat interior half width (m)
 var HALF_Z = 10.0;     // boat interior half length (m)
 var MAX_QUEUED_INPUTS = 6;
+var MAX_ALLOWANCE = 4; // max inputs a player may apply in one tick to catch up after a network stall
 var MAX_PLAYERS = 4;
 
 function clamp(v, lo, hi) { return v < lo ? lo : (v > hi ? hi : v); }
@@ -48,7 +49,7 @@ var matchJoin = function (ctx, logger, nk, dispatcher, tick, state, presences) {
     var id = presences[i].userId;
     if (!state.players[id]) {
       var slot = state.order.length;
-      state.players[id] = { x: -1.5 + slot, z: 0, seq: 0, lastQueued: 0, queue: [], presence: presences[i] };
+      state.players[id] = { x: -1.5 + slot, z: 0, seq: 0, lastQueued: 0, allowance: 0, applied: 0, queue: [], presence: presences[i] };
       state.order.push(id);
     }
   }
@@ -81,11 +82,20 @@ var matchLoop = function (ctx, logger, nk, dispatcher, tick, state, messages) {
     while (p.queue.length > MAX_QUEUED_INPUTS) p.queue.shift();
   }
 
-  // 2. Apply exactly one queued input per player per tick (same cadence as the client's input tick).
+  // 2. Apply queued inputs under a per-player budget: +1 per tick (the nominal input rate), capped at
+  //    MAX_ALLOWANCE. In steady state this is exactly one input per tick; after a network stall (TCP
+  //    retransmission) the backlog drains in a few ticks instead of lagging forever. The long-term rate can
+  //    never exceed TICK_RATE inputs/s, so flooding the server with inputs does not speed a player up.
   for (var k = 0; k < state.order.length; k++) {
     var pl = state.players[state.order[k]];
-    var next = pl.queue.shift();
-    if (next) { stepPlayer(pl, next.mx, next.mz); pl.seq = next.seq; }
+    pl.allowance = Math.min(MAX_ALLOWANCE, pl.allowance + 1);
+    while (pl.allowance >= 1 && pl.queue.length > 0) {
+      var next = pl.queue.shift();
+      stepPlayer(pl, next.mx, next.mz);
+      pl.seq = next.seq;
+      pl.applied += 1;
+      pl.allowance -= 1;
+    }
   }
 
   // 3. Broadcast authoritative state.
@@ -146,7 +156,7 @@ function InitModule(ctx, logger, nk, initializer) {
 if (typeof module !== "undefined" && module.exports) {
   module.exports = {
     InitModule: InitModule, stepPlayer: stepPlayer,
-    TICK_RATE: TICK_RATE, DT: DT, MOVE_SPEED: MOVE_SPEED, HALF_X: HALF_X, HALF_Z: HALF_Z,
+    TICK_RATE: TICK_RATE, DT: DT, MAX_ALLOWANCE: MAX_ALLOWANCE, MOVE_SPEED: MOVE_SPEED, HALF_X: HALF_X, HALF_Z: HALF_Z,
     OP_INPUT: OP_INPUT, OP_STATE: OP_STATE,
     handlers: { matchInit: matchInit, matchJoinAttempt: matchJoinAttempt, matchJoin: matchJoin, matchLeave: matchLeave, matchLoop: matchLoop }
   };

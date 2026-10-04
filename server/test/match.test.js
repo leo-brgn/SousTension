@@ -68,3 +68,33 @@ test("module registers match + rpc", () => {
   assert.deepStrictEqual(reg.rpcs, ["get_moving_frame_match"]);
   assert.strictEqual(published.length, 1); // match id published to storage at startup
 });
+
+test("backlog after a network stall drains in a few ticks (no permanent lag)", () => {
+  let { state } = h.matchInit({}, logger, nk, {});
+  state = h.matchJoin({}, logger, nk, null, 0, state, [presence("a")]).state;
+  const d = makeDispatcher();
+  let tick = 0, seq = 0;
+  const step = (msgs) => { state = h.matchLoop({}, logger, nk, d, ++tick, state, msgs).state; };
+  for (let i = 0; i < 5; i++) { seq++; step([input("a", seq, 1, 0)]); }   // healthy: 1 input per tick
+  step([]); step([]); step([]);                                           // stall: nothing arrives for 3 ticks
+  const burst = []; for (let i = 0; i < 4; i++) { seq++; burst.push(input("a", seq, 1, 0)); }
+  step(burst);                                                            // retransmission delivers 4 inputs at once
+  step([]);
+  assert.strictEqual(state.players.a.queue.length, 0, "queue should be empty");
+  assert.strictEqual(state.players.a.seq, seq, "all inputs applied, not lagging behind");
+});
+
+test("flooding the server with inputs does not speed a player up", () => {
+  let { state } = h.matchInit({}, logger, nk, {});
+  state = h.matchJoin({}, logger, nk, null, 0, state, [presence("a")]).state;
+  const d = makeDispatcher();
+  let seq = 0;
+  const TICKS = 50;
+  for (let t = 1; t <= TICKS; t++) {
+    const flood = []; for (let i = 0; i < 20; i++) { seq++; flood.push(input("a", seq, 1, 0)); }
+    state = h.matchLoop({}, logger, nk, d, t, state, flood).state;
+  }
+  // At most TICKS inputs of budget (+ the initial burst allowance) can ever be applied.
+  const applied = state.players.a.applied;
+  assert.ok(applied <= TICKS + m.MAX_ALLOWANCE, "applied " + applied + " > budget");
+});
