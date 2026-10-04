@@ -44,6 +44,27 @@ namespace SousTension.Spikes.MovingFrame
         }
     }
 
+    /// <summary>Authoritative reactor gauges (server-simulated, E3-02). The client only displays them.</summary>
+    public readonly struct ReactorState
+    {
+        public readonly bool Valid;          // false when the server did not send reactor data
+        public readonly string Regime;       // "veille" | "croisiere" | "pleine" (selector position)
+        public readonly float Rods;          // 0..1 real rod position (lags the selector)
+        public readonly float Noise;         // 0..4 plant noise (follows the rods)
+        public readonly float Power, Temp, Steam, Electricity, Supply, Flow;   // MWth, degC, bar, MWe, 0..1, 0..~1.2
+        public readonly float[] Valves;      // 4 main primary valves, 0..1
+        public readonly bool[] Pumps;        // 2 primary pumps
+        public readonly bool Scram, AutoScram, Leak, Warn, Crit;
+
+        public ReactorState(string regime, float rods, float noise, float power, float temp, float steam, float electricity,
+            float supply, float flow, float[] valves, bool[] pumps, bool scram, bool autoScram, bool leak, bool warn, bool crit)
+        {
+            Valid = true; Regime = regime ?? "veille"; Rods = rods; Noise = noise; Power = power; Temp = temp; Steam = steam;
+            Electricity = electricity; Supply = supply; Flow = flow; Valves = valves ?? new float[4]; Pumps = pumps ?? new bool[2];
+            Scram = scram; AutoScram = autoScram; Leak = leak; Warn = warn; Crit = crit;
+        }
+    }
+
     /// <summary>One authoritative broadcast from the match (10 Hz).</summary>
     public sealed class StateSnapshot
     {
@@ -52,10 +73,11 @@ namespace SousTension.Spikes.MovingFrame
         public readonly PlayerState[] Players;
         public readonly InterlockState Interlock;
         public readonly CargoState[] Cargo;
+        public readonly ReactorState Reactor;
 
-        public StateSnapshot(int tick, double serverTime, PlayerState[] players, InterlockState interlock = default, CargoState[] cargo = null)
+        public StateSnapshot(int tick, double serverTime, PlayerState[] players, InterlockState interlock = default, CargoState[] cargo = null, ReactorState reactor = default)
         {
-            Tick = tick; ServerTime = serverTime; Players = players; Interlock = interlock; Cargo = cargo ?? new CargoState[0];
+            Tick = tick; ServerTime = serverTime; Players = players; Interlock = interlock; Cargo = cargo ?? new CargoState[0]; Reactor = reactor;
         }
     }
 }

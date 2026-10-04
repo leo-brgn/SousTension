@@ -175,6 +175,26 @@ namespace SousTension.Spikes.MovingFrame.Tests
         }
 
         [Test]
+        public void Snapshot_StoresAuthoritativeReactorGauges_AndIgnoresMissingReactorData()
+        {
+            var net = new FakeNetwork(); var clock = new FakeClock(); var model = new MovingFrameModel();
+            var c = new MovingFrameController(net, new ConstantInput(), clock, model);
+            Assert.IsFalse(model.Reactor.Valid);
+            var rx = new ReactorState("croisiere", 0.45f, 1.75f, 48f, 312f, 120f, 15f, 1f, 1.15f,
+                new[] { 1f, 1f, 1f, 1f }, new[] { true, true }, false, false, false, false, false);
+            net.Enqueue(new StateSnapshot(1, 0.1, new[] { new PlayerState("me", 0, 0, 0) }, default, null, rx));
+            c.Tick(0);
+            Assert.IsTrue(model.Reactor.Valid);
+            Assert.AreEqual("croisiere", model.Reactor.Regime);
+            Assert.AreEqual(312f, model.Reactor.Temp);
+            Assert.AreEqual(1.75f, model.Reactor.Noise);
+            // a snapshot without reactor data (older server) must not wipe the last known gauges
+            net.Enqueue(new StateSnapshot(2, 0.2, new[] { new PlayerState("me", 0, 0, 0) }));
+            c.Tick(0);
+            Assert.AreEqual("croisiere", model.Reactor.Regime);
+        }
+
+        [Test]
         public void Snapshot_StoresAuthoritativeInterlockState_WithoutPredicting()
         {
             var net = new FakeNetwork(); var clock = new FakeClock(); var model = new MovingFrameModel();

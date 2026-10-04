@@ -131,11 +131,18 @@ function reactorStep(r) {
   r.t += dt;
 }
 
+// Noise made by the plant, 0 (quiet, Veille) to 4 (loud, Pleine puissance): follows the REAL rod position, so it lags the
+// regime selector like everything else. The boat's total noise (E8-01) will add pumps, impacts and voices on top.
+function reactorNoise(r) {
+  var lo = REACTOR_K.regimes.veille, hi = REACTOR_K.regimes.pleine;
+  return 4 * clamp((r.R - lo) / (hi - lo), 0, 1);
+}
+
 // Gauge values broadcast to clients (rounded: keeps the payload small and the display stable).
 function reactorView(r) {
   function q(x) { return Math.round(x * 100) / 100; }
   return {
-    reg: r.regime, R: q(r.R), P: q(r.P), T: q(r.T), S: q(r.S), E: q(r.E), eta: q(r.eta), F: q(r.flow),
+    reg: r.regime, R: q(r.R), nz: q(reactorNoise(r)), P: q(r.P), T: q(r.T), S: q(r.S), E: q(r.E), eta: q(r.eta), F: q(r.flow),
     v: [q(r.valves[0]), q(r.valves[1]), q(r.valves[2]), q(r.valves[3])],
     pu: [r.pumps[0] ? 1 : 0, r.pumps[1] ? 1 : 0],
     scram: r.scram ? 1 : 0, auto: r.autoScram ? 1 : 0, leak: r.leak ? 1 : 0,

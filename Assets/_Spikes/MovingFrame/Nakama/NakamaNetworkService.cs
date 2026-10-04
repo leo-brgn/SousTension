@@ -22,7 +22,8 @@ namespace SousTension.Spikes.MovingFrame
         [Serializable] private class PlayerDto { public string id; public float x; public float z; public int seq; }
         [Serializable] private class InterlockDto { public int a; public int b; public string ab; public string bb; public string result; public int rt; public int n; }
         [Serializable] private class CargoDto { public string id; public float x; public float z; public int h; public string[] c; public string p; }
-        [Serializable] private class StateDto { public int tick; public double t; public PlayerDto[] players; public InterlockDto il; public CargoDto[] cargo; }
+        [Serializable] private class ReactorDto { public string reg; public float R; public float nz; public float P; public float T; public float S; public float E; public float eta; public float F; public float[] v; public int[] pu; public int scram; public int auto; public int leak; public int warn; public int crit; }
+        [Serializable] private class StateDto { public int tick; public double t; public PlayerDto[] players; public InterlockDto il; public CargoDto[] cargo; public ReactorDto rx; }
         [Serializable] private class MatchDto { public string matchId; }
 
         private readonly string _scheme, _host, _serverKey, _deviceId;
@@ -92,7 +93,15 @@ namespace SousTension.Spikes.MovingFrame
                 var c = dto.cargo[i];
                 cargo[i] = new CargoState(c.id, c.x, c.z, c.h == 1, c.c, c.p);
             }
-            _queue.Enqueue(new StateSnapshot(dto.tick, dto.t, players, il, cargo));
+            ReactorState reactor = default;
+            if (dto.rx != null && !string.IsNullOrEmpty(dto.rx.reg))
+            {
+                var x = dto.rx;
+                reactor = new ReactorState(x.reg, x.R, x.nz, x.P, x.T, x.S, x.E, x.eta, x.F, x.v,
+                    new[] { x.pu != null && x.pu.Length > 0 && x.pu[0] == 1, x.pu != null && x.pu.Length > 1 && x.pu[1] == 1 },
+                    x.scram == 1, x.auto == 1, x.leak == 1, x.warn == 1, x.crit == 1);
+            }
+            _queue.Enqueue(new StateSnapshot(dto.tick, dto.t, players, il, cargo, reactor));
         }
 
         public void Poll()

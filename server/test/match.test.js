@@ -294,3 +294,50 @@ test("cargo: tilt projection golden values (same numbers asserted in C#: BoatMot
     assert.ok(Math.abs(u.x - ux) < 1e-8 && Math.abs(u.z - uz) < 1e-8, "t=" + t + " got " + u.x + "," + u.z);
   }
 });
+
+// ---- RK-1 regime selector (E3-03) ----
+const REGIME_POS = { x: -2.5, z: -1.7 };
+function regimeOf(ctx) { return ctx.state.reactor.regime; }
+
+test("selector: each press within reach turns it one position, with wrap-around (Veille -> Croisiere -> Pleine -> Veille)", () => {
+  const c = lockSetup(["a"]);
+  place(c, "a", REGIME_POS.x + 0.5, REGIME_POS.z);
+  assert.strictEqual(regimeOf(c), "veille");
+  const seen = [];
+  for (let i = 0; i < 4; i++) { tickWith(c, [inputAct(c, "a", true)]); seen.push(regimeOf(c)); }
+  assert.deepStrictEqual(seen, ["croisiere", "pleine", "veille", "croisiere"]);
+});
+
+test("selector: out of reach (2 m) the press does nothing", () => {
+  const c = lockSetup(["a"]);
+  place(c, "a", REGIME_POS.x + 2.5, REGIME_POS.z);                 // 2.5 m away
+  tickWith(c, [inputAct(c, "a", true)]);
+  assert.strictEqual(regimeOf(c), "veille");
+  place(c, "a", REGIME_POS.x + 1.9, REGIME_POS.z);                 // 1.9 m away
+  tickWith(c, [inputAct(c, "a", true)]);
+  assert.strictEqual(regimeOf(c), "croisiere");
+});
+
+test("selector: ignored while the reactor is SCRAMmed (restart is a separate procedure)", () => {
+  const c = lockSetup(["a"]);
+  place(c, "a", REGIME_POS.x + 0.5, REGIME_POS.z);
+  m.reactorScram(c.state.reactor);
+  tickWith(c, [inputAct(c, "a", true)]);
+  assert.strictEqual(regimeOf(c), "veille");
+});
+
+test("selector: a single player is enough and the change is visible in the broadcast gauges", () => {
+  const c = lockSetup(["a", "b"]);
+  place(c, "a", REGIME_POS.x + 0.5, REGIME_POS.z);
+  tickWith(c, [inputAct(c, "a", true)]);
+  const rx = c.d.sent[c.d.sent.length - 1].data.rx;
+  assert.strictEqual(rx.reg, "croisiere");
+});
+
+test("interaction key goes to the nearest interactable: the interlock keeps working away from the selector", () => {
+  const c = lockSetup(["a"]);
+  place(c, "a", 0, -9);                                             // next to interlock station A, far from the selector
+  const il = tickWith(c, [inputAct(c, "a", true)]);
+  assert.strictEqual(il.ab, "a");
+  assert.strictEqual(regimeOf(c), "veille");
+});

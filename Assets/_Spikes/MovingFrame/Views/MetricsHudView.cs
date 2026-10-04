@@ -38,7 +38,10 @@ namespace SousTension.Spikes.MovingFrame
                 $"correction: last {_model.LastCorrection * 100f:F1} cm, max {_model.MaxCorrection * 100f:F1} cm\n" +
                 $"bandwidth: up {_kbSent:F2} kB/s, down {_kbRecv:F2} kB/s | players: {_model.RemoteCountPlusLocal()}\n" +
                 $"interlock: A {il.RemainingA / 10f:F1}s B {il.RemainingB / 10f:F1}s | last: {il.Result} | successes: {il.Count}\n" +
-                $"cargo: {carried} carried by you");
+                $"cargo: {carried} carried by you\n" +
+                (_model.Reactor.Valid
+                    ? $"reactor: {_model.Reactor.Regime} | T {_model.Reactor.Temp:F0} C, steam {_model.Reactor.Steam:F0} bar, {_model.Reactor.Electricity:F1} MWe, noise {_model.Reactor.Noise:F1}/4{(_model.Reactor.Scram ? " | SCRAM" : "")}"
+                    : "reactor: (no data)"));
         }
     }
 

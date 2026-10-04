@@ -315,16 +315,67 @@ function reactorStep(r) {
   r.t += dt;
 }
 
+// Noise made by the plant, 0 (quiet, Veille) to 4 (loud, Pleine puissance): follows the REAL rod position, so it lags the
+// regime selector like everything else. The boat's total noise (E8-01) will add pumps, impacts and voices on top.
+function reactorNoise(r) {
+  var lo = REACTOR_K.regimes.veille, hi = REACTOR_K.regimes.pleine;
+  return 4 * clamp((r.R - lo) / (hi - lo), 0, 1);
+}
+
 // Gauge values broadcast to clients (rounded: keeps the payload small and the display stable).
 function reactorView(r) {
   function q(x) { return Math.round(x * 100) / 100; }
   return {
-    reg: r.regime, R: q(r.R), P: q(r.P), T: q(r.T), S: q(r.S), E: q(r.E), eta: q(r.eta), F: q(r.flow),
+    reg: r.regime, R: q(r.R), nz: q(reactorNoise(r)), P: q(r.P), T: q(r.T), S: q(r.S), E: q(r.E), eta: q(r.eta), F: q(r.flow),
     v: [q(r.valves[0]), q(r.valves[1]), q(r.valves[2]), q(r.valves[3])],
     pu: [r.pumps[0] ? 1 : 0, r.pumps[1] ? 1 : 0],
     scram: r.scram ? 1 : 0, auto: r.autoScram ? 1 : 0, leak: r.leak ? 1 : 0,
     warn: r.T >= REACTOR_K.tWarn ? 1 : 0, crit: r.T >= REACTOR_K.tCrit ? 1 : 0
   };
+}
+
+// ---- Interactive controls (boat-local) ---------------------------------------------------------------------
+// One interaction key ("act") serves every control: the server picks the nearest interactable within reach, so the
+// client never has to say what it is pressing (and cannot cheat about it). Interlock stations live in interlock.js;
+// the other controls are listed here.
+//   regime : the RK-1 three-position selector (compartment 4, left wall). One press turns it to the next position
+//            (Veille -> Croisiere -> Pleine -> Veille). A single player is enough: the Rule of Two Players covers
+//            starting/stopping the reactor, not choosing a regime (GDD 3.3/3.4).
+var CONTROLS = [
+  { id: "regime", x: -2.5, z: -1.7, reach: 2.0 }
+];
+var REGIME_ORDER = ["veille", "croisiere", "pleine"];
+
+function controlDistance(pl, c) {
+  var dx = pl.x - c.x, dz = pl.z - c.z;
+  return Math.sqrt(dx * dx + dz * dz);
+}
+
+// Turn the selector one position. Ignored while the reactor is SCRAMmed (restarting is the E3-05 procedure).
+function useRegimeSelector(reactor) {
+  if (reactor.scram) return false;
+  var next = REGIME_ORDER[(REGIME_ORDER.indexOf(reactor.regime) + 1) % REGIME_ORDER.length];
+  return reactorSetRegime(reactor, next);
+}
+
+// The interaction key was pressed by player `id`: dispatch to the nearest interactable in reach.
+function tryAct(state, id, pl, tick) {
+  var bestControl = null, bestControlD = Infinity;
+  for (var i = 0; i < CONTROLS.length; i++) {
+    var d = controlDistance(pl, CONTROLS[i]);
+    if (d <= CONTROLS[i].reach && d < bestControlD) { bestControl = CONTROLS[i]; bestControlD = d; }
+  }
+  var bestStationD = Infinity;
+  for (var s = 0; s < STATIONS.length; s++) {
+    var dx = pl.x - STATIONS[s].x, dz = pl.z - STATIONS[s].z;
+    var ds = Math.sqrt(dx * dx + dz * dz);
+    if (ds <= STATION_REACH && ds < bestStationD) bestStationD = ds;
+  }
+  if (bestControl && bestControlD < bestStationD) {
+    if (bestControl.id === "regime") useRegimeSelector(state.reactor);
+    return;
+  }
+  if (bestStationD < Infinity) tryActivate(state.il, id, pl, tick);
 }
 
 var matchInit = function (ctx, logger, nk, params) {
@@ -395,7 +446,7 @@ var matchLoop = function (ctx, logger, nk, dispatcher, tick, state, messages) {
     while (pl.allowance >= 1 && pl.queue.length > 0) {
       var next = pl.queue.shift();
       stepPlayer(pl, next.mx, next.mz);
-      if (next.act) tryActivate(state.il, state.order[k], pl, tick);
+      if (next.act) tryAct(state, state.order[k], pl, tick);
       if (next.grab) tryGrab(state.cargo, state.order[k], pl, tick);
       pl.seq = next.seq;
       pl.applied += 1;
@@ -467,7 +518,8 @@ if (typeof module !== "undefined" && module.exports) {
     InitModule: InitModule, stepPlayer: stepPlayer,
     TICK_RATE: TICK_RATE, DT: DT, STATIONS: STATIONS, STATION_REACH: STATION_REACH, INTERLOCK_WINDOW_TICKS: INTERLOCK_WINDOW_TICKS, MAX_ALLOWANCE: MAX_ALLOWANCE, MOVE_SPEED: MOVE_SPEED, HALF_X: HALF_X, HALF_Z: HALF_Z,
     OP_INPUT: OP_INPUT, OP_STATE: OP_STATE,
-    REACTOR_K: REACTOR_K, newReactor: newReactor, reactorStep: reactorStep, reactorView: reactorView, reactorScram: reactorScram,
+    CONTROLS: CONTROLS, REGIME_ORDER: REGIME_ORDER, tryAct: tryAct,
+    reactorNoise: reactorNoise, REACTOR_K: REACTOR_K, newReactor: newReactor, reactorStep: reactorStep, reactorView: reactorView, reactorScram: reactorScram,
     reactorRestart: reactorRestart, reactorSetRegime: reactorSetRegime, reactorSetValve: reactorSetValve, reactorSetPump: reactorSetPump,
     GRAB_REACH: GRAB_REACH, GRAVITY: GRAVITY, FRICTION: FRICTION, boatUpHorizontal: boatUpHorizontal,
     handlers: { matchInit: matchInit, matchJoinAttempt: matchJoinAttempt, matchJoin: matchJoin, matchLeave: matchLeave, matchLoop: matchLoop }
