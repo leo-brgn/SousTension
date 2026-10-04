@@ -9,7 +9,21 @@ Co-op 2–4 joueurs, première personne, parodie de sous-marin nucléaire (Steam
 - `moodboard/` — direction artistique (`v2_references/` est la version courante).
 - `tools/create_issues.js` — génère les issues depuis `BACKLOG.md`. Ne le relance pas sans vérifier `tools/issues_created.log` (il saute les issues déjà créées).
 
-Travailler sur une issue : lis-la, lis la section GDD qu'elle cite, annonce le plan avant de coder, référence l'issue dans le commit/PR (`Refs #n`, `Closes #n`).
+## Workflow d'une issue
+
+**Une issue n'est jamais démarrée telle quelle : elle doit d'abord être affinée.** Les issues actuelles sont des lignes de backlog, pas des spécifications.
+
+1. **Lire** l'issue, la section GDD qu'elle cite, ses dépendances (`#n`) et le code existant concerné.
+2. **Affiner avant de coder** : rédige (dans un commentaire de l'issue ou en le proposant à l'utilisateur) :
+   - le périmètre exact et ce qui est **hors périmètre** ;
+   - les **critères d'acceptation** vérifiables (testables ou observables en jeu) ;
+   - les décisions de design/technique à trancher, et les questions ouvertes (D-xx liées) ;
+   - les dépendances bloquantes (issues non terminées) et le plan de découpage si la taille est `L`/`XL` ;
+   - l'approche technique et les tests prévus (simulation → tests EditMode déterministes).
+3. **Faire valider** l'issue affinée par l'utilisateur. Sans validation, ne commence pas l'implémentation. Une issue dont les dépendances bloquantes ne sont pas faites, ou qui dépend d'une décision ouverte, reste en attente : signale-le au lieu de contourner.
+4. **Implémenter** sur une branche dédiée (`feature/<id>-court-titre`, ex. `feature/E3-02-reactor-sim`), par petits commits référençant l'issue (`Refs #n`).
+5. **Vérifier** les critères d'acceptation (tests, lancement) et le respect des règles d'architecture et de design de ce fichier.
+6. **PR** avec `Closes #n` et les critères d'acceptation cochés. Les issues `XL` sont découpées en sous-issues avant de démarrer.
 
 ## Moteur et statut
 
