@@ -1,0 +1,113 @@
+# CI SousTension — adapté du pipeline GitLab/RHEL (voir ci/README.md pour ce qui est repris ou non).
+# Les jobs Unity tournent sur un runner auto-hébergé (étiquettes: self-hosted, unity) où le Unity CLI,
+# l'éditeur de ProjectVersion.txt et une licence sont déjà en place. Le dépôt étant public, ces jobs
+# ne s'exécutent jamais pour les PR venant de forks.
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      build:
+        description: "Construire aussi le build Windows"
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  secrets-scan:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with: { fetch-depth: 0 }
+      - name: Gitleaks
+        run: docker run --rm -v "$PWD:/repo" zricethezav/gitleaks:latest detect --source /repo --no-banner --redact --exit-code 1
+
+  deps-lock-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Packages Unity figés et sans dépendance git non épinglée
+        run: |
+          test -f Packages/packages-lock.json
+          grep -q '"dependencies"' Packages/packages-lock.json
+          if grep -nE '"(url|dependencies)".*(github\.com|git\+)' Packages/manifest.json; then
+            echo "Dépendance git/registre à vérifier"; exit 1
+          fi
+
+  test-editmode:
+    # Jamais pour une PR de fork (le runner auto-hébergé exécuterait du code non fiable)
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: [self-hosted, unity]
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+        with: { lfs: true }
+      - name: Tests EditMode
+        shell: bash
+        env:
+          TEST_MODE: EditMode
+          UNITY_LICENSE_MODE: ${{ vars.UNITY_LICENSE_MODE || 'none' }}
+        run: ci/scripts/ci-test.sh
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: test-results-editmode
+          path: test-results/
+          retention-days: 14
+
+  test-playmode:
+    # Manuel : à valider sur ton runner avant de le rendre bloquant (le PlayMode peut demander du rendu)
+    if: github.event_name == 'workflow_dispatch'
+    runs-on: [self-hosted, unity]
+    timeout-minutes: 60
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+        with: { lfs: true }
+      - name: Tests PlayMode
+        shell: bash
+        env:
+          TEST_MODE: PlayMode
+          UNITY_LICENSE_MODE: ${{ vars.UNITY_LICENSE_MODE || 'none' }}
+        run: ci/scripts/ci-test.sh
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: test-results-playmode
+          path: test-results/
+          retention-days: 14
+
+  build-windows:
+    # Sur main ou à la demande ; après les contrôles et les tests
+    if: github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && inputs.build)
+    needs: [secrets-scan, deps-lock-check, test-editmode]
+    runs-on: [self-hosted, unity]
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+        with: { lfs: true }
+      - name: Build Windows (StandaloneWindows64)
+        shell: bash
+        env:
+          UNITY_LICENSE_MODE: ${{ vars.UNITY_LICENSE_MODE || 'none' }}
+          OUTPUT_DIR: Build/Windows
+          OUTPUT_NAME: SousTension.exe
+        run: ci/scripts/ci-build.sh
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: build-windows
+          path: |
+            Build/Windows/
+            Logs/
+          retention-days: 7
