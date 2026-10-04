@@ -1,0 +1,17 @@
+{
+    "name": "SousTension.Net",
+    "rootNamespace": "SousTension.Net",
+    "references": [
+        "SousTension.Sim",
+        "SousTension.Gameplay"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

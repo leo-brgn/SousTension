@@ -88,3 +88,6 @@ tools/apply.out
 
 # Third-party game screenshots (moodboard references): keep local, not for the public repo
 moodboard/references/
+
+# CI output
+test-results/

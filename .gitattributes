@@ -17,6 +17,8 @@
 *.asmref    text eol=lf
 *.json      text eol=lf
 *.md        text eol=lf
+*.sh        text eol=lf
+*.yml       text eol=lf
 *.meta      text eol=lf
 *.unity     merge=unityyamlmerge text eol=lf
 *.prefab    merge=unityyamlmerge text eol=lf
