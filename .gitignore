@@ -93,3 +93,8 @@ moodboard/references/
 test-results/
 results-*.xml
 *.slnx
+
+# Blender: previews and scratch output (not committed)
+scratch_out/
+blender/__pycache__/
+*.blend1
