@@ -8,7 +8,7 @@ Issue : [#16](https://github.com/leo-brgn/SousTension/issues/16) · Date des mes
 - **Serveur** (`server/modules/index.js`, JavaScript) : match autoritatif Nakama à **10 Hz**. Reçoit une entrée par tick client (`seq`, `mx`, `mz`), simule la position des joueurs en **repère local du bateau**, diffuse l'état (`tick`, `t`, joueurs) avec la dernière séquence traitée. L'identifiant du match est publié en stockage au démarrage.
 - **Mouvement du bateau** (`BoatMotion`, C# pur) : fonction **déterministe du temps** (tangage ±15°, roulis ±20°, pilonnement, avance). Chaque client le calcule à partir de l'horloge serveur estimée : seule la position locale des joueurs est répliquée.
 - **Client Unity en MVCS** (`Assets/_Spikes/MovingFrame/`) : `Core` (Models, Controller, interfaces de Services, décorateur de latence simulée), `Nakama` (implémentation du Service réseau), `Views` (vues passives + composition root). Prédiction locale + réconciliation (`PredictionBuffer`, dans `Sim`), interpolation des joueurs distants à −100 ms.
-- **Tests** : 12 tests Node (serveur), 16 tests EditMode (Unity), 2 tests PlayMode de mesure (4 clients Nakama complets : déplacement + double verrou), 1 test de bout en bout Node (`server/test/e2e.js`).
+- **Tests** : 20 tests Node (serveur), 20 tests EditMode (Unity), 3 tests PlayMode de mesure (4 clients Nakama complets : déplacement, double verrou, cargo), 1 test de bout en bout Node (`server/test/e2e.js`).
 
 ## Mesures (4 clients, 10 s par scénario, Nakama local)
 Latence simulée : demi-RTT ajouté dans chaque sens ; « perte » simulée en **sémantique TCP** (le message touché est retardé de 200 ms et bloque ceux qui le suivent), car le socket de Nakama est un WebSocket.
@@ -43,10 +43,27 @@ Mesures (4 clients Nakama complets, bots scriptés qui marchent jusqu'aux postes
 
 La fenêtre de 3 s est très largement supérieure à la latence mesurée : la tolérance à la latence est acquise tant que le RTT reste bien inférieur à ~1 s. **Limite connue** : le serveur date l'appui à sa **réception**, donc un joueur à fort ping est légèrement désavantagé dans la fenêtre ; une compensation de latence (daté par tick client) n'est pas implémentée.
 
+## Objets portés et cargo glissant
+**Règles implémentées côté serveur (autoritatif, sans moteur physique)**, en repère local du bateau :
+- **Caisse légère** : un porteur (touche `F`, portée 1,5 m) ; l'objet suit exactement son porteur ; un second `F` le lâche.
+- **Fiole lourde** : deux porteurs, qui doivent chacun appuyer dans la fenêtre de 3 s (comme le double verrou) ; l'objet se place au milieu des deux ; si l'un lâche, les deux relâchent ; un porteur qui quitte le match libère l'objet.
+- **Cargo posé = glisse** : la gravité est projetée dans les axes du bateau à partir de l'inclinaison (fonction déterministe du temps serveur, mêmes formules que `BoatMotion`), avec un frottement de Coulomb (μ = 0,25 : le cargo démarre à glisser au-delà d'environ 14° d'inclinaison) ; il reste dans le bateau. Les valeurs de l'inclinaison sont vérifiées **identiques en C# et en JavaScript** par des valeurs de référence communes.
+- Aucun ralentissement du porteur (il aurait cassé la prédiction locale) : c'est du réglage de gameplay à faire plus tard.
+- Côté client : l'objet porté par le joueur local est dessiné à la **position prédite** (pas de retard entre les mains et l'objet) ; les autres objets sont interpolés comme les joueurs distants.
+
+Mesures (4 clients, bots scriptés ; un observateur passif mesure ce qu'il voit) :
+
+| Scénario | Caisse portée vue | Fiole lourde levée à deux | Prise → visible chez l'observateur | Écart objet / porteur vu par l'observateur | Glissade après lâcher (observée) |
+|---|---|---|---|---|---|
+| localhost | oui | oui | 83 ms | 0,00 cm (622 mesures) | 247 cm |
+| RTT 200 ms, 2 % | oui | oui | 267 ms | 0,00 cm (623 mesures) | 315 cm |
+
+Lecture : la synchronisation d'objets portés fonctionne sans moteur physique serveur ; le cargo glisse bien avec l'inclinaison du bateau et tous les clients le voient au même endroit (même état diffusé). **L'écart de 0,00 cm est vrai par construction** (l'état serveur place l'objet sur son porteur) : la mesure vérifie la cohérence de l'état diffusé, pas la précision d'une physique. **Point à améliorer** : à la prise, l'objet « saute » vers son porteur (jusqu'à 1,5 m) ; une animation de ramassage côté client est à prévoir.
+
 ## Limites de ce spike (à lire avant de conclure)
 - **Serveur sur la même machine** : les latences sont simulées, le vrai réseau (jitter, pertes réelles, NAT) n'est pas testé.
 - **Clients scriptés (bots)** dans un seul processus : pas de test visuel avec 4 humains dans une scène (glissement, motion sickness), et pas de build joueur.
-- **Pas de physique** : pas d'objets 📦 portés ni de collisions ; ce point de la spécification d'E1-01 **n'est pas couvert**. (Le double verrou « deux joueurs » est couvert, voir plus haut.)
+- **Physique minimale** : le cargo glisse et est porté, mais sans collisions entre objets, ni avec les joueurs, ni inertie due aux accélérations du bateau (pilonnement, avance) ; pas d'empilement ni de chute.
 - **Pas de comparaison** avec NGO/Fish-Net (décision utilisateur).
 - **Pas de mesure de l'erreur de position vue par un autre joueur** (seul le joueur local est mesuré en erreur de prédiction) ; l'interpolation distante est implémentée mais non quantifiée.
 - Le critère « < 5 cm à 100 ms » est vérifié sur la **réconciliation locale**, pas sur l'écart entre un joueur et sa vue par un autre.
@@ -57,8 +74,8 @@ La fenêtre de 3 s est très largement supérieure à la latence mesurée : la t
 ## Suites proposées
 1. ~~Rattrapage de file côté serveur~~ : fait (point 5).
 2. **Test avec 4 humains** sur le réseau local, puis à distance : mesurer l'écart de position distant et le confort.
-3. **Objets portés** (le double verrou est fait) : prototyper la synchronisation d'objets en match autoritatif (pas de moteur physique serveur dans Nakama : probablement une physique simplifiée côté serveur ou une autorité déléguée).
-4. Relire la décision « Nakama pour le gameplay temps réel » à la lumière du point 3 ; un netcode Unity (NGO/Fish-Net) reste l'alternative si les objets physiques s'avèrent trop coûteux à répliquer à la main.
+3. ~~Objets portés et double verrou~~ : faits (voir plus haut). Reste à étendre : collisions, empilement, animation de ramassage, ralentissement du porteur (avec prédiction).
+4. Relire la décision « Nakama pour le gameplay temps réel » quand les collisions et l'empilement seront ajoutés : un netcode Unity (NGO/Fish-Net) reste l'alternative si la physique des objets devient trop coûteuse à répliquer à la main.
 
 ## Reproduire
 ```bash

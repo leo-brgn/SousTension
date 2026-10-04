@@ -22,7 +22,7 @@ namespace SousTension.Spikes.MovingFrame
         private readonly double _loss;
         private readonly double _retransmitDelay;
         private readonly Random _rng;
-        private readonly List<Delayed<(int seq, float mx, float mz, bool act)>> _outgoing = new List<Delayed<(int, float, float, bool)>>();
+        private readonly List<Delayed<(int seq, float mx, float mz, bool act, bool grab)>> _outgoing = new List<Delayed<(int, float, float, bool, bool)>>();
         private readonly List<Delayed<StateSnapshot>> _incoming = new List<Delayed<StateSnapshot>>();
         private double _lastOutDue, _lastInDue;
 
@@ -45,10 +45,10 @@ namespace SousTension.Spikes.MovingFrame
 
         public Task ConnectAsync(CancellationToken ct) => _inner.ConnectAsync(ct);
 
-        public void SendInput(int seq, float moveX, float moveZ, bool act)
+        public void SendInput(int seq, float moveX, float moveZ, bool act, bool grab)
         {
             _lastOutDue = Math.Max(_lastOutDue, _clock.Now + NextDelay());
-            _outgoing.Add(new Delayed<(int, float, float, bool)> { Due = _lastOutDue, Item = (seq, moveX, moveZ, act) });
+            _outgoing.Add(new Delayed<(int, float, float, bool, bool)> { Due = _lastOutDue, Item = (seq, moveX, moveZ, act, grab) });
         }
 
         private void OnInnerState(StateSnapshot s)
@@ -64,7 +64,7 @@ namespace SousTension.Spikes.MovingFrame
             while (_outgoing.Count > 0 && _outgoing[0].Due <= now)
             {
                 var o = _outgoing[0].Item; _outgoing.RemoveAt(0);
-                _inner.SendInput(o.seq, o.mx, o.mz, o.act);
+                _inner.SendInput(o.seq, o.mx, o.mz, o.act, o.grab);
             }
             while (_incoming.Count > 0 && _incoming[0].Due <= now)
             {

@@ -23,7 +23,7 @@ namespace SousTension.Spikes.MovingFrame
         private double _accumulator;
         private bool _initialized;
         private int _lastAcked;
-        private bool _prevAct;
+        private bool _prevAct, _prevGrab;
 
         public MovingFrameController(INetworkService net, IInputSource input, IClockService clock, MovingFrameModel model)
         {
@@ -44,12 +44,13 @@ namespace SousTension.Spikes.MovingFrame
             {
                 _accumulator -= SimClock.TickSeconds;
                 ticks++;
-                _input.Read(out float mx, out float mz, out bool actHeld);
-                bool act = actHeld && !_prevAct;   // one activation per key press (edge), the server rejects repeats anyway
-                _prevAct = actHeld;
+                _input.Read(out float mx, out float mz, out bool actHeld, out bool grabHeld);
+                bool act = actHeld && !_prevAct;     // one activation per key press (edge), the server rejects repeats anyway
+                bool grab = grabHeld && !_prevGrab;  // grab/drop toggles on each key press
+                _prevAct = actHeld; _prevGrab = grabHeld;
                 int seq = _prediction.Predict(mx, mz);
                 _sendTimes[seq] = _clock.Now;
-                _net.SendInput(seq, mx, mz, act);
+                _net.SendInput(seq, mx, mz, act, grab);
             }
             if (ticks == MaxCatchUpTicks) _accumulator = 0; // drop backlog after a long stall
             _model.SetLocal(_prediction.X, _prediction.Z);
@@ -60,6 +61,7 @@ namespace SousTension.Spikes.MovingFrame
             _model.LocalId = _net.LocalUserId;
             _model.ApplyServerState(snapshot, _clock.Now);
             _model.SetInterlock(snapshot.Interlock);
+            _model.ApplyCargo(snapshot.Cargo, snapshot.ServerTime);
 
             foreach (var p in snapshot.Players)
             {

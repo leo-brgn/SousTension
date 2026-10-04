@@ -28,6 +28,67 @@ namespace SousTension.Spikes.MovingFrame
 
         public IEnumerable<string> RemoteIds => _remotes.Keys;
 
+        // ---- Cargo (authoritative; interpolated like remote players, but locally-carried items use the prediction) ----
+        private readonly Dictionary<string, List<Sample>> _cargoHistory = new Dictionary<string, List<Sample>>();
+        private readonly Dictionary<string, CargoState> _cargoLatest = new Dictionary<string, CargoState>();
+
+        public IEnumerable<CargoState> Cargo => _cargoLatest.Values;
+
+        public void ApplyCargo(CargoState[] cargo, double serverTime)
+        {
+            foreach (var c in cargo)
+            {
+                _cargoLatest[c.Id] = c;
+                if (!_cargoHistory.TryGetValue(c.Id, out var list)) { list = new List<Sample>(); _cargoHistory[c.Id] = list; }
+                list.Add(new Sample { Time = serverTime, X = c.X, Z = c.Z });
+                if (list.Count > MaxSamples) list.RemoveAt(0);
+            }
+        }
+
+        public bool IsCarriedByLocal(string cargoId)
+        {
+            if (!_cargoLatest.TryGetValue(cargoId, out var c)) return false;
+            foreach (var id in c.Carriers) if (id == LocalId) return true;
+            return false;
+        }
+
+        /// <summary>
+        /// Where to draw a piece of cargo. Carried by the local player: the predicted position (no visible lag between hands
+        /// and cargo). Heavy item shared with the local player: midpoint of the local prediction and the partner at render time.
+        /// Otherwise: authoritative history interpolated at <paramref name="renderServerTime"/>.
+        /// </summary>
+        public bool TryGetCargoRenderPosition(string id, double renderServerTime, out float x, out float z)
+        {
+            x = z = 0f;
+            if (!_cargoLatest.TryGetValue(id, out var c)) return false;
+            if (IsCarriedByLocal(id))
+            {
+                if (c.Carriers.Length == 1) { x = LocalX; z = LocalZ; return true; }
+                string partner = c.Carriers[0] == LocalId ? c.Carriers[1] : c.Carriers[0];
+                if (TrySampleRemote(partner, renderServerTime, out float px, out float pz)) { x = (LocalX + px) * 0.5f; z = (LocalZ + pz) * 0.5f; return true; }
+            }
+            if (!_cargoHistory.TryGetValue(id, out var s) || s.Count == 0) { x = c.X; z = c.Z; return true; }
+            return Interpolate(s, renderServerTime, out x, out z);
+        }
+
+        private static bool Interpolate(List<Sample> s, double serverTime, out float x, out float z)
+        {
+            x = z = 0f;
+            if (s.Count == 0) return false;
+            if (serverTime <= s[0].Time) { x = s[0].X; z = s[0].Z; return true; }
+            for (int i = 0; i < s.Count - 1; i++)
+            {
+                var a = s[i]; var b = s[i + 1];
+                if (serverTime >= a.Time && serverTime <= b.Time)
+                {
+                    float t = (float)((serverTime - a.Time) / Math.Max(1e-6, b.Time - a.Time));
+                    x = a.X + (b.X - a.X) * t; z = a.Z + (b.Z - a.Z) * t;
+                    return true;
+                }
+            }
+            var last = s[s.Count - 1]; x = last.X; z = last.Z; return true;
+        }
+
         /// <summary>Latest authoritative interlock state (never predicted: the server decides).</summary>
         public InterlockState Interlock { get; private set; }
         public void SetInterlock(InterlockState state) { Interlock = state; }

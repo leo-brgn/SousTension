@@ -26,9 +26,9 @@ namespace SousTension.Spikes.MovingFrame.Tests
         {
             private readonly IClockService _clock; private readonly double _offset;
             public ScriptedInput(IClockService clock, int index) { _clock = clock; _offset = index * 0.5; }
-            public void Read(out float moveX, out float moveZ, out bool act)
+            public void Read(out float moveX, out float moveZ, out bool act, out bool grab)
             {
-                act = false;
+                act = false; grab = false;
                 int phase = (int)Math.Floor((_clock.Now + _offset) / 2.0) % 4;
                 moveX = phase == 1 ? 1f : phase == 3 ? -1f : 0f;
                 moveZ = phase == 0 ? 1f : phase == 2 ? -1f : 0f;
@@ -150,8 +150,9 @@ namespace SousTension.Spikes.MovingFrame.Tests
             private readonly Func<double> _start; private readonly double _pressAt;
             public StationBot(IClockService clock, Func<float> z, float targetZ, Func<double> start, double pressAt)
             { _clock = clock; _z = z; _targetZ = targetZ; _start = start; _pressAt = pressAt; }
-            public void Read(out float moveX, out float moveZ, out bool act)
+            public void Read(out float moveX, out float moveZ, out bool act, out bool grab)
             {
+                grab = false;
                 moveX = 0f;
                 float dz = _targetZ - _z();
                 moveZ = Math.Abs(dz) > 0.3f ? Math.Sign(dz) : 0f;
@@ -162,7 +163,7 @@ namespace SousTension.Spikes.MovingFrame.Tests
 
         private sealed class IdleInput : IInputSource
         {
-            public void Read(out float moveX, out float moveZ, out bool act) { moveX = 0f; moveZ = 0f; act = false; }
+            public void Read(out float moveX, out float moveZ, out bool act, out bool grab) { moveX = 0f; moveZ = 0f; act = false; grab = false; }
         }
 
         private struct LockScenario { public string Name; public double RttMs, LossPct, PressA, PressB; public bool ExpectSuccess; }
@@ -261,6 +262,183 @@ namespace SousTension.Spikes.MovingFrame.Tests
             }
             Directory.CreateDirectory("Logs");
             File.WriteAllText("Logs/e1-01-interlock.json", "[\n  " + string.Join(",\n  ", results) + "\n]\n");
+        }
+
+        private enum StepKind { GoTo, GrabCargo, WaitUntil, Press }
+        private struct Step
+        {
+            public StepKind Kind; public float X, Z; public string Cargo; public double At;
+            public static Step GoTo(float x, float z) => new Step { Kind = StepKind.GoTo, X = x, Z = z };
+            public static Step GrabCargo(string id, double notBefore) => new Step { Kind = StepKind.GrabCargo, Cargo = id, At = notBefore };
+            public static Step WaitUntil(double t) => new Step { Kind = StepKind.WaitUntil, At = t };
+            public static Step Press() => new Step { Kind = StepKind.Press };
+        }
+
+        /// <summary>Follows a script of steps: walk to a point, chase and grab a piece of cargo, wait, press grab again (drop).</summary>
+        private sealed class ScriptBot : IInputSource
+        {
+            private readonly IClockService _clock; private readonly MovingFrameModel _model; private readonly Func<double> _start;
+            private readonly List<Step> _steps; private int _i; private double _stepStart = -1;
+            public double LastGrabPressAt;
+
+            public ScriptBot(IClockService clock, MovingFrameModel model, Func<double> start, params Step[] steps)
+            { _clock = clock; _model = model; _start = start; _steps = new List<Step>(steps); }
+
+            private void Advance() { _i++; _stepStart = -1; }
+
+            public void Read(out float moveX, out float moveZ, out bool act, out bool grab)
+            {
+                moveX = moveZ = 0f; act = false; grab = false;
+                if (_i >= _steps.Count) return;
+                var s = _steps[_i];
+                if (_stepStart < 0) _stepStart = _clock.Now;
+                double t = _clock.Now - _start();
+                switch (s.Kind)
+                {
+                    case StepKind.GoTo:
+                        Walk(s.X, s.Z, 0.2f, ref moveX, ref moveZ, out bool arrived);
+                        if (arrived) Advance();
+                        break;
+                    case StepKind.WaitUntil:
+                        if (t >= s.At) Advance();
+                        break;
+                    case StepKind.Press:
+                        grab = true; if (LastGrabPressAt == 0) LastGrabPressAt = _clock.Now;
+                        if (_clock.Now - _stepStart > 0.25) Advance();
+                        break;
+                    case StepKind.GrabCargo:
+                    {
+                        bool found = false; float cx = 0, cz = 0;
+                        foreach (var c in _model.Cargo) if (c.Id == s.Cargo) { found = true; cx = c.X; cz = c.Z; }
+                        if (!found) break;
+                        float dx = cx - _model.LocalX, dz = cz - _model.LocalZ;
+                        bool near = Math.Sqrt(dx * dx + dz * dz) < 1.0;
+                        if (!near || t < s.At) { Walk(cx, cz, 0.6f, ref moveX, ref moveZ, out _); break; }
+                        grab = true; if (LastGrabPressAt == 0) LastGrabPressAt = _clock.Now;
+                        if (_clock.Now - _stepStart > 0.25 && t >= s.At) Advance();
+                        break;
+                    }
+                }
+            }
+
+            private void Walk(float tx, float tz, float stop, ref float mx, ref float mz, out bool arrived)
+            {
+                float dx = tx - _model.LocalX, dz = tz - _model.LocalZ, d = (float)Math.Sqrt(dx * dx + dz * dz);
+                arrived = d < stop;
+                if (!arrived) { mx = dx / d; mz = dz / d; }
+            }
+        }
+
+        private struct CargoScenario { public string Name; public double RttMs, LossPct; }
+
+        private static readonly CargoScenario[] CargoScenarios =
+        {
+            new CargoScenario { Name = "cargo-rtt0",         RttMs = 0,   LossPct = 0 },
+            new CargoScenario { Name = "cargo-rtt200-loss2", RttMs = 200, LossPct = 2 },
+        };
+
+        [UnityTest, Timeout(300000)]
+        public IEnumerator Measure_CarriedCargo()
+        {
+            Application.targetFrameRate = 60;
+            Thread.CurrentThread.CurrentCulture = CultureInfo.InvariantCulture;
+            var results = new List<string>();
+            foreach (var sc in CargoScenarios)
+            {
+                var clock = new RealClock();
+                var cts = new CancellationTokenSource();
+                var clients = new List<Client>();
+                string run = Guid.NewGuid().ToString("N").Substring(0, 8);
+                double start = double.MaxValue;
+                var models = new MovingFrameModel[ClientCount];
+                for (int i = 0; i < ClientCount; i++) models[i] = new MovingFrameModel();
+
+                // bot0 carries a light crate across the boat and drops it; bot1 + bot2 lift the heavy fuel flask together
+                var bot0 = new ScriptBot(clock, models[0], () => start,
+                    Step.GrabCargo("crate1", 5.0), Step.GoTo(-2f, 5f), Step.WaitUntil(10.0), Step.Press());
+                var bot1 = new ScriptBot(clock, models[1], () => start,
+                    Step.GrabCargo("fuel", 6.0), Step.WaitUntil(8.5), Step.GoTo(-0.5f, 0f), Step.WaitUntil(13.0), Step.Press());
+                var bot2 = new ScriptBot(clock, models[2], () => start,
+                    Step.GrabCargo("fuel", 6.8), Step.WaitUntil(8.5), Step.GoTo(0.5f, 0f));
+                var inputs = new IInputSource[] { bot0, bot1, bot2, new IdleInput() };
+                for (int i = 0; i < ClientCount; i++)
+                {
+                    INetworkService net = new NakamaNetworkService($"e1-01-{sc.Name}-{run}-{i}");
+                    if (sc.RttMs > 0 || sc.LossPct > 0)
+                        net = new SimulatedLatencyNetworkService(net, clock, sc.RttMs / 2000.0, 0.01, sc.LossPct / 100.0, seed: 300 + i);
+                    clients.Add(new Client { Net = net, Model = models[i], Controller = new MovingFrameController(net, inputs[i], clock, models[i]) });
+                }
+
+                double crateCarriedAt = 0, heavyLiftedAt = 0; float maxFollowErr = 0f; double maxSlide = 0; int followSamples = 0;
+                float lastCrateX = float.NaN, lastCrateZ = float.NaN; bool dropped = false;
+                try
+                {
+                    foreach (var c in clients)
+                    {
+                        var t = c.Net.ConnectAsync(cts.Token);
+                        double deadline = clock.Now + 10;
+                        while (!t.IsCompleted && clock.Now < deadline) yield return null;
+                        if (!t.IsCompleted || t.IsFaulted)
+                            Assert.Ignore("Nakama unreachable (docker compose -f server/docker-compose.yml up -d): " + (t.IsFaulted ? t.Exception?.GetBaseException().Message : "timeout"));
+                    }
+                    double warm = clock.Now + 3;
+                    while (clock.Now < warm && !models.All(m => m.HasServerTime)) { foreach (var c in clients) c.Controller.Tick(0f); yield return null; }
+                    start = clock.Now;
+                    string id0 = clients[0].Net.LocalUserId, id1 = clients[1].Net.LocalUserId, id2 = clients[2].Net.LocalUserId;
+                    var observer = models[3];
+                    double end = start + 19.0, last = start;
+                    while (clock.Now < end)
+                    {
+                        float dt = (float)(clock.Now - last); last = clock.Now;
+                        foreach (var c in clients) c.Controller.Tick(dt);
+
+                        double renderTime = observer.EstimateServerTime(clock.Now) - 0.1;
+                        foreach (var c in observer.Cargo)
+                        {
+                            if (c.Id == "crate1" && c.Carriers.Length == 1 && c.Carriers[0] == id0)
+                            {
+                                if (crateCarriedAt == 0) crateCarriedAt = clock.Now;
+                                // Skip the first 0.5 s: at pickup the cargo snaps to its carrier, and the render time (100 ms in the past) still shows the loose position.
+                                if (clock.Now - crateCarriedAt > 0.5 && observer.TrySampleRemote(id0, renderTime, out float px, out float pz) && observer.TryGetCargoRenderPosition("crate1", renderTime, out float cx, out float cz))
+                                { maxFollowErr = Math.Max(maxFollowErr, (float)Math.Sqrt((cx - px) * (cx - px) + (cz - pz) * (cz - pz))); followSamples++; }
+                            }
+                            if (c.Id == "fuel" && c.Carriers.Length == 2)
+                            {
+                                if (heavyLiftedAt == 0) heavyLiftedAt = clock.Now;
+                                if (clock.Now - heavyLiftedAt > 0.5 && observer.TrySampleRemote(id1, renderTime, out float ax, out float az) && observer.TrySampleRemote(id2, renderTime, out float bx, out float bz)
+                                    && observer.TryGetCargoRenderPosition("fuel", renderTime, out float fx, out float fz))
+                                {
+                                    float mx = (ax + bx) / 2, mz = (az + bz) / 2;
+                                    maxFollowErr = Math.Max(maxFollowErr, (float)Math.Sqrt((fx - mx) * (fx - mx) + (fz - mz) * (fz - mz))); followSamples++;
+                                }
+                            }
+                            if (c.Id == "crate1" && crateCarriedAt > 0 && c.Carriers.Length == 0)
+                            {
+                                if (!dropped) { dropped = true; lastCrateX = c.X; lastCrateZ = c.Z; }
+                                maxSlide = Math.Max(maxSlide, Math.Sqrt((c.X - lastCrateX) * (c.X - lastCrateX) + (c.Z - lastCrateZ) * (c.Z - lastCrateZ)));
+                            }
+                        }
+                        yield return null;
+                    }
+                }
+                finally { Cleanup(clients, cts); }
+
+                double grabLatency = crateCarriedAt > 0 && bot0.LastGrabPressAt > 0 ? (crateCarriedAt - bot0.LastGrabPressAt) * 1000.0 : double.NaN;
+                results.Add("{\"scenario\":\"" + sc.Name + "\",\"rttMs\":" + sc.RttMs.ToString("F0") + ",\"lossPct\":" + sc.LossPct.ToString("F0")
+                    + ",\"crateCarriedSeen\":" + (crateCarriedAt > 0).ToString().ToLower() + ",\"heavyLiftedSeen\":" + (heavyLiftedAt > 0).ToString().ToLower()
+                    + ",\"grabToObserverMs\":" + (double.IsNaN(grabLatency) ? "null" : grabLatency.ToString("F0"))
+                    + ",\"maxCargoFollowErrCm\":" + (maxFollowErr * 100f).ToString("F2") + ",\"followSamples\":" + followSamples
+                    + ",\"maxSlideAfterDropCm\":" + (maxSlide * 100.0).ToString("F0") + "}");
+                Debug.Log("[E1-01-CARGO] " + results[results.Count - 1]);
+
+                Assert.IsTrue(crateCarriedAt > 0, sc.Name + ": the observer must see the crate carried by bot 0");
+                Assert.IsTrue(heavyLiftedAt > 0, sc.Name + ": two players grabbing within 3 s must lift the heavy flask");
+                Assert.Less(maxFollowErr, 0.05f, sc.Name + ": carried cargo must stay within 5 cm of its carrier(s) as drawn by an observer");
+                Assert.Less(grabLatency, 1500, sc.Name + ": grab must be visible to an observer within 1.5 s");
+                yield return new WaitForSeconds(1.0f);
+            }
+            Directory.CreateDirectory("Logs");
+            File.WriteAllText("Logs/e1-01-cargo.json", "[\n  " + string.Join(",\n  ", results) + "\n]\n");
         }
 
         private static void Cleanup(List<Client> clients, CancellationTokenSource cts)
