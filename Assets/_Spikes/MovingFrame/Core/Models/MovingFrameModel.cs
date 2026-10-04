@@ -28,6 +28,10 @@ namespace SousTension.Spikes.MovingFrame
 
         public IEnumerable<string> RemoteIds => _remotes.Keys;
 
+        /// <summary>Latest authoritative interlock state (never predicted: the server decides).</summary>
+        public InterlockState Interlock { get; private set; }
+        public void SetInterlock(InterlockState state) { Interlock = state; }
+
         public void SetLocal(float x, float z) { LocalX = x; LocalZ = z; }
 
         public void ApplyServerState(StateSnapshot snapshot, double localNow)

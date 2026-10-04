@@ -15,6 +15,9 @@ var MOVE_SPEED = 3.0;  // m/s
 var HALF_X = 3.0;      // boat interior half width (m)
 var HALF_Z = 10.0;     // boat interior half length (m)
 var MAX_QUEUED_INPUTS = 6;
+var STATIONS = [{ x: 0, z: -9 }, { x: 0, z: 9 }]; // two-player interlock keys (boat-local), one at each end
+var STATION_REACH = 2.0;       // m
+var INTERLOCK_WINDOW_TICKS = 30; // 3 s at 10 Hz (GDD: Rule of Two Players)
 var MAX_ALLOWANCE = 4; // max inputs a player may apply in one tick to catch up after a network stall
 var MAX_PLAYERS = 4;
 
@@ -28,10 +31,49 @@ function stepPlayer(p, mx, mz) {
   p.z = clamp(p.z + mz * MOVE_SPEED * DT, -HALF_Z, HALF_Z);
 }
 
+function newInterlock() {
+  return { st: [{ by: "", tick: 0 }, { by: "", tick: 0 }], result: "none", resultTick: 0, count: 0 };
+}
+
+// A player at a station presses the key. Rejected when out of reach, when the station is already held, or when
+// the same player already holds the other station (the rule needs two different players).
+function tryActivate(il, id, pl, tick) {
+  var best = -1, bestD = STATION_REACH;
+  for (var i = 0; i < STATIONS.length; i++) {
+    var dx = pl.x - STATIONS[i].x, dz = pl.z - STATIONS[i].z;
+    var d = Math.sqrt(dx * dx + dz * dz);
+    if (d <= bestD) { best = i; bestD = d; }
+  }
+  if (best < 0 || il.st[best].by !== "") return;
+  if (il.st[1 - best].by === id) return;
+  il.st[best].by = id; il.st[best].tick = tick;
+}
+
+// Success when both stations are held (by different players, guaranteed by tryActivate) and each was pressed
+// within the window of the first one; otherwise the first press expires after the window.
+function evaluateInterlock(il, tick) {
+  var a = il.st[0], b = il.st[1];
+  if (a.by !== "" && b.by !== "") {
+    il.result = "success"; il.resultTick = tick; il.count++;
+    a.by = ""; b.by = ""; return;
+  }
+  for (var i = 0; i < 2; i++) {
+    var s = il.st[i];
+    if (s.by !== "" && tick - s.tick >= INTERLOCK_WINDOW_TICKS) {
+      il.result = "timeout"; il.resultTick = tick; s.by = "";
+    }
+  }
+}
+
+function interlockView(il, tick) {
+  function rem(s) { return s.by === "" ? 0 : Math.max(0, INTERLOCK_WINDOW_TICKS - (tick - s.tick)); }
+  return { a: rem(il.st[0]), b: rem(il.st[1]), ab: il.st[0].by, bb: il.st[1].by, result: il.result, rt: il.resultTick, n: il.count };
+}
+
 var matchInit = function (ctx, logger, nk, params) {
   logger.info("moving_frame match init");
   return {
-    state: { tick: 0, players: {}, order: [] },
+    state: { tick: 0, players: {}, order: [], il: newInterlock() },
     tickRate: TICK_RATE,
     label: JSON.stringify({ name: MATCH_NAME })
   };
@@ -60,6 +102,7 @@ var matchLeave = function (ctx, logger, nk, dispatcher, tick, state, presences) 
   for (var i = 0; i < presences.length; i++) {
     var id = presences[i].userId;
     delete state.players[id];
+    for (var si = 0; si < 2; si++) if (state.il.st[si].by === id) state.il.st[si].by = "";
     var idx = state.order.indexOf(id);
     if (idx >= 0) state.order.splice(idx, 1);
   }
@@ -78,7 +121,7 @@ var matchLoop = function (ctx, logger, nk, dispatcher, tick, state, messages) {
     // Reject stale or duplicate sequences, including ones already waiting in the queue.
     if (typeof input.seq !== "number" || input.seq <= p.lastQueued) continue;
     p.lastQueued = input.seq;
-    p.queue.push({ seq: input.seq, mx: +input.mx || 0, mz: +input.mz || 0 });
+    p.queue.push({ seq: input.seq, mx: +input.mx || 0, mz: +input.mz || 0, act: input.act === true || input.act === 1 });
     while (p.queue.length > MAX_QUEUED_INPUTS) p.queue.shift();
   }
 
@@ -92,11 +135,14 @@ var matchLoop = function (ctx, logger, nk, dispatcher, tick, state, messages) {
     while (pl.allowance >= 1 && pl.queue.length > 0) {
       var next = pl.queue.shift();
       stepPlayer(pl, next.mx, next.mz);
+      if (next.act) tryActivate(state.il, state.order[k], pl, tick);
       pl.seq = next.seq;
       pl.applied += 1;
       pl.allowance -= 1;
     }
   }
+
+  evaluateInterlock(state.il, tick);
 
   // 3. Broadcast authoritative state.
   var out = [];
@@ -105,7 +151,7 @@ var matchLoop = function (ctx, logger, nk, dispatcher, tick, state, messages) {
     out.push({ id: id, x: q.x, z: q.z, seq: q.seq });
   }
   state.tick = tick;
-  dispatcher.broadcastMessage(OP_STATE, JSON.stringify({ tick: tick, t: tick * DT, players: out }), null, null, true);
+  dispatcher.broadcastMessage(OP_STATE, JSON.stringify({ tick: tick, t: tick * DT, players: out, il: interlockView(state.il, tick) }), null, null, true);
   return { state: state };
 };
 
@@ -156,7 +202,7 @@ function InitModule(ctx, logger, nk, initializer) {
 if (typeof module !== "undefined" && module.exports) {
   module.exports = {
     InitModule: InitModule, stepPlayer: stepPlayer,
-    TICK_RATE: TICK_RATE, DT: DT, MAX_ALLOWANCE: MAX_ALLOWANCE, MOVE_SPEED: MOVE_SPEED, HALF_X: HALF_X, HALF_Z: HALF_Z,
+    TICK_RATE: TICK_RATE, DT: DT, STATIONS: STATIONS, STATION_REACH: STATION_REACH, INTERLOCK_WINDOW_TICKS: INTERLOCK_WINDOW_TICKS, MAX_ALLOWANCE: MAX_ALLOWANCE, MOVE_SPEED: MOVE_SPEED, HALF_X: HALF_X, HALF_Z: HALF_Z,
     OP_INPUT: OP_INPUT, OP_STATE: OP_STATE,
     handlers: { matchInit: matchInit, matchJoinAttempt: matchJoinAttempt, matchJoin: matchJoin, matchLeave: matchLeave, matchLoop: matchLoop }
   };

@@ -14,8 +14,8 @@ namespace SousTension.Spikes.MovingFrame.Tests
 
     internal sealed class ConstantInput : IInputSource
     {
-        public float Mx, Mz;
-        public void Read(out float moveX, out float moveZ) { moveX = Mx; moveZ = Mz; }
+        public float Mx, Mz; public bool Act;
+        public void Read(out float moveX, out float moveZ, out bool act) { moveX = Mx; moveZ = Mz; act = Act; }
     }
 
     /// <summary>Fake authoritative server: echoes each input back as a snapshot after applying CharacterMotion.</summary>
@@ -25,11 +25,11 @@ namespace SousTension.Spikes.MovingFrame.Tests
         public long BytesSent { get; private set; }
         public long BytesReceived { get; private set; }
         public event Action<StateSnapshot> StateReceived;
-        public readonly List<(int seq, float mx, float mz)> Sent = new List<(int, float, float)>();
+        public readonly List<(int seq, float mx, float mz, bool act)> Sent = new List<(int, float, float, bool)>();
         private readonly Queue<StateSnapshot> _incoming = new Queue<StateSnapshot>();
 
         public Task ConnectAsync(CancellationToken ct) => Task.CompletedTask;
-        public void SendInput(int seq, float moveX, float moveZ) { Sent.Add((seq, moveX, moveZ)); BytesSent += 24; }
+        public void SendInput(int seq, float moveX, float moveZ, bool act) { Sent.Add((seq, moveX, moveZ, act)); BytesSent += 24; }
         public void Enqueue(StateSnapshot s) => _incoming.Enqueue(s);
         public void Poll() { while (_incoming.Count > 0) StateReceived?.Invoke(_incoming.Dequeue()); }
         public void Dispose() { }
@@ -115,6 +115,37 @@ namespace SousTension.Spikes.MovingFrame.Tests
         }
 
         [Test]
+        public void Act_IsSentOncePerKeyPress_NotWhileHeld()
+        {
+            var net = new FakeNetwork(); var clock = new FakeClock(); var model = new MovingFrameModel();
+            var input = new ConstantInput();
+            var c = new MovingFrameController(net, input, clock, model);
+            net.Enqueue(Snapshot(1, new PlayerState("me", 0, 0, 0)));
+            c.Tick(0.0f);
+            input.Act = true;  c.Tick(0.35f);      // 3 ticks with the key held
+            input.Act = false; c.Tick(0.1f);       // released
+            input.Act = true;  c.Tick(0.1f);       // pressed again
+            Assert.AreEqual(new[] { true, false, false, false, true }, net.Sent.ConvertAll(s => s.act).ToArray());
+        }
+
+        [Test]
+        public void Snapshot_StoresAuthoritativeInterlockState_WithoutPredicting()
+        {
+            var net = new FakeNetwork(); var clock = new FakeClock(); var model = new MovingFrameModel();
+            var c = new MovingFrameController(net, new ConstantInput(), clock, model);
+            net.Enqueue(new StateSnapshot(7, 0.7, new[] { new PlayerState("me", 0, 0, 0) },
+                new InterlockState(12, 0, "me", "", "none", 0, 0)));
+            c.Tick(0);
+            Assert.AreEqual(12, model.Interlock.RemainingA);
+            Assert.AreEqual("me", model.Interlock.HolderA);
+            net.Enqueue(new StateSnapshot(8, 0.8, new[] { new PlayerState("me", 0, 0, 0) },
+                new InterlockState(0, 0, "", "", "success", 8, 1)));
+            c.Tick(0);
+            Assert.AreEqual("success", model.Interlock.Result);
+            Assert.AreEqual(1, model.Interlock.Count);
+        }
+
+        [Test]
         public void Snapshot_UpdatesRemotePlayersAndServerClock()
         {
             var net = new FakeNetwork(); var clock = new FakeClock { Now = 10.0 }; var model = new MovingFrameModel();
@@ -134,7 +165,7 @@ namespace SousTension.Spikes.MovingFrame.Tests
             var clock = new FakeClock { Now = 0 };
             var inner = new FakeNetwork();
             var net = new SimulatedLatencyNetworkService(inner, clock, oneWayLatencySeconds: 0.1);
-            net.SendInput(1, 1, 0);
+            net.SendInput(1, 1, 0, false);
             net.Poll();
             Assert.AreEqual(0, inner.Sent.Count);        // still in flight
             clock.Now = 0.11; net.Poll();
@@ -156,8 +187,8 @@ namespace SousTension.Spikes.MovingFrame.Tests
             var clock = new FakeClock { Now = 0 };
             var inner = new FakeNetwork();
             var net = new SimulatedLatencyNetworkService(inner, clock, 0.0, lossRate: 1.0, retransmitDelaySeconds: 0.2);
-            net.SendInput(1, 1, 0);
-            net.SendInput(2, 1, 0);
+            net.SendInput(1, 1, 0, false);
+            net.SendInput(2, 1, 0, false);
             clock.Now = 0.1; net.Poll();
             Assert.AreEqual(0, inner.Sent.Count);                       // still waiting for the retransmission
             clock.Now = 0.25; net.Poll();

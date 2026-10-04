@@ -98,3 +98,74 @@ test("flooding the server with inputs does not speed a player up", () => {
   const applied = state.players.a.applied;
   assert.ok(applied <= TICKS + m.MAX_ALLOWANCE, "applied " + applied + " > budget");
 });
+
+// ---- Two-player interlock (Rule of Two Players) ----
+function lockSetup(ids) {
+  let { state } = h.matchInit({}, logger, nk, {});
+  ids.forEach((id) => { state = h.matchJoin({}, logger, nk, null, 0, state, [presence(id)]).state; });
+  return { state, d: makeDispatcher(), tick: 0, seq: {} };
+}
+function inputAct(ctx, id, act) {
+  ctx.seq[id] = (ctx.seq[id] || 0) + 1;
+  return { opCode: m.OP_INPUT, sender: presence(id), data: JSON.stringify({ seq: ctx.seq[id], mx: 0, mz: 0, act }) };
+}
+function tickWith(ctx, msgs) { ctx.state = h.matchLoop({}, logger, nk, ctx.d, ++ctx.tick, ctx.state, msgs).state; return ctx.d.sent[ctx.d.sent.length - 1].data.il; }
+function place(ctx, id, x, z) { ctx.state.players[id].x = x; ctx.state.players[id].z = z; }
+
+test("interlock: two different players at the two stations within the window succeed", () => {
+  const c = lockSetup(["a", "b"]);
+  place(c, "a", 0, -9); place(c, "b", 0, 9);
+  tickWith(c, [inputAct(c, "a", true)]);
+  for (let i = 0; i < 10; i++) tickWith(c, []);           // 1 s later
+  const il = tickWith(c, [inputAct(c, "b", true)]);
+  assert.strictEqual(il.result, "success");
+  assert.strictEqual(il.n, 1);
+  assert.strictEqual(il.a, 0); assert.strictEqual(il.b, 0); // both stations released
+});
+
+test("interlock: the window is inclusive at exactly 3 s and expires after", () => {
+  let c = lockSetup(["a", "b"]);
+  place(c, "a", 0, -9); place(c, "b", 0, 9);
+  tickWith(c, [inputAct(c, "a", true)]);
+  for (let i = 0; i < m.INTERLOCK_WINDOW_TICKS - 1; i++) tickWith(c, []);
+  assert.strictEqual(tickWith(c, [inputAct(c, "b", true)]).result, "success"); // exactly 30 ticks later
+
+  c = lockSetup(["a", "b"]);
+  place(c, "a", 0, -9); place(c, "b", 0, 9);
+  tickWith(c, [inputAct(c, "a", true)]);
+  for (let i = 0; i < m.INTERLOCK_WINDOW_TICKS; i++) tickWith(c, []);
+  const il = tickWith(c, [inputAct(c, "b", true)]);                           // too late
+  assert.strictEqual(il.result, "timeout");
+  assert.strictEqual(il.n, 0);
+});
+
+test("interlock: one player can never hold both stations", () => {
+  const c = lockSetup(["a", "b"]);
+  place(c, "a", 0, -9);
+  tickWith(c, [inputAct(c, "a", true)]);
+  place(c, "a", 0, 9);                                                         // runs to the other end
+  const il = tickWith(c, [inputAct(c, "a", true)]);
+  assert.notStrictEqual(il.result, "success");
+  assert.strictEqual(il.bb, "");
+});
+
+test("interlock: out-of-reach presses are ignored; reach is 2 m", () => {
+  const c = lockSetup(["a", "b"]);
+  place(c, "a", 0, -6.5); place(c, "b", 0, 9);                                 // 2.5 m from station A
+  let il = tickWith(c, [inputAct(c, "a", true)]);
+  assert.strictEqual(il.ab, "");
+  place(c, "a", 0, -7.1);                                                      // 1.9 m
+  il = tickWith(c, [inputAct(c, "a", true)]);
+  assert.strictEqual(il.ab, "a");
+});
+
+test("interlock: remaining time counts down and leaving the match releases the station", () => {
+  const c = lockSetup(["a", "b"]);
+  place(c, "a", 0, -9);
+  tickWith(c, [inputAct(c, "a", true)]);
+  let il = tickWith(c, []);
+  assert.ok(il.a > 0 && il.a < m.INTERLOCK_WINDOW_TICKS);
+  c.state = h.matchLeave({}, logger, nk, null, 0, c.state, [presence("a")]).state;
+  il = tickWith(c, []);
+  assert.strictEqual(il.ab, "");
+});
