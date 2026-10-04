@@ -472,7 +472,10 @@ namespace SousTension.Spikes.MovingFrame.Tests
                         break;
                     }
                     case Phase.ToVeille: if (_model.Reactor.Valid && regime == "veille") Go(Phase.SettleVeille); else Press(); break;
-                    case Phase.SettleVeille: if (_clock.Now - _phaseStart > 2.0) { Go(Phase.ToPleine); PleinePhaseStart = _clock.Now; } break;
+                    case Phase.SettleVeille:
+                        // The shared reactor persists between scenarios: wait for the rods to be back in (noise follows the rods), not just for the selector.
+                        if (_clock.Now - _phaseStart > 2.0 && (_model.Reactor.Rods < 0.15f || _clock.Now - _phaseStart > 90.0)) { Go(Phase.ToPleine); PleinePhaseStart = _clock.Now; }
+                        break;
                     case Phase.ToPleine: if (regime == "pleine") { PleineReachedAt = _clock.Now; Go(Phase.Measure); } else Press(); break;
                     case Phase.Measure: if (_clock.Now - _phaseStart >= 25.0) Go(Phase.BackToVeille); break;
                     case Phase.BackToVeille: if (regime == "veille") Go(Phase.Done); else Press(); break;
@@ -537,7 +540,7 @@ namespace SousTension.Spikes.MovingFrame.Tests
                     if (observer.Reactor.Scram) { latched = true; }
                     else
                     {
-                        double end = clock.Now + 120.0, last = clock.Now;
+                        double end = clock.Now + 240.0, last = clock.Now;
                         while (clock.Now < end && !bot.Done)
                         {
                             float dt = (float)(clock.Now - last); last = clock.Now;
