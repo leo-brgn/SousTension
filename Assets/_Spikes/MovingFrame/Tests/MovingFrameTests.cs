@@ -283,6 +283,22 @@ namespace SousTension.Spikes.MovingFrame.Tests
         }
 
         [Test]
+        public void Snapshot_StoresWater_AndKeepsLastValuesWhenMissing()
+        {
+            var net = new FakeNetwork(); var clock = new FakeClock(); var model = new MovingFrameModel();
+            var c = new MovingFrameController(net, new ConstantInput(), clock, model);
+            Assert.IsFalse(model.Water.Valid);
+            net.Enqueue(new StateSnapshot(1, 0.1, new[] { new PlayerState("me", 0, 0, 0) }, default, null, default, default, default, null, default,
+                new WaterState(new[] { 0.5f, 0.1f, 0f, 0f, 0f, 0f }, 22f, 3.2f, -1.5f, new[] { true, true, false, true, true })));
+            c.Tick(0);
+            Assert.AreEqual(0.5f, model.Water.Fill[0], 1e-5f); Assert.AreEqual(3.2f, model.Water.TrimDeg, 1e-5f);
+            Assert.AreEqual(-1.5f, model.Water.ListDeg, 1e-5f); Assert.IsFalse(model.Water.DoorOpen[2]);
+            net.Enqueue(new StateSnapshot(2, 0.2, new[] { new PlayerState("me", 0, 0, 0) }));   // older server: nothing wiped
+            c.Tick(0);
+            Assert.AreEqual(22f, model.Water.MassTonnes, 1e-5f);
+        }
+
+        [Test]
         public void Snapshot_StoresAuthoritativeInterlockState_WithoutPredicting()
         {
             var net = new FakeNetwork(); var clock = new FakeClock(); var model = new MovingFrameModel();

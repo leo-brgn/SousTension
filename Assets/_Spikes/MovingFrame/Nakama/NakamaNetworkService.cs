@@ -26,8 +26,9 @@ namespace SousTension.Spikes.MovingFrame
         [Serializable] private class ReactorDto { public string reg; public float R; public float nz; public float P; public float T; public float S; public float E; public float eta; public float F; public float[] v; public int[] pu; public int scram; public int auto; public int leak; public int warn; public int crit; }
         [Serializable] private class LeverDto { public int cv; public int pl; }
         [Serializable] private class RestartDto { public int[] s; public string last; public int lt; public int n; }
+        [Serializable] private class WaterDto { public float[] l; public float m; public float tr; public float li; public int[] dr; }
         [Serializable] private class BoatDto { public float d; public float vz; }
-        [Serializable] private class StateDto { public int tick; public double t; public PlayerDto[] players; public InterlockDto il; public CargoDto[] cargo; public ReactorDto rx; public CoupledDto[] cp; public RestartDto rs; public LeverDto sc; public BoatDto boat; }
+        [Serializable] private class StateDto { public int tick; public double t; public PlayerDto[] players; public InterlockDto il; public CargoDto[] cargo; public ReactorDto rx; public CoupledDto[] cp; public RestartDto rs; public WaterDto bw; public LeverDto sc; public BoatDto boat; }
         [Serializable] private class MatchDto { public string matchId; }
 
         private readonly string _scheme, _host, _serverKey, _deviceId;
@@ -114,9 +115,16 @@ namespace SousTension.Spikes.MovingFrame
             }
             var restart = dto.rs != null && dto.rs.s != null && dto.rs.s.Length >= 3
                 ? new RestartState(dto.rs.s[0] == 1, dto.rs.s[1] == 1, dto.rs.s[2] == 1, dto.rs.last, dto.rs.lt, dto.rs.n) : default;
+            WaterState water = default;
+            if (dto.bw != null && dto.bw.l != null)
+            {
+                var doors = new bool[dto.bw.dr == null ? 0 : dto.bw.dr.Length];
+                for (int i = 0; i < doors.Length; i++) doors[i] = dto.bw.dr[i] == 1;
+                water = new WaterState(dto.bw.l, dto.bw.m, dto.bw.tr, dto.bw.li, doors);
+            }
             var lever = dto.sc != null ? new ScramLeverState(dto.sc.cv == 1, dto.sc.pl == 1) : default;
             var boat = dto.boat != null ? new BoatDepthState(dto.boat.d, dto.boat.vz) : default;
-            _queue.Enqueue(new StateSnapshot(dto.tick, dto.t, players, il, cargo, reactor, lever, boat, coupled, restart));
+            _queue.Enqueue(new StateSnapshot(dto.tick, dto.t, players, il, cargo, reactor, lever, boat, coupled, restart, water));
         }
 
         public void Poll()

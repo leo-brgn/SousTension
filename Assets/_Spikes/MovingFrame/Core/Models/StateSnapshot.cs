@@ -96,6 +96,18 @@ namespace SousTension.Spikes.MovingFrame
         { Valid = true; LeverBack = leverBack; ValvesOpen = valvesOpen; PumpsRunning = pumpsRunning; Last = last ?? "none"; LastTick = lastTick; Count = count; }
     }
 
+    /// <summary>Water in the boat (E6-01): fill fraction of each compartment and the trim / list its weight adds to the swell.</summary>
+    public readonly struct WaterState
+    {
+        public readonly bool Valid;
+        public readonly float[] Fill;        // 0..1 per compartment, bow (index 0) to stern
+        public readonly float MassTonnes;
+        public readonly float TrimDeg, ListDeg;
+        public readonly bool[] DoorOpen;     // bulkhead openings between neighbouring compartments
+        public WaterState(float[] fill, float massTonnes, float trimDeg, float listDeg, bool[] doorOpen)
+        { Valid = true; Fill = fill ?? new float[0]; MassTonnes = massTonnes; TrimDeg = trimDeg; ListDeg = listDeg; DoorOpen = doorOpen ?? new bool[0]; }
+    }
+
     /// <summary>Authoritative boat depth below patrol depth (E3-04): grows after a SCRAM. Display only.</summary>
     public readonly struct BoatDepthState
     {
@@ -118,11 +130,13 @@ namespace SousTension.Spikes.MovingFrame
         public readonly BoatDepthState Boat;
         public readonly CoupledActionState[] Coupled;
         public readonly RestartState Restart;
+        public readonly WaterState Water;
 
         public StateSnapshot(int tick, double serverTime, PlayerState[] players, InterlockState interlock = default, CargoState[] cargo = null, ReactorState reactor = default,
             ScramLeverState lever = default, BoatDepthState boat = default, CoupledActionState[] coupled = null,
-            RestartState restart = default)
+            RestartState restart = default, WaterState water = default)
         {
+            Water = water;
             Restart = restart;
             Coupled = coupled ?? new CoupledActionState[0];
             Lever = lever; Boat = boat;

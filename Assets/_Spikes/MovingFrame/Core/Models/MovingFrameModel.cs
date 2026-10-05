@@ -116,6 +116,10 @@ namespace SousTension.Spikes.MovingFrame
         public RestartState Restart { get; private set; }
         public void SetRestart(RestartState state) { if (state.Valid) Restart = state; }
 
+        /// <summary>Latest authoritative water state (E6-01); the boat view adds its trim / list to the swell.</summary>
+        public WaterState Water { get; private set; }
+        public void SetWater(WaterState state) { if (state.Valid) Water = state; }
+
         public void SetLocal(float x, float z) { LocalX = x; LocalZ = z; }
 
         public void ApplyServerState(StateSnapshot snapshot, double localNow)

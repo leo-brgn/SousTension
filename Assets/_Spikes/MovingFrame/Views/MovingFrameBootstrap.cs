@@ -65,6 +65,7 @@ namespace SousTension.Spikes.MovingFrame
             new GameObject("ReactorPanel").AddComponent<ReactorPanelView>().Bind(model, boat.transform);
             new GameObject("ScramLever").AddComponent<ScramLeverView>().Bind(model, boat.transform);
             new GameObject("PrimaryCircuit").AddComponent<PrimaryCircuitView>().Bind(model, boat.transform);
+            new GameObject("Water").AddComponent<WaterView>().Bind(model, boat.transform);
             _hud = new GameObject("MetricsHud").AddComponent<MetricsHudView>();
             _hud.Bind(model, network, _controller, clock);
             Cursor.lockState = CursorLockMode.Locked;
