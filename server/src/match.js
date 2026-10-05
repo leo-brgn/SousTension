@@ -1,7 +1,7 @@
 var matchInit = function (ctx, logger, nk, params) {
   logger.info("moving_frame match init");
   return {
-    state: { tick: 0, players: {}, order: [], il: newInterlock(), cargo: newCargo(), reactor: newReactor(REACTOR_SEED, "veille") },
+    state: { tick: 0, players: {}, order: [], il: newInterlock(), cargo: newCargo(), reactor: newReactor(REACTOR_SEED, "veille"), lever: newLever(), boat: newBoat() },
     tickRate: TICK_RATE,
     label: JSON.stringify({ name: MATCH_NAME })
   };
@@ -77,6 +77,8 @@ var matchLoop = function (ctx, logger, nk, dispatcher, tick, state, messages) {
   evaluateInterlock(state.il, tick);
   updateCargo(state, tick);
   reactorStep(state.reactor);
+  leverStep(state.lever);
+  boatStep(state.boat, state.reactor);
 
   // 3. Broadcast authoritative state.
   var out = [];
@@ -85,7 +87,7 @@ var matchLoop = function (ctx, logger, nk, dispatcher, tick, state, messages) {
     out.push({ id: id, x: q.x, z: q.z, seq: q.seq });
   }
   state.tick = tick;
-  dispatcher.broadcastMessage(OP_STATE, JSON.stringify({ tick: tick, t: tick * DT, players: out, il: interlockView(state.il, tick), cargo: cargoView(state.cargo), rx: reactorView(state.reactor) }), null, null, true);
+  dispatcher.broadcastMessage(OP_STATE, JSON.stringify({ tick: tick, t: tick * DT, players: out, il: interlockView(state.il, tick), cargo: cargoView(state.cargo), rx: reactorView(state.reactor), sc: leverView(state.lever, state.reactor), boat: boatView(state.boat) }), null, null, true);
   return { state: state };
 };
 
@@ -138,6 +140,7 @@ if (typeof module !== "undefined" && module.exports) {
     InitModule: InitModule, stepPlayer: stepPlayer,
     TICK_RATE: TICK_RATE, DT: DT, STATIONS: STATIONS, STATION_REACH: STATION_REACH, INTERLOCK_WINDOW_TICKS: INTERLOCK_WINDOW_TICKS, MAX_ALLOWANCE: MAX_ALLOWANCE, MOVE_SPEED: MOVE_SPEED, HALF_X: HALF_X, HALF_Z: HALF_Z,
     OP_INPUT: OP_INPUT, OP_STATE: OP_STATE,
+    LEVER_COVER_TICKS: LEVER_COVER_TICKS, SINK_RATE_MAX: SINK_RATE_MAX, SINK_RAMP_SECONDS: SINK_RAMP_SECONDS, newBoat: newBoat, boatStep: boatStep,
     CONTROLS: CONTROLS, REGIME_ORDER: REGIME_ORDER, tryAct: tryAct,
     reactorNoise: reactorNoise, REACTOR_K: REACTOR_K, newReactor: newReactor, reactorStep: reactorStep, reactorView: reactorView, reactorScram: reactorScram,
     reactorRestart: reactorRestart, reactorSetRegime: reactorSetRegime, reactorSetValve: reactorSetValve, reactorSetPump: reactorSetPump,
