@@ -65,6 +65,7 @@ function nearestControl(pl) {
 
 // The interaction key is HELD (input flag `hold`, sent every tick while the key is down): only valve wheels use it.
 function tryHold(state, pl) {
+  if (!canUseHands(pl)) return;                        // E2-03: a hand must be free
   var c = nearestControl(pl);
   if (c && c.valve !== undefined) holdValve(state.reactor, c.valve);
 }
@@ -110,6 +111,7 @@ function tryAct(state, id, pl, tick) {
   }
   var cmd = nearestCommand(pl);
   var bestStationD = cmd ? cmd.d : Infinity;
+  if (!canUseHands(pl)) return;                         // E2-03: pressing a control needs a free hand and no two-handed item
   if (bestControl && bestControlD < bestStationD) { activateControl(state, bestControl); return; }
   if (cmd) tryActivate(state.cp, id, pl, tick);
 }
@@ -142,6 +144,7 @@ function useTarget(state, id, pl, tick, target) {
     for (var l = 0; l < state.leaks.list.length; l++) if (state.leaks.list[l].id === n) { tryRepair(state, id, pl, tick, state.leaks.list[l]); return; }
     return;
   }
+  if (!canUseHands(pl)) return;                         // E2-03: controls and commands need a free hand; the item uses above do not
   if (target.indexOf("cc:") === 0) {
     var parts = target.split(":");
     var side = +parts[2];
@@ -161,6 +164,7 @@ function useTarget(state, id, pl, tick, target) {
 
 // The key is HELD on the object with id `target`: only the valve wheels use it.
 function holdTarget(state, pl, target) {
+  if (!canUseHands(pl)) return;
   var c = controlById(target);
   if (c && c.valve !== undefined && controlDistance(pl, c) <= AIM_REACH) holdValve(state.reactor, c.valve);
 }

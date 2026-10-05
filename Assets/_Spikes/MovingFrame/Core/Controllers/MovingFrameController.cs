@@ -18,6 +18,7 @@ namespace SousTension.Spikes.MovingFrame
         private readonly IClockService _clock;
         private readonly IUseInput _use;
         private readonly IAimSource _aim;
+        private readonly IHandsInput _hands;
         private readonly MovingFrameModel _model;
         private readonly PredictionBuffer _prediction = new PredictionBuffer();
         private readonly Dictionary<int, double> _sendTimes = new Dictionary<int, double>();
@@ -25,13 +26,13 @@ namespace SousTension.Spikes.MovingFrame
         private double _accumulator;
         private bool _initialized;
         private int _lastAcked;
-        private bool _prevAct, _prevGrab, _prevUse;
+        private bool _prevAct, _prevGrab, _prevUse, _prevTake, _prevDrop, _prevStow;
 
         /// <param name="use">primary action button (mouse); null = keyboard only (position-based interaction)</param>
         /// <param name="aim">what the player looks at; null = nothing aimable</param>
-        public MovingFrameController(INetworkService net, IInputSource input, IClockService clock, MovingFrameModel model, IUseInput use = null, IAimSource aim = null)
+        public MovingFrameController(INetworkService net, IInputSource input, IClockService clock, MovingFrameModel model, IUseInput use = null, IAimSource aim = null, IHandsInput hands = null)
         {
-            _net = net; _input = input; _clock = clock; _model = model; _use = use; _aim = aim;
+            _net = net; _input = input; _clock = clock; _model = model; _use = use; _aim = aim; _hands = hands;
             _net.StateReceived += OnState;
         }
 
@@ -63,9 +64,17 @@ namespace SousTension.Spikes.MovingFrame
                     if (use != null) { act |= !_prevUse; actHeld = true; }
                 }
                 _prevUse = useHeld;
+                // Hands (E2-03): one command per tick, on the key press (edge): drop wins over stow, stow over take.
+                string hand = null;
+                if (_hands != null)
+                {
+                    bool take = _hands.TakeHeld, drop = _hands.DropHeld, stow = _hands.StowHeld;
+                    if (drop && !_prevDrop) hand = "drop"; else if (stow && !_prevStow) hand = "stow"; else if (take && !_prevTake) hand = "take";
+                    _prevTake = take; _prevDrop = drop; _prevStow = stow;
+                }
                 int seq = _prediction.Predict(mx, mz);
                 _sendTimes[seq] = _clock.Now;
-                _net.SendInput(seq, mx, mz, act, grab, actHeld, use);   // hold = key still down: valve wheels turn while it is held
+                _net.SendInput(seq, mx, mz, act, grab, actHeld, use, hand);   // hold = key still down: valve wheels turn while it is held
             }
             if (ticks == MaxCatchUpTicks) _accumulator = 0; // drop backlog after a long stall
             _model.SetLocal(_prediction.X, _prediction.Z);

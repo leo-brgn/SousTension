@@ -15,7 +15,7 @@ namespace SousTension.Spikes.MovingFrame
         event Action<StateSnapshot> StateReceived;
 
         Task ConnectAsync(CancellationToken cancellationToken);
-        void SendInput(int seq, float moveX, float moveZ, bool act, bool grab, bool hold = false, string use = null);
+        void SendInput(int seq, float moveX, float moveZ, bool act, bool grab, bool hold = false, string use = null, string hand = null);
 
         /// <summary>Deliver queued network events on the calling thread.</summary>
         void Poll();
@@ -31,6 +31,14 @@ namespace SousTension.Spikes.MovingFrame
     public interface IInputSource
     {
         void Read(out float moveX, out float moveZ, out bool act, out bool grab);
+    }
+
+    /// <summary>The hand keys (E2-03): take the nearest item, put down what was taken last, move the torch between hand and pocket.</summary>
+    public interface IHandsInput
+    {
+        bool TakeHeld { get; }
+        bool DropHeld { get; }
+        bool StowHeld { get; }
     }
 
     /// <summary>The primary action button (mouse left): used on the object the player looks at (E2-02).</summary>

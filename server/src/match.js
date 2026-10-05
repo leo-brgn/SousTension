@@ -19,7 +19,7 @@ var matchJoin = function (ctx, logger, nk, dispatcher, tick, state, presences) {
     var id = presences[i].userId;
     if (!state.players[id]) {
       var slot = state.order.length;
-      state.players[id] = { x: -1.5 + slot, z: 0, seq: 0, lastQueued: 0, allowance: 0, applied: 0, queue: [], presence: presences[i] };
+      state.players[id] = { x: -1.5 + slot, z: 0, seq: 0, lastQueued: 0, allowance: 0, applied: 0, queue: [], hands: newHands(), presence: presences[i] };
       state.order.push(id);
     }
   }
@@ -31,8 +31,7 @@ var matchLeave = function (ctx, logger, nk, dispatcher, tick, state, presences) 
     var id = presences[i].userId;
     delete state.players[id];
     releaseCoupled(state.cp, id);
-    var heldCargo = heldBy(state.cargo, id);
-    if (heldCargo) { if (heldCargo.pend === id) heldCargo.pend = ""; heldCargo.carriers = []; heldCargo.vx = 0; heldCargo.vz = 0; }
+    releasePlayerItems(state, id);
     var idx = state.order.indexOf(id);
     if (idx >= 0) state.order.splice(idx, 1);
   }
@@ -58,7 +57,7 @@ var matchLoop = function (ctx, logger, nk, dispatcher, tick, state, messages) {
   var out = [];
   for (var j = 0; j < state.order.length; j++) {
     var id = state.order[j], q = state.players[id];
-    out.push({ id: id, x: q.x, z: q.z, seq: q.seq });
+    out.push({ id: id, x: q.x, z: q.z, seq: q.seq, hd: handsView(q.hands) });
   }
   dispatcher.broadcastMessage(OP_STATE, JSON.stringify({ tick: tick, t: tick * DT, players: out, il: coupledView(state.cp, tick)[0], cp: coupledView(state.cp, tick), cargo: cargoView(state.cargo), rx: reactorView(state.reactor), sc: leverView(state.lever, state.reactor), rs: restartView(state), bw: waterView(state.water), lk: leaksView(state.leaks), bp: bilgeView(state.bilge), pw: powerView(state), pr: propulsionView(state.prop), boat: boatView(state.boat) }), null, null, true);
   return { state: state };
@@ -126,6 +125,7 @@ if (typeof module !== "undefined" && module.exports) {
     WATER_COMPARTMENTS: WATER_COMPARTMENTS, WATER_FLOW: WATER_FLOW, MAX_TRIM_DEG: MAX_TRIM_DEG, MAX_LIST_DEG: MAX_LIST_DEG, newWater: newWater, waterAdd: waterAdd,
     waterRemove: waterRemove, waterSetDoor: waterSetDoor, waterStep: waterStep, waterTotal: waterTotal, waterTilt: waterTilt, waterView: waterView, waterLevel: waterLevel, compartmentAt: compartmentAt,
     newCoupled: newCoupled, COUPLED_ACTIONS: COUPLED_ACTIONS, COUPLED_EFFECTS: COUPLED_EFFECTS, COUPLED_GRACE_TICKS: COUPLED_GRACE_TICKS,
+    ITEM_KINDS: ITEM_KINDS, newHands: newHands, takeItem: takeItem, dropItem: dropItem, stowItem: stowItem, canUseHands: canUseHands, handsView: handsView,
     AIM_REACH: AIM_REACH, interactableIds: interactableIds,
     CONTROLS: CONTROLS, REGIME_ORDER: REGIME_ORDER, tryAct: tryAct,
     reactorNoise: reactorNoise, REACTOR_K: REACTOR_K, newReactor: newReactor, reactorStep: reactorStep, reactorView: reactorView, reactorScram: reactorScram,

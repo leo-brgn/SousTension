@@ -56,6 +56,11 @@ namespace SousTension.Spikes.MovingFrame
             return false;
         }
 
+        private readonly Dictionary<string, string[]> _hands = new Dictionary<string, string[]>();
+
+        /// <summary>What a player holds, [left, right, pocket] as cargo ids ("" = empty); all empty for an unknown player (E2-03).</summary>
+        public string[] HandsOf(string playerId) => _hands.TryGetValue(playerId ?? "", out var h) ? h : new[] { "", "", "" };
+
         public bool IsCarriedByLocal(string cargoId)
         {
             if (!_cargoLatest.TryGetValue(cargoId, out var c)) return false;
@@ -157,6 +162,7 @@ namespace SousTension.Spikes.MovingFrame
             var present = new HashSet<string>();
             foreach (var p in snapshot.Players)
             {
+                _hands[p.Id] = p.Hands;
                 if (p.Id == LocalId) continue;
                 present.Add(p.Id);
                 if (!_remotes.TryGetValue(p.Id, out var list)) { list = new List<Sample>(); _remotes[p.Id] = list; }

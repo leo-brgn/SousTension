@@ -13,19 +13,24 @@ namespace SousTension.Spikes.MovingFrame
     /// WASD + mouse look. Produces movement in BOAT-LOCAL axes (the look yaw is applied here, so the
     /// controller and the server never need to know about the camera).
     /// </summary>
-    public sealed class KeyboardInputSource : IInputSource
+    public sealed class KeyboardInputSource : IInputSource, IUseInput, IHandsInput
     {
         public float Yaw { get; private set; }   // radians, about the boat's up axis
         public float Pitch { get; private set; } // radians
 
         private const float Sensitivity = 0.0025f;
 
+        public bool UseHeld => Mouse.current != null && Mouse.current.leftButton.isPressed;
+        public bool TakeHeld => Keyboard.current != null && Keyboard.current.fKey.isPressed;
+        public bool DropHeld => Keyboard.current != null && Keyboard.current.gKey.isPressed;
+        public bool StowHeld => Keyboard.current != null && Keyboard.current.hKey.isPressed;
+
         public void Read(out float moveX, out float moveZ, out bool act, out bool grab)
         {
             var kb = Keyboard.current;
             float f = 0f, r = 0f;
             act = kb != null && kb.eKey.isPressed;
-            grab = kb != null && kb.fKey.isPressed;
+            grab = false;                      // the old F toggle is gone: F takes, G puts down, H stows (IHandsInput)
             if (kb != null)
             {
                 if (kb.wKey.isPressed || kb.zKey.isPressed) f += 1f;
