@@ -149,7 +149,9 @@ var CARGO_DEFS = [
   // Hull patches (E6-02): the toolbox of compartment 2. Light, used up on a leak, back in the toolbox 30 s later.
   { id: "patch1", kind: "patch", heavy: false, x: 0.6, z: 5.5 },
   { id: "patch2", kind: "patch", heavy: false, x: 1.0, z: 5.5 },
-  { id: "patch3", kind: "patch", heavy: false, x: 1.4, z: 5.5 }
+  { id: "patch3", kind: "patch", heavy: false, x: 1.4, z: 5.5 },
+  // Bucket (E6-03): same toolbox, never used up.
+  { id: "bucket", kind: "bucket", heavy: false, x: 1.8, z: 5.5 }
 ];
 // Boat tilt (must match BoatMotion.cs defaults: pitch 15 deg / 7 s, roll 20 deg / 5 s + 1 rad phase).
 var PITCH_AMP = 15 * Math.PI / 180, PITCH_PERIOD = 7;
@@ -453,6 +455,71 @@ function leaksView(L) {
   return out;
 }
 
+// ---- Bilge pumps and the bucket (E6-03) -------------------------------------------------------------------------------------
+// Two electric bilge pumps each pump the water out of THEIR OWN compartment at BILGE_CAPACITY (water in neighbouring compartments reaches it
+// through the open bulkhead openings, E6-01). A pump runs only while it is switched on, not broken and the plant produces electricity
+// (reactor.E above BILGE_MIN_E): a SCRAM stops them and the boat is bailed by hand. That electricity rule is provisional until the real
+// electrical network (E3-07). Bucket: a light cargo item (the toolbox of compartment 2); carried into a flooded compartment, one press
+// scoops BUCKET_VOLUME out, at most once per BUCKET_COOLDOWN_TICKS per player. The mop waits for the spills of E6-05.
+var BILGE_PUMPS = [
+  { id: "bilge0", comp: 1, x: -2.5, z: 4.5, reach: 1.0 },     // compartment 2, left wall
+  { id: "bilge1", comp: 4, x: 2.5, z: -5.0, reach: 0.9 }      // compartment 5, right wall
+];
+var BILGE_CAPACITY = 0.15;         // m3/s per pump
+var BILGE_MIN_E = 0.5;             // MWe the plant must produce for the pumps to turn
+var BUCKET_VOLUME = 0.015;         // m3 (15 L) per scoop
+var BUCKET_COOLDOWN_TICKS = 15;    // 1.5 s per player between two scoops
+
+function newBilge() {
+  var pumps = [];
+  for (var i = 0; i < BILGE_PUMPS.length; i++) pumps.push({ on: false, broken: false, run: false });
+  return { pumps: pumps, scoopTick: {} };           // scoopTick: player id -> tick of their last scoop
+}
+
+// A press at the pump's switch: toggles run/stop. A broken pump cannot be started.
+function bilgeToggle(b, i) {
+  var p = b.pumps[i];
+  if (!p.on && p.broken) return false;
+  p.on = !p.on;
+  return true;
+}
+
+// Breakdown / repair (nothing triggers a breakdown yet: E3-09; the spare part is E5/E9). A repaired pump stays stopped.
+function bilgeBreak(b, i) { b.pumps[i].broken = true; b.pumps[i].on = false; b.pumps[i].run = false; return true; }
+function bilgeRepair(b, i) { b.pumps[i].broken = false; return true; }
+
+// One 10 Hz step: every running pump takes up to BILGE_CAPACITY * DT out of its compartment.
+function bilgeStep(state) {
+  var powered = state.reactor.E > BILGE_MIN_E;
+  for (var i = 0; i < BILGE_PUMPS.length; i++) {
+    var p = state.bilge.pumps[i];
+    p.run = false;
+    if (!p.on || p.broken || !powered) continue;
+    p.run = waterRemove(state.water, BILGE_PUMPS[i].comp, BILGE_CAPACITY * DT) > 0;
+  }
+}
+
+// The interaction key pressed by a player carrying the bucket: scoop water out of the compartment they stand in. Returns true when the press
+// was used by the bucket (a scoop, or a scoop refused by the cooldown); false lets the press go to whatever else is in reach.
+function tryScoop(state, id, pl, tick) {
+  var held = heldBy(state.cargo, id);
+  if (!held || held.kind !== "bucket" || held.carriers.indexOf(id) < 0) return false;
+  var comp = compartmentAt(pl.z);
+  if (state.water.comps[comp].w <= 0) return false;
+  var last = state.bilge.scoopTick[id];
+  if (last !== undefined && tick - last < BUCKET_COOLDOWN_TICKS) return true;
+  waterRemove(state.water, comp, BUCKET_VOLUME);
+  state.bilge.scoopTick[id] = tick;
+  return true;
+}
+
+// Broadcast (and resync): s = 0 stopped, 1 on, 2 broken; r = 1 when the pump is actually moving water this tick.
+function bilgeView(b) {
+  var out = [];
+  for (var i = 0; i < b.pumps.length; i++) out.push({ s: b.pumps[i].broken ? 2 : (b.pumps[i].on ? 1 : 0), r: b.pumps[i].run ? 1 : 0 });
+  return out;
+}
+
 // ---- Reactor RK-1 "Petit Soleil" (E3-02) -------------------------------------------------------------------
 // Authoritative, deterministic model (fixed step = 1 tick = 0.1 s, seeded PRNG, no wall-clock). Design and
 // constants: docs/design/reactor-dependency-tree.md. All constants are starting hypotheses to be tuned by playtests.
@@ -664,7 +731,9 @@ var CONTROLS = [
   { id: "valve2", x: 2.5, z: 0.0, reach: 1.0, valve: 2 },
   { id: "valve3", x: 2.5, z: 1.5, reach: 1.0, valve: 3 },
   { id: "pump0", x: 2.5, z: 3.5, reach: 1.2, pump: 0 },
-  { id: "pump1", x: 2.5, z: 5.0, reach: 1.2, pump: 1 }
+  { id: "pump1", x: 2.5, z: 5.0, reach: 1.2, pump: 1 },
+  { id: "bilge0", x: -2.5, z: 4.5, reach: 1.0, bilge: 0 },
+  { id: "bilge1", x: 2.5, z: -5.0, reach: 0.9, bilge: 1 }
 ];
 var VALVE_TURN_RATE = 0.25;        // valve opening per second while the wheel is held (4 s from closed to open)
 var LEVER_COVER_TICKS = 60;        // 6 s at 10 Hz
@@ -729,6 +798,7 @@ function leverView(lever, reactor) {
 // The interaction key was pressed by player `id`: dispatch to the nearest interactable in reach.
 function tryAct(state, id, pl, tick) {
   if (tryRepair(state, id, pl, tick)) return;           // carrying a hull patch next to a leak: the press applies it (E6-02)
+  if (tryScoop(state, id, pl, tick)) return;            // carrying the bucket in a flooded compartment: the press scoops (E6-03)
   var bestControl = null, bestControlD = Infinity;
   for (var i = 0; i < CONTROLS.length; i++) {
     var d = controlDistance(pl, CONTROLS[i]);
@@ -740,6 +810,7 @@ function tryAct(state, id, pl, tick) {
     if (bestControl.id === "regime") useRegimeSelector(state.reactor);
     else if (bestControl.id === "scram") useScramLever(state.lever, state.reactor);
     else if (bestControl.pump !== undefined) togglePump(state.reactor, bestControl.pump);
+    else if (bestControl.bilge !== undefined) bilgeToggle(state.bilge, bestControl.bilge);
     return;
   }
   if (cmd) tryActivate(state.cp, id, pl, tick);
@@ -790,7 +861,7 @@ function restartView(state) {
 var matchInit = function (ctx, logger, nk, params) {
   logger.info("moving_frame match init");
   return {
-    state: { tick: 0, players: {}, order: [], cp: newCoupled(), cargo: newCargo(), reactor: newReactor(REACTOR_SEED, "veille"), lever: newLever(), boat: newBoat(), restart: newRestart(), water: newWater(), leaks: newLeaks() },
+    state: { tick: 0, players: {}, order: [], cp: newCoupled(), cargo: newCargo(), reactor: newReactor(REACTOR_SEED, "veille"), lever: newLever(), boat: newBoat(), restart: newRestart(), water: newWater(), leaks: newLeaks(), bilge: newBilge() },
     tickRate: TICK_RATE,
     label: JSON.stringify({ name: MATCH_NAME })
   };
@@ -866,6 +937,7 @@ var matchLoop = function (ctx, logger, nk, dispatcher, tick, state, messages) {
 
   evaluateCoupled(state, tick);
   leakStep(state, tick);
+  bilgeStep(state);
   waterStep(state.water);
   updateCargo(state, tick);
   reactorStep(state.reactor);
@@ -879,7 +951,7 @@ var matchLoop = function (ctx, logger, nk, dispatcher, tick, state, messages) {
     out.push({ id: id, x: q.x, z: q.z, seq: q.seq });
   }
   state.tick = tick;
-  dispatcher.broadcastMessage(OP_STATE, JSON.stringify({ tick: tick, t: tick * DT, players: out, il: coupledView(state.cp, tick)[0], cp: coupledView(state.cp, tick), cargo: cargoView(state.cargo), rx: reactorView(state.reactor), sc: leverView(state.lever, state.reactor), rs: restartView(state), bw: waterView(state.water), lk: leaksView(state.leaks), boat: boatView(state.boat) }), null, null, true);
+  dispatcher.broadcastMessage(OP_STATE, JSON.stringify({ tick: tick, t: tick * DT, players: out, il: coupledView(state.cp, tick)[0], cp: coupledView(state.cp, tick), cargo: cargoView(state.cargo), rx: reactorView(state.reactor), sc: leverView(state.lever, state.reactor), rs: restartView(state), bw: waterView(state.water), lk: leaksView(state.leaks), bp: bilgeView(state.bilge), boat: boatView(state.boat) }), null, null, true);
   return { state: state };
 };
 
@@ -935,6 +1007,8 @@ if (typeof module !== "undefined" && module.exports) {
     LEVER_COVER_TICKS: LEVER_COVER_TICKS, SINK_RATE_MAX: SINK_RATE_MAX, SINK_RAMP_SECONDS: SINK_RAMP_SECONDS, newBoat: newBoat, boatStep: boatStep,
     VALVE_TURN_RATE: VALVE_TURN_RATE, reactorBreakPump: reactorBreakPump, reactorRepairPump: reactorRepairPump,
     RESTART_VALVE_MIN: RESTART_VALVE_MIN,
+    BILGE_PUMPS: BILGE_PUMPS, BILGE_CAPACITY: BILGE_CAPACITY, BILGE_MIN_E: BILGE_MIN_E, BUCKET_VOLUME: BUCKET_VOLUME, BUCKET_COOLDOWN_TICKS: BUCKET_COOLDOWN_TICKS,
+    bilgeBreak: bilgeBreak, bilgeRepair: bilgeRepair, bilgeToggle: bilgeToggle,
     LEAK_RATES: LEAK_RATES, LEAK_REACH: LEAK_REACH, LEAK_FIRST_TICK: LEAK_FIRST_TICK, PATCH_RESPAWN_TICKS: PATCH_RESPAWN_TICKS, leakCreate: leakCreate, leakRate: leakRate,
     WATER_COMPARTMENTS: WATER_COMPARTMENTS, WATER_FLOW: WATER_FLOW, MAX_TRIM_DEG: MAX_TRIM_DEG, MAX_LIST_DEG: MAX_LIST_DEG, newWater: newWater, waterAdd: waterAdd,
     waterRemove: waterRemove, waterSetDoor: waterSetDoor, waterStep: waterStep, waterTotal: waterTotal, waterTilt: waterTilt, waterView: waterView, waterLevel: waterLevel, compartmentAt: compartmentAt,
