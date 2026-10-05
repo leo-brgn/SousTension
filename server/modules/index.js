@@ -33,43 +33,102 @@ function stepPlayer(p, mx, mz) {
   p.z = clamp(p.z + mz * MOVE_SPEED * DT, -HALF_Z, HALF_Z);
 }
 
-function newInterlock() {
-  return { st: [{ by: "", tick: 0 }, { by: "", tick: 0 }], result: "none", resultTick: 0, count: 0 };
+// ---- Coupled actions: the Rule of Two Players framework (E4-02) ----------------------------------------------------
+// A critical action needs TWO commands, far apart, activated by two DIFFERENT players within a window of 3 s (GDD 3.4). Actions are
+// DATA (COUPLED_ACTIONS); the engine below is generic: it tracks each action independently (several can be pending at once), validates
+// on the server only, and calls the action's effect once per successful pair. Nothing critical may ever be executable by one player.
+//
+// A command is { x, z, reach, kind }. kind "press" (one key press arms the command) is the only kind for now; "hold" (cranks, pedals)
+// will be added with the first action that needs it.
+//
+// Latency tolerance: the official window is 3 s (windowTicks, what the diegetic feedback counts down). The server accepts a second press up
+// to COUPLED_GRACE_TICKS later (0.3 s) so that two players with different latency still make the window when they press in time.
+var COUPLED_GRACE_TICKS = 3;
+
+var COUPLED_ACTIONS = [
+  // Spike demo pair: the two keys at the ends of the boat (kept from the E1-01 interlock).
+  { id: "demo", windowTicks: INTERLOCK_WINDOW_TICKS,
+    a: { x: STATIONS[0].x, z: STATIONS[0].z, reach: STATION_REACH, kind: "press" },
+    b: { x: STATIONS[1].x, z: STATIONS[1].z, reach: STATION_REACH, kind: "press" } },
+  // Second demo pair on the opposite diagonal: lets two pairs of players work independently at the same time.
+  { id: "demo2", windowTicks: INTERLOCK_WINDOW_TICKS,
+    a: { x: -2.5, z: 6.0, reach: STATION_REACH, kind: "press" },
+    b: { x: 2.5, z: -7.0, reach: STATION_REACH, kind: "press" } }
+];
+
+// Effects of successful actions: id -> function(state, actionId). Registered by the systems that own the action (E3-05 restart...).
+var COUPLED_EFFECTS = {};
+
+function newCoupled() {
+  var acts = [];
+  for (var i = 0; i < COUPLED_ACTIONS.length; i++)
+    acts.push({ st: [{ by: "", tick: 0 }, { by: "", tick: 0 }], result: "none", resultTick: 0, count: 0 });
+  return { acts: acts };
 }
 
-// A player at a station presses the key. Rejected when out of reach, when the station is already held, or when
-// the same player already holds the other station (the rule needs two different players).
-function tryActivate(il, id, pl, tick) {
-  var best = -1, bestD = STATION_REACH;
-  for (var i = 0; i < STATIONS.length; i++) {
-    var dx = pl.x - STATIONS[i].x, dz = pl.z - STATIONS[i].z;
-    var d = Math.sqrt(dx * dx + dz * dz);
-    if (d <= bestD) { best = i; bestD = d; }
+// The nearest command (of any action) within its reach: { ai, side, d } or null.
+function nearestCommand(pl) {
+  var best = null;
+  for (var i = 0; i < COUPLED_ACTIONS.length; i++) {
+    for (var s = 0; s < 2; s++) {
+      var c = s === 0 ? COUPLED_ACTIONS[i].a : COUPLED_ACTIONS[i].b;
+      var dx = pl.x - c.x, dz = pl.z - c.z;
+      var d = Math.sqrt(dx * dx + dz * dz);
+      if (d <= c.reach && (best === null || d < best.d)) best = { ai: i, side: s, d: d };
+    }
   }
-  if (best < 0 || il.st[best].by !== "") return;
-  if (il.st[1 - best].by === id) return;
-  il.st[best].by = id; il.st[best].tick = tick;
+  return best;
 }
 
-// Success when both stations are held (by different players, guaranteed by tryActivate) and each was pressed
-// within the window of the first one; otherwise the first press expires after the window.
-function evaluateInterlock(il, tick) {
-  var a = il.st[0], b = il.st[1];
-  if (a.by !== "" && b.by !== "") {
-    il.result = "success"; il.resultTick = tick; il.count++;
-    a.by = ""; b.by = ""; return;
-  }
-  for (var i = 0; i < 2; i++) {
-    var s = il.st[i];
-    if (s.by !== "" && tick - s.tick >= INTERLOCK_WINDOW_TICKS) {
-      il.result = "timeout"; il.resultTick = tick; s.by = "";
+// A player presses the key at a command. Rejected when out of reach, when the command is already armed, or when the same
+// player already holds the other command of that action (the rule needs two different players).
+function tryActivate(cp, id, pl, tick) {
+  var c = nearestCommand(pl);
+  if (c === null) return;
+  var act = cp.acts[c.ai];
+  if (act.st[c.side].by !== "") return;
+  if (act.st[1 - c.side].by === id) return;
+  act.st[c.side].by = id; act.st[c.side].tick = tick;
+}
+
+// Success when both commands of an action are armed (by different players, guaranteed by tryActivate): the pair is released and the
+// action's effect runs once. An armed command expires once the window plus the latency grace has passed.
+function evaluateCoupled(state, tick) {
+  var cp = state.cp;
+  for (var i = 0; i < COUPLED_ACTIONS.length; i++) {
+    var def = COUPLED_ACTIONS[i], act = cp.acts[i];
+    var a = act.st[0], b = act.st[1];
+    if (a.by !== "" && b.by !== "") {
+      act.result = "success"; act.resultTick = tick; act.count++;
+      a.by = ""; b.by = "";
+      var effect = COUPLED_EFFECTS[def.id];
+      if (effect) effect(state, def.id);
+      continue;
+    }
+    for (var s = 0; s < 2; s++) {
+      var st = act.st[s];
+      if (st.by !== "" && tick - st.tick >= def.windowTicks + COUPLED_GRACE_TICKS) {
+        act.result = "timeout"; act.resultTick = tick; st.by = "";
+      }
     }
   }
 }
 
-function interlockView(il, tick) {
-  function rem(s) { return s.by === "" ? 0 : Math.max(0, INTERLOCK_WINDOW_TICKS - (tick - s.tick)); }
-  return { a: rem(il.st[0]), b: rem(il.st[1]), ab: il.st[0].by, bb: il.st[1].by, result: il.result, rt: il.resultTick, n: il.count };
+// A player left the match: release every command they had armed.
+function releaseCoupled(cp, id) {
+  for (var i = 0; i < cp.acts.length; i++)
+    for (var s = 0; s < 2; s++) if (cp.acts[i].st[s].by === id) cp.acts[i].st[s].by = "";
+}
+
+// Broadcast (also the full resync after a reconnection). a / b = ticks left of the official window for each armed command.
+function coupledView(cp, tick) {
+  var out = [];
+  for (var i = 0; i < COUPLED_ACTIONS.length; i++) {
+    var def = COUPLED_ACTIONS[i], act = cp.acts[i];
+    var rem = function (s) { return s.by === "" ? 0 : Math.max(0, def.windowTicks - (tick - s.tick)); };
+    out.push({ id: def.id, a: rem(act.st[0]), b: rem(act.st[1]), ab: act.st[0].by, bb: act.st[1].by, result: act.result, rt: act.resultTick, n: act.count });
+  }
+  return out;
 }
 
 // ---- Carried & sliding cargo (boat-local space, no physics engine) -----------------------------------------
@@ -374,7 +433,7 @@ function boatView(boat) {
 
 // ---- Interactive controls (boat-local) ---------------------------------------------------------------------
 // One interaction key ("act") serves every control: the server picks the nearest interactable within reach, so the
-// client never has to say what it is pressing (and cannot cheat about it). Interlock stations live in interlock.js;
+// client never has to say what it is pressing (and cannot cheat about it). Coupled-action commands live in coupled.js;
 // the other controls are listed here.
 //   regime : the RK-1 three-position selector (compartment 4, left wall). One press turns it to the next position
 //            (Veille -> Croisiere -> Pleine -> Veille). A single player is enough: the Rule of Two Players covers
@@ -461,25 +520,21 @@ function tryAct(state, id, pl, tick) {
     var d = controlDistance(pl, CONTROLS[i]);
     if (d <= CONTROLS[i].reach && d < bestControlD) { bestControl = CONTROLS[i]; bestControlD = d; }
   }
-  var bestStationD = Infinity;
-  for (var s = 0; s < STATIONS.length; s++) {
-    var dx = pl.x - STATIONS[s].x, dz = pl.z - STATIONS[s].z;
-    var ds = Math.sqrt(dx * dx + dz * dz);
-    if (ds <= STATION_REACH && ds < bestStationD) bestStationD = ds;
-  }
+  var cmd = nearestCommand(pl);
+  var bestStationD = cmd ? cmd.d : Infinity;
   if (bestControl && bestControlD < bestStationD) {
     if (bestControl.id === "regime") useRegimeSelector(state.reactor);
     else if (bestControl.id === "scram") useScramLever(state.lever, state.reactor);
     else if (bestControl.pump !== undefined) togglePump(state.reactor, bestControl.pump);
     return;
   }
-  if (bestStationD < Infinity) tryActivate(state.il, id, pl, tick);
+  if (cmd) tryActivate(state.cp, id, pl, tick);
 }
 
 var matchInit = function (ctx, logger, nk, params) {
   logger.info("moving_frame match init");
   return {
-    state: { tick: 0, players: {}, order: [], il: newInterlock(), cargo: newCargo(), reactor: newReactor(REACTOR_SEED, "veille"), lever: newLever(), boat: newBoat() },
+    state: { tick: 0, players: {}, order: [], cp: newCoupled(), cargo: newCargo(), reactor: newReactor(REACTOR_SEED, "veille"), lever: newLever(), boat: newBoat() },
     tickRate: TICK_RATE,
     label: JSON.stringify({ name: MATCH_NAME })
   };
@@ -508,7 +563,7 @@ var matchLeave = function (ctx, logger, nk, dispatcher, tick, state, presences) 
   for (var i = 0; i < presences.length; i++) {
     var id = presences[i].userId;
     delete state.players[id];
-    for (var si = 0; si < 2; si++) if (state.il.st[si].by === id) state.il.st[si].by = "";
+    releaseCoupled(state.cp, id);
     var heldCargo = heldBy(state.cargo, id);
     if (heldCargo) { if (heldCargo.pend === id) heldCargo.pend = ""; heldCargo.carriers = []; heldCargo.vx = 0; heldCargo.vz = 0; }
     var idx = state.order.indexOf(id);
@@ -553,7 +608,7 @@ var matchLoop = function (ctx, logger, nk, dispatcher, tick, state, messages) {
     }
   }
 
-  evaluateInterlock(state.il, tick);
+  evaluateCoupled(state, tick);
   updateCargo(state, tick);
   reactorStep(state.reactor);
   leverStep(state.lever);
@@ -566,7 +621,7 @@ var matchLoop = function (ctx, logger, nk, dispatcher, tick, state, messages) {
     out.push({ id: id, x: q.x, z: q.z, seq: q.seq });
   }
   state.tick = tick;
-  dispatcher.broadcastMessage(OP_STATE, JSON.stringify({ tick: tick, t: tick * DT, players: out, il: interlockView(state.il, tick), cargo: cargoView(state.cargo), rx: reactorView(state.reactor), sc: leverView(state.lever, state.reactor), boat: boatView(state.boat) }), null, null, true);
+  dispatcher.broadcastMessage(OP_STATE, JSON.stringify({ tick: tick, t: tick * DT, players: out, il: coupledView(state.cp, tick)[0], cp: coupledView(state.cp, tick), cargo: cargoView(state.cargo), rx: reactorView(state.reactor), sc: leverView(state.lever, state.reactor), boat: boatView(state.boat) }), null, null, true);
   return { state: state };
 };
 
@@ -621,6 +676,7 @@ if (typeof module !== "undefined" && module.exports) {
     OP_INPUT: OP_INPUT, OP_STATE: OP_STATE,
     LEVER_COVER_TICKS: LEVER_COVER_TICKS, SINK_RATE_MAX: SINK_RATE_MAX, SINK_RAMP_SECONDS: SINK_RAMP_SECONDS, newBoat: newBoat, boatStep: boatStep,
     VALVE_TURN_RATE: VALVE_TURN_RATE, reactorBreakPump: reactorBreakPump, reactorRepairPump: reactorRepairPump,
+    COUPLED_ACTIONS: COUPLED_ACTIONS, COUPLED_EFFECTS: COUPLED_EFFECTS, COUPLED_GRACE_TICKS: COUPLED_GRACE_TICKS,
     CONTROLS: CONTROLS, REGIME_ORDER: REGIME_ORDER, tryAct: tryAct,
     reactorNoise: reactorNoise, REACTOR_K: REACTOR_K, newReactor: newReactor, reactorStep: reactorStep, reactorView: reactorView, reactorScram: reactorScram,
     reactorRestart: reactorRestart, reactorSetRegime: reactorSetRegime, reactorSetValve: reactorSetValve, reactorSetPump: reactorSetPump,

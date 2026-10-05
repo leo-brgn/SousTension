@@ -123,20 +123,19 @@ test("interlock: two different players at the two stations within the window suc
   assert.strictEqual(il.a, 0); assert.strictEqual(il.b, 0); // both stations released
 });
 
-test("interlock: the window is inclusive at exactly 3 s and expires after", () => {
-  let c = lockSetup(["a", "b"]);
-  place(c, "a", 0, -9); place(c, "b", 0, 9);
-  tickWith(c, [inputAct(c, "a", true)]);
-  for (let i = 0; i < m.INTERLOCK_WINDOW_TICKS - 1; i++) tickWith(c, []);
-  assert.strictEqual(tickWith(c, [inputAct(c, "b", true)]).result, "success"); // exactly 30 ticks later
-
-  c = lockSetup(["a", "b"]);
-  place(c, "a", 0, -9); place(c, "b", 0, 9);
-  tickWith(c, [inputAct(c, "a", true)]);
-  for (let i = 0; i < m.INTERLOCK_WINDOW_TICKS; i++) tickWith(c, []);
-  const il = tickWith(c, [inputAct(c, "b", true)]);                           // too late
-  assert.strictEqual(il.result, "timeout");
-  assert.strictEqual(il.n, 0);
+test("interlock: the window is 3 s, the server tolerates 0.3 s more (latency grace), and expires after", () => {
+  const press = (delayTicks) => {                                           // second press arrives `delayTicks` after the first
+    const c = lockSetup(["a", "b"]);
+    place(c, "a", 0, -9); place(c, "b", 0, 9);
+    tickWith(c, [inputAct(c, "a", true)]);
+    for (let i = 0; i < delayTicks - 1; i++) tickWith(c, []);
+    return tickWith(c, [inputAct(c, "b", true)]);
+  };
+  assert.strictEqual(press(m.INTERLOCK_WINDOW_TICKS).result, "success");                          // exactly 3.0 s
+  assert.strictEqual(press(m.INTERLOCK_WINDOW_TICKS + m.COUPLED_GRACE_TICKS - 1).result, "success"); // 3.2 s: inside the grace
+  const late = press(m.INTERLOCK_WINDOW_TICKS + m.COUPLED_GRACE_TICKS + 1);                       // 3.4 s: too late
+  assert.strictEqual(late.result, "timeout");
+  assert.strictEqual(late.n, 0);
 });
 
 test("interlock: one player can never hold both stations", () => {
@@ -534,4 +533,98 @@ test("valve and pump state is always in the broadcast (reconnection resync)", ()
 test("valve: holding sets a deterministic opening (same inputs, same valves, with the seeded drift)", () => {
   const run = () => { const c = lockSetup(["a"]); place(c, "a", ctl("valve0").x - 0.5, ctl("valve0").z); for (let i = 0; i < 300; i++) tickWith(c, [inputHold(c, "a")]); return JSON.stringify(c.state.reactor.valves); };
   assert.strictEqual(run(), run());
+});
+
+// ---- Coupled-action framework (E4-02): several independent actions, effects, resync ----
+const DEMO2 = m.COUPLED_ACTIONS.find((x) => x.id === "demo2");
+function cpOf(c, id) { return c.d.sent[c.d.sent.length - 1].data.cp.find((x) => x.id === id); }
+
+test("coupled: every action is listed in the broadcast with its id (resync after a reconnection)", () => {
+  const c = lockSetup(["a"]);
+  tickWith(c, []);
+  const cp = c.d.sent[c.d.sent.length - 1].data.cp;
+  assert.deepStrictEqual(cp.map((x) => x.id), m.COUPLED_ACTIONS.map((x) => x.id));
+  assert.ok(m.COUPLED_ACTIONS.length >= 2);
+});
+
+test("coupled: two actions run independently and at the same time with four players", () => {
+  const c = lockSetup(["a", "b", "c", "d"]);
+  place(c, "a", 0, -9); place(c, "b", 0, 9);                                    // demo pair
+  place(c, "c", DEMO2.a.x, DEMO2.a.z); place(c, "d", DEMO2.b.x, DEMO2.b.z);     // demo2 pair
+  tickWith(c, [inputAct(c, "a", true), inputAct(c, "c", true)]);
+  assert.strictEqual(cpOf(c, "demo").ab, "a"); assert.strictEqual(cpOf(c, "demo2").ab, "c");
+  tickWith(c, [inputAct(c, "b", true)]);                                         // completes demo only
+  assert.strictEqual(cpOf(c, "demo").result, "success");
+  assert.strictEqual(cpOf(c, "demo2").result, "none");
+  assert.strictEqual(cpOf(c, "demo2").ab, "c", "the other action is still waiting for its partner");
+  tickWith(c, [inputAct(c, "d", true)]);
+  assert.strictEqual(cpOf(c, "demo2").result, "success");
+  assert.strictEqual(cpOf(c, "demo").n, 1); assert.strictEqual(cpOf(c, "demo2").n, 1);
+});
+
+test("coupled: the same player can never hold both commands of an action, and cannot satisfy it alone", () => {
+  const c = lockSetup(["a", "b"]);
+  place(c, "a", DEMO2.a.x, DEMO2.a.z);
+  tickWith(c, [inputAct(c, "a", true)]);
+  place(c, "a", DEMO2.b.x, DEMO2.b.z);
+  tickWith(c, [inputAct(c, "a", true)]);
+  assert.strictEqual(cpOf(c, "demo2").bb, "");
+  assert.notStrictEqual(cpOf(c, "demo2").result, "success");
+});
+
+test("coupled: a command that is already armed cannot be taken over by another player (no stealing the slot)", () => {
+  const c = lockSetup(["a", "b"]);
+  place(c, "a", DEMO2.a.x, DEMO2.a.z); place(c, "b", DEMO2.a.x + 0.3, DEMO2.a.z);
+  tickWith(c, [inputAct(c, "a", true)]);
+  tickWith(c, [inputAct(c, "b", true)]);
+  assert.strictEqual(cpOf(c, "demo2").ab, "a");
+  assert.strictEqual(cpOf(c, "demo2").result, "none");
+});
+
+test("coupled: the effect of an action runs exactly once per successful pair, with the action id, and never on a timeout", () => {
+  const calls = [];
+  m.COUPLED_EFFECTS.demo2 = (state, id) => calls.push(id + ":" + state.tick);
+  try {
+    const c = lockSetup(["a", "b"]);
+    place(c, "a", DEMO2.a.x, DEMO2.a.z); place(c, "b", DEMO2.b.x, DEMO2.b.z);
+    tickWith(c, [inputAct(c, "a", true)]);
+    for (let i = 0; i < 50; i++) tickWith(c, []);                                // first press expires
+    assert.strictEqual(calls.length, 0);
+    tickWith(c, [inputAct(c, "a", true)]);
+    tickWith(c, [inputAct(c, "b", true)]);
+    for (let i = 0; i < 20; i++) tickWith(c, []);                                // nothing re-fires afterwards
+    assert.strictEqual(calls.length, 1);
+    assert.ok(calls[0].startsWith("demo2:"));
+  } finally { delete m.COUPLED_EFFECTS.demo2; }
+});
+
+test("coupled: leaving the match releases the commands that player had armed on every action", () => {
+  const c = lockSetup(["a", "b"]);
+  place(c, "a", DEMO2.a.x, DEMO2.a.z);
+  tickWith(c, [inputAct(c, "a", true)]);
+  assert.strictEqual(cpOf(c, "demo2").ab, "a");
+  c.state = h.matchLeave({}, logger, nk, null, c.tick, c.state, [presence("a")]).state;
+  tickWith(c, []);
+  assert.strictEqual(cpOf(c, "demo2").ab, "");
+});
+
+test("coupled: the nearest command wins and pressing near one action does not arm the other", () => {
+  const c = lockSetup(["a"]);
+  place(c, "a", DEMO2.a.x, DEMO2.a.z);
+  tickWith(c, [inputAct(c, "a", true)]);
+  assert.strictEqual(cpOf(c, "demo").ab, ""); assert.strictEqual(cpOf(c, "demo").bb, "");
+  assert.strictEqual(cpOf(c, "demo2").ab, "a");
+});
+
+test("coupled: the countdown shown to the clients is the official 3 s window even though the server tolerates a little more", () => {
+  const c = lockSetup(["a"]);
+  place(c, "a", DEMO2.a.x, DEMO2.a.z);
+  tickWith(c, [inputAct(c, "a", true)]);
+  assert.strictEqual(cpOf(c, "demo2").a, DEMO2.windowTicks);
+  for (let i = 0; i < DEMO2.windowTicks; i++) tickWith(c, []);
+  assert.strictEqual(cpOf(c, "demo2").a, 0);
+  assert.strictEqual(cpOf(c, "demo2").ab, "a", "still armed during the latency grace");
+  for (let i = 0; i < m.COUPLED_GRACE_TICKS; i++) tickWith(c, []);
+  assert.strictEqual(cpOf(c, "demo2").ab, "");
+  assert.strictEqual(cpOf(c, "demo2").result, "timeout");
 });

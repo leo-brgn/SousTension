@@ -29,6 +29,14 @@ namespace SousTension.Spikes.MovingFrame
         }
     }
 
+    /// <summary>One coupled action of the Rule of Two Players (E4-02): its id and the state of its two commands.</summary>
+    public readonly struct CoupledActionState
+    {
+        public readonly string Id;
+        public readonly InterlockState State;
+        public CoupledActionState(string id, InterlockState state) { Id = id ?? ""; State = state; }
+    }
+
     /// <summary>Authoritative state of one piece of cargo, in boat-local space.</summary>
     public readonly struct CargoState
     {
@@ -97,10 +105,12 @@ namespace SousTension.Spikes.MovingFrame
         public readonly ReactorState Reactor;
         public readonly ScramLeverState Lever;
         public readonly BoatDepthState Boat;
+        public readonly CoupledActionState[] Coupled;
 
         public StateSnapshot(int tick, double serverTime, PlayerState[] players, InterlockState interlock = default, CargoState[] cargo = null, ReactorState reactor = default,
-            ScramLeverState lever = default, BoatDepthState boat = default)
+            ScramLeverState lever = default, BoatDepthState boat = default, CoupledActionState[] coupled = null)
         {
+            Coupled = coupled ?? new CoupledActionState[0];
             Lever = lever; Boat = boat;
             Tick = tick; ServerTime = serverTime; Players = players; Interlock = interlock; Cargo = cargo ?? new CargoState[0]; Reactor = reactor;
         }
