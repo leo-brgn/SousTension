@@ -202,14 +202,14 @@ Références visuelles : `moodboard/01..05`, `moodboard/v2_references/01..16`, e
 - [ ] **E11-01 🎨 Bible artistique** (à partir du moodboard v2) : palette, proportions, langage de formes, règle du rouge unique, références hors-limites. `M` · PROTO
 - [ ] **E11-02 🎨 Typographie « administration kravique »** + tampons + gabarit **K-90/B** (formulaire de fin de mission, 3 exemplaires — TODO §2.1). `M` · `VS`
 - [ ] **E11-03 🎨 Système de lumière/tension** : blanc → orange → rouge → noir ; plafonnier par compartiment, éclairage de secours rouge, lampes torches. `L` · PROTO
-- [ ] **E11-04 🎨 Matelot de base** (corps pataud, rig complet + mains 1re personne) — réf. `v2_references/11_equipage_personnages.png` : silhouettes en œuf, moustaches, casquettes vertes à étoile rouge. `L` · PROTO
+- [x] **E11-04 🎨 Matelot de base** (corps pataud, rig complet + mains 1re personne) — réf. `v2_references/11_equipage_personnages.png` : silhouettes en œuf, moustaches, casquettes vertes à étoile rouge. `L` · PROTO
 - [ ] **E11-05 🎨 Concepts manquants** : plans d'ensemble du bateau (coupe 6 compartiments), carte des zones, Entente (frégate/avion), sous-marin jumeau. `L`
 
 ## Production d'assets (suivre l'ordre d'attaque du GDD)
-- [ ] **E11-06 🎨 Kit structure** : coque droite 2 m, cloison, sas de cloison 🔧, caillebotis, fond de cale, tuyauterie modulaire. `L` · PROTO
-- [ ] **E11-07 🎨 Kit instruments (le plus rentable)** : ~15 meshes de base (manomètres S/M/L, indicateur vertical, compteur à rouleaux, voyant, VU-mètre, levier, bouton sous garde, sélecteur, volants S/M/L, manivelle, roue crantée) — réf. `v2_references/12_instruments_kit.png`. `L` · PROTO
-- [ ] **E11-08 🎨 Réacteur** : tableau RK-1 🔧, levier SCRAM 🔧 (« asset le plus filmé », soigner à l'extrême), pompes ×2, vannes ×4 — réf. `02_reacteur_scram.png`, `03_poste_reacteur_panne.png`. `L` · PROTO
-- [ ] **E11-09 🎨 Poste central** : barre, pupitre, télégraphe, table à cartes, **Manuel OK-114**, tube pneumatique + capsule — réf. `01_poste_central.png`, `07_manuel_ok114.png`, `13_commandant_capsule.png`. `L` · PROTO/VS
+- [x] **E11-06 🎨 Kit structure** : coque droite 2 m, cloison, sas de cloison 🔧, caillebotis, fond de cale, tuyauterie modulaire. `L` · PROTO
+- [x] **E11-07 🎨 Kit instruments (le plus rentable)** : ~15 meshes de base (manomètres S/M/L, indicateur vertical, compteur à rouleaux, voyant, VU-mètre, levier, bouton sous garde, sélecteur, volants S/M/L, manivelle, roue crantée) — réf. `v2_references/12_instruments_kit.png`. `L` · PROTO
+- [x] **E11-08 🎨 Réacteur** : tableau RK-1 🔧, levier SCRAM 🔧 (« asset le plus filmé », soigner à l'extrême), pompes ×2, vannes ×4 — réf. `02_reacteur_scram.png`, `03_poste_reacteur_panne.png`. `L` · PROTO
+- [x] **E11-09 🎨 Poste central** : barre, pupitre, télégraphe, table à cartes, **Manuel OK-114**, tube pneumatique + capsule — réf. `01_poste_central.png`, `07_manuel_ok114.png`, `13_commandant_capsule.png`. `L` · PROTO/VS
 - [ ] **E11-10 🎨 Machines** : tableau électrique (~20 disjoncteurs à états), pompes de cale, interphone (même asset partout), turbine, batteries. `L`
 - [ ] **E11-11 🎨 Sas & vie** : sas de plongée, scaphandre, douche de décon 🔧 (réf. `04_douche_decon.png`, `10_scaphandre_depot.png`), cambuse + marmite (réf. `05_cambuse_soupe.png`), couchettes, **porte du carré** (réf. `06_porte_carre.png`). `XL`
 - [ ] **E11-12 🎨 Radio & sonar** : console sonar, enregistreur à bandes, poste VLF + antenne, machine à chiffrer. `L` · `VS/ALPHA`
