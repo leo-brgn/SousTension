@@ -18,11 +18,11 @@ namespace SousTension.Spikes.MovingFrame
         private const long OpInput = 1;
         private const long OpState = 2;
 
-        [Serializable] private class InputDto { public int seq; public float mx; public float mz; public bool act; public bool grab; public bool hold; public string use; public string hand; }
+        [Serializable] private class InputDto { public int seq; public float mx; public float mz; public bool act; public bool grab; public bool hold; public string use; public string hand; public float ry; }
         [Serializable] private class PlayerDto { public string id; public float x; public float z; public int seq; public string[] hd; }
         [Serializable] private class InterlockDto { public int a; public int b; public string ab; public string bb; public string result; public int rt; public int n; }
         [Serializable] private class CoupledDto { public string id; public int a; public int b; public string ab; public string bb; public string result; public int rt; public int n; }
-        [Serializable] private class CargoDto { public string id; public float x; public float z; public int h; public string[] c; public string p; public string k; public int a; }
+        [Serializable] private class CargoDto { public string id; public float x; public float z; public int h; public string[] c; public string p; public string k; public int a; public float y; }
         [Serializable] private class ReactorDto { public string reg; public float R; public float nz; public float P; public float T; public float S; public float E; public float eta; public float F; public float[] v; public int[] pu; public int scram; public int auto; public int leak; public int warn; public int crit; }
         [Serializable] private class LeverDto { public int cv; public int pl; }
         [Serializable] private class RestartDto { public int[] s; public string last; public int lt; public int n; }
@@ -69,10 +69,10 @@ namespace SousTension.Spikes.MovingFrame
             await _socket.JoinMatchAsync(_matchId);
         }
 
-        public void SendInput(int seq, float moveX, float moveZ, bool act, bool grab, bool hold = false, string use = null, string hand = null)
+        public void SendInput(int seq, float moveX, float moveZ, bool act, bool grab, bool hold = false, string use = null, string hand = null, float yaw = 0f)
         {
             if (_socket == null || !_socket.IsConnected) return;
-            var json = JsonUtility.ToJson(new InputDto { seq = seq, mx = moveX, mz = moveZ, act = act, grab = grab, hold = hold, use = use ?? "", hand = hand ?? "" });
+            var json = JsonUtility.ToJson(new InputDto { seq = seq, mx = moveX, mz = moveZ, act = act, grab = grab, hold = hold, use = use ?? "", hand = hand ?? "", ry = yaw });
             var bytes = Encoding.UTF8.GetBytes(json);
             Interlocked.Add(ref _bytesSent, bytes.Length);
             _ = SendAsync(bytes);
@@ -100,7 +100,7 @@ namespace SousTension.Spikes.MovingFrame
             for (int i = 0; i < cargo.Length; i++)
             {
                 var c = dto.cargo[i];
-                cargo[i] = new CargoState(c.id, c.x, c.z, c.h == 1, c.c, c.p, c.k, c.a != 0);
+                cargo[i] = new CargoState(c.id, c.x, c.z, c.h == 1, c.c, c.p, c.k, c.a != 0, c.y);
             }
             ReactorState reactor = default;
             if (dto.rx != null && !string.IsNullOrEmpty(dto.rx.reg))

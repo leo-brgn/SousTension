@@ -48,10 +48,11 @@ namespace SousTension.Spikes.MovingFrame
         public readonly string Pending;      // first carrier of a heavy item, waiting for the second one
         public readonly string Kind;         // "crate" | "patch" (hull patch, E6-02)
         public readonly bool Active;         // false for a used patch that has not yet respawned in the toolbox
+        public readonly float Y;             // height above the floor (E2-04): > 0 while a thrown item is in the air
 
-        public CargoState(string id, float x, float z, bool heavy, string[] carriers, string pending, string kind = "crate", bool active = true)
+        public CargoState(string id, float x, float z, bool heavy, string[] carriers, string pending, string kind = "crate", bool active = true, float y = 0f)
         {
-            Kind = kind ?? "crate"; Active = active;
+            Kind = kind ?? "crate"; Active = active; Y = y;
             Id = id; X = x; Z = z; Heavy = heavy; Carriers = carriers ?? new string[0]; Pending = pending ?? "";
         }
     }

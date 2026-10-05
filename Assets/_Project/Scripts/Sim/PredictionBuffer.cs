@@ -10,7 +10,7 @@ namespace SousTension.Sim
     /// </summary>
     public sealed class PredictionBuffer
     {
-        private struct Pending { public int Seq; public float Mx, Mz; }
+        private struct Pending { public int Seq; public float Mx, Mz, Factor; }
 
         private readonly List<Pending> _pending = new List<Pending>();
         private int _nextSeq = 1;
@@ -25,13 +25,13 @@ namespace SousTension.Sim
         }
 
         /// <summary>Apply one input tick locally and return its sequence number (to send to the server).</summary>
-        public int Predict(float mx, float mz)
+        public int Predict(float mx, float mz, float speedFactor = 1f)
         {
             int seq = _nextSeq++;
             float x = X, z = Z;
-            CharacterMotion.Step(ref x, ref z, mx, mz);
+            CharacterMotion.Step(ref x, ref z, mx, mz, speedFactor);
             X = x; Z = z;
-            _pending.Add(new Pending { Seq = seq, Mx = mx, Mz = mz });
+            _pending.Add(new Pending { Seq = seq, Mx = mx, Mz = mz, Factor = speedFactor });
             return seq;
         }
 
@@ -41,7 +41,7 @@ namespace SousTension.Sim
             float oldX = X, oldZ = Z;
             _pending.RemoveAll(p => p.Seq <= ackedSeq);
             float x = serverX, z = serverZ;
-            foreach (var p in _pending) CharacterMotion.Step(ref x, ref z, p.Mx, p.Mz);
+            foreach (var p in _pending) CharacterMotion.Step(ref x, ref z, p.Mx, p.Mz, p.Factor);
             X = x; Z = z;
             float dx = X - oldX, dz = Z - oldZ;
             return (float)Math.Sqrt(dx * dx + dz * dz);

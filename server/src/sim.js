@@ -27,9 +27,11 @@ function simStep(state, tick) {
     pl.allowance = Math.min(MAX_ALLOWANCE, pl.allowance + 1);
     while (pl.allowance >= 1 && pl.queue.length > 0) {
       var next = pl.queue.shift();
-      stepPlayer(pl, next.mx, next.mz);
+      if (next.ry !== null) pl.yaw = next.ry;
+      stepPlayer(pl, next.mx, next.mz, carrySpeedFactor(state, state.order[k]));
       if (next.act) { if (next.use) useTarget(state, state.order[k], pl, tick, next.use); else tryAct(state, state.order[k], pl, tick); }
       if (next.hold) { if (next.use) holdTarget(state, pl, next.use); else tryHold(state, pl); }
+      if (next.throw) throwItem(state, state.order[k], pl);
       if (next.take) takeItem(state, state.order[k], pl, tick);
       if (next.drop) dropItem(state, state.order[k], pl, next.drop);
       if (next.stow) stowItem(state, state.order[k], pl);
@@ -59,6 +61,8 @@ function queueInput(p, input) {
   p.lastQueued = input.seq;
   p.queue.push({ seq: input.seq, mx: +input.mx || 0, mz: +input.mz || 0, act: input.act === true || input.act === 1,
                  grab: input.grab === true || input.grab === 1, hold: input.hold === true || input.hold === 1,
+                 ry: typeof input.ry === "number" && isFinite(input.ry) ? input.ry : null,
+                 throw: input.throw === true || input.throw === 1 || input.hand === "throw",
                  use: typeof input.use === "string" && input.use.length <= 40 ? input.use : "",
                  take: input.take === true || input.take === 1 || input.hand === "take", stow: input.stow === true || input.stow === 1 || input.hand === "stow",
                  drop: input.drop === "L" || input.drop === "R" || input.drop === "P" ? input.drop

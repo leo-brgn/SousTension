@@ -7,13 +7,21 @@
 //
 // Protocol (input fields): take (pick the nearest item into free hands), drop (true = the last item taken, or "L" / "R" / "P" for a slot), stow
 // (a pocketable one-hand item goes hand -> pocket, or pocket -> hand). The legacy field grab stays: it drops what you hold, else takes (the old F key).
+// mass in kg (E2-04): what you carry slows you down, a shared (heavy) item is carried half each.
 var ITEM_KINDS = {
-  crate: { hands: 2 },
-  fuel: { hands: 2 },
-  patch: { hands: 1 },
-  bucket: { hands: 1 },
-  flashlight: { hands: 1, pocket: true }
+  crate: { hands: 2, mass: 12 },
+  fuel: { hands: 2, mass: 40 },
+  patch: { hands: 1, mass: 1 },
+  bucket: { hands: 1, mass: 2 },
+  flashlight: { hands: 1, pocket: true, mass: 0.5 }
 };
+var CARRY_SLOWDOWN_PER_KG = 0.012;       // walking speed factor = 1 - this x carried mass ...
+var CARRY_MIN_FACTOR = 0.5;              // ... never below this
+var THROW_SPEED = 6;                     // m/s horizontal, along the player's heading (E2-04)
+var THROW_UP = 2;                        // m/s upwards: a small arc
+var THROW_HEIGHT = 1.2;                  // m above the floor when it leaves the hand
+var THROW_BOUNCE = 0.3;                  // fraction of the speed kept after hitting a wall
+var THROW_LAND_KEEP = 0.5;               // fraction of the horizontal speed kept on landing: the item then slides like any loose cargo
 
 function newHands() { return { l: "", r: "", p: "", order: [] }; }     // slots hold cargo ids; order = items in the order they were taken
 
@@ -25,6 +33,23 @@ function cargoById(cargo, id) {
 function freeHandCount(h) { return (h.l === "" ? 1 : 0) + (h.r === "" ? 1 : 0); }
 function holdsTwoHanded(h) { return h.l !== "" && h.l === h.r; }
 function holdsAnything(h) { return h.l !== "" || h.r !== "" || h.p !== ""; }
+// Mass carried by a player (kg): every distinct item in their hands and pocket, a heavy item counts half (two carriers).
+function carriedMass(state, playerId) {
+  var h = state.players[playerId].hands, seen = [], mass = 0;
+  var slots = [h.l, h.r, h.p];
+  for (var i = 0; i < slots.length; i++) {
+    if (slots[i] === "" || seen.indexOf(slots[i]) >= 0) continue;
+    seen.push(slots[i]);
+    var item = cargoById(state.cargo, slots[i]);
+    if (item) mass += itemKind(item).mass / (item.heavy ? 2 : 1);
+  }
+  return mass;
+}
+// Walking speed factor from the mass carried (1 = empty hands).
+function carrySpeedFactor(state, playerId) {
+  return Math.max(CARRY_MIN_FACTOR, 1 - CARRY_SLOWDOWN_PER_KG * carriedMass(state, playerId));
+}
+
 // A control may be pressed (or a valve held, or a command armed) only with a free hand and no two-handed item.
 function canUseHands(pl) { return !holdsTwoHanded(pl.hands) && freeHandCount(pl.hands) >= 1; }
 
@@ -56,6 +81,7 @@ function takeItem(state, id, pl, tick) {
     if (!c.active) continue;                                        // a used patch is not in the world until it respawns
     if (c.carriers.length >= (c.heavy ? 2 : 1)) continue;
     if (c.carriers.indexOf(id) >= 0 || c.pend === id) continue;
+    if (c.fly) continue;                                            // an item in the air cannot be caught
     var dx = pl.x - c.x, dz = pl.z - c.z, d = Math.sqrt(dx * dx + dz * dz);
     if (d <= bestD) { best = c; bestD = d; }
   }
@@ -87,6 +113,23 @@ function releaseItem(state, itemId) {
   var item = cargoById(state.cargo, itemId);
   if (item) { item.carriers = []; item.pend = ""; item.vx = 0; item.vz = 0; }
   for (var k = 0; k < state.order.length; k++) removeFromHands(state.players[state.order[k]].hands, itemId);
+}
+
+// Throw the last one-hand item taken (from a hand, not the pocket) along the player's heading: a small arc in the boat's frame, a bounce on
+// the walls, then it lands and slides (cargo.js flyStep). Two-handed items, the pocket and empty hands throw nothing.
+function throwItem(state, id, pl) {
+  var h = pl.hands;
+  for (var i = h.order.length - 1; i >= 0; i--) {
+    var item = cargoById(state.cargo, h.order[i]);
+    if (!item || itemKind(item).hands !== 1) continue;
+    if (h.l !== item.id && h.r !== item.id) continue;               // in the pocket: not thrown
+    releaseItem(state, item.id);
+    item.x = pl.x; item.z = pl.z;
+    item.vx = THROW_SPEED * Math.sin(pl.yaw); item.vz = THROW_SPEED * Math.cos(pl.yaw);
+    item.y = THROW_HEIGHT; item.vy = THROW_UP; item.fly = true;
+    return true;
+  }
+  return false;
 }
 
 // hand <-> pocket for a pocketable one-hand item: the pocket holds ONE small thing.

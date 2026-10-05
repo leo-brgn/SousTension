@@ -36,9 +36,20 @@ function newCargo() {
   for (var i = 0; i < CARGO_DEFS.length; i++) {
     var d = CARGO_DEFS[i];
     out.push({ id: d.id, kind: d.kind || "crate", heavy: d.heavy, x: d.x, z: d.z, vx: 0, vz: 0, carriers: [], pend: "", pendTick: 0,
-               active: true, respawnTick: 0, homeX: d.x, homeZ: d.z });
+               active: true, respawnTick: 0, homeX: d.x, homeZ: d.z, y: 0, vy: 0, fly: false });
   }
   return out;
+}
+
+// A thrown item (E2-04): ballistic in the boat's frame (gravity only, no boat inertia), bounces on the walls, lands on the floor and then
+// slides like any loose cargo. Deterministic: plain arithmetic on the tick.
+function flyStep(c) {
+  c.x += c.vx * DT; c.z += c.vz * DT;
+  c.vy -= GRAVITY * DT;
+  c.y += c.vy * DT;
+  if (c.x < -HALF_X || c.x > HALF_X) { c.x = clamp(c.x, -HALF_X, HALF_X); c.vx = -c.vx * THROW_BOUNCE; }
+  if (c.z < -HALF_Z || c.z > HALF_Z) { c.z = clamp(c.z, -HALF_Z, HALF_Z); c.vz = -c.vz * THROW_BOUNCE; }
+  if (c.y <= 0) { c.y = 0; c.vy = 0; c.fly = false; c.vx *= THROW_LAND_KEEP; c.vz *= THROW_LAND_KEEP; }
 }
 
 function slideStep(c, up) {
@@ -67,6 +78,7 @@ function updateCargo(state, tick) {
       if (tick >= c.respawnTick) { c.active = true; c.x = c.homeX; c.z = c.homeZ; c.vx = 0; c.vz = 0; }
       continue;
     }
+    if (c.fly) { flyStep(c); continue; }                          // thrown: in the air until it lands
     if (c.pend !== "" && tick - c.pendTick >= INTERLOCK_WINDOW_TICKS) c.pend = ""; // second carrier too late
     // A carrier that left the match releases the cargo
     var alive = [];
@@ -88,7 +100,7 @@ function cargoView(cargo) {
   var out = [];
   for (var i = 0; i < cargo.length; i++) {
     var c = cargo[i];
-    out.push({ id: c.id, x: c.x, z: c.z, h: c.heavy ? 1 : 0, c: c.carriers, p: c.pend, k: c.kind, a: c.active ? 1 : 0 });
+    out.push({ id: c.id, x: c.x, z: c.z, h: c.heavy ? 1 : 0, c: c.carriers, p: c.pend, k: c.kind, a: c.active ? 1 : 0, y: Math.round(c.y * 100) / 100 });
   }
   return out;
 }

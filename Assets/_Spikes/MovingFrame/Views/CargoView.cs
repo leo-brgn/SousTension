@@ -33,7 +33,7 @@ namespace SousTension.Spikes.MovingFrame
                 if (t.gameObject.activeSelf != c.Active) t.gameObject.SetActive(c.Active);   // a used hull patch is away until it respawns
                 if (!c.Active) continue;
                 bool carried = c.Carriers.Length > 0;
-                t.localPosition = new Vector3(x, (c.Heavy ? 0.4f : 0.25f) + (carried ? 1.0f : 0f), z);
+                t.localPosition = new Vector3(x, (c.Heavy ? 0.4f : 0.25f) + (carried ? 1.0f : 0f) + c.Y, z);   // c.Y: thrown items fly (E2-04)
                 var r = t.GetComponent<Renderer>();
                 r.material.color = c.Kind == "bucket" ? new Color(0.2f, 0.55f, 0.75f) : c.Kind == "patch" ? new Color(0.55f, 0.65f, 0.72f) : c.Pending != "" ? new Color(0.95f, 0.7f, 0.1f) : c.Heavy ? new Color(0.35f, 0.35f, 0.4f) : new Color(0.6f, 0.4f, 0.2f);
             }

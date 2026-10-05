@@ -41,7 +41,7 @@ jobs:
       - name: Le fichier assemblé server/modules/index.js est à jour avec server/src/
         run: node server/build.js --check
       - name: Tests du serveur Nakama (logique du match, réacteur)
-        run: node --test server/test/match.test.js server/test/reactor.test.js server/test/water.test.js server/test/leaks.test.js server/test/bilge.test.js server/test/latency.test.js server/test/determinism.test.js server/test/power.test.js server/test/propulsion.test.js server/test/aim.test.js server/test/hands.test.js
+        run: node --test server/test/match.test.js server/test/reactor.test.js server/test/water.test.js server/test/leaks.test.js server/test/bilge.test.js server/test/latency.test.js server/test/determinism.test.js server/test/power.test.js server/test/propulsion.test.js server/test/aim.test.js server/test/hands.test.js server/test/throw.test.js
 
   deps-lock-check:
     runs-on: ubuntu-latest

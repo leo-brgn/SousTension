@@ -26,11 +26,14 @@ var REACTOR_SEED = 1234; // TODO(E3-05/run start): derive from the run so every 
 function clamp(v, lo, hi) { return v < lo ? lo : (v > hi ? hi : v); }
 
 // One fixed-step integration, shared by server and (identically re-implemented) by the client prediction.
-function stepPlayer(p, mx, mz) {
+// `factor` (E2-04, default 1) scales the walking speed: what a player carries slows them down (hands.js carrySpeedFactor, mirrored in
+// CharacterMotion.cs for the client's prediction).
+function stepPlayer(p, mx, mz, factor) {
   var len = Math.sqrt(mx * mx + mz * mz);
   if (len > 1) { mx /= len; mz /= len; }
-  p.x = clamp(p.x + mx * MOVE_SPEED * DT, -HALF_X, HALF_X);
-  p.z = clamp(p.z + mz * MOVE_SPEED * DT, -HALF_Z, HALF_Z);
+  var f = factor === undefined ? 1 : factor;
+  p.x = clamp(p.x + mx * MOVE_SPEED * f * DT, -HALF_X, HALF_X);
+  p.z = clamp(p.z + mz * MOVE_SPEED * f * DT, -HALF_Z, HALF_Z);
 }
 
 // ---- Coupled actions: the Rule of Two Players framework (E4-02) ----------------------------------------------------
@@ -178,9 +181,20 @@ function newCargo() {
   for (var i = 0; i < CARGO_DEFS.length; i++) {
     var d = CARGO_DEFS[i];
     out.push({ id: d.id, kind: d.kind || "crate", heavy: d.heavy, x: d.x, z: d.z, vx: 0, vz: 0, carriers: [], pend: "", pendTick: 0,
-               active: true, respawnTick: 0, homeX: d.x, homeZ: d.z });
+               active: true, respawnTick: 0, homeX: d.x, homeZ: d.z, y: 0, vy: 0, fly: false });
   }
   return out;
+}
+
+// A thrown item (E2-04): ballistic in the boat's frame (gravity only, no boat inertia), bounces on the walls, lands on the floor and then
+// slides like any loose cargo. Deterministic: plain arithmetic on the tick.
+function flyStep(c) {
+  c.x += c.vx * DT; c.z += c.vz * DT;
+  c.vy -= GRAVITY * DT;
+  c.y += c.vy * DT;
+  if (c.x < -HALF_X || c.x > HALF_X) { c.x = clamp(c.x, -HALF_X, HALF_X); c.vx = -c.vx * THROW_BOUNCE; }
+  if (c.z < -HALF_Z || c.z > HALF_Z) { c.z = clamp(c.z, -HALF_Z, HALF_Z); c.vz = -c.vz * THROW_BOUNCE; }
+  if (c.y <= 0) { c.y = 0; c.vy = 0; c.fly = false; c.vx *= THROW_LAND_KEEP; c.vz *= THROW_LAND_KEEP; }
 }
 
 function slideStep(c, up) {
@@ -209,6 +223,7 @@ function updateCargo(state, tick) {
       if (tick >= c.respawnTick) { c.active = true; c.x = c.homeX; c.z = c.homeZ; c.vx = 0; c.vz = 0; }
       continue;
     }
+    if (c.fly) { flyStep(c); continue; }                          // thrown: in the air until it lands
     if (c.pend !== "" && tick - c.pendTick >= INTERLOCK_WINDOW_TICKS) c.pend = ""; // second carrier too late
     // A carrier that left the match releases the cargo
     var alive = [];
@@ -230,7 +245,7 @@ function cargoView(cargo) {
   var out = [];
   for (var i = 0; i < cargo.length; i++) {
     var c = cargo[i];
-    out.push({ id: c.id, x: c.x, z: c.z, h: c.heavy ? 1 : 0, c: c.carriers, p: c.pend, k: c.kind, a: c.active ? 1 : 0 });
+    out.push({ id: c.id, x: c.x, z: c.z, h: c.heavy ? 1 : 0, c: c.carriers, p: c.pend, k: c.kind, a: c.active ? 1 : 0, y: Math.round(c.y * 100) / 100 });
   }
   return out;
 }
@@ -244,13 +259,21 @@ function cargoView(cargo) {
 //
 // Protocol (input fields): take (pick the nearest item into free hands), drop (true = the last item taken, or "L" / "R" / "P" for a slot), stow
 // (a pocketable one-hand item goes hand -> pocket, or pocket -> hand). The legacy field grab stays: it drops what you hold, else takes (the old F key).
+// mass in kg (E2-04): what you carry slows you down, a shared (heavy) item is carried half each.
 var ITEM_KINDS = {
-  crate: { hands: 2 },
-  fuel: { hands: 2 },
-  patch: { hands: 1 },
-  bucket: { hands: 1 },
-  flashlight: { hands: 1, pocket: true }
+  crate: { hands: 2, mass: 12 },
+  fuel: { hands: 2, mass: 40 },
+  patch: { hands: 1, mass: 1 },
+  bucket: { hands: 1, mass: 2 },
+  flashlight: { hands: 1, pocket: true, mass: 0.5 }
 };
+var CARRY_SLOWDOWN_PER_KG = 0.012;       // walking speed factor = 1 - this x carried mass ...
+var CARRY_MIN_FACTOR = 0.5;              // ... never below this
+var THROW_SPEED = 6;                     // m/s horizontal, along the player's heading (E2-04)
+var THROW_UP = 2;                        // m/s upwards: a small arc
+var THROW_HEIGHT = 1.2;                  // m above the floor when it leaves the hand
+var THROW_BOUNCE = 0.3;                  // fraction of the speed kept after hitting a wall
+var THROW_LAND_KEEP = 0.5;               // fraction of the horizontal speed kept on landing: the item then slides like any loose cargo
 
 function newHands() { return { l: "", r: "", p: "", order: [] }; }     // slots hold cargo ids; order = items in the order they were taken
 
@@ -262,6 +285,23 @@ function cargoById(cargo, id) {
 function freeHandCount(h) { return (h.l === "" ? 1 : 0) + (h.r === "" ? 1 : 0); }
 function holdsTwoHanded(h) { return h.l !== "" && h.l === h.r; }
 function holdsAnything(h) { return h.l !== "" || h.r !== "" || h.p !== ""; }
+// Mass carried by a player (kg): every distinct item in their hands and pocket, a heavy item counts half (two carriers).
+function carriedMass(state, playerId) {
+  var h = state.players[playerId].hands, seen = [], mass = 0;
+  var slots = [h.l, h.r, h.p];
+  for (var i = 0; i < slots.length; i++) {
+    if (slots[i] === "" || seen.indexOf(slots[i]) >= 0) continue;
+    seen.push(slots[i]);
+    var item = cargoById(state.cargo, slots[i]);
+    if (item) mass += itemKind(item).mass / (item.heavy ? 2 : 1);
+  }
+  return mass;
+}
+// Walking speed factor from the mass carried (1 = empty hands).
+function carrySpeedFactor(state, playerId) {
+  return Math.max(CARRY_MIN_FACTOR, 1 - CARRY_SLOWDOWN_PER_KG * carriedMass(state, playerId));
+}
+
 // A control may be pressed (or a valve held, or a command armed) only with a free hand and no two-handed item.
 function canUseHands(pl) { return !holdsTwoHanded(pl.hands) && freeHandCount(pl.hands) >= 1; }
 
@@ -293,6 +333,7 @@ function takeItem(state, id, pl, tick) {
     if (!c.active) continue;                                        // a used patch is not in the world until it respawns
     if (c.carriers.length >= (c.heavy ? 2 : 1)) continue;
     if (c.carriers.indexOf(id) >= 0 || c.pend === id) continue;
+    if (c.fly) continue;                                            // an item in the air cannot be caught
     var dx = pl.x - c.x, dz = pl.z - c.z, d = Math.sqrt(dx * dx + dz * dz);
     if (d <= bestD) { best = c; bestD = d; }
   }
@@ -324,6 +365,23 @@ function releaseItem(state, itemId) {
   var item = cargoById(state.cargo, itemId);
   if (item) { item.carriers = []; item.pend = ""; item.vx = 0; item.vz = 0; }
   for (var k = 0; k < state.order.length; k++) removeFromHands(state.players[state.order[k]].hands, itemId);
+}
+
+// Throw the last one-hand item taken (from a hand, not the pocket) along the player's heading: a small arc in the boat's frame, a bounce on
+// the walls, then it lands and slides (cargo.js flyStep). Two-handed items, the pocket and empty hands throw nothing.
+function throwItem(state, id, pl) {
+  var h = pl.hands;
+  for (var i = h.order.length - 1; i >= 0; i--) {
+    var item = cargoById(state.cargo, h.order[i]);
+    if (!item || itemKind(item).hands !== 1) continue;
+    if (h.l !== item.id && h.r !== item.id) continue;               // in the pocket: not thrown
+    releaseItem(state, item.id);
+    item.x = pl.x; item.z = pl.z;
+    item.vx = THROW_SPEED * Math.sin(pl.yaw); item.vz = THROW_SPEED * Math.cos(pl.yaw);
+    item.y = THROW_HEIGHT; item.vy = THROW_UP; item.fly = true;
+    return true;
+  }
+  return false;
 }
 
 // hand <-> pocket for a pocketable one-hand item: the pocket holds ONE small thing.
@@ -1236,9 +1294,11 @@ function simStep(state, tick) {
     pl.allowance = Math.min(MAX_ALLOWANCE, pl.allowance + 1);
     while (pl.allowance >= 1 && pl.queue.length > 0) {
       var next = pl.queue.shift();
-      stepPlayer(pl, next.mx, next.mz);
+      if (next.ry !== null) pl.yaw = next.ry;
+      stepPlayer(pl, next.mx, next.mz, carrySpeedFactor(state, state.order[k]));
       if (next.act) { if (next.use) useTarget(state, state.order[k], pl, tick, next.use); else tryAct(state, state.order[k], pl, tick); }
       if (next.hold) { if (next.use) holdTarget(state, pl, next.use); else tryHold(state, pl); }
+      if (next.throw) throwItem(state, state.order[k], pl);
       if (next.take) takeItem(state, state.order[k], pl, tick);
       if (next.drop) dropItem(state, state.order[k], pl, next.drop);
       if (next.stow) stowItem(state, state.order[k], pl);
@@ -1268,6 +1328,8 @@ function queueInput(p, input) {
   p.lastQueued = input.seq;
   p.queue.push({ seq: input.seq, mx: +input.mx || 0, mz: +input.mz || 0, act: input.act === true || input.act === 1,
                  grab: input.grab === true || input.grab === 1, hold: input.hold === true || input.hold === 1,
+                 ry: typeof input.ry === "number" && isFinite(input.ry) ? input.ry : null,
+                 throw: input.throw === true || input.throw === 1 || input.hand === "throw",
                  use: typeof input.use === "string" && input.use.length <= 40 ? input.use : "",
                  take: input.take === true || input.take === 1 || input.hand === "take", stow: input.stow === true || input.stow === 1 || input.hand === "stow",
                  drop: input.drop === "L" || input.drop === "R" || input.drop === "P" ? input.drop
@@ -1326,7 +1388,7 @@ var matchJoin = function (ctx, logger, nk, dispatcher, tick, state, presences) {
     var id = presences[i].userId;
     if (!state.players[id]) {
       var slot = state.order.length;
-      state.players[id] = { x: -1.5 + slot, z: 0, seq: 0, lastQueued: 0, allowance: 0, applied: 0, queue: [], hands: newHands(), presence: presences[i] };
+      state.players[id] = { x: -1.5 + slot, z: 0, seq: 0, lastQueued: 0, allowance: 0, applied: 0, queue: [], hands: newHands(), yaw: 0, presence: presences[i] };
       state.order.push(id);
     }
   }
@@ -1432,6 +1494,7 @@ if (typeof module !== "undefined" && module.exports) {
     WATER_COMPARTMENTS: WATER_COMPARTMENTS, WATER_FLOW: WATER_FLOW, MAX_TRIM_DEG: MAX_TRIM_DEG, MAX_LIST_DEG: MAX_LIST_DEG, newWater: newWater, waterAdd: waterAdd,
     waterRemove: waterRemove, waterSetDoor: waterSetDoor, waterStep: waterStep, waterTotal: waterTotal, waterTilt: waterTilt, waterView: waterView, waterLevel: waterLevel, compartmentAt: compartmentAt,
     newCoupled: newCoupled, COUPLED_ACTIONS: COUPLED_ACTIONS, COUPLED_EFFECTS: COUPLED_EFFECTS, COUPLED_GRACE_TICKS: COUPLED_GRACE_TICKS,
+    carrySpeedFactor: carrySpeedFactor, carriedMass: carriedMass, throwItem: throwItem, THROW_SPEED: THROW_SPEED, THROW_UP: THROW_UP, THROW_HEIGHT: THROW_HEIGHT, THROW_BOUNCE: THROW_BOUNCE,
     ITEM_KINDS: ITEM_KINDS, newHands: newHands, takeItem: takeItem, dropItem: dropItem, stowItem: stowItem, canUseHands: canUseHands, handsView: handsView,
     AIM_REACH: AIM_REACH, interactableIds: interactableIds,
     CONTROLS: CONTROLS, REGIME_ORDER: REGIME_ORDER, tryAct: tryAct,
