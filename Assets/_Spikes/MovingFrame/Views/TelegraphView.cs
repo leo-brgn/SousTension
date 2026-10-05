@@ -44,8 +44,8 @@ namespace SousTension.Spikes.MovingFrame
             Block(_needle, "Needle", new Vector3(0.02f, 0.09f, 0.015f), new Vector3(0f, 0.045f, 0f), Color.black);
 
             // the two floor tiles (up / down)
-            Tile(boat, "TelegraphUp", new Vector3(-0.5f, 0.04f, 4.2f), new Color(0.3f, 0.65f, 0.3f));
-            Tile(boat, "TelegraphDown", new Vector3(-0.5f, 0.04f, 3.6f), new Color(0.65f, 0.5f, 0.2f));
+            InteractableTarget.Mark(Tile(boat, "TelegraphUp", new Vector3(-0.5f, 0.04f, 4.2f), new Color(0.3f, 0.65f, 0.3f)), "tele_up");
+            InteractableTarget.Mark(Tile(boat, "TelegraphDown", new Vector3(-0.5f, 0.04f, 3.6f), new Color(0.65f, 0.5f, 0.2f)), "tele_down");
         }
 
         private void Update()
@@ -60,7 +60,7 @@ namespace SousTension.Spikes.MovingFrame
             _needle.localRotation = Quaternion.AngleAxis(-Mathf.Lerp(-30f, 120f, (t + 0.5f) / 1.5f), Vector3.right);
         }
 
-        private static void Tile(Transform parent, string name, Vector3 pos, Color color) => Block(parent, name, new Vector3(0.4f, 0.08f, 0.4f), pos, color);
+        private static GameObject Tile(Transform parent, string name, Vector3 pos, Color color) => Block(parent, name, new Vector3(0.4f, 0.08f, 0.4f), pos, color);
 
         private static GameObject Block(Transform parent, string name, Vector3 scale, Vector3 localPos, Color color)
         {

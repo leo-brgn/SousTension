@@ -18,7 +18,7 @@ namespace SousTension.Spikes.MovingFrame
         private const long OpInput = 1;
         private const long OpState = 2;
 
-        [Serializable] private class InputDto { public int seq; public float mx; public float mz; public bool act; public bool grab; public bool hold; }
+        [Serializable] private class InputDto { public int seq; public float mx; public float mz; public bool act; public bool grab; public bool hold; public string use; }
         [Serializable] private class PlayerDto { public string id; public float x; public float z; public int seq; }
         [Serializable] private class InterlockDto { public int a; public int b; public string ab; public string bb; public string result; public int rt; public int n; }
         [Serializable] private class CoupledDto { public string id; public int a; public int b; public string ab; public string bb; public string result; public int rt; public int n; }
@@ -69,10 +69,10 @@ namespace SousTension.Spikes.MovingFrame
             await _socket.JoinMatchAsync(_matchId);
         }
 
-        public void SendInput(int seq, float moveX, float moveZ, bool act, bool grab, bool hold = false)
+        public void SendInput(int seq, float moveX, float moveZ, bool act, bool grab, bool hold = false, string use = null)
         {
             if (_socket == null || !_socket.IsConnected) return;
-            var json = JsonUtility.ToJson(new InputDto { seq = seq, mx = moveX, mz = moveZ, act = act, grab = grab, hold = hold });
+            var json = JsonUtility.ToJson(new InputDto { seq = seq, mx = moveX, mz = moveZ, act = act, grab = grab, hold = hold, use = use ?? "" });
             var bytes = Encoding.UTF8.GetBytes(json);
             Interlocked.Add(ref _bytesSent, bytes.Length);
             _ = SendAsync(bytes);

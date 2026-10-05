@@ -33,11 +33,11 @@ namespace SousTension.Spikes.MovingFrame
             Block(root, "Plate", new Vector3(0.06f, 1.3f, 1.5f), Vector3.zero, new Color(0.18f, 0.28f, 0.2f));
 
             // Selector: dial plate + knob + pointer, rotating about the wall normal (x axis)
-            Block(root, "SelectorBase", new Vector3(0.08f, 0.42f, 0.42f), new Vector3(0.05f, 0.42f, 0f), new Color(0.12f, 0.12f, 0.12f));
+            InteractableTarget.Mark(Block(root, "SelectorBase", new Vector3(0.08f, 0.42f, 0.42f), new Vector3(0.05f, 0.42f, 0f), new Color(0.12f, 0.12f, 0.12f)), "regime");
             _knobPivot = new GameObject("KnobPivot").transform;
             _knobPivot.SetParent(root, false);
             _knobPivot.localPosition = new Vector3(0.1f, 0.42f, 0f);
-            Block(_knobPivot, "Knob", new Vector3(0.08f, 0.28f, 0.28f), Vector3.zero, new Color(0.7f, 0.55f, 0.2f));
+            InteractableTarget.Mark(Block(_knobPivot, "Knob", new Vector3(0.08f, 0.28f, 0.28f), Vector3.zero, new Color(0.7f, 0.55f, 0.2f)), "regime");
             Block(_knobPivot, "Pointer", new Vector3(0.1f, 0.2f, 0.04f), new Vector3(0.02f, 0.12f, 0f), new Color(0.95f, 0.95f, 0.9f));
             // Position marks (Veille / Croisiere / Pleine)
             for (int i = 0; i < 3; i++)

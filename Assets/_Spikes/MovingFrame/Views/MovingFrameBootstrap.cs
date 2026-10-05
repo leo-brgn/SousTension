@@ -50,14 +50,16 @@ namespace SousTension.Spikes.MovingFrame
             var input = new KeyboardInputSource();
             _network = network;
 
-            // Model + Controller
+            // Model + Controller (aim and mouse button: AimView, bound to the camera below)
             var model = new MovingFrameModel();
-            _controller = new MovingFrameController(network, input, clock, model);
+            var aim = new GameObject("Aim").AddComponent<AimView>();
+            _controller = new MovingFrameController(network, input, clock, model, aim, aim);
 
             // Views
             var boat = BuildBoat();
             boat.Bind(model, clock, new BoatMotion());
             var cam = BuildCamera();
+            aim.Bind(cam);
             var characters = new GameObject("Characters").AddComponent<CharactersView>();
             characters.Bind(model, clock, input, boat.transform, cam);
             new GameObject("Stations").AddComponent<StationsView>().Bind(model, boat.transform);

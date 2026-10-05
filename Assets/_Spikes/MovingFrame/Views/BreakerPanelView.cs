@@ -20,7 +20,7 @@ namespace SousTension.Spikes.MovingFrame
             {
                 var go = GameObject.CreatePrimitive(PrimitiveType.Cube);
                 go.name = "Breaker" + i;
-                Destroy(go.GetComponent<Collider>());
+                InteractableTarget.Mark(go, InteractableIds.Breakers[i]);
                 go.transform.SetParent(boat, false);
                 go.transform.localPosition = new Vector3(-2.5f + 0.5f * (i % 3), 0.04f, -9.75f + 0.5f * (i / 3));
                 go.transform.localScale = new Vector3(0.36f, 0.08f, 0.36f);

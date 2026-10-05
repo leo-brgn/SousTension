@@ -42,7 +42,7 @@ namespace SousTension.Spikes.MovingFrame
         {
             var go = GameObject.CreatePrimitive(PrimitiveType.Cube);
             go.name = "Leak" + leak.Id;
-            Destroy(go.GetComponent<Collider>());
+            InteractableTarget.Mark(go, InteractableIds.Leak(leak.Id));
             go.transform.SetParent(_boat, false);
             go.GetComponent<Renderer>().material.color = new Color(0.45f, 0.75f, 0.95f);
             return go.transform;

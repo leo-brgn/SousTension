@@ -28,8 +28,8 @@ function simStep(state, tick) {
     while (pl.allowance >= 1 && pl.queue.length > 0) {
       var next = pl.queue.shift();
       stepPlayer(pl, next.mx, next.mz);
-      if (next.act) tryAct(state, state.order[k], pl, tick);
-      if (next.hold) tryHold(state, pl);
+      if (next.act) { if (next.use) useTarget(state, state.order[k], pl, tick, next.use); else tryAct(state, state.order[k], pl, tick); }
+      if (next.hold) { if (next.use) holdTarget(state, pl, next.use); else tryHold(state, pl); }
       if (next.grab) tryGrab(state.cargo, state.order[k], pl, tick);
       pl.seq = next.seq;
       pl.applied += 1;
@@ -54,7 +54,8 @@ function queueInput(p, input) {
   if (typeof input.seq !== "number" || input.seq <= p.lastQueued) return false;
   p.lastQueued = input.seq;
   p.queue.push({ seq: input.seq, mx: +input.mx || 0, mz: +input.mz || 0, act: input.act === true || input.act === 1,
-                 grab: input.grab === true || input.grab === 1, hold: input.hold === true || input.hold === 1 });
+                 grab: input.grab === true || input.grab === 1, hold: input.hold === true || input.hold === 1,
+                 use: typeof input.use === "string" && input.use.length <= 40 ? input.use : "" });
   while (p.queue.length > MAX_QUEUED_INPUTS) p.queue.shift();
   return true;
 }

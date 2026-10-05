@@ -45,6 +45,17 @@ namespace SousTension.Spikes.MovingFrame
             }
         }
 
+        /// <summary>True when the local player carries a hull patch or the bucket (E2-02: a click with no aimed target then uses the item).</summary>
+        public bool IsLocalHoldingUsableItem()
+        {
+            foreach (var c in _cargoLatest.Values)
+            {
+                if (c.Kind != "patch" && c.Kind != "bucket") continue;
+                foreach (var id in c.Carriers) if (id == LocalId) return true;
+            }
+            return false;
+        }
+
         public bool IsCarriedByLocal(string cargoId)
         {
             if (!_cargoLatest.TryGetValue(cargoId, out var c)) return false;
