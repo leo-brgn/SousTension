@@ -1,12 +1,12 @@
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace SousTension.Spikes.MovingFrame
 {
     /// <summary>
     /// Passive, diegetic SCRAM station (no HUD): a big red lever under a sealed cover, on the left wall of compartment 4, 1 m from the
-    /// RK-1 selector (boat-local x = -2.9, z = -2.7; the interaction point is in server/src/controls.js), plus a depth needle gauge.
-    /// Cover, lever and depth come from the authoritative state. After a SCRAM the lights go out (blackout) while the boat sinks.
+    /// RK-1 selector (boat-local x = -2.9, z = -2.7; the interaction point is in server/src/controls.js), plus a depth needle gauge and the
+    /// restart procedure lamps. Cover, lever and depth come from the authoritative state. The blackout after a SCRAM is no longer faked here:
+    /// the lights follow the electrical network's bus voltage (GridLightingView, E3-07), which the SCRAM drops to zero.
     /// Built from primitives for the spike; the real lever art is E11-08 (Models/Reactor/ScramLever.fbx).
     /// </summary>
     public sealed class ScramLeverView : MonoBehaviour
@@ -14,15 +14,11 @@ namespace SousTension.Spikes.MovingFrame
         private const float WallX = -2.88f;
         private static readonly Vector3 Centre = new Vector3(WallX, 1.2f, -2.7f);
         private const float DepthDialMax = 10f;        // m, full-scale of the depth needle
-        private const float BlackoutLevel = 0.04f;     // fraction of the light left in the dark
 
         private MovingFrameModel _model;
         private Transform _cover, _lever, _depthNeedle;
         private readonly Renderer[] _stepLamps = new Renderer[3];
-        private float _coverAngle, _leverAngle, _light = 1f;
-        private readonly List<Light> _lights = new List<Light>();
-        private readonly List<float> _lightBase = new List<float>();
-        private float _ambientBase;
+        private float _coverAngle, _leverAngle;
 
         public void Bind(MovingFrameModel model, Transform boat)
         {
@@ -54,8 +50,6 @@ namespace SousTension.Spikes.MovingFrame
             // restart procedure lamps (E3-05) under the lever: lever back, valves open, pumps running. They only light during a SCRAM.
             for (int i = 0; i < 3; i++)
                 _stepLamps[i] = Block(root, "StepLamp" + i, new Vector3(0.04f, 0.07f, 0.07f), new Vector3(0.06f, -0.38f, -0.15f + 0.15f * i), Color.gray).GetComponent<Renderer>();
-
-            _ambientBase = RenderSettings.ambientIntensity;
         }
 
         private void Update()
@@ -78,26 +72,6 @@ namespace SousTension.Spikes.MovingFrame
             var boat = _model.Boat;
             if (boat.Valid)
                 _depthNeedle.localRotation = Quaternion.AngleAxis(Mathf.Lerp(-120f, 120f, Mathf.Clamp01(boat.Depth / DepthDialMax)), Vector3.right);
-
-            // blackout: every scene light (and the ambient) fades to almost nothing while the reactor is SCRAMmed
-            bool dark = lv.Valid && lv.Pulled;
-            _light = Mathf.MoveTowards(_light, dark ? BlackoutLevel : 1f, 4f * Time.deltaTime);
-            ApplyLight();
-        }
-
-        private void ApplyLight()
-        {
-            if (_lights.Count == 0)
-                foreach (var l in FindObjectsByType<Light>(FindObjectsSortMode.None)) { _lights.Add(l); _lightBase.Add(l.intensity); }
-            for (int i = 0; i < _lights.Count; i++) if (_lights[i] != null) _lights[i].intensity = _lightBase[i] * _light;
-            RenderSettings.ambientIntensity = _ambientBase * _light;
-        }
-
-        private void OnDestroy()
-        {
-            // restore the scene lighting so leaving play mode never leaves the world dark
-            for (int i = 0; i < _lights.Count; i++) if (_lights[i] != null) _lights[i].intensity = _lightBase[i];
-            RenderSettings.ambientIntensity = _ambientBase;
         }
 
         private static GameObject Block(Transform parent, string name, Vector3 scale, Vector3 localPos, Color color)

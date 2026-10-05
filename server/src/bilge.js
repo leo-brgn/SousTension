@@ -1,15 +1,13 @@
 // ---- Bilge pumps and the bucket (E6-03) -------------------------------------------------------------------------------------
 // Two electric bilge pumps each pump the water out of THEIR OWN compartment at BILGE_CAPACITY (water in neighbouring compartments reaches it
-// through the open bulkhead openings, E6-01). A pump runs only while it is switched on, not broken and the plant produces electricity
-// (reactor.E above BILGE_MIN_E): a SCRAM stops them and the boat is bailed by hand. That electricity rule is provisional until the real
-// electrical network (E3-07). Bucket: a light cargo item (the toolbox of compartment 2); carried into a flooded compartment, one press
+// through the open bulkhead openings, E6-01). A pump runs only while it is switched on, not broken, its breaker is closed and the bus voltage
+// is high enough (power.js, E3-07): a SCRAM drops the voltage to zero and stops them, and the boat is bailed by hand. Bucket: a light cargo item (the toolbox of compartment 2); carried into a flooded compartment, one press
 // scoops BUCKET_VOLUME out, at most once per BUCKET_COOLDOWN_TICKS per player. The mop waits for the spills of E6-05.
 var BILGE_PUMPS = [
   { id: "bilge0", comp: 1, x: -2.5, z: 4.5, reach: 1.0 },     // compartment 2, left wall
   { id: "bilge1", comp: 4, x: 2.5, z: -5.0, reach: 0.9 }      // compartment 5, right wall
 ];
 var BILGE_CAPACITY = 0.15;         // m3/s per pump
-var BILGE_MIN_E = 0.5;             // MWe the plant must produce for the pumps to turn
 var BUCKET_VOLUME = 0.015;         // m3 (15 L) per scoop
 var BUCKET_COOLDOWN_TICKS = 15;    // 1.5 s per player between two scoops
 
@@ -31,13 +29,18 @@ function bilgeToggle(b, i) {
 function bilgeBreak(b, i) { b.pumps[i].broken = true; b.pumps[i].on = false; b.pumps[i].run = false; return true; }
 function bilgeRepair(b, i) { b.pumps[i].broken = false; return true; }
 
+// A bilge pump is fed when its breaker (use "bilge", pump i) is closed and the bus voltage is at least BILGE_MIN_V.
+function pumpPowered(state, i) {
+  for (var b = 0; b < BREAKERS.length; b++) if (BREAKERS[b].use === "bilge" && BREAKERS[b].pump === i) return consumerPowered(state.power, b, BILGE_MIN_V);
+  return false;
+}
+
 // One 10 Hz step: every running pump takes up to BILGE_CAPACITY * DT out of its compartment.
 function bilgeStep(state) {
-  var powered = state.reactor.E > BILGE_MIN_E;
   for (var i = 0; i < BILGE_PUMPS.length; i++) {
     var p = state.bilge.pumps[i];
     p.run = false;
-    if (!p.on || p.broken || !powered) continue;
+    if (!p.on || p.broken || !pumpPowered(state, i)) continue;
     p.run = waterRemove(state.water, BILGE_PUMPS[i].comp, BILGE_CAPACITY * DT) > 0;
   }
 }

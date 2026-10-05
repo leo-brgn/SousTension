@@ -457,16 +457,14 @@ function leaksView(L) {
 
 // ---- Bilge pumps and the bucket (E6-03) -------------------------------------------------------------------------------------
 // Two electric bilge pumps each pump the water out of THEIR OWN compartment at BILGE_CAPACITY (water in neighbouring compartments reaches it
-// through the open bulkhead openings, E6-01). A pump runs only while it is switched on, not broken and the plant produces electricity
-// (reactor.E above BILGE_MIN_E): a SCRAM stops them and the boat is bailed by hand. That electricity rule is provisional until the real
-// electrical network (E3-07). Bucket: a light cargo item (the toolbox of compartment 2); carried into a flooded compartment, one press
+// through the open bulkhead openings, E6-01). A pump runs only while it is switched on, not broken, its breaker is closed and the bus voltage
+// is high enough (power.js, E3-07): a SCRAM drops the voltage to zero and stops them, and the boat is bailed by hand. Bucket: a light cargo item (the toolbox of compartment 2); carried into a flooded compartment, one press
 // scoops BUCKET_VOLUME out, at most once per BUCKET_COOLDOWN_TICKS per player. The mop waits for the spills of E6-05.
 var BILGE_PUMPS = [
   { id: "bilge0", comp: 1, x: -2.5, z: 4.5, reach: 1.0 },     // compartment 2, left wall
   { id: "bilge1", comp: 4, x: 2.5, z: -5.0, reach: 0.9 }      // compartment 5, right wall
 ];
 var BILGE_CAPACITY = 0.15;         // m3/s per pump
-var BILGE_MIN_E = 0.5;             // MWe the plant must produce for the pumps to turn
 var BUCKET_VOLUME = 0.015;         // m3 (15 L) per scoop
 var BUCKET_COOLDOWN_TICKS = 15;    // 1.5 s per player between two scoops
 
@@ -488,13 +486,18 @@ function bilgeToggle(b, i) {
 function bilgeBreak(b, i) { b.pumps[i].broken = true; b.pumps[i].on = false; b.pumps[i].run = false; return true; }
 function bilgeRepair(b, i) { b.pumps[i].broken = false; return true; }
 
+// A bilge pump is fed when its breaker (use "bilge", pump i) is closed and the bus voltage is at least BILGE_MIN_V.
+function pumpPowered(state, i) {
+  for (var b = 0; b < BREAKERS.length; b++) if (BREAKERS[b].use === "bilge" && BREAKERS[b].pump === i) return consumerPowered(state.power, b, BILGE_MIN_V);
+  return false;
+}
+
 // One 10 Hz step: every running pump takes up to BILGE_CAPACITY * DT out of its compartment.
 function bilgeStep(state) {
-  var powered = state.reactor.E > BILGE_MIN_E;
   for (var i = 0; i < BILGE_PUMPS.length; i++) {
     var p = state.bilge.pumps[i];
     p.run = false;
-    if (!p.on || p.broken || !powered) continue;
+    if (!p.on || p.broken || !pumpPowered(state, i)) continue;
     p.run = waterRemove(state.water, BILGE_PUMPS[i].comp, BILGE_CAPACITY * DT) > 0;
   }
 }
@@ -518,6 +521,116 @@ function bilgeView(b) {
   var out = [];
   for (var i = 0; i < b.pumps.length; i++) out.push({ s: b.pumps[i].broken ? 2 : (b.pumps[i].on ? 1 : 0), r: b.pumps[i].run ? 1 : 0 });
   return out;
+}
+
+// ---- Electrical network: bus voltage, breakers, emergency battery (E3-07) ------------------------------------------------------
+// The turbine makes E (MWe). The reactor's primary pumps are on the ESSENTIAL bus and take their share first (reactor.js, untouched). What is
+// left, SURPLUS = max(0, E - essential demand), feeds the boat's consumers through 20 breakers. The bus VOLTAGE V (0..1) follows
+// supply / demand slowly: it rises with TAU_UP, it declines slowly with TAU_DOWN ("l'air et la lumière déclinent lentement" in Veille, GDD 3.3),
+// but a SCRAM cuts it at once ("tue instantanément toute l'électricité"). The lights show V as white -> orange -> red -> black, the
+// signature of the game. A small BATTERY feeds an emergency bus (red emergency lights) while the grid is dark: it charges when V is high,
+// lasts ~10 minutes. Breakers can be opened by players (shedding load), TRIP by themselves when the voltage stays low although power exists
+// (the biggest closed consumer goes first), and are re-armed by hand at the panel. Effects: lights per compartment and the bilge pumps
+// today; the other consumers only report whether they are powered (their gameplay comes with their epics: air E6-06, sonar/radio, ...).
+var TAU_UP = 30;                 // s: voltage rise
+var TAU_DOWN = 120;              // s: slow decline when supply falls short (a SCRAM is instantaneous)
+var TRIP_V = 0.4;                // a breaker trips when V stays below this ...
+var TRIP_TICKS = 50;             // ... for 5 s while the plant still produces surplus (nothing to shed otherwise)
+var SETTLED = 0.02;               // the voltage counts as settled when the target is at most this far above it
+var DARK_V = 0.2;                // below this the grid counts as dark: the emergency bus takes over
+var BATTERY_DRAIN_S = 600;       // s of emergency light on a full battery
+var BATTERY_CHARGE_S = 900;      // s to charge it from empty while the voltage is high
+var BATTERY_CHARGE_V = 0.9;
+var BILGE_MIN_V = 0.5;           // the bilge pumps need this voltage (and their breaker closed)
+
+// 20 breakers, one consumer each. Spike layout: floor tiles 0.5 m apart (3 columns x 7 rows) at the stern, left wall, because the spike's
+// interaction works on position, not on aim (E2-02 will replace this by a real panel: the positions are data).
+var BREAKERS = [
+  { id: "light1", demand: 0.15, use: "light", comp: 0 }, { id: "light2", demand: 0.15, use: "light", comp: 1 },
+  { id: "light3", demand: 0.15, use: "light", comp: 2 }, { id: "light4", demand: 0.15, use: "light", comp: 3 },
+  { id: "light5", demand: 0.15, use: "light", comp: 4 }, { id: "light6", demand: 0.15, use: "light", comp: 5 },
+  { id: "bilge0", demand: 0.4, use: "bilge", pump: 0 }, { id: "bilge1", demand: 0.4, use: "bilge", pump: 1 },
+  { id: "sonar", demand: 0.6 }, { id: "radio", demand: 0.3 }, { id: "cipher", demand: 0.15 }, { id: "ventilation", demand: 0.5 },
+  { id: "galley", demand: 0.5 }, { id: "samovar", demand: 0.25 }, { id: "coffee", demand: 0.25 }, { id: "shower", demand: 0.3 },
+  { id: "periscope", demand: 0.15 }, { id: "interphone", demand: 0.15 }, { id: "heater", demand: 0.4 }, { id: "pneumatic", demand: 0.1 }
+];
+(function placeBreakers() {
+  for (var i = 0; i < BREAKERS.length; i++) {
+    BREAKERS[i].x = -2.5 + 0.5 * (i % 3);
+    BREAKERS[i].z = -9.75 + 0.5 * Math.floor(i / 3);
+    BREAKERS[i].reach = 0.3;
+  }
+})();
+
+function newPower() {
+  var br = [];
+  for (var i = 0; i < BREAKERS.length; i++) br.push({ closed: true, tripped: false });
+  return { V: 1, B: 1, br: br, lowTicks: 0 };
+}
+
+// Power drawn by the closed breakers (MWe) and the surplus the plant offers them.
+function gridDemand(pw) {
+  var d = 0;
+  for (var i = 0; i < BREAKERS.length; i++) if (pw.br[i].closed) d += BREAKERS[i].demand;
+  return d;
+}
+function gridSurplus(reactor) {
+  var essential = ((reactor.pumps[0] ? 1 : 0) + (reactor.pumps[1] ? 1 : 0)) * REACTOR_K.pumpDemand;
+  return Math.max(0, reactor.E - essential);
+}
+
+// A press at a breaker: closed -> open (shedding a load); open or tripped -> closed (re-arm). The next step decides if it holds.
+function breakerToggle(pw, i) {
+  var b = pw.br[i];
+  if (b.closed) { b.closed = false; b.tripped = false; } else { b.closed = true; b.tripped = false; }
+  return true;
+}
+function breakerTrip(pw, i) { pw.br[i].closed = false; pw.br[i].tripped = true; return true; }
+
+// Is a consumer fed? (its breaker is closed and the bus voltage is at least minV)
+function consumerPowered(pw, i, minV) { return pw.br[i].closed && pw.V >= minV; }
+
+// One 10 Hz step, after the reactor.
+function powerStep(state) {
+  var pw = state.power, r = state.reactor;
+  var demand = gridDemand(pw), surplus = gridSurplus(r);
+  var target = demand > 0 ? Math.min(1, surplus / demand) : 1;
+  if (r.scram) {
+    pw.V = 0;                                              // the SCRAM tears the whole grid down at once
+  } else {
+    pw.V += (target - pw.V) * DT / (target > pw.V ? TAU_UP : TAU_DOWN);
+  }
+  // emergency battery: carries the emergency bus while the grid is dark, charges while the voltage is high
+  if (pw.V < DARK_V) pw.B = Math.max(0, pw.B - DT / BATTERY_DRAIN_S);
+  else if (pw.V > BATTERY_CHARGE_V) pw.B = Math.min(1, pw.B + DT / BATTERY_CHARGE_S);
+  // load shedding: the voltage is low and NOT recovering (it has settled within SETTLED of the target supply ratio, or is above it: a structural
+  // overload, not the plant spinning up after a restart) although the plant produces surplus -> the biggest closed consumer trips
+  if (!r.scram && surplus > 0 && pw.V < TRIP_V && target <= pw.V + SETTLED) {
+    pw.lowTicks++;
+    if (pw.lowTicks >= TRIP_TICKS) {
+      var big = -1;
+      for (var i = 0; i < BREAKERS.length; i++) if (pw.br[i].closed && (big < 0 || BREAKERS[i].demand > BREAKERS[big].demand)) big = i;
+      if (big >= 0) breakerTrip(pw, big);
+      pw.lowTicks = 0;
+    }
+  } else pw.lowTicks = 0;
+}
+
+// Light level of a compartment: the bus voltage when its lights breaker is closed. Band: 3 white, 2 orange, 1 red, 0 dark.
+function lightLevel(pw, comp) {
+  for (var i = 0; i < BREAKERS.length; i++) if (BREAKERS[i].use === "light" && BREAKERS[i].comp === comp) return pw.br[i].closed ? pw.V : 0;
+  return 0;
+}
+function lightBand(level) { return level >= 0.8 ? 3 : (level >= 0.5 ? 2 : (level >= DARK_V ? 1 : 0)); }
+
+// Broadcast (and resync): v = bus voltage, b = battery 0..1, em = emergency lights on (grid dark, battery left), br = per breaker 0 open / 1 closed /
+// 2 tripped, lt = light band per compartment (3 white .. 0 dark), dm = demand, su = surplus (MWe).
+function powerView(state) {
+  var pw = state.power, br = [], lt = [];
+  function q(x, k) { return Math.round(x * k) / k; }
+  for (var i = 0; i < BREAKERS.length; i++) br.push(pw.br[i].tripped ? 2 : (pw.br[i].closed ? 1 : 0));
+  for (var c = 0; c < WATER_COMPARTMENTS.length; c++) lt.push(lightBand(lightLevel(pw, c)));
+  return { v: q(pw.V, 1000), b: q(pw.B, 1000), em: pw.V < DARK_V && pw.B > 0 ? 1 : 0, br: br, lt: lt, dm: q(gridDemand(pw), 100), su: q(gridSurplus(state.reactor), 100) };
 }
 
 // ---- Reactor RK-1 "Petit Soleil" (E3-02) -------------------------------------------------------------------
@@ -736,6 +849,10 @@ var CONTROLS = [
   { id: "bilge1", x: 2.5, z: -5.0, reach: 0.9, bilge: 1 }
 ];
 var VALVE_TURN_RATE = 0.25;        // valve opening per second while the wheel is held (4 s from closed to open)
+(function addBreakerControls() {                        // the 20 breakers of the main panel (E3-07): floor tiles at the stern, left wall
+  for (var i = 0; i < BREAKERS.length; i++)
+    CONTROLS.push({ id: "breaker_" + BREAKERS[i].id, x: BREAKERS[i].x, z: BREAKERS[i].z, reach: BREAKERS[i].reach, breaker: i });
+})();
 var LEVER_COVER_TICKS = 60;        // 6 s at 10 Hz
 var REGIME_ORDER = ["veille", "croisiere", "pleine"];
 
@@ -811,6 +928,7 @@ function tryAct(state, id, pl, tick) {
     else if (bestControl.id === "scram") useScramLever(state.lever, state.reactor);
     else if (bestControl.pump !== undefined) togglePump(state.reactor, bestControl.pump);
     else if (bestControl.bilge !== undefined) bilgeToggle(state.bilge, bestControl.bilge);
+    else if (bestControl.breaker !== undefined) breakerToggle(state.power, bestControl.breaker);
     return;
   }
   if (cmd) tryActivate(state.cp, id, pl, tick);
@@ -874,8 +992,9 @@ function restartView(state) {
 //   5. water       flow between compartments through the open openings (trim / list follow)
 //   6. cargo       carried cargo follows its carriers, loose cargo slides on the (water-tilted) floor, used patches respawn
 //   7. reactor     rods, heat, steam, electricity, cooling, drift, automatic protection
-//   8. lever       the SCRAM cover falls shut
-//   9. boat        buoyancy: descent speed and depth follow the SCRAM latch
+//   8. power       bus voltage from the surplus electricity, emergency battery, breakers that trip
+//   9. lever       the SCRAM cover falls shut
+//  10. boat        buoyancy: descent speed and depth follow the SCRAM latch
 function simStep(state, tick) {
   // 1. inputs: +1 per tick per player (the nominal input rate), capped at MAX_ALLOWANCE. In steady state this is exactly one input per tick;
   //    after a network stall (TCP retransmission) the backlog drains in a few ticks instead of lagging forever. The long-term rate can never
@@ -900,6 +1019,7 @@ function simStep(state, tick) {
   waterStep(state.water);
   updateCargo(state, tick);
   reactorStep(state.reactor);
+  powerStep(state);
   leverStep(state.lever);
   boatStep(state.boat, state.reactor);
   state.tick = tick;
@@ -946,7 +1066,7 @@ function stableStringify(v) {
 var matchInit = function (ctx, logger, nk, params) {
   logger.info("moving_frame match init");
   return {
-    state: { tick: 0, players: {}, order: [], cp: newCoupled(), cargo: newCargo(), reactor: newReactor(REACTOR_SEED, "veille"), lever: newLever(), boat: newBoat(), restart: newRestart(), water: newWater(), leaks: newLeaks(), bilge: newBilge() },
+    state: { tick: 0, players: {}, order: [], cp: newCoupled(), cargo: newCargo(), reactor: newReactor(REACTOR_SEED, "veille"), lever: newLever(), boat: newBoat(), restart: newRestart(), water: newWater(), leaks: newLeaks(), bilge: newBilge(), power: newPower() },
     tickRate: TICK_RATE,
     label: JSON.stringify({ name: MATCH_NAME })
   };
@@ -1005,7 +1125,7 @@ var matchLoop = function (ctx, logger, nk, dispatcher, tick, state, messages) {
     var id = state.order[j], q = state.players[id];
     out.push({ id: id, x: q.x, z: q.z, seq: q.seq });
   }
-  dispatcher.broadcastMessage(OP_STATE, JSON.stringify({ tick: tick, t: tick * DT, players: out, il: coupledView(state.cp, tick)[0], cp: coupledView(state.cp, tick), cargo: cargoView(state.cargo), rx: reactorView(state.reactor), sc: leverView(state.lever, state.reactor), rs: restartView(state), bw: waterView(state.water), lk: leaksView(state.leaks), bp: bilgeView(state.bilge), boat: boatView(state.boat) }), null, null, true);
+  dispatcher.broadcastMessage(OP_STATE, JSON.stringify({ tick: tick, t: tick * DT, players: out, il: coupledView(state.cp, tick)[0], cp: coupledView(state.cp, tick), cargo: cargoView(state.cargo), rx: reactorView(state.reactor), sc: leverView(state.lever, state.reactor), rs: restartView(state), bw: waterView(state.water), lk: leaksView(state.leaks), bp: bilgeView(state.bilge), pw: powerView(state), boat: boatView(state.boat) }), null, null, true);
   return { state: state };
 };
 
@@ -1061,7 +1181,9 @@ if (typeof module !== "undefined" && module.exports) {
     LEVER_COVER_TICKS: LEVER_COVER_TICKS, SINK_RATE_MAX: SINK_RATE_MAX, SINK_RAMP_SECONDS: SINK_RAMP_SECONDS, newBoat: newBoat, boatStep: boatStep,
     VALVE_TURN_RATE: VALVE_TURN_RATE, reactorBreakPump: reactorBreakPump, reactorRepairPump: reactorRepairPump,
     RESTART_VALVE_MIN: RESTART_VALVE_MIN,
-    BILGE_PUMPS: BILGE_PUMPS, BILGE_CAPACITY: BILGE_CAPACITY, BILGE_MIN_E: BILGE_MIN_E, BUCKET_VOLUME: BUCKET_VOLUME, BUCKET_COOLDOWN_TICKS: BUCKET_COOLDOWN_TICKS,
+    BILGE_PUMPS: BILGE_PUMPS, BILGE_CAPACITY: BILGE_CAPACITY, BILGE_MIN_V: BILGE_MIN_V,
+    BREAKERS: BREAKERS, TAU_UP: TAU_UP, TAU_DOWN: TAU_DOWN, TRIP_V: TRIP_V, TRIP_TICKS: TRIP_TICKS, DARK_V: DARK_V, BATTERY_DRAIN_S: BATTERY_DRAIN_S, BATTERY_CHARGE_S: BATTERY_CHARGE_S,
+    newPower: newPower, powerStep: powerStep, powerView: powerView, breakerToggle: breakerToggle, breakerTrip: breakerTrip, gridDemand: gridDemand, gridSurplus: gridSurplus, lightLevel: lightLevel, lightBand: lightBand, BUCKET_VOLUME: BUCKET_VOLUME, BUCKET_COOLDOWN_TICKS: BUCKET_COOLDOWN_TICKS,
     bilgeBreak: bilgeBreak, bilgeRepair: bilgeRepair, bilgeToggle: bilgeToggle,
     LEAK_RATES: LEAK_RATES, LEAK_REACH: LEAK_REACH, LEAK_FIRST_TICK: LEAK_FIRST_TICK, PATCH_RESPAWN_TICKS: PATCH_RESPAWN_TICKS, leakCreate: leakCreate, leakRate: leakRate,
     WATER_COMPARTMENTS: WATER_COMPARTMENTS, WATER_FLOW: WATER_FLOW, MAX_TRIM_DEG: MAX_TRIM_DEG, MAX_LIST_DEG: MAX_LIST_DEG, newWater: newWater, waterAdd: waterAdd,

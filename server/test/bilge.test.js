@@ -15,6 +15,7 @@ function setup(ids) {
   (ids || ["a"]).forEach((id) => { state = h.matchJoin({}, logger, nk, null, 0, state, [presence(id)]).state; });
   const sent = [];
   state.leaks.nextTick = 1e9;                                                  // no scheduled leak unless a test creates one
+  state.reactor = m.newReactor(1234, "croisiere");                             // cruise regime: the plant feeds the whole grid (V = 1), as in normal play
   return { state, d: { broadcastMessage: (op, data) => sent.push(JSON.parse(data)) }, sent, tick: 0, seq: {} };
 }
 function send(c, id, extra) {
@@ -33,7 +34,7 @@ test("two bilge pumps, each in its own compartment, off until a player switches 
   assert.notStrictEqual(m.BILGE_PUMPS[0].comp, m.BILGE_PUMPS[1].comp);
   const c = setup();
   assert.deepStrictEqual(tick(c).bp, [{ s: 0, r: 0 }, { s: 0, r: 0 }]);
-  assert.ok(c.state.reactor.E > m.BILGE_MIN_E, "the plant produces electricity at the start");
+  assert.ok(c.state.power.V > m.BILGE_MIN_V, "the grid is up at the start");
 });
 
 test("a running pump takes water out of its own compartment at its capacity, nothing is lost or created", () => {
@@ -73,17 +74,19 @@ test("through the open bulkhead openings a pump also drains its neighbours", () 
   assert.ok(m.waterTotal(c.state.water) < 10 - 0.15 * 30, "total fell: " + m.waterTotal(c.state.water));
 });
 
-test("without electricity (SCRAM) the pumps stop, and run again after the restart", () => {
+test("without voltage (SCRAM) the pumps stop, and run again once the grid is back after the restart", () => {
   const c = setup();
   closeAllDoors(c);
   m.waterAdd(c.state.water, m.BILGE_PUMPS[0].comp, 10, 0);
   pumpOn(c, 0);
   m.reactorScram(c.state.reactor);
+  tick(c);                                                                     // the pump still saw the old voltage during this one tick
+  const dark = c.state.water.comps[m.BILGE_PUMPS[0].comp].w;
   ticks(c, 50);
-  assert.strictEqual(c.state.water.comps[m.BILGE_PUMPS[0].comp].w, 10, "no electricity, no pumping");
+  assert.strictEqual(c.state.water.comps[m.BILGE_PUMPS[0].comp].w, dark, "no voltage, no pumping");
   assert.strictEqual(tick(c).bp[0].r, 0);
   m.reactorRestart(c.state.reactor);
-  for (let i = 0; i < 400 && c.state.reactor.E <= m.BILGE_MIN_E; i++) tick(c);   // wait for the plant to produce again
+  for (let i = 0; i < 3000 && c.state.power.V <= m.BILGE_MIN_V; i++) tick(c);    // wait for the plant to feed the grid again
   const before = c.state.water.comps[m.BILGE_PUMPS[0].comp].w;
   ticks(c, 50);
   assert.ok(c.state.water.comps[m.BILGE_PUMPS[0].comp].w < before);

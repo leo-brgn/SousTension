@@ -128,6 +128,10 @@ namespace SousTension.Spikes.MovingFrame
         public BilgeState Bilge { get; private set; }
         public void SetBilge(BilgeState state) { if (state.Valid) Bilge = state; }
 
+        /// <summary>Electrical network (E3-07), authoritative; a snapshot without it keeps the last known state.</summary>
+        public GridState Grid { get; private set; }
+        public void SetGrid(GridState state) { if (state.Valid) Grid = state; }
+
         public void SetLocal(float x, float z) { LocalX = x; LocalZ = z; }
 
         public void ApplyServerState(StateSnapshot snapshot, double localNow)

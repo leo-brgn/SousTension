@@ -1,7 +1,7 @@
 var matchInit = function (ctx, logger, nk, params) {
   logger.info("moving_frame match init");
   return {
-    state: { tick: 0, players: {}, order: [], cp: newCoupled(), cargo: newCargo(), reactor: newReactor(REACTOR_SEED, "veille"), lever: newLever(), boat: newBoat(), restart: newRestart(), water: newWater(), leaks: newLeaks(), bilge: newBilge() },
+    state: { tick: 0, players: {}, order: [], cp: newCoupled(), cargo: newCargo(), reactor: newReactor(REACTOR_SEED, "veille"), lever: newLever(), boat: newBoat(), restart: newRestart(), water: newWater(), leaks: newLeaks(), bilge: newBilge(), power: newPower() },
     tickRate: TICK_RATE,
     label: JSON.stringify({ name: MATCH_NAME })
   };
@@ -60,7 +60,7 @@ var matchLoop = function (ctx, logger, nk, dispatcher, tick, state, messages) {
     var id = state.order[j], q = state.players[id];
     out.push({ id: id, x: q.x, z: q.z, seq: q.seq });
   }
-  dispatcher.broadcastMessage(OP_STATE, JSON.stringify({ tick: tick, t: tick * DT, players: out, il: coupledView(state.cp, tick)[0], cp: coupledView(state.cp, tick), cargo: cargoView(state.cargo), rx: reactorView(state.reactor), sc: leverView(state.lever, state.reactor), rs: restartView(state), bw: waterView(state.water), lk: leaksView(state.leaks), bp: bilgeView(state.bilge), boat: boatView(state.boat) }), null, null, true);
+  dispatcher.broadcastMessage(OP_STATE, JSON.stringify({ tick: tick, t: tick * DT, players: out, il: coupledView(state.cp, tick)[0], cp: coupledView(state.cp, tick), cargo: cargoView(state.cargo), rx: reactorView(state.reactor), sc: leverView(state.lever, state.reactor), rs: restartView(state), bw: waterView(state.water), lk: leaksView(state.leaks), bp: bilgeView(state.bilge), pw: powerView(state), boat: boatView(state.boat) }), null, null, true);
   return { state: state };
 };
 
@@ -116,7 +116,9 @@ if (typeof module !== "undefined" && module.exports) {
     LEVER_COVER_TICKS: LEVER_COVER_TICKS, SINK_RATE_MAX: SINK_RATE_MAX, SINK_RAMP_SECONDS: SINK_RAMP_SECONDS, newBoat: newBoat, boatStep: boatStep,
     VALVE_TURN_RATE: VALVE_TURN_RATE, reactorBreakPump: reactorBreakPump, reactorRepairPump: reactorRepairPump,
     RESTART_VALVE_MIN: RESTART_VALVE_MIN,
-    BILGE_PUMPS: BILGE_PUMPS, BILGE_CAPACITY: BILGE_CAPACITY, BILGE_MIN_E: BILGE_MIN_E, BUCKET_VOLUME: BUCKET_VOLUME, BUCKET_COOLDOWN_TICKS: BUCKET_COOLDOWN_TICKS,
+    BILGE_PUMPS: BILGE_PUMPS, BILGE_CAPACITY: BILGE_CAPACITY, BILGE_MIN_V: BILGE_MIN_V,
+    BREAKERS: BREAKERS, TAU_UP: TAU_UP, TAU_DOWN: TAU_DOWN, TRIP_V: TRIP_V, TRIP_TICKS: TRIP_TICKS, DARK_V: DARK_V, BATTERY_DRAIN_S: BATTERY_DRAIN_S, BATTERY_CHARGE_S: BATTERY_CHARGE_S,
+    newPower: newPower, powerStep: powerStep, powerView: powerView, breakerToggle: breakerToggle, breakerTrip: breakerTrip, gridDemand: gridDemand, gridSurplus: gridSurplus, lightLevel: lightLevel, lightBand: lightBand, BUCKET_VOLUME: BUCKET_VOLUME, BUCKET_COOLDOWN_TICKS: BUCKET_COOLDOWN_TICKS,
     bilgeBreak: bilgeBreak, bilgeRepair: bilgeRepair, bilgeToggle: bilgeToggle,
     LEAK_RATES: LEAK_RATES, LEAK_REACH: LEAK_REACH, LEAK_FIRST_TICK: LEAK_FIRST_TICK, PATCH_RESPAWN_TICKS: PATCH_RESPAWN_TICKS, leakCreate: leakCreate, leakRate: leakRate,
     WATER_COMPARTMENTS: WATER_COMPARTMENTS, WATER_FLOW: WATER_FLOW, MAX_TRIM_DEG: MAX_TRIM_DEG, MAX_LIST_DEG: MAX_LIST_DEG, newWater: newWater, waterAdd: waterAdd,
