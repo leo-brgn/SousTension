@@ -48,41 +48,11 @@ var matchLoop = function (ctx, logger, nk, dispatcher, tick, state, messages) {
     if (!p) continue;
     var input;
     try { input = JSON.parse(nk.binaryToString(m.data)); } catch (e) { continue; }
-    // Reject stale or duplicate sequences, including ones already waiting in the queue.
-    if (typeof input.seq !== "number" || input.seq <= p.lastQueued) continue;
-    p.lastQueued = input.seq;
-    p.queue.push({ seq: input.seq, mx: +input.mx || 0, mz: +input.mz || 0, act: input.act === true || input.act === 1,
-                  grab: input.grab === true || input.grab === 1, hold: input.hold === true || input.hold === 1 });
-    while (p.queue.length > MAX_QUEUED_INPUTS) p.queue.shift();
+    queueInput(p, input);
   }
 
-  // 2. Apply queued inputs under a per-player budget: +1 per tick (the nominal input rate), capped at
-  //    MAX_ALLOWANCE. In steady state this is exactly one input per tick; after a network stall (TCP
-  //    retransmission) the backlog drains in a few ticks instead of lagging forever. The long-term rate can
-  //    never exceed TICK_RATE inputs/s, so flooding the server with inputs does not speed a player up.
-  for (var k = 0; k < state.order.length; k++) {
-    var pl = state.players[state.order[k]];
-    pl.allowance = Math.min(MAX_ALLOWANCE, pl.allowance + 1);
-    while (pl.allowance >= 1 && pl.queue.length > 0) {
-      var next = pl.queue.shift();
-      stepPlayer(pl, next.mx, next.mz);
-      if (next.act) tryAct(state, state.order[k], pl, tick);
-      if (next.hold) tryHold(state, pl);
-      if (next.grab) tryGrab(state.cargo, state.order[k], pl, tick);
-      pl.seq = next.seq;
-      pl.applied += 1;
-      pl.allowance -= 1;
-    }
-  }
-
-  evaluateCoupled(state, tick);
-  leakStep(state, tick);
-  bilgeStep(state);
-  waterStep(state.water);
-  updateCargo(state, tick);
-  reactorStep(state.reactor);
-  leverStep(state.lever);
-  boatStep(state.boat, state.reactor);
+  // 2. Advance the whole simulation by one fixed step (server/src/sim.js: no Nakama, no clock, deterministic).
+  simStep(state, tick);
 
   // 3. Broadcast authoritative state.
   var out = [];
@@ -90,7 +60,6 @@ var matchLoop = function (ctx, logger, nk, dispatcher, tick, state, messages) {
     var id = state.order[j], q = state.players[id];
     out.push({ id: id, x: q.x, z: q.z, seq: q.seq });
   }
-  state.tick = tick;
   dispatcher.broadcastMessage(OP_STATE, JSON.stringify({ tick: tick, t: tick * DT, players: out, il: coupledView(state.cp, tick)[0], cp: coupledView(state.cp, tick), cargo: cargoView(state.cargo), rx: reactorView(state.reactor), sc: leverView(state.lever, state.reactor), rs: restartView(state), bw: waterView(state.water), lk: leaksView(state.leaks), bp: bilgeView(state.bilge), boat: boatView(state.boat) }), null, null, true);
   return { state: state };
 };
@@ -141,7 +110,7 @@ function InitModule(ctx, logger, nk, initializer) {
 // Allow tests in Node to import the handlers (ignored by the Nakama runtime).
 if (typeof module !== "undefined" && module.exports) {
   module.exports = {
-    InitModule: InitModule, stepPlayer: stepPlayer,
+    InitModule: InitModule, stepPlayer: stepPlayer, simStep: simStep, queueInput: queueInput, stateDigest: stateDigest,
     TICK_RATE: TICK_RATE, DT: DT, STATIONS: STATIONS, STATION_REACH: STATION_REACH, INTERLOCK_WINDOW_TICKS: INTERLOCK_WINDOW_TICKS, MAX_ALLOWANCE: MAX_ALLOWANCE, MOVE_SPEED: MOVE_SPEED, HALF_X: HALF_X, HALF_Z: HALF_Z,
     OP_INPUT: OP_INPUT, OP_STATE: OP_STATE,
     LEVER_COVER_TICKS: LEVER_COVER_TICKS, SINK_RATE_MAX: SINK_RATE_MAX, SINK_RAMP_SECONDS: SINK_RAMP_SECONDS, newBoat: newBoat, boatStep: boatStep,
