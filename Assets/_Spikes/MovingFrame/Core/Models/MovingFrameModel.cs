@@ -61,6 +61,25 @@ namespace SousTension.Spikes.MovingFrame
         /// <summary>What a player holds, [left, right, pocket] as cargo ids ("" = empty); all empty for an unknown player (E2-03).</summary>
         public string[] HandsOf(string playerId) => _hands.TryGetValue(playerId ?? "", out var h) ? h : new[] { "", "", "" };
 
+        /// <summary>Walking speed factor from what the local player carries (E2-04, same rule as the server: CarryLoad).</summary>
+        public float LocalCarryFactor()
+        {
+            if (string.IsNullOrEmpty(LocalId)) return 1f;
+            var held = HandsOf(LocalId);
+            float mass = 0f;
+            for (int i = 0; i < held.Length; i++)
+            {
+                if (string.IsNullOrEmpty(held[i])) continue;
+                bool seen = false;
+                for (int k = 0; k < i; k++) if (held[k] == held[i]) seen = true;      // a two-handed item fills both hands: count it once
+                if (seen) continue;
+                string kind = "crate"; bool heavy = false;
+                if (_cargoLatest.TryGetValue(held[i], out var c)) { kind = c.Kind; heavy = c.Heavy; }
+                mass += SousTension.Sim.CarryLoad.ItemMass(kind) / (heavy ? 2f : 1f);
+            }
+            return SousTension.Sim.CarryLoad.SpeedFactor(mass);
+        }
+
         public bool IsCarriedByLocal(string cargoId)
         {
             if (!_cargoLatest.TryGetValue(cargoId, out var c)) return false;

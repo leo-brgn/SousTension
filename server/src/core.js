@@ -25,10 +25,13 @@ var REACTOR_SEED = 1234; // TODO(E3-05/run start): derive from the run so every 
 function clamp(v, lo, hi) { return v < lo ? lo : (v > hi ? hi : v); }
 
 // One fixed-step integration, shared by server and (identically re-implemented) by the client prediction.
-function stepPlayer(p, mx, mz) {
+// `factor` (E2-04, default 1) scales the walking speed: what a player carries slows them down (hands.js carrySpeedFactor, mirrored in
+// CharacterMotion.cs for the client's prediction).
+function stepPlayer(p, mx, mz, factor) {
   var len = Math.sqrt(mx * mx + mz * mz);
   if (len > 1) { mx /= len; mz /= len; }
-  p.x = clamp(p.x + mx * MOVE_SPEED * DT, -HALF_X, HALF_X);
-  p.z = clamp(p.z + mz * MOVE_SPEED * DT, -HALF_Z, HALF_Z);
+  var f = factor === undefined ? 1 : factor;
+  p.x = clamp(p.x + mx * MOVE_SPEED * f * DT, -HALF_X, HALF_X);
+  p.z = clamp(p.z + mz * MOVE_SPEED * f * DT, -HALF_Z, HALF_Z);
 }
 

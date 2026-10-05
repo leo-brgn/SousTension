@@ -14,7 +14,8 @@ namespace SousTension.Spikes.MovingFrame.Tests
 
     internal sealed class FakeUse : IUseInput { public bool UseHeld { get; set; } }
     internal sealed class FakeAim : IAimSource { public string TargetId { get; set; } }
-    internal sealed class FakeHands : IHandsInput { public bool TakeHeld { get; set; } public bool DropHeld { get; set; } public bool StowHeld { get; set; } }
+    internal sealed class FakeHands : IHandsInput { public bool TakeHeld { get; set; } public bool DropHeld { get; set; } public bool StowHeld { get; set; } public bool ThrowHeld { get; set; } }
+    internal sealed class FakeLook : ILookSource { public float Yaw { get; set; } }
 
     internal sealed class ConstantInput : IInputSource
     {
@@ -29,11 +30,11 @@ namespace SousTension.Spikes.MovingFrame.Tests
         public long BytesSent { get; private set; }
         public long BytesReceived { get; private set; }
         public event Action<StateSnapshot> StateReceived;
-        public readonly List<(int seq, float mx, float mz, bool act, bool grab, bool hold, string use, string hand)> Sent = new List<(int, float, float, bool, bool, bool, string, string)>();
+        public readonly List<(int seq, float mx, float mz, bool act, bool grab, bool hold, string use, string hand, float yaw)> Sent = new List<(int, float, float, bool, bool, bool, string, string, float)>();
         private readonly Queue<StateSnapshot> _incoming = new Queue<StateSnapshot>();
 
         public Task ConnectAsync(CancellationToken ct) => Task.CompletedTask;
-        public void SendInput(int seq, float moveX, float moveZ, bool act, bool grab, bool hold = false, string use = null, string hand = null) { Sent.Add((seq, moveX, moveZ, act, grab, hold, use, hand)); BytesSent += 24; }
+        public void SendInput(int seq, float moveX, float moveZ, bool act, bool grab, bool hold = false, string use = null, string hand = null, float yaw = 0f) { Sent.Add((seq, moveX, moveZ, act, grab, hold, use, hand, yaw)); BytesSent += 24; }
         public void Enqueue(StateSnapshot s) => _incoming.Enqueue(s);
         public void Poll() { while (_incoming.Count > 0) StateReceived?.Invoke(_incoming.Dequeue()); }
         public void Dispose() { }
@@ -478,6 +479,81 @@ namespace SousTension.Spikes.MovingFrame.Tests
             hands.StowHeld = false; c.Tick(0.1f); net.Sent.Clear();
             hands.StowHeld = true; c.Tick(0.1f);
             Assert.AreEqual("stow", net.Sent[0].hand);
+        }
+
+        // ---- Mass, speed and throws (E2-04) ----
+        [Test]
+        public void CarryLoad_MatchesTheServerRule_AndTheCharacterWalksSlowerWithAFactor()
+        {
+            Assert.AreEqual(1f, CarryLoad.SpeedFactor(0f), 1e-6f);
+            Assert.AreEqual(1f - 0.012f * 12f, CarryLoad.SpeedFactor(CarryLoad.ItemMass("crate")), 1e-6f);
+            Assert.AreEqual(1f - 0.012f * 3f, CarryLoad.SpeedFactor(CarryLoad.ItemMass("patch") + CarryLoad.ItemMass("bucket")), 1e-6f);
+            Assert.AreEqual(1f - 0.012f * 20f, CarryLoad.SpeedFactor(CarryLoad.ItemMass("fuel") / 2f), 1e-6f);   // the flask is shared by two
+            Assert.AreEqual(0.5f, CarryLoad.SpeedFactor(500f), 1e-6f);
+            float x = 0, z = 0, x2 = 0, z2 = 0;
+            CharacterMotion.Step(ref x, ref z, 1, 0);
+            CharacterMotion.Step(ref x2, ref z2, 1, 0, 0.5f);
+            Assert.AreEqual(x * 0.5f, x2, 1e-6f);
+        }
+
+        [Test]
+        public void Prediction_ReplaysEachPendingInputWithTheFactorItWasPredictedWith()
+        {
+            var p = new PredictionBuffer();
+            p.Reset(0, 0);
+            for (int i = 0; i < 3; i++) p.Predict(1, 0, 1f);
+            for (int i = 0; i < 3; i++) p.Predict(1, 0, 0.5f);
+            float predicted = p.X;
+            // the server processed the first 3 inputs (full speed) and says x = 0.9
+            float correction = p.Reconcile(0.9f, 0f, 3);
+            Assert.AreEqual(predicted, p.X, 1e-5f, "replaying the 3 slowed inputs from the acknowledged position gives the same place");
+            Assert.AreEqual(0f, correction, 1e-5f);
+        }
+
+        [Test]
+        public void TheLocalCarryFactor_FollowsWhatTheLocalPlayerHolds()
+        {
+            var net = new FakeNetwork(); var clock = new FakeClock(); var model = new MovingFrameModel();
+            var c = new MovingFrameController(net, new ConstantInput(), clock, model);
+            model.LocalId = "me";
+            Assert.AreEqual(1f, model.LocalCarryFactor(), 1e-6f);
+            var cargo = new[]
+            {
+                new CargoState("crate1", 0, 0, false, new[] { "me" }, "", "crate"),
+                new CargoState("fuel", 0, 0, true, new[] { "me", "pal" }, "", "fuel"),
+                new CargoState("patch1", 0, 0, false, new[] { "me" }, "", "patch"),
+                new CargoState("bucket", 0, 0, false, new[] { "me" }, "", "bucket"),
+            };
+            net.Enqueue(new StateSnapshot(1, 0.1, new[] { new PlayerState("me", 0, 0, 0, new[] { "crate1", "crate1", "" }) }, default, cargo));
+            c.Tick(0);
+            Assert.AreEqual(1f - 0.012f * 12f, model.LocalCarryFactor(), 1e-6f, "a two-handed crate counts once");
+            net.Enqueue(new StateSnapshot(2, 0.2, new[] { new PlayerState("me", 0, 0, 0, new[] { "fuel", "fuel", "" }) }, default, cargo));
+            c.Tick(0);
+            Assert.AreEqual(1f - 0.012f * 20f, model.LocalCarryFactor(), 1e-6f, "half of the shared flask");
+            net.Enqueue(new StateSnapshot(3, 0.3, new[] { new PlayerState("me", 0, 0, 0, new[] { "patch1", "bucket", "" }) }, default, cargo));
+            c.Tick(0);
+            Assert.AreEqual(1f - 0.012f * 3f, model.LocalCarryFactor(), 1e-6f);
+        }
+
+        [Test]
+        public void RightClick_SendsTheThrowOnThePress_AndEveryInputCarriesTheHeading()
+        {
+            var net = new FakeNetwork(); var clock = new FakeClock(); var model = new MovingFrameModel(); var hands = new FakeHands(); var look = new FakeLook { Yaw = 1.5f };
+            var c = new MovingFrameController(net, new ConstantInput(), clock, model, null, null, hands, look);
+            net.Enqueue(new StateSnapshot(1, 0.1, new[] { new PlayerState("me", 0, 0, 0) }));
+            c.Tick(0); net.Sent.Clear();
+            hands.ThrowHeld = true;
+            c.Tick(0.3f);
+            Assert.AreEqual("throw", net.Sent[0].hand);
+            for (int i = 1; i < net.Sent.Count; i++) Assert.IsNull(net.Sent[i].hand, "one throw per press");
+            foreach (var sent in net.Sent) Assert.AreEqual(1.5f, sent.yaw, 1e-6f);
+        }
+
+        [Test]
+        public void CargoState_CarriesItsHeight()
+        {
+            Assert.AreEqual(0f, new CargoState("c", 0, 0, false, null, "").Y);
+            Assert.AreEqual(1.4f, new CargoState("c", 0, 0, false, null, "", "bucket", true, 1.4f).Y, 1e-6f);
         }
 
         [Test]

@@ -15,7 +15,7 @@ namespace SousTension.Spikes.MovingFrame
         event Action<StateSnapshot> StateReceived;
 
         Task ConnectAsync(CancellationToken cancellationToken);
-        void SendInput(int seq, float moveX, float moveZ, bool act, bool grab, bool hold = false, string use = null, string hand = null);
+        void SendInput(int seq, float moveX, float moveZ, bool act, bool grab, bool hold = false, string use = null, string hand = null, float yaw = 0f);
 
         /// <summary>Deliver queued network events on the calling thread.</summary>
         void Poll();
@@ -39,6 +39,13 @@ namespace SousTension.Spikes.MovingFrame
         bool TakeHeld { get; }
         bool DropHeld { get; }
         bool StowHeld { get; }
+        bool ThrowHeld { get; }
+    }
+
+    /// <summary>Where the player looks (E2-04): the heading in radians about the boat's up axis, sent with every input so the server can aim a throw.</summary>
+    public interface ILookSource
+    {
+        float Yaw { get; }
     }
 
     /// <summary>The primary action button (mouse left): used on the object the player looks at (E2-02).</summary>

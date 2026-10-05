@@ -19,7 +19,7 @@ var matchJoin = function (ctx, logger, nk, dispatcher, tick, state, presences) {
     var id = presences[i].userId;
     if (!state.players[id]) {
       var slot = state.order.length;
-      state.players[id] = { x: -1.5 + slot, z: 0, seq: 0, lastQueued: 0, allowance: 0, applied: 0, queue: [], hands: newHands(), presence: presences[i] };
+      state.players[id] = { x: -1.5 + slot, z: 0, seq: 0, lastQueued: 0, allowance: 0, applied: 0, queue: [], hands: newHands(), yaw: 0, presence: presences[i] };
       state.order.push(id);
     }
   }
@@ -125,6 +125,7 @@ if (typeof module !== "undefined" && module.exports) {
     WATER_COMPARTMENTS: WATER_COMPARTMENTS, WATER_FLOW: WATER_FLOW, MAX_TRIM_DEG: MAX_TRIM_DEG, MAX_LIST_DEG: MAX_LIST_DEG, newWater: newWater, waterAdd: waterAdd,
     waterRemove: waterRemove, waterSetDoor: waterSetDoor, waterStep: waterStep, waterTotal: waterTotal, waterTilt: waterTilt, waterView: waterView, waterLevel: waterLevel, compartmentAt: compartmentAt,
     newCoupled: newCoupled, COUPLED_ACTIONS: COUPLED_ACTIONS, COUPLED_EFFECTS: COUPLED_EFFECTS, COUPLED_GRACE_TICKS: COUPLED_GRACE_TICKS,
+    carrySpeedFactor: carrySpeedFactor, carriedMass: carriedMass, throwItem: throwItem, THROW_SPEED: THROW_SPEED, THROW_UP: THROW_UP, THROW_HEIGHT: THROW_HEIGHT, THROW_BOUNCE: THROW_BOUNCE,
     ITEM_KINDS: ITEM_KINDS, newHands: newHands, takeItem: takeItem, dropItem: dropItem, stowItem: stowItem, canUseHands: canUseHands, handsView: handsView,
     AIM_REACH: AIM_REACH, interactableIds: interactableIds,
     CONTROLS: CONTROLS, REGIME_ORDER: REGIME_ORDER, tryAct: tryAct,
