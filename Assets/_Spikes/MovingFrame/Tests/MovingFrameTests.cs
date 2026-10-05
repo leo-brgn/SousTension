@@ -247,6 +247,26 @@ namespace SousTension.Spikes.MovingFrame.Tests
         }
 
         [Test]
+        public void Snapshot_StoresEveryCoupledAction_ById_AndKeepsLastWhenMissing()
+        {
+            var net = new FakeNetwork(); var clock = new FakeClock(); var model = new MovingFrameModel();
+            var c = new MovingFrameController(net, new ConstantInput(), clock, model);
+            Assert.IsFalse(model.TryGetCoupled("demo2", out _));
+            net.Enqueue(new StateSnapshot(1, 0.1, new[] { new PlayerState("me", 0, 0, 0) }, default, null, default, default, default, new[]
+            {
+                new CoupledActionState("demo", new InterlockState(0, 0, "", "", "none", 0, 0)),
+                new CoupledActionState("demo2", new InterlockState(12, 0, "pal", "", "none", 0, 3)),
+            }));
+            c.Tick(0);
+            Assert.IsTrue(model.TryGetCoupled("demo2", out var s));
+            Assert.AreEqual(12, s.RemainingA); Assert.AreEqual("pal", s.HolderA); Assert.AreEqual(3, s.Count);
+            Assert.IsTrue(model.TryGetCoupled("demo", out var d)); Assert.AreEqual(0, d.Count);
+            net.Enqueue(new StateSnapshot(2, 0.2, new[] { new PlayerState("me", 0, 0, 0) }));   // older server: nothing wiped
+            c.Tick(0);
+            Assert.IsTrue(model.TryGetCoupled("demo2", out s)); Assert.AreEqual(12, s.RemainingA);
+        }
+
+        [Test]
         public void Snapshot_StoresAuthoritativeInterlockState_WithoutPredicting()
         {
             var net = new FakeNetwork(); var clock = new FakeClock(); var model = new MovingFrameModel();

@@ -1,6 +1,6 @@
 // ---- Interactive controls (boat-local) ---------------------------------------------------------------------
 // One interaction key ("act") serves every control: the server picks the nearest interactable within reach, so the
-// client never has to say what it is pressing (and cannot cheat about it). Interlock stations live in interlock.js;
+// client never has to say what it is pressing (and cannot cheat about it). Coupled-action commands live in coupled.js;
 // the other controls are listed here.
 //   regime : the RK-1 three-position selector (compartment 4, left wall). One press turns it to the next position
 //            (Veille -> Croisiere -> Pleine -> Veille). A single player is enough: the Rule of Two Players covers
@@ -87,18 +87,14 @@ function tryAct(state, id, pl, tick) {
     var d = controlDistance(pl, CONTROLS[i]);
     if (d <= CONTROLS[i].reach && d < bestControlD) { bestControl = CONTROLS[i]; bestControlD = d; }
   }
-  var bestStationD = Infinity;
-  for (var s = 0; s < STATIONS.length; s++) {
-    var dx = pl.x - STATIONS[s].x, dz = pl.z - STATIONS[s].z;
-    var ds = Math.sqrt(dx * dx + dz * dz);
-    if (ds <= STATION_REACH && ds < bestStationD) bestStationD = ds;
-  }
+  var cmd = nearestCommand(pl);
+  var bestStationD = cmd ? cmd.d : Infinity;
   if (bestControl && bestControlD < bestStationD) {
     if (bestControl.id === "regime") useRegimeSelector(state.reactor);
     else if (bestControl.id === "scram") useScramLever(state.lever, state.reactor);
     else if (bestControl.pump !== undefined) togglePump(state.reactor, bestControl.pump);
     return;
   }
-  if (bestStationD < Infinity) tryActivate(state.il, id, pl, tick);
+  if (cmd) tryActivate(state.cp, id, pl, tick);
 }
 

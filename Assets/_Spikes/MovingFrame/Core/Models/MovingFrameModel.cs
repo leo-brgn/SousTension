@@ -93,6 +93,15 @@ namespace SousTension.Spikes.MovingFrame
         public InterlockState Interlock { get; private set; }
         public void SetInterlock(InterlockState state) { Interlock = state; }
 
+        /// <summary>Latest authoritative state of every coupled action (E4-02). Interlock above is the first one (legacy alias).</summary>
+        public CoupledActionState[] Coupled { get; private set; } = new CoupledActionState[0];
+        public void SetCoupled(CoupledActionState[] actions) { if (actions != null && actions.Length > 0) Coupled = actions; }
+        public bool TryGetCoupled(string id, out InterlockState state)
+        {
+            foreach (var a in Coupled) if (a.Id == id) { state = a.State; return true; }
+            state = default; return false;
+        }
+
         /// <summary>Latest authoritative reactor gauges (Valid = false until the server has sent them).</summary>
         public ReactorState Reactor { get; private set; }
         public void SetReactor(ReactorState state) { if (state.Valid) Reactor = state; }

@@ -61,6 +61,7 @@ namespace SousTension.Spikes.MovingFrame
             _model.LocalId = _net.LocalUserId;
             _model.ApplyServerState(snapshot, _clock.Now);
             _model.SetInterlock(snapshot.Interlock);
+            _model.SetCoupled(snapshot.Coupled);
             _model.ApplyCargo(snapshot.Cargo, snapshot.ServerTime);
             _model.SetReactor(snapshot.Reactor);
             _model.SetLever(snapshot.Lever);
