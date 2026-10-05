@@ -267,6 +267,22 @@ namespace SousTension.Spikes.MovingFrame.Tests
         }
 
         [Test]
+        public void Snapshot_StoresRestartProcedure_AndKeepsLastValuesWhenMissing()
+        {
+            var net = new FakeNetwork(); var clock = new FakeClock(); var model = new MovingFrameModel();
+            var c = new MovingFrameController(net, new ConstantInput(), clock, model);
+            Assert.IsFalse(model.Restart.Valid);
+            net.Enqueue(new StateSnapshot(1, 0.1, new[] { new PlayerState("me", 0, 0, 0) }, default, null, default, default, default, null,
+                new RestartState(true, false, true, "refused", 7, 0)));
+            c.Tick(0);
+            Assert.IsTrue(model.Restart.LeverBack); Assert.IsFalse(model.Restart.ValvesOpen); Assert.IsTrue(model.Restart.PumpsRunning);
+            Assert.AreEqual("refused", model.Restart.Last); Assert.AreEqual(7, model.Restart.LastTick);
+            net.Enqueue(new StateSnapshot(2, 0.2, new[] { new PlayerState("me", 0, 0, 0) }));
+            c.Tick(0);
+            Assert.AreEqual("refused", model.Restart.Last);   // an older server must not wipe it
+        }
+
+        [Test]
         public void Snapshot_StoresAuthoritativeInterlockState_WithoutPredicting()
         {
             var net = new FakeNetwork(); var clock = new FakeClock(); var model = new MovingFrameModel();

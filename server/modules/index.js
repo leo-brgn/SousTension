@@ -53,10 +53,14 @@ var COUPLED_ACTIONS = [
   // Second demo pair on the opposite diagonal: lets two pairs of players work independently at the same time.
   { id: "demo2", windowTicks: INTERLOCK_WINDOW_TICKS,
     a: { x: -2.5, z: 6.0, reach: STATION_REACH, kind: "press" },
-    b: { x: 2.5, z: -7.0, reach: STATION_REACH, kind: "press" } }
+    b: { x: 2.5, z: -7.0, reach: STATION_REACH, kind: "press" } },
+  // Restart of the reactor after a SCRAM (E3-05): near the RK-1 panel and at the bow, 13 m apart.
+  { id: "reactor_restart", windowTicks: INTERLOCK_WINDOW_TICKS,
+    a: { x: -2.5, z: -5.0, reach: STATION_REACH, kind: "press" },
+    b: { x: 2.5, z: 8.5, reach: STATION_REACH, kind: "press" } }
 ];
 
-// Effects of successful actions: id -> function(state, actionId). Registered by the systems that own the action (E3-05 restart...).
+// Effects of successful actions: id -> function(state, actionId, tick). Registered by the systems that own the action (E3-05 restart...).
 var COUPLED_EFFECTS = {};
 
 function newCoupled() {
@@ -102,7 +106,7 @@ function evaluateCoupled(state, tick) {
       act.result = "success"; act.resultTick = tick; act.count++;
       a.by = ""; b.by = "";
       var effect = COUPLED_EFFECTS[def.id];
-      if (effect) effect(state, def.id);
+      if (effect) effect(state, def.id, tick);
       continue;
     }
     for (var s = 0; s < 2; s++) {
@@ -495,11 +499,12 @@ function tryHold(state, pl) {
   if (c && c.valve !== undefined) holdValve(state.reactor, c.valve);
 }
 
-function newLever() { return { cover: 0 }; }   // cover = ticks left before the cover falls shut (0 = closed)
+// cover = ticks left before the cover falls shut (0 = closed); reset = the lever was put back after a SCRAM (restart step 1, E3-05)
+function newLever() { return { cover: 0, reset: false }; }
 
 // First press lifts the cover, second press (cover open) pulls the lever. Returns true when the SCRAM was triggered.
 function useScramLever(lever, reactor) {
-  if (reactor.scram) return false;
+  if (reactor.scram) { lever.reset = true; return false; }   // a press on a pulled lever puts it back (restart step 1); the latch stays until the restart
   if (lever.cover <= 0) { lever.cover = LEVER_COVER_TICKS; return false; }
   reactorScram(reactor);
   lever.cover = 0;
@@ -531,10 +536,52 @@ function tryAct(state, id, pl, tick) {
   if (cmd) tryActivate(state.cp, id, pl, tick);
 }
 
+// ---- Reactor restart procedure after a SCRAM (E3-05) ----------------------------------------------------------------
+// GDD 3.3: restarting is a two-player procedure, by torchlight, following the manual. Three preparation steps anyone can do, in any
+// order (so the two players can split them), then a coupled action (Rule of Two Players, E4-02) that actually restarts the plant:
+//   1. lever    : put the SCRAM lever back (one press at the lever while the reactor is SCRAMmed)
+//   2. valves   : the four primary valves open to at least RESTART_VALVE_MIN (the wheels are held open, E3-06)
+//   3. pumps    : both primary pumps running (not stopped, not broken)
+//   4. restart  : the coupled action "reactor_restart" (two commands far apart, two different players, 3 s window)
+// Step 4 is refused until 1-3 are done (result "refused", no penalty). Batteries (E3-07) and the manual pages (E5) are not modelled yet.
+var RESTART_VALVE_MIN = 0.9;
+
+function newRestart() { return { last: "none", lastTick: 0, count: 0 }; }
+
+function restartSteps(state) {
+  var r = state.reactor, v = r.valves, ok = true;
+  for (var i = 0; i < 4; i++) if (v[i] < RESTART_VALVE_MIN) ok = false;
+  return [
+    state.lever.reset === true,
+    ok,
+    r.pumps[0] === true && r.pumps[1] === true && !r.pumpBroken[0] && !r.pumpBroken[1]
+  ];
+}
+
+// Effect of the coupled action "reactor_restart": succeeds only on a SCRAMmed reactor whose three preparation steps are done.
+function restartAttempt(state, id, tick) {
+  var steps = restartSteps(state);
+  if (state.reactor.scram && steps[0] && steps[1] && steps[2]) {
+    reactorRestart(state.reactor);
+    state.lever.reset = false; state.lever.cover = 0;
+    state.restart.last = "success"; state.restart.count++;
+  } else {
+    state.restart.last = "refused";
+  }
+  state.restart.lastTick = tick;
+}
+COUPLED_EFFECTS.reactor_restart = restartAttempt;
+
+// Broadcast (and resync): s = the three preparation steps (1 done), last = outcome of the latest attempt, lt = its tick, n = restarts so far.
+function restartView(state) {
+  var s = restartSteps(state);
+  return { s: [s[0] ? 1 : 0, s[1] ? 1 : 0, s[2] ? 1 : 0], last: state.restart.last, lt: state.restart.lastTick, n: state.restart.count };
+}
+
 var matchInit = function (ctx, logger, nk, params) {
   logger.info("moving_frame match init");
   return {
-    state: { tick: 0, players: {}, order: [], cp: newCoupled(), cargo: newCargo(), reactor: newReactor(REACTOR_SEED, "veille"), lever: newLever(), boat: newBoat() },
+    state: { tick: 0, players: {}, order: [], cp: newCoupled(), cargo: newCargo(), reactor: newReactor(REACTOR_SEED, "veille"), lever: newLever(), boat: newBoat(), restart: newRestart() },
     tickRate: TICK_RATE,
     label: JSON.stringify({ name: MATCH_NAME })
   };
@@ -621,7 +668,7 @@ var matchLoop = function (ctx, logger, nk, dispatcher, tick, state, messages) {
     out.push({ id: id, x: q.x, z: q.z, seq: q.seq });
   }
   state.tick = tick;
-  dispatcher.broadcastMessage(OP_STATE, JSON.stringify({ tick: tick, t: tick * DT, players: out, il: coupledView(state.cp, tick)[0], cp: coupledView(state.cp, tick), cargo: cargoView(state.cargo), rx: reactorView(state.reactor), sc: leverView(state.lever, state.reactor), boat: boatView(state.boat) }), null, null, true);
+  dispatcher.broadcastMessage(OP_STATE, JSON.stringify({ tick: tick, t: tick * DT, players: out, il: coupledView(state.cp, tick)[0], cp: coupledView(state.cp, tick), cargo: cargoView(state.cargo), rx: reactorView(state.reactor), sc: leverView(state.lever, state.reactor), rs: restartView(state), boat: boatView(state.boat) }), null, null, true);
   return { state: state };
 };
 
@@ -676,6 +723,7 @@ if (typeof module !== "undefined" && module.exports) {
     OP_INPUT: OP_INPUT, OP_STATE: OP_STATE,
     LEVER_COVER_TICKS: LEVER_COVER_TICKS, SINK_RATE_MAX: SINK_RATE_MAX, SINK_RAMP_SECONDS: SINK_RAMP_SECONDS, newBoat: newBoat, boatStep: boatStep,
     VALVE_TURN_RATE: VALVE_TURN_RATE, reactorBreakPump: reactorBreakPump, reactorRepairPump: reactorRepairPump,
+    RESTART_VALVE_MIN: RESTART_VALVE_MIN,
     COUPLED_ACTIONS: COUPLED_ACTIONS, COUPLED_EFFECTS: COUPLED_EFFECTS, COUPLED_GRACE_TICKS: COUPLED_GRACE_TICKS,
     CONTROLS: CONTROLS, REGIME_ORDER: REGIME_ORDER, tryAct: tryAct,
     reactorNoise: reactorNoise, REACTOR_K: REACTOR_K, newReactor: newReactor, reactorStep: reactorStep, reactorView: reactorView, reactorScram: reactorScram,

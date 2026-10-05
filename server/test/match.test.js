@@ -628,3 +628,161 @@ test("coupled: the countdown shown to the clients is the official 3 s window eve
   assert.strictEqual(cpOf(c, "demo2").ab, "");
   assert.strictEqual(cpOf(c, "demo2").result, "timeout");
 });
+
+// ---- Reactor restart procedure (E3-05) ----
+const RESTART = m.COUPLED_ACTIONS.find((x) => x.id === "reactor_restart");
+function rsOf(c) { return lastView(c).rs; }
+function moveInput(ctx, id, mx, mz, act, hold) {
+  ctx.seq[id] = (ctx.seq[id] || 0) + 1;
+  return { opCode: m.OP_INPUT, sender: presence(id), data: JSON.stringify({ seq: ctx.seq[id], mx, mz, act: !!act, hold: !!hold }) };
+}
+function scrammedSetup(ids) {
+  const c = lockSetup(ids);
+  m.reactorScram(c.state.reactor);
+  return c;
+}
+function prepareAllSteps(c) {
+  c.state.lever.reset = true;
+  c.state.reactor.valves = [1, 1, 1, 1];
+  c.state.reactor.pumps = [true, true];
+}
+function pressRestartPair(c, a, b) {
+  place(c, a, RESTART.a.x, RESTART.a.z); place(c, b, RESTART.b.x, RESTART.b.z);
+  tickWith(c, [inputAct(c, a, true)]);
+  tickWith(c, [inputAct(c, b, true)]);
+}
+
+test("restart: refused until the three preparation steps are done, and the reactor stays SCRAMmed", () => {
+  const c = scrammedSetup(["a", "b"]);
+  c.state.reactor.valves = [0.5, 0.5, 0.5, 0.5];                              // drift closed them before the SCRAM
+  pressRestartPair(c, "a", "b");
+  assert.strictEqual(rsOf(c).last, "refused");
+  assert.strictEqual(c.state.reactor.scram, true);
+  assert.strictEqual(rsOf(c).n, 0);
+});
+
+test("restart: the coupled action needs two different players, a lone player cannot restart", () => {
+  const c = scrammedSetup(["a"]);
+  prepareAllSteps(c);
+  place(c, "a", RESTART.a.x, RESTART.a.z);
+  tickWith(c, [inputAct(c, "a", true)]);
+  place(c, "a", RESTART.b.x, RESTART.b.z);
+  tickWith(c, [inputAct(c, "a", true)]);
+  assert.strictEqual(c.state.reactor.scram, true);
+  assert.strictEqual(rsOf(c).n, 0);
+});
+
+test("restart: refused (and harmless) when the reactor is not SCRAMmed", () => {
+  const c = lockSetup(["a", "b"]);
+  prepareAllSteps(c);
+  pressRestartPair(c, "a", "b");
+  assert.strictEqual(rsOf(c).last, "refused");
+  assert.strictEqual(c.state.reactor.scram, false);
+});
+
+test("restart step 1: a press at the lever puts it back while SCRAMmed, and does nothing before the SCRAM", () => {
+  const c = lockSetup(["a"]);
+  place(c, "a", LEVER_POS.x + 0.5, LEVER_POS.z);
+  tickWith(c, [inputAct(c, "a", true)]);                                      // lifts the cover, not a reset
+  assert.strictEqual(rsOf(c).s[0], 0);
+  m.reactorScram(c.state.reactor);
+  tickWith(c, [inputAct(c, "a", true)]);
+  assert.strictEqual(rsOf(c).s[0], 1);
+});
+
+test("restart step 2: every one of the four valves must be open to at least 90 %", () => {
+  const c = scrammedSetup(["a"]);
+  c.state.reactor.valves = [1, 1, 1, 0.8];
+  tickWith(c, []);
+  assert.strictEqual(rsOf(c).s[1], 0);
+  c.state.reactor.valves[3] = m.RESTART_VALVE_MIN;
+  tickWith(c, []);
+  assert.strictEqual(rsOf(c).s[1], 1);
+});
+
+test("restart step 3: both pumps must be running, a stopped or broken pump blocks the restart", () => {
+  const c = scrammedSetup(["a"]);
+  tickWith(c, []);
+  assert.strictEqual(rsOf(c).s[2], 1);
+  m.reactorSetPump(c.state.reactor, 0, false);
+  tickWith(c, []);
+  assert.strictEqual(rsOf(c).s[2], 0);
+  m.reactorSetPump(c.state.reactor, 0, true); m.reactorBreakPump(c.state.reactor, 1);
+  tickWith(c, []);
+  assert.strictEqual(rsOf(c).s[2], 0);
+});
+
+test("restart: with the three steps done the pair restarts the plant: latch cleared, lever back, sinking eases off", () => {
+  const c = scrammedSetup(["a", "b"]);
+  for (let i = 0; i < 300; i++) tickWith(c, []);                              // 30 s in the dark: the boat is sinking
+  assert.ok(c.state.boat.vz > 0.1);
+  prepareAllSteps(c);
+  pressRestartPair(c, "a", "b");
+  assert.strictEqual(rsOf(c).last, "success");
+  assert.strictEqual(rsOf(c).n, 1);
+  assert.strictEqual(c.state.reactor.scram, false);
+  assert.strictEqual(c.state.lever.reset, false);
+  assert.deepStrictEqual(lastView(c).sc, { cv: 0, pl: 0 });
+  for (let i = 0; i < 300; i++) tickWith(c, []);
+  assert.strictEqual(c.state.boat.vz, 0);
+});
+
+test("restart: after the restart the plant produces electricity again and the core stays safe (no leak)", () => {
+  const c = scrammedSetup(["a", "b"]);
+  for (let i = 0; i < 300; i++) tickWith(c, []);
+  prepareAllSteps(c);
+  pressRestartPair(c, "a", "b");
+  for (let i = 0; i < 1500; i++) tickWith(c, []);                             // 2.5 min
+  assert.ok(lastView(c).rx.E > 1, "electricity is back, E=" + lastView(c).rx.E);
+  assert.strictEqual(lastView(c).rx.leak, 0);
+  assert.strictEqual(lastView(c).rx.scram, 0);
+});
+
+test("restart: the procedure state is always in the broadcast (reconnection resync)", () => {
+  const c = scrammedSetup(["a"]);
+  c.state.lever.reset = true;
+  tickWith(c, []);
+  assert.deepStrictEqual(rsOf(c).s, [1, 1, 1]);
+  assert.strictEqual(rsOf(c).last, "none");
+});
+
+// Two scripted players follow the procedure from the SCRAM (walking at 3 m/s, holding the valve wheels): it must be doable within the
+// GDD's 90 s. The measured duration is reported in the failure message and printed.
+test("restart: two scripted players complete the whole procedure in under 90 s (GDD balance target)", () => {
+  const c = scrammedSetup(["a", "b"]);
+  c.state.reactor.valves = [0.4, 0.4, 0.4, 0.4];
+  const walk = (id, x, z) => {
+    const p = c.state.players[id];
+    const dx = x - p.x, dz = z - p.z, d = Math.hypot(dx, dz);
+    return d < 0.15 ? null : moveInput(c, id, dx / d, dz / d, false, false);
+  };
+  const valveAt = (i) => m.CONTROLS.find((k) => k.id === "valve" + i);
+  const lever = m.CONTROLS.find((k) => k.id === "scram");
+  let phase = 0, valve = 0;
+  const maxTicks = 900;
+  const restarted = () => c.d.sent.length > 0 && rsOf(c).last === "success";
+  const armedByA = () => c.d.sent.length > 0 && c.d.sent[c.d.sent.length - 1].data.cp.find((x) => x.id === "reactor_restart").ab === "a";
+  while (!restarted() && c.tick < maxTicks) {
+    const msgs = [];
+    // player a: lever, then the four valves (walk up, hold the wheel), then the first restart command
+    if (phase === 0) {
+      const w = walk("a", lever.x + 0.5, lever.z + 0.4);
+      if (w) msgs.push(w); else { msgs.push(inputAct(c, "a", true)); phase = 1; }
+    } else if (phase === 1) {
+      if (c.state.reactor.valves[valve] >= m.RESTART_VALVE_MIN) { valve++; if (valve === 4) phase = 2; }
+      else { const v = valveAt(valve); msgs.push(walk("a", v.x - 0.5, v.z) || moveInput(c, "a", 0, 0, false, true)); }
+    } else if (phase === 2) {
+      const w = walk("a", RESTART.a.x, RESTART.a.z);
+      if (w) msgs.push(w); else { msgs.push(inputAct(c, "a", true)); phase = 3; }
+    }
+    // player b: waits at the bow and presses the second command as soon as a has armed the first one (they talk on the interphone)
+    const wb = walk("b", RESTART.b.x, RESTART.b.z);
+    if (wb) msgs.push(wb); else if (phase === 3 && armedByA()) msgs.push(inputAct(c, "b", true));
+    tickWith(c, msgs);
+  }
+  const seconds = c.tick / m.TICK_RATE;
+  console.log("restart procedure duration with two scripted players: " + seconds.toFixed(1) + " s");
+  assert.strictEqual(rsOf(c).last, "success", "procedure not completed after " + seconds + " s");
+  assert.ok(seconds <= 90, "took " + seconds + " s");
+  assert.strictEqual(c.state.reactor.scram, false);
+});

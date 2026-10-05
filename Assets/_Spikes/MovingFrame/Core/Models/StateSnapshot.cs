@@ -85,6 +85,17 @@ namespace SousTension.Spikes.MovingFrame
         public ScramLeverState(bool coverOpen, bool pulled) { Valid = true; CoverOpen = coverOpen; Pulled = pulled; }
     }
 
+    /// <summary>Reactor restart procedure after a SCRAM (E3-05): the three preparation steps and the outcome of the latest attempt.</summary>
+    public readonly struct RestartState
+    {
+        public readonly bool Valid;
+        public readonly bool LeverBack, ValvesOpen, PumpsRunning;   // steps 1-3 (step 4 is the coupled action "reactor_restart")
+        public readonly string Last;                                 // "none" | "success" | "refused"
+        public readonly int LastTick, Count;
+        public RestartState(bool leverBack, bool valvesOpen, bool pumpsRunning, string last, int lastTick, int count)
+        { Valid = true; LeverBack = leverBack; ValvesOpen = valvesOpen; PumpsRunning = pumpsRunning; Last = last ?? "none"; LastTick = lastTick; Count = count; }
+    }
+
     /// <summary>Authoritative boat depth below patrol depth (E3-04): grows after a SCRAM. Display only.</summary>
     public readonly struct BoatDepthState
     {
@@ -106,10 +117,13 @@ namespace SousTension.Spikes.MovingFrame
         public readonly ScramLeverState Lever;
         public readonly BoatDepthState Boat;
         public readonly CoupledActionState[] Coupled;
+        public readonly RestartState Restart;
 
         public StateSnapshot(int tick, double serverTime, PlayerState[] players, InterlockState interlock = default, CargoState[] cargo = null, ReactorState reactor = default,
-            ScramLeverState lever = default, BoatDepthState boat = default, CoupledActionState[] coupled = null)
+            ScramLeverState lever = default, BoatDepthState boat = default, CoupledActionState[] coupled = null,
+            RestartState restart = default)
         {
+            Restart = restart;
             Coupled = coupled ?? new CoupledActionState[0];
             Lever = lever; Boat = boat;
             Tick = tick; ServerTime = serverTime; Players = players; Interlock = interlock; Cargo = cargo ?? new CargoState[0]; Reactor = reactor;

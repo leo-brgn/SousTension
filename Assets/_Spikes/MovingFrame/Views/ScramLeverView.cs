@@ -18,6 +18,7 @@ namespace SousTension.Spikes.MovingFrame
 
         private MovingFrameModel _model;
         private Transform _cover, _lever, _depthNeedle;
+        private readonly Renderer[] _stepLamps = new Renderer[3];
         private float _coverAngle, _leverAngle, _light = 1f;
         private readonly List<Light> _lights = new List<Light>();
         private readonly List<float> _lightBase = new List<float>();
@@ -50,6 +51,10 @@ namespace SousTension.Spikes.MovingFrame
             _depthNeedle.localPosition = new Vector3(0.09f, 0.33f, 0f);
             Block(_depthNeedle, "Needle", new Vector3(0.02f, 0.1f, 0.015f), new Vector3(0f, 0.05f, 0f), Color.black);
 
+            // restart procedure lamps (E3-05) under the lever: lever back, valves open, pumps running. They only light during a SCRAM.
+            for (int i = 0; i < 3; i++)
+                _stepLamps[i] = Block(root, "StepLamp" + i, new Vector3(0.04f, 0.07f, 0.07f), new Vector3(0.06f, -0.38f, -0.15f + 0.15f * i), Color.gray).GetComponent<Renderer>();
+
             _ambientBase = RenderSettings.ambientIntensity;
         }
 
@@ -61,9 +66,15 @@ namespace SousTension.Spikes.MovingFrame
             {
                 _coverAngle = Mathf.MoveTowards(_coverAngle, lv.CoverOpen ? 80f : 0f, 240f * Time.deltaTime);
                 _cover.localRotation = Quaternion.AngleAxis(_coverAngle, Vector3.forward);
-                _leverAngle = Mathf.MoveTowards(_leverAngle, lv.Pulled ? -85f : 0f, 400f * Time.deltaTime);
+                // pulled down during a SCRAM, raised again once the restart procedure's first step (lever back) is done
+                bool down = lv.Pulled && !_model.Restart.LeverBack;
+                _leverAngle = Mathf.MoveTowards(_leverAngle, down ? -85f : 0f, 400f * Time.deltaTime);
                 _lever.localRotation = Quaternion.AngleAxis(_leverAngle, Vector3.right);
             }
+            var rs = _model.Restart;
+            bool[] steps = { rs.LeverBack, rs.ValvesOpen, rs.PumpsRunning };
+            for (int i = 0; i < 3; i++)
+                _stepLamps[i].material.color = lv.Pulled && steps[i] ? new Color(0.3f, 0.85f, 0.35f) : new Color(0.25f, 0.25f, 0.25f);
             var boat = _model.Boat;
             if (boat.Valid)
                 _depthNeedle.localRotation = Quaternion.AngleAxis(Mathf.Lerp(-120f, 120f, Mathf.Clamp01(boat.Depth / DepthDialMax)), Vector3.right);

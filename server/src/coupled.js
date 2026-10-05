@@ -18,10 +18,14 @@ var COUPLED_ACTIONS = [
   // Second demo pair on the opposite diagonal: lets two pairs of players work independently at the same time.
   { id: "demo2", windowTicks: INTERLOCK_WINDOW_TICKS,
     a: { x: -2.5, z: 6.0, reach: STATION_REACH, kind: "press" },
-    b: { x: 2.5, z: -7.0, reach: STATION_REACH, kind: "press" } }
+    b: { x: 2.5, z: -7.0, reach: STATION_REACH, kind: "press" } },
+  // Restart of the reactor after a SCRAM (E3-05): near the RK-1 panel and at the bow, 13 m apart.
+  { id: "reactor_restart", windowTicks: INTERLOCK_WINDOW_TICKS,
+    a: { x: -2.5, z: -5.0, reach: STATION_REACH, kind: "press" },
+    b: { x: 2.5, z: 8.5, reach: STATION_REACH, kind: "press" } }
 ];
 
-// Effects of successful actions: id -> function(state, actionId). Registered by the systems that own the action (E3-05 restart...).
+// Effects of successful actions: id -> function(state, actionId, tick). Registered by the systems that own the action (E3-05 restart...).
 var COUPLED_EFFECTS = {};
 
 function newCoupled() {
@@ -67,7 +71,7 @@ function evaluateCoupled(state, tick) {
       act.result = "success"; act.resultTick = tick; act.count++;
       a.by = ""; b.by = "";
       var effect = COUPLED_EFFECTS[def.id];
-      if (effect) effect(state, def.id);
+      if (effect) effect(state, def.id, tick);
       continue;
     }
     for (var s = 0; s < 2; s++) {

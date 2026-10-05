@@ -112,6 +112,10 @@ namespace SousTension.Spikes.MovingFrame
         public void SetLever(ScramLeverState state) { if (state.Valid) Lever = state; }
         public void SetBoat(BoatDepthState state) { if (state.Valid) Boat = state; }
 
+        /// <summary>Latest reactor restart procedure state (E3-05), authoritative.</summary>
+        public RestartState Restart { get; private set; }
+        public void SetRestart(RestartState state) { if (state.Valid) Restart = state; }
+
         public void SetLocal(float x, float z) { LocalX = x; LocalZ = z; }
 
         public void ApplyServerState(StateSnapshot snapshot, double localNow)
