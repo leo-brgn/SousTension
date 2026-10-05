@@ -122,6 +122,15 @@ namespace SousTension.Spikes.MovingFrame
         { Id = id; Compartment = compartment; X = x; Z = z; Size = size; Type = type ?? "plate"; }
     }
 
+    /// <summary>The two bilge pumps (E6-03): switch state and whether each is actually moving water.</summary>
+    public readonly struct BilgeState
+    {
+        public readonly bool Valid;
+        public readonly int[] State;         // per pump: 0 stopped, 1 on, 2 broken
+        public readonly bool[] Running;      // per pump: moving water this tick (on, powered, something to pump)
+        public BilgeState(int[] state, bool[] running) { Valid = true; State = state ?? new int[0]; Running = running ?? new bool[0]; }
+    }
+
     /// <summary>Authoritative boat depth below patrol depth (E3-04): grows after a SCRAM. Display only.</summary>
     public readonly struct BoatDepthState
     {
@@ -145,12 +154,14 @@ namespace SousTension.Spikes.MovingFrame
         public readonly CoupledActionState[] Coupled;
         public readonly RestartState Restart;
         public readonly WaterState Water;
+        public readonly BilgeState Bilge;
         public readonly LeakState[] Leaks;   // null = the server sent no leak list (older server); empty = no leak
 
         public StateSnapshot(int tick, double serverTime, PlayerState[] players, InterlockState interlock = default, CargoState[] cargo = null, ReactorState reactor = default,
             ScramLeverState lever = default, BoatDepthState boat = default, CoupledActionState[] coupled = null,
-            RestartState restart = default, WaterState water = default, LeakState[] leaks = null)
+            RestartState restart = default, WaterState water = default, LeakState[] leaks = null, BilgeState bilge = default)
         {
+            Bilge = bilge;
             Leaks = leaks;
             Water = water;
             Restart = restart;

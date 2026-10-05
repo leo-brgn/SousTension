@@ -35,7 +35,7 @@ namespace SousTension.Spikes.MovingFrame
                 bool carried = c.Carriers.Length > 0;
                 t.localPosition = new Vector3(x, (c.Heavy ? 0.4f : 0.25f) + (carried ? 1.0f : 0f), z);
                 var r = t.GetComponent<Renderer>();
-                r.material.color = c.Kind == "patch" ? new Color(0.55f, 0.65f, 0.72f) : c.Pending != "" ? new Color(0.95f, 0.7f, 0.1f) : c.Heavy ? new Color(0.35f, 0.35f, 0.4f) : new Color(0.6f, 0.4f, 0.2f);
+                r.material.color = c.Kind == "bucket" ? new Color(0.2f, 0.55f, 0.75f) : c.Kind == "patch" ? new Color(0.55f, 0.65f, 0.72f) : c.Pending != "" ? new Color(0.95f, 0.7f, 0.1f) : c.Heavy ? new Color(0.35f, 0.35f, 0.4f) : new Color(0.6f, 0.4f, 0.2f);
             }
         }
 
@@ -46,7 +46,7 @@ namespace SousTension.Spikes.MovingFrame
             go.name = "Cargo_" + c.Id;
             Destroy(go.GetComponent<Collider>());
             go.transform.SetParent(_boat, false);
-            go.transform.localScale = c.Heavy ? new Vector3(0.6f, 0.4f, 0.6f) : c.Kind == "patch" ? new Vector3(0.4f, 0.12f, 0.4f) : new Vector3(0.5f, 0.5f, 0.5f);
+            go.transform.localScale = c.Heavy ? new Vector3(0.6f, 0.4f, 0.6f) : c.Kind == "bucket" ? new Vector3(0.3f, 0.3f, 0.3f) : c.Kind == "patch" ? new Vector3(0.4f, 0.12f, 0.4f) : new Vector3(0.5f, 0.5f, 0.5f);
             _items[c.Id] = go.transform;
             return go.transform;
         }

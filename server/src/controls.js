@@ -19,7 +19,9 @@ var CONTROLS = [
   { id: "valve2", x: 2.5, z: 0.0, reach: 1.0, valve: 2 },
   { id: "valve3", x: 2.5, z: 1.5, reach: 1.0, valve: 3 },
   { id: "pump0", x: 2.5, z: 3.5, reach: 1.2, pump: 0 },
-  { id: "pump1", x: 2.5, z: 5.0, reach: 1.2, pump: 1 }
+  { id: "pump1", x: 2.5, z: 5.0, reach: 1.2, pump: 1 },
+  { id: "bilge0", x: -2.5, z: 4.5, reach: 1.0, bilge: 0 },
+  { id: "bilge1", x: 2.5, z: -5.0, reach: 0.9, bilge: 1 }
 ];
 var VALVE_TURN_RATE = 0.25;        // valve opening per second while the wheel is held (4 s from closed to open)
 var LEVER_COVER_TICKS = 60;        // 6 s at 10 Hz
@@ -84,6 +86,7 @@ function leverView(lever, reactor) {
 // The interaction key was pressed by player `id`: dispatch to the nearest interactable in reach.
 function tryAct(state, id, pl, tick) {
   if (tryRepair(state, id, pl, tick)) return;           // carrying a hull patch next to a leak: the press applies it (E6-02)
+  if (tryScoop(state, id, pl, tick)) return;            // carrying the bucket in a flooded compartment: the press scoops (E6-03)
   var bestControl = null, bestControlD = Infinity;
   for (var i = 0; i < CONTROLS.length; i++) {
     var d = controlDistance(pl, CONTROLS[i]);
@@ -95,6 +98,7 @@ function tryAct(state, id, pl, tick) {
     if (bestControl.id === "regime") useRegimeSelector(state.reactor);
     else if (bestControl.id === "scram") useScramLever(state.lever, state.reactor);
     else if (bestControl.pump !== undefined) togglePump(state.reactor, bestControl.pump);
+    else if (bestControl.bilge !== undefined) bilgeToggle(state.bilge, bestControl.bilge);
     return;
   }
   if (cmd) tryActivate(state.cp, id, pl, tick);

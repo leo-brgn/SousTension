@@ -12,7 +12,9 @@ var CARGO_DEFS = [
   // Hull patches (E6-02): the toolbox of compartment 2. Light, used up on a leak, back in the toolbox 30 s later.
   { id: "patch1", kind: "patch", heavy: false, x: 0.6, z: 5.5 },
   { id: "patch2", kind: "patch", heavy: false, x: 1.0, z: 5.5 },
-  { id: "patch3", kind: "patch", heavy: false, x: 1.4, z: 5.5 }
+  { id: "patch3", kind: "patch", heavy: false, x: 1.4, z: 5.5 },
+  // Bucket (E6-03): same toolbox, never used up.
+  { id: "bucket", kind: "bucket", heavy: false, x: 1.8, z: 5.5 }
 ];
 // Boat tilt (must match BoatMotion.cs defaults: pitch 15 deg / 7 s, roll 20 deg / 5 s + 1 rad phase).
 var PITCH_AMP = 15 * Math.PI / 180, PITCH_PERIOD = 7;

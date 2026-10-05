@@ -328,6 +328,22 @@ namespace SousTension.Spikes.MovingFrame.Tests
         }
 
         [Test]
+        public void Snapshot_StoresBilgePumps_AndKeepsLastStateWhenMissing()
+        {
+            var net = new FakeNetwork(); var clock = new FakeClock(); var model = new MovingFrameModel();
+            var c = new MovingFrameController(net, new ConstantInput(), clock, model);
+            Assert.IsFalse(model.Bilge.Valid);
+            net.Enqueue(new StateSnapshot(1, 0.1, new[] { new PlayerState("me", 0, 0, 0) }, default, null, default, default, default, null, default, default, null,
+                new BilgeState(new[] { 1, 2 }, new[] { true, false })));
+            c.Tick(0);
+            Assert.AreEqual(1, model.Bilge.State[0]); Assert.AreEqual(2, model.Bilge.State[1]);
+            Assert.IsTrue(model.Bilge.Running[0]); Assert.IsFalse(model.Bilge.Running[1]);
+            net.Enqueue(new StateSnapshot(2, 0.2, new[] { new PlayerState("me", 0, 0, 0) }));                   // older server
+            c.Tick(0);
+            Assert.AreEqual(2, model.Bilge.State[1]);
+        }
+
+        [Test]
         public void Snapshot_StoresAuthoritativeInterlockState_WithoutPredicting()
         {
             var net = new FakeNetwork(); var clock = new FakeClock(); var model = new MovingFrameModel();

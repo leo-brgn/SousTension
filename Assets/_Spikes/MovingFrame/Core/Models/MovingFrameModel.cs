@@ -124,6 +124,10 @@ namespace SousTension.Spikes.MovingFrame
         public LeakState[] Leaks { get; private set; } = new LeakState[0];
         public void SetLeaks(LeakState[] leaks) { if (leaks != null) Leaks = leaks; }
 
+        /// <summary>Bilge pumps (E6-03), authoritative; a snapshot without them keeps the last known state.</summary>
+        public BilgeState Bilge { get; private set; }
+        public void SetBilge(BilgeState state) { if (state.Valid) Bilge = state; }
+
         public void SetLocal(float x, float z) { LocalX = x; LocalZ = z; }
 
         public void ApplyServerState(StateSnapshot snapshot, double localNow)
