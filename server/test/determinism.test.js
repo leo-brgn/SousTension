@@ -10,7 +10,7 @@ const { createMatch, simulate, m } = require("./sim-harness.js");
 
 const IDS = ["a", "b", "c"];
 const TICKS = 3000;                         // 5 minutes of play
-const GOLDEN_DIGEST = "f54428118392625b";
+const GOLDEN_DIGEST = "0df9d13e3c7f2184";
 
 // A small deterministic generator for the scripted "monkey" players (never Math.random).
 function lcg(seed) { let s = seed >>> 0; return () => { s = (Math.imul(s, 1664525) + 1013904223) >>> 0; return s / 4294967296; }; }

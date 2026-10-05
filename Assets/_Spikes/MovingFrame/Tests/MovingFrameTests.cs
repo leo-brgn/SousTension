@@ -361,6 +361,22 @@ namespace SousTension.Spikes.MovingFrame.Tests
         }
 
         [Test]
+        public void Snapshot_StoresPropulsion_AndKeepsLastStateWhenMissing()
+        {
+            var net = new FakeNetwork(); var clock = new FakeClock(); var model = new MovingFrameModel();
+            var c = new MovingFrameController(net, new ConstantInput(), clock, model);
+            Assert.IsFalse(model.Propulsion.Valid);
+            net.Enqueue(new StateSnapshot(1, 0.1, new[] { new PlayerState("me", 0, 0, 0) }, default, null, default, default, default, null, default, default, null, default, default,
+                new PropulsionState(3, 2.4f, 120.5f, 1.6f)));
+            c.Tick(0);
+            Assert.AreEqual(3, model.Propulsion.Telegraph); Assert.AreEqual(2.4f, model.Propulsion.Speed, 1e-5f);
+            Assert.AreEqual(120.5f, model.Propulsion.Distance, 1e-4f); Assert.AreEqual(1.6f, model.Propulsion.Noise, 1e-5f);
+            net.Enqueue(new StateSnapshot(2, 0.2, new[] { new PlayerState("me", 0, 0, 0) }));                   // older server
+            c.Tick(0);
+            Assert.AreEqual(3, model.Propulsion.Telegraph);
+        }
+
+        [Test]
         public void Snapshot_StoresAuthoritativeInterlockState_WithoutPredicting()
         {
             var net = new FakeNetwork(); var clock = new FakeClock(); var model = new MovingFrameModel();

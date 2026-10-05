@@ -43,7 +43,8 @@ function newPower() {
   return { V: 1, B: 1, br: br, lowTicks: 0 };
 }
 
-// Power drawn by the closed breakers (MWe) and the surplus the plant offers them.
+// Power drawn by the closed breakers (MWe), the whole demand (breakers + propulsion, E3-08) and the surplus the plant offers them.
+function powerDemand(state) { return gridDemand(state.power) + propulsionDemand(state.prop); }
 function gridDemand(pw) {
   var d = 0;
   for (var i = 0; i < BREAKERS.length; i++) if (pw.br[i].closed) d += BREAKERS[i].demand;
@@ -68,7 +69,7 @@ function consumerPowered(pw, i, minV) { return pw.br[i].closed && pw.V >= minV; 
 // One 10 Hz step, after the reactor.
 function powerStep(state) {
   var pw = state.power, r = state.reactor;
-  var demand = gridDemand(pw), surplus = gridSurplus(r);
+  var demand = powerDemand(state), surplus = gridSurplus(r);
   var target = demand > 0 ? Math.min(1, surplus / demand) : 1;
   if (r.scram) {
     pw.V = 0;                                              // the SCRAM tears the whole grid down at once
@@ -105,5 +106,5 @@ function powerView(state) {
   function q(x, k) { return Math.round(x * k) / k; }
   for (var i = 0; i < BREAKERS.length; i++) br.push(pw.br[i].tripped ? 2 : (pw.br[i].closed ? 1 : 0));
   for (var c = 0; c < WATER_COMPARTMENTS.length; c++) lt.push(lightBand(lightLevel(pw, c)));
-  return { v: q(pw.V, 1000), b: q(pw.B, 1000), em: pw.V < DARK_V && pw.B > 0 ? 1 : 0, br: br, lt: lt, dm: q(gridDemand(pw), 100), su: q(gridSurplus(state.reactor), 100) };
+  return { v: q(pw.V, 1000), b: q(pw.B, 1000), em: pw.V < DARK_V && pw.B > 0 ? 1 : 0, br: br, lt: lt, dm: q(powerDemand(state), 100), su: q(gridSurplus(state.reactor), 100) };
 }

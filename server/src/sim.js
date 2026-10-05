@@ -15,8 +15,9 @@
 //   6. cargo       carried cargo follows its carriers, loose cargo slides on the (water-tilted) floor, used patches respawn
 //   7. reactor     rods, heat, steam, electricity, cooling, drift, automatic protection
 //   8. power       bus voltage from the surplus electricity, emergency battery, breakers that trip
-//   9. lever       the SCRAM cover falls shut
-//  10. boat        buoyancy: descent speed and depth follow the SCRAM latch
+//   9. propulsion  the boat's speed follows the telegraph set-point x bus voltage
+//  10. lever       the SCRAM cover falls shut
+//  11. boat        buoyancy: descent speed and depth follow the SCRAM latch
 function simStep(state, tick) {
   // 1. inputs: +1 per tick per player (the nominal input rate), capped at MAX_ALLOWANCE. In steady state this is exactly one input per tick;
   //    after a network stall (TCP retransmission) the backlog drains in a few ticks instead of lagging forever. The long-term rate can never
@@ -42,6 +43,7 @@ function simStep(state, tick) {
   updateCargo(state, tick);
   reactorStep(state.reactor);
   powerStep(state);
+  propulsionStep(state);
   leverStep(state.lever);
   boatStep(state.boat, state.reactor);
   state.tick = tick;

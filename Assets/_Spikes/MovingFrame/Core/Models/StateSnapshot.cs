@@ -145,6 +145,18 @@ namespace SousTension.Spikes.MovingFrame
         { Valid = true; Voltage = voltage; Battery = battery; Emergency = emergency; Breakers = breakers ?? new int[0]; LightBands = lightBands ?? new int[0]; Demand = demand; Surplus = surplus; }
     }
 
+    /// <summary>Propulsion (E3-08): machine telegraph position, boat speed, distance travelled and propulsion noise.</summary>
+    public readonly struct PropulsionState
+    {
+        public readonly bool Valid;
+        public readonly int Telegraph;       // 0 arriere, 1 stop, 2 lent, 3 demi, 4 toute
+        public readonly float Speed;         // m/s (negative astern)
+        public readonly float Distance;      // m travelled (signed)
+        public readonly float Noise;         // 0..4
+        public PropulsionState(int telegraph, float speed, float distance, float noise)
+        { Valid = true; Telegraph = telegraph; Speed = speed; Distance = distance; Noise = noise; }
+    }
+
     /// <summary>Authoritative boat depth below patrol depth (E3-04): grows after a SCRAM. Display only.</summary>
     public readonly struct BoatDepthState
     {
@@ -170,12 +182,14 @@ namespace SousTension.Spikes.MovingFrame
         public readonly WaterState Water;
         public readonly BilgeState Bilge;
         public readonly GridState Grid;
+        public readonly PropulsionState Propulsion;
         public readonly LeakState[] Leaks;   // null = the server sent no leak list (older server); empty = no leak
 
         public StateSnapshot(int tick, double serverTime, PlayerState[] players, InterlockState interlock = default, CargoState[] cargo = null, ReactorState reactor = default,
             ScramLeverState lever = default, BoatDepthState boat = default, CoupledActionState[] coupled = null,
-            RestartState restart = default, WaterState water = default, LeakState[] leaks = null, BilgeState bilge = default, GridState grid = default)
+            RestartState restart = default, WaterState water = default, LeakState[] leaks = null, BilgeState bilge = default, GridState grid = default, PropulsionState propulsion = default)
         {
+            Propulsion = propulsion;
             Grid = grid;
             Bilge = bilge;
             Leaks = leaks;

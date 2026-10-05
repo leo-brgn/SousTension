@@ -132,6 +132,10 @@ namespace SousTension.Spikes.MovingFrame
         public GridState Grid { get; private set; }
         public void SetGrid(GridState state) { if (state.Valid) Grid = state; }
 
+        /// <summary>Propulsion and telegraph (E3-08), authoritative; a snapshot without it keeps the last known state.</summary>
+        public PropulsionState Propulsion { get; private set; }
+        public void SetPropulsion(PropulsionState state) { if (state.Valid) Propulsion = state; }
+
         public void SetLocal(float x, float z) { LocalX = x; LocalZ = z; }
 
         public void ApplyServerState(StateSnapshot snapshot, double localNow)
