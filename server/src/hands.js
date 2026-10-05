@@ -13,7 +13,8 @@ var ITEM_KINDS = {
   fuel: { hands: 2, mass: 40 },
   patch: { hands: 1, mass: 1 },
   bucket: { hands: 1, mass: 2 },
-  flashlight: { hands: 1, pocket: true, mass: 0.5 }
+  flashlight: { hands: 1, pocket: true, mass: 0.5 },
+  manual: { hands: 2, mass: 8 }            // the OK-114 binder (manual.js): read with both hands
 };
 var CARRY_SLOWDOWN_PER_KG = 0.012;       // walking speed factor = 1 - this x carried mass ...
 var CARRY_MIN_FACTOR = 0.5;              // ... never below this

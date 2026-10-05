@@ -27,7 +27,7 @@ namespace SousTension.Spikes.MovingFrame
         private double _accumulator;
         private bool _initialized;
         private int _lastAcked;
-        private bool _prevAct, _prevGrab, _prevUse, _prevTake, _prevDrop, _prevStow, _prevThrow;
+        private bool _prevAct, _prevGrab, _prevUse, _prevTake, _prevDrop, _prevStow, _prevThrow, _prevNext, _prevPrev;
 
         /// <param name="use">primary action button (mouse); null = keyboard only (position-based interaction)</param>
         /// <param name="aim">what the player looks at; null = nothing aimable</param>
@@ -69,9 +69,10 @@ namespace SousTension.Spikes.MovingFrame
                 string hand = null;
                 if (_hands != null)
                 {
-                    bool take = _hands.TakeHeld, drop = _hands.DropHeld, stow = _hands.StowHeld, thr = _hands.ThrowHeld;
+                    bool take = _hands.TakeHeld, drop = _hands.DropHeld, stow = _hands.StowHeld, thr = _hands.ThrowHeld, next = _hands.NextHeld, prev = _hands.PrevHeld;
                     if (thr && !_prevThrow) hand = "throw"; else if (drop && !_prevDrop) hand = "drop"; else if (stow && !_prevStow) hand = "stow"; else if (take && !_prevTake) hand = "take";
-                    _prevTake = take; _prevDrop = drop; _prevStow = stow; _prevThrow = thr;
+                    else if (next && !_prevNext) hand = "next"; else if (prev && !_prevPrev) hand = "prev";    // turn the Manual's pages
+                    _prevTake = take; _prevDrop = drop; _prevStow = stow; _prevThrow = thr; _prevNext = next; _prevPrev = prev;
                 }
                 int seq = _prediction.Predict(mx, mz, _model.LocalCarryFactor());
                 _sendTimes[seq] = _clock.Now;
@@ -97,6 +98,7 @@ namespace SousTension.Spikes.MovingFrame
             _model.SetBilge(snapshot.Bilge);
             _model.SetGrid(snapshot.Grid);
             _model.SetPropulsion(snapshot.Propulsion);
+            _model.SetManual(snapshot.Manual);
 
             foreach (var p in snapshot.Players)
             {

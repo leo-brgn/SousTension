@@ -25,6 +25,8 @@ namespace SousTension.Spikes.MovingFrame
         public bool DropHeld => Keyboard.current != null && Keyboard.current.gKey.isPressed;
         public bool StowHeld => Keyboard.current != null && Keyboard.current.hKey.isPressed;
         public bool ThrowHeld => Mouse.current != null && Mouse.current.rightButton.isPressed;
+        public bool NextHeld => Keyboard.current != null && Keyboard.current.rightArrowKey.isPressed;
+        public bool PrevHeld => Keyboard.current != null && Keyboard.current.leftArrowKey.isPressed;
 
         public void Read(out float moveX, out float moveZ, out bool act, out bool grab)
         {

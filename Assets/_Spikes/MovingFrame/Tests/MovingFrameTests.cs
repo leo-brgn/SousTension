@@ -14,7 +14,7 @@ namespace SousTension.Spikes.MovingFrame.Tests
 
     internal sealed class FakeUse : IUseInput { public bool UseHeld { get; set; } }
     internal sealed class FakeAim : IAimSource { public string TargetId { get; set; } }
-    internal sealed class FakeHands : IHandsInput { public bool TakeHeld { get; set; } public bool DropHeld { get; set; } public bool StowHeld { get; set; } public bool ThrowHeld { get; set; } }
+    internal sealed class FakeHands : IHandsInput { public bool TakeHeld { get; set; } public bool DropHeld { get; set; } public bool StowHeld { get; set; } public bool ThrowHeld { get; set; } public bool NextHeld { get; set; } public bool PrevHeld { get; set; } }
     internal sealed class FakeLook : ILookSource { public float Yaw { get; set; } }
 
     internal sealed class ConstantInput : IInputSource
@@ -547,6 +547,70 @@ namespace SousTension.Spikes.MovingFrame.Tests
             Assert.AreEqual("throw", net.Sent[0].hand);
             for (int i = 1; i < net.Sent.Count; i++) Assert.IsNull(net.Sent[i].hand, "one throw per press");
             foreach (var sent in net.Sent) Assert.AreEqual(1.5f, sent.yaw, 1e-6f);
+        }
+
+        // ---- The Operating Manual (E5-02) ----
+        [Test]
+        public void Snapshot_StoresTheManualPage_AndKeepsLastPageWhenMissing()
+        {
+            var net = new FakeNetwork(); var clock = new FakeClock(); var model = new MovingFrameModel();
+            var c = new MovingFrameController(net, new ConstantInput(), clock, model);
+            Assert.IsFalse(model.Manual.Valid);
+            net.Enqueue(new StateSnapshot(1, 0.1, new[] { new PlayerState("me", 0, 0, 0) }, default, null, default, default, default, null, default, default, null, default, default, default,
+                new ManualState(3, 6)));
+            c.Tick(0);
+            Assert.AreEqual(3, model.Manual.Page); Assert.AreEqual(6, model.Manual.PageCount);
+            net.Enqueue(new StateSnapshot(2, 0.2, new[] { new PlayerState("me", 0, 0, 0) }));
+            c.Tick(0);
+            Assert.AreEqual(3, model.Manual.Page);
+        }
+
+        [Test]
+        public void TheLocalPlayerIsReading_OnlyWhileHoldingTheManual()
+        {
+            var net = new FakeNetwork(); var clock = new FakeClock(); var model = new MovingFrameModel();
+            var c = new MovingFrameController(net, new ConstantInput(), clock, model);
+            model.LocalId = "me";
+            var cargo = new[] { new CargoState("manual", 0, 0, false, new[] { "me" }, "", "manual"), new CargoState("bucket", 0, 0, false, new[] { "me" }, "", "bucket") };
+            net.Enqueue(new StateSnapshot(1, 0.1, new[] { new PlayerState("me", 0, 0, 0, new[] { "manual", "manual", "" }) }, default, cargo));
+            c.Tick(0);
+            Assert.IsTrue(model.IsLocalReading());
+            Assert.AreEqual(1f - 0.012f * 8f, model.LocalCarryFactor(), 1e-6f, "the binder weighs 8 kg");
+            net.Enqueue(new StateSnapshot(2, 0.2, new[] { new PlayerState("me", 0, 0, 0, new[] { "bucket", "", "" }) }, default, cargo));
+            c.Tick(0);
+            Assert.IsFalse(model.IsLocalReading());
+        }
+
+        [Test]
+        public void TheArrowKeys_SendNextAndPrevOnThePress()
+        {
+            var net = new FakeNetwork(); var clock = new FakeClock(); var model = new MovingFrameModel(); var hands = new FakeHands();
+            var c = new MovingFrameController(net, new ConstantInput(), clock, model, null, null, hands);
+            net.Enqueue(new StateSnapshot(1, 0.1, new[] { new PlayerState("me", 0, 0, 0) }));
+            c.Tick(0); net.Sent.Clear();
+            hands.NextHeld = true;
+            c.Tick(0.3f);
+            Assert.AreEqual("next", net.Sent[0].hand);
+            for (int i = 1; i < net.Sent.Count; i++) Assert.IsNull(net.Sent[i].hand);
+            net.Sent.Clear();
+            hands.NextHeld = false; c.Tick(0.1f); net.Sent.Clear();
+            hands.PrevHeld = true; c.Tick(0.1f);
+            Assert.AreEqual("prev", net.Sent[0].hand);
+        }
+
+        [Test]
+        public void ManualPages_EveryPageHasATextForEachStep_AndAtMostFiveSteps()
+        {
+            Assert.AreEqual("index", ManualView.Pages[0].id);
+            foreach (var (id, steps) in ManualView.Pages)
+            {
+                Assert.LessOrEqual(steps, 5, id);
+                Assert.AreNotEqual("manual." + id + ".title", ManualView.Text("manual." + id + ".title"), id + ": title is missing");
+                for (int k = 1; k <= steps; k++) Assert.AreNotEqual("manual." + id + ".step" + k, ManualView.Text("manual." + id + ".step" + k), id + " step " + k);
+            }
+            StringAssert.Contains("Sommaire", ManualView.PageText(0));
+            StringAssert.Contains("Redémarrage", ManualView.PageText(0), "the contents lists the procedures");
+            StringAssert.Contains("1 / 6", ManualView.PageText(0));
         }
 
         [Test]

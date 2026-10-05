@@ -161,7 +161,9 @@ var CARGO_DEFS = [
   // Bucket (E6-03): same toolbox, never used up.
   { id: "bucket", kind: "bucket", heavy: false, x: 1.8, z: 5.5 },
   // Torch (E2-03): the restart "à la lampe torche" (GDD 3.3); one hand, or the chest pocket.
-  { id: "flashlight", kind: "flashlight", heavy: false, x: 0.2, z: 5.5 }
+  { id: "flashlight", kind: "flashlight", heavy: false, x: 0.2, z: 5.5 },
+  // The OK-114 Operating Manual (E5-02): one copy, on the table of the central post.
+  { id: "manual", kind: "manual", heavy: false, x: -2.0, z: 6.0 }
 ];
 // Boat tilt (must match BoatMotion.cs defaults: pitch 15 deg / 7 s, roll 20 deg / 5 s + 1 rad phase).
 var PITCH_AMP = 15 * Math.PI / 180, PITCH_PERIOD = 7;
@@ -265,7 +267,8 @@ var ITEM_KINDS = {
   fuel: { hands: 2, mass: 40 },
   patch: { hands: 1, mass: 1 },
   bucket: { hands: 1, mass: 2 },
-  flashlight: { hands: 1, pocket: true, mass: 0.5 }
+  flashlight: { hands: 1, pocket: true, mass: 0.5 },
+  manual: { hands: 2, mass: 8 }            // the OK-114 binder (manual.js): read with both hands
 };
 var CARRY_SLOWDOWN_PER_KG = 0.012;       // walking speed factor = 1 - this x carried mass ...
 var CARRY_MIN_FACTOR = 0.5;              // ... never below this
@@ -437,6 +440,50 @@ function syncHands(state) {
 
 // Broadcast (and resync): what a player holds, [left, right, pocket] as cargo ids ("" = empty).
 function handsView(h) { return [h.l, h.r, h.p]; }
+
+// ---- The OK-114 Operating Manual (E5-02) --------------------------------------------------------------------------------------
+// GDD 3.5: a physical 8 kg binder at the central post, ONE copy. It must be held with two hands, so whoever reads cannot act (the two-handed rule
+// of hands.js locks every control): the game nudges players towards a reader / doer duo. v0 ("papier / placeholder"): a contents page and five
+// procedures of at most 5 steps each, all true to the game as it is; the texts live on the CLIENT under localization keys
+// (manual.<page id>.title, manual.<page id>.step<k>), the server only knows the page ids and how many steps each has. The current page is global
+// state; pages are turned only while holding the binder. Tearing pages out, annotations and errata are v1; opening on the right page when an
+// alarm rings (E5-04) will use manualGoto.
+var MANUAL_PAGES = [
+  { id: "index", steps: 0 },          // contents
+  { id: "scram", steps: 2 },          // lift the cover, pull the lever
+  { id: "restart", steps: 4 },        // lever back, valves, pumps, the two keys
+  { id: "leak", steps: 4 },           // patch, carry, click the leak, bail
+  { id: "power", steps: 3 },          // find the tripped breaker, re-arm, shed load
+  { id: "propulsion", steps: 2 }      // telegraph, more speed = less light
+];
+var MANUAL_MAX_STEPS = 5;
+
+function newManual() { return { page: 0 }; }
+
+function manualPageIndex(id) {
+  for (var i = 0; i < MANUAL_PAGES.length; i++) if (MANUAL_PAGES[i].id === id) return i;
+  return -1;
+}
+
+// Turn the page by dir (+1 / -1), stopping at the first and last page. Only the player holding the binder can: returns whether the page changed.
+function manualFlip(state, playerId, dir) {
+  if (!handItem(state, playerId, "manual")) return false;
+  var next = Math.max(0, Math.min(MANUAL_PAGES.length - 1, state.manual.page + (dir > 0 ? 1 : -1)));
+  if (next === state.manual.page) return false;
+  state.manual.page = next;
+  return true;
+}
+
+// Open the manual on a page, by id or index (E5-04: the page of the alarm that rings). Returns whether the page exists.
+function manualGoto(state, page) {
+  var i = typeof page === "number" ? page : manualPageIndex(page);
+  if (i < 0 || i >= MANUAL_PAGES.length) return false;
+  state.manual.page = i;
+  return true;
+}
+
+// Broadcast (and resync): p = current page, n = number of pages.
+function manualView(manual) { return { p: manual.page, n: MANUAL_PAGES.length }; }
 
 // ---- Water by volume per compartment and the boat's trim / list (E6-01) -----------------------------------------------------
 // GDD 8: water is simulated as a VOLUME per compartment plus a centre of mass (no fluid). Six compartments in a line from the bow (+z)
@@ -1298,6 +1345,7 @@ function simStep(state, tick) {
       stepPlayer(pl, next.mx, next.mz, carrySpeedFactor(state, state.order[k]));
       if (next.act) { if (next.use) useTarget(state, state.order[k], pl, tick, next.use); else tryAct(state, state.order[k], pl, tick); }
       if (next.hold) { if (next.use) holdTarget(state, pl, next.use); else tryHold(state, pl); }
+      if (next.flip) manualFlip(state, state.order[k], next.flip);
       if (next.throw) throwItem(state, state.order[k], pl);
       if (next.take) takeItem(state, state.order[k], pl, tick);
       if (next.drop) dropItem(state, state.order[k], pl, next.drop);
@@ -1329,6 +1377,7 @@ function queueInput(p, input) {
   p.queue.push({ seq: input.seq, mx: +input.mx || 0, mz: +input.mz || 0, act: input.act === true || input.act === 1,
                  grab: input.grab === true || input.grab === 1, hold: input.hold === true || input.hold === 1,
                  ry: typeof input.ry === "number" && isFinite(input.ry) ? input.ry : null,
+                 flip: input.flip === 1 || input.hand === "next" ? 1 : (input.flip === -1 || input.hand === "prev" ? -1 : 0),
                  throw: input.throw === true || input.throw === 1 || input.hand === "throw",
                  use: typeof input.use === "string" && input.use.length <= 40 ? input.use : "",
                  take: input.take === true || input.take === 1 || input.hand === "take", stow: input.stow === true || input.stow === 1 || input.hand === "stow",
@@ -1370,7 +1419,7 @@ function stableStringify(v) {
 var matchInit = function (ctx, logger, nk, params) {
   logger.info("moving_frame match init");
   return {
-    state: { tick: 0, players: {}, order: [], cp: newCoupled(), cargo: newCargo(), reactor: newReactor(REACTOR_SEED, "veille"), lever: newLever(), boat: newBoat(), restart: newRestart(), water: newWater(), leaks: newLeaks(), bilge: newBilge(), power: newPower(), prop: newPropulsion() },
+    state: { tick: 0, players: {}, order: [], cp: newCoupled(), cargo: newCargo(), reactor: newReactor(REACTOR_SEED, "veille"), lever: newLever(), boat: newBoat(), restart: newRestart(), water: newWater(), leaks: newLeaks(), bilge: newBilge(), power: newPower(), prop: newPropulsion(), manual: newManual() },
     tickRate: TICK_RATE,
     label: JSON.stringify({ name: MATCH_NAME })
   };
@@ -1428,7 +1477,7 @@ var matchLoop = function (ctx, logger, nk, dispatcher, tick, state, messages) {
     var id = state.order[j], q = state.players[id];
     out.push({ id: id, x: q.x, z: q.z, seq: q.seq, hd: handsView(q.hands) });
   }
-  dispatcher.broadcastMessage(OP_STATE, JSON.stringify({ tick: tick, t: tick * DT, players: out, il: coupledView(state.cp, tick)[0], cp: coupledView(state.cp, tick), cargo: cargoView(state.cargo), rx: reactorView(state.reactor), sc: leverView(state.lever, state.reactor), rs: restartView(state), bw: waterView(state.water), lk: leaksView(state.leaks), bp: bilgeView(state.bilge), pw: powerView(state), pr: propulsionView(state.prop), boat: boatView(state.boat) }), null, null, true);
+  dispatcher.broadcastMessage(OP_STATE, JSON.stringify({ tick: tick, t: tick * DT, players: out, il: coupledView(state.cp, tick)[0], cp: coupledView(state.cp, tick), cargo: cargoView(state.cargo), rx: reactorView(state.reactor), sc: leverView(state.lever, state.reactor), rs: restartView(state), bw: waterView(state.water), lk: leaksView(state.leaks), bp: bilgeView(state.bilge), pw: powerView(state), pr: propulsionView(state.prop), mn: manualView(state.manual), boat: boatView(state.boat) }), null, null, true);
   return { state: state };
 };
 
@@ -1495,6 +1544,7 @@ if (typeof module !== "undefined" && module.exports) {
     waterRemove: waterRemove, waterSetDoor: waterSetDoor, waterStep: waterStep, waterTotal: waterTotal, waterTilt: waterTilt, waterView: waterView, waterLevel: waterLevel, compartmentAt: compartmentAt,
     newCoupled: newCoupled, COUPLED_ACTIONS: COUPLED_ACTIONS, COUPLED_EFFECTS: COUPLED_EFFECTS, COUPLED_GRACE_TICKS: COUPLED_GRACE_TICKS,
     carrySpeedFactor: carrySpeedFactor, carriedMass: carriedMass, throwItem: throwItem, THROW_SPEED: THROW_SPEED, THROW_UP: THROW_UP, THROW_HEIGHT: THROW_HEIGHT, THROW_BOUNCE: THROW_BOUNCE,
+    MANUAL_PAGES: MANUAL_PAGES, MANUAL_MAX_STEPS: MANUAL_MAX_STEPS, manualFlip: manualFlip, manualGoto: manualGoto, manualPageIndex: manualPageIndex,
     ITEM_KINDS: ITEM_KINDS, newHands: newHands, takeItem: takeItem, dropItem: dropItem, stowItem: stowItem, canUseHands: canUseHands, handsView: handsView,
     AIM_REACH: AIM_REACH, interactableIds: interactableIds,
     CONTROLS: CONTROLS, REGIME_ORDER: REGIME_ORDER, tryAct: tryAct,

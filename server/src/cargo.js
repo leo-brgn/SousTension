@@ -16,7 +16,9 @@ var CARGO_DEFS = [
   // Bucket (E6-03): same toolbox, never used up.
   { id: "bucket", kind: "bucket", heavy: false, x: 1.8, z: 5.5 },
   // Torch (E2-03): the restart "à la lampe torche" (GDD 3.3); one hand, or the chest pocket.
-  { id: "flashlight", kind: "flashlight", heavy: false, x: 0.2, z: 5.5 }
+  { id: "flashlight", kind: "flashlight", heavy: false, x: 0.2, z: 5.5 },
+  // The OK-114 Operating Manual (E5-02): one copy, on the table of the central post.
+  { id: "manual", kind: "manual", heavy: false, x: -2.0, z: 6.0 }
 ];
 // Boat tilt (must match BoatMotion.cs defaults: pitch 15 deg / 7 s, roll 20 deg / 5 s + 1 rad phase).
 var PITCH_AMP = 15 * Math.PI / 180, PITCH_PERIOD = 7;
