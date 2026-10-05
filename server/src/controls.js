@@ -28,6 +28,7 @@ var VALVE_TURN_RATE = 0.25;        // valve opening per second while the wheel i
   for (var i = 0; i < BREAKERS.length; i++)
     CONTROLS.push({ id: "breaker_" + BREAKERS[i].id, x: BREAKERS[i].x, z: BREAKERS[i].z, reach: BREAKERS[i].reach, breaker: i });
 })();
+CONTROLS.push({ id: "tele_up", x: -0.5, z: 4.2, reach: 0.3, tele: 1 }, { id: "tele_down", x: -0.5, z: 3.6, reach: 0.3, tele: -1 });   // machine telegraph (E3-08)
 var LEVER_COVER_TICKS = 60;        // 6 s at 10 Hz
 var REGIME_ORDER = ["veille", "croisiere", "pleine"];
 
@@ -104,6 +105,7 @@ function tryAct(state, id, pl, tick) {
     else if (bestControl.pump !== undefined) togglePump(state.reactor, bestControl.pump);
     else if (bestControl.bilge !== undefined) bilgeToggle(state.bilge, bestControl.bilge);
     else if (bestControl.breaker !== undefined) breakerToggle(state.power, bestControl.breaker);
+    else if (bestControl.tele !== undefined) telegraphStep(state.prop, bestControl.tele);
     return;
   }
   if (cmd) tryActivate(state.cp, id, pl, tick);

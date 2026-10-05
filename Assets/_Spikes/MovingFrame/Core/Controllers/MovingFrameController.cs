@@ -71,6 +71,7 @@ namespace SousTension.Spikes.MovingFrame
             _model.SetLeaks(snapshot.Leaks);
             _model.SetBilge(snapshot.Bilge);
             _model.SetGrid(snapshot.Grid);
+            _model.SetPropulsion(snapshot.Propulsion);
 
             foreach (var p in snapshot.Players)
             {

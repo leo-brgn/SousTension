@@ -23,7 +23,7 @@ function ticks(c, n) { for (let i = 0; i < n; i++) tick(c); }
 function press(c, extra) { c.seq++; return { opCode: m.OP_INPUT, sender: presence("a"), data: JSON.stringify(Object.assign({ seq: c.seq, mx: 0, mz: 0, act: true }, extra || {})) }; }
 function idx(id) { return m.BREAKERS.findIndex((b) => b.id === id); }
 // a bare state for the unit tests of powerStep: the real reactor is replaced by a fixed electricity output
-function bare(E) { return { power: m.newPower(), reactor: { E, pumps: [true, true], scram: false } }; }
+function bare(E) { return { power: m.newPower(), prop: m.newPropulsion(), reactor: { E, pumps: [true, true], scram: false } }; }
 const run = (s, secs) => { for (let i = 0; i < Math.round(secs * m.TICK_RATE); i++) m.powerStep(s); };
 
 test("20 breakers, each with its own consumer and a demand; the whole boat asks for less than the plant offers at cruise, more than it offers in Veille", () => {

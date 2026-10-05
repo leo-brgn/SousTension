@@ -568,7 +568,8 @@ function newPower() {
   return { V: 1, B: 1, br: br, lowTicks: 0 };
 }
 
-// Power drawn by the closed breakers (MWe) and the surplus the plant offers them.
+// Power drawn by the closed breakers (MWe), the whole demand (breakers + propulsion, E3-08) and the surplus the plant offers them.
+function powerDemand(state) { return gridDemand(state.power) + propulsionDemand(state.prop); }
 function gridDemand(pw) {
   var d = 0;
   for (var i = 0; i < BREAKERS.length; i++) if (pw.br[i].closed) d += BREAKERS[i].demand;
@@ -593,7 +594,7 @@ function consumerPowered(pw, i, minV) { return pw.br[i].closed && pw.V >= minV; 
 // One 10 Hz step, after the reactor.
 function powerStep(state) {
   var pw = state.power, r = state.reactor;
-  var demand = gridDemand(pw), surplus = gridSurplus(r);
+  var demand = powerDemand(state), surplus = gridSurplus(r);
   var target = demand > 0 ? Math.min(1, surplus / demand) : 1;
   if (r.scram) {
     pw.V = 0;                                              // the SCRAM tears the whole grid down at once
@@ -630,7 +631,51 @@ function powerView(state) {
   function q(x, k) { return Math.round(x * k) / k; }
   for (var i = 0; i < BREAKERS.length; i++) br.push(pw.br[i].tripped ? 2 : (pw.br[i].closed ? 1 : 0));
   for (var c = 0; c < WATER_COMPARTMENTS.length; c++) lt.push(lightBand(lightLevel(pw, c)));
-  return { v: q(pw.V, 1000), b: q(pw.B, 1000), em: pw.V < DARK_V && pw.B > 0 ? 1 : 0, br: br, lt: lt, dm: q(gridDemand(pw), 100), su: q(gridSurplus(state.reactor), 100) };
+  return { v: q(pw.V, 1000), b: q(pw.B, 1000), em: pw.V < DARK_V && pw.B > 0 ? 1 : 0, br: br, lt: lt, dm: q(powerDemand(state), 100), su: q(gridSurplus(state.reactor), 100) };
+}
+
+// ---- Propulsion and the machine telegraph (E3-08) ------------------------------------------------------------------------------
+// GDD 3.3: turbine -> electricity + propulsion. Decision (E3-08): propulsion is a CONSUMER of the electrical network (power.js), not a share of
+// the steam, so the reactor's balance (E3-02) is untouched: the telegraph position adds its demand to the grid's, which lowers the bus voltage
+// unless the plant makes enough surplus. "The faster we go, the darker it gets", and full speed needs full power. The boat's speed follows the
+// telegraph set-point scaled by the bus voltage, with inertia: after a SCRAM the boat coasts and slows down. Position (distance) is accumulated
+// for the future map (E9). The total noise of the boat (E8-01) will add PROPULSION noise to the reactor's; here it is only a derived value.
+//
+// Telegraph: 5 positions of a brass dial. Spike interaction: two floor tiles, "up" and "down", one notch per press (the aimed handle is E2-02).
+var PROP_NAMES = ["arriere", "stop", "lent", "demi", "toute"];
+var PROP_DEMAND = [1.0, 0, 1.0, 2.5, 5.0];                 // MWe added to the grid demand
+var PROP_SPEED = [-0.3, 0, 0.3, 0.6, 1.0];                 // set-point as a fraction of PROP_VMAX
+var PROP_VMAX = 6;                                         // m/s (about 12 knots)
+var PROP_TAU = 15;                                         // s: inertia of the boat's speed
+var PROP_STOP = 1;                                         // index of "stop", the starting position
+
+function newPropulsion() { return { pos: PROP_STOP, speed: 0, dist: 0 }; }
+
+// One notch up (+1) or down (-1) on the telegraph, stopping at the ends. Returns whether the handle moved.
+function telegraphStep(prop, dir) {
+  var next = Math.max(0, Math.min(PROP_NAMES.length - 1, prop.pos + (dir > 0 ? 1 : -1)));
+  if (next === prop.pos) return false;
+  prop.pos = next;
+  return true;
+}
+
+function propulsionDemand(prop) { return PROP_DEMAND[prop.pos]; }
+
+// One 10 Hz step, after the electrical network: the speed eases towards set-point x bus voltage.
+function propulsionStep(state) {
+  var p = state.prop, V = state.power.V;
+  var target = PROP_SPEED[p.pos] * PROP_VMAX * V;
+  p.speed += (target - p.speed) * DT / PROP_TAU;
+  p.dist += p.speed * DT;
+}
+
+// Propulsion noise 0..4, from the speed (the telegraph alone makes none: a stopped boat is quiet).
+function propulsionNoise(prop) { return 4 * Math.min(1, Math.abs(prop.speed) / PROP_VMAX); }
+
+// Broadcast (and resync): p = telegraph position 0..4, s = speed m/s, d = distance travelled m, n = noise 0..4.
+function propulsionView(prop) {
+  function q(x, k) { return Math.round(x * k) / k; }
+  return { p: prop.pos, s: q(prop.speed, 100), d: q(prop.dist, 10), n: q(propulsionNoise(prop), 100) };
 }
 
 // ---- Reactor RK-1 "Petit Soleil" (E3-02) -------------------------------------------------------------------
@@ -853,6 +898,7 @@ var VALVE_TURN_RATE = 0.25;        // valve opening per second while the wheel i
   for (var i = 0; i < BREAKERS.length; i++)
     CONTROLS.push({ id: "breaker_" + BREAKERS[i].id, x: BREAKERS[i].x, z: BREAKERS[i].z, reach: BREAKERS[i].reach, breaker: i });
 })();
+CONTROLS.push({ id: "tele_up", x: -0.5, z: 4.2, reach: 0.3, tele: 1 }, { id: "tele_down", x: -0.5, z: 3.6, reach: 0.3, tele: -1 });   // machine telegraph (E3-08)
 var LEVER_COVER_TICKS = 60;        // 6 s at 10 Hz
 var REGIME_ORDER = ["veille", "croisiere", "pleine"];
 
@@ -929,6 +975,7 @@ function tryAct(state, id, pl, tick) {
     else if (bestControl.pump !== undefined) togglePump(state.reactor, bestControl.pump);
     else if (bestControl.bilge !== undefined) bilgeToggle(state.bilge, bestControl.bilge);
     else if (bestControl.breaker !== undefined) breakerToggle(state.power, bestControl.breaker);
+    else if (bestControl.tele !== undefined) telegraphStep(state.prop, bestControl.tele);
     return;
   }
   if (cmd) tryActivate(state.cp, id, pl, tick);
@@ -993,8 +1040,9 @@ function restartView(state) {
 //   6. cargo       carried cargo follows its carriers, loose cargo slides on the (water-tilted) floor, used patches respawn
 //   7. reactor     rods, heat, steam, electricity, cooling, drift, automatic protection
 //   8. power       bus voltage from the surplus electricity, emergency battery, breakers that trip
-//   9. lever       the SCRAM cover falls shut
-//  10. boat        buoyancy: descent speed and depth follow the SCRAM latch
+//   9. propulsion  the boat's speed follows the telegraph set-point x bus voltage
+//  10. lever       the SCRAM cover falls shut
+//  11. boat        buoyancy: descent speed and depth follow the SCRAM latch
 function simStep(state, tick) {
   // 1. inputs: +1 per tick per player (the nominal input rate), capped at MAX_ALLOWANCE. In steady state this is exactly one input per tick;
   //    after a network stall (TCP retransmission) the backlog drains in a few ticks instead of lagging forever. The long-term rate can never
@@ -1020,6 +1068,7 @@ function simStep(state, tick) {
   updateCargo(state, tick);
   reactorStep(state.reactor);
   powerStep(state);
+  propulsionStep(state);
   leverStep(state.lever);
   boatStep(state.boat, state.reactor);
   state.tick = tick;
@@ -1066,7 +1115,7 @@ function stableStringify(v) {
 var matchInit = function (ctx, logger, nk, params) {
   logger.info("moving_frame match init");
   return {
-    state: { tick: 0, players: {}, order: [], cp: newCoupled(), cargo: newCargo(), reactor: newReactor(REACTOR_SEED, "veille"), lever: newLever(), boat: newBoat(), restart: newRestart(), water: newWater(), leaks: newLeaks(), bilge: newBilge(), power: newPower() },
+    state: { tick: 0, players: {}, order: [], cp: newCoupled(), cargo: newCargo(), reactor: newReactor(REACTOR_SEED, "veille"), lever: newLever(), boat: newBoat(), restart: newRestart(), water: newWater(), leaks: newLeaks(), bilge: newBilge(), power: newPower(), prop: newPropulsion() },
     tickRate: TICK_RATE,
     label: JSON.stringify({ name: MATCH_NAME })
   };
@@ -1125,7 +1174,7 @@ var matchLoop = function (ctx, logger, nk, dispatcher, tick, state, messages) {
     var id = state.order[j], q = state.players[id];
     out.push({ id: id, x: q.x, z: q.z, seq: q.seq });
   }
-  dispatcher.broadcastMessage(OP_STATE, JSON.stringify({ tick: tick, t: tick * DT, players: out, il: coupledView(state.cp, tick)[0], cp: coupledView(state.cp, tick), cargo: cargoView(state.cargo), rx: reactorView(state.reactor), sc: leverView(state.lever, state.reactor), rs: restartView(state), bw: waterView(state.water), lk: leaksView(state.leaks), bp: bilgeView(state.bilge), pw: powerView(state), boat: boatView(state.boat) }), null, null, true);
+  dispatcher.broadcastMessage(OP_STATE, JSON.stringify({ tick: tick, t: tick * DT, players: out, il: coupledView(state.cp, tick)[0], cp: coupledView(state.cp, tick), cargo: cargoView(state.cargo), rx: reactorView(state.reactor), sc: leverView(state.lever, state.reactor), rs: restartView(state), bw: waterView(state.water), lk: leaksView(state.leaks), bp: bilgeView(state.bilge), pw: powerView(state), pr: propulsionView(state.prop), boat: boatView(state.boat) }), null, null, true);
   return { state: state };
 };
 
@@ -1182,6 +1231,8 @@ if (typeof module !== "undefined" && module.exports) {
     VALVE_TURN_RATE: VALVE_TURN_RATE, reactorBreakPump: reactorBreakPump, reactorRepairPump: reactorRepairPump,
     RESTART_VALVE_MIN: RESTART_VALVE_MIN,
     BILGE_PUMPS: BILGE_PUMPS, BILGE_CAPACITY: BILGE_CAPACITY, BILGE_MIN_V: BILGE_MIN_V,
+    PROP_NAMES: PROP_NAMES, PROP_DEMAND: PROP_DEMAND, PROP_SPEED: PROP_SPEED, PROP_VMAX: PROP_VMAX, PROP_TAU: PROP_TAU, newPropulsion: newPropulsion, telegraphStep: telegraphStep,
+    propulsionStep: propulsionStep, propulsionNoise: propulsionNoise, powerDemand: powerDemand,
     BREAKERS: BREAKERS, TAU_UP: TAU_UP, TAU_DOWN: TAU_DOWN, TRIP_V: TRIP_V, TRIP_TICKS: TRIP_TICKS, DARK_V: DARK_V, BATTERY_DRAIN_S: BATTERY_DRAIN_S, BATTERY_CHARGE_S: BATTERY_CHARGE_S,
     newPower: newPower, powerStep: powerStep, powerView: powerView, breakerToggle: breakerToggle, breakerTrip: breakerTrip, gridDemand: gridDemand, gridSurplus: gridSurplus, lightLevel: lightLevel, lightBand: lightBand, BUCKET_VOLUME: BUCKET_VOLUME, BUCKET_COOLDOWN_TICKS: BUCKET_COOLDOWN_TICKS,
     bilgeBreak: bilgeBreak, bilgeRepair: bilgeRepair, bilgeToggle: bilgeToggle,
