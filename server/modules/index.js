@@ -1012,7 +1012,7 @@ if (typeof module !== "undefined" && module.exports) {
     LEAK_RATES: LEAK_RATES, LEAK_REACH: LEAK_REACH, LEAK_FIRST_TICK: LEAK_FIRST_TICK, PATCH_RESPAWN_TICKS: PATCH_RESPAWN_TICKS, leakCreate: leakCreate, leakRate: leakRate,
     WATER_COMPARTMENTS: WATER_COMPARTMENTS, WATER_FLOW: WATER_FLOW, MAX_TRIM_DEG: MAX_TRIM_DEG, MAX_LIST_DEG: MAX_LIST_DEG, newWater: newWater, waterAdd: waterAdd,
     waterRemove: waterRemove, waterSetDoor: waterSetDoor, waterStep: waterStep, waterTotal: waterTotal, waterTilt: waterTilt, waterView: waterView, waterLevel: waterLevel, compartmentAt: compartmentAt,
-    COUPLED_ACTIONS: COUPLED_ACTIONS, COUPLED_EFFECTS: COUPLED_EFFECTS, COUPLED_GRACE_TICKS: COUPLED_GRACE_TICKS,
+    newCoupled: newCoupled, COUPLED_ACTIONS: COUPLED_ACTIONS, COUPLED_EFFECTS: COUPLED_EFFECTS, COUPLED_GRACE_TICKS: COUPLED_GRACE_TICKS,
     CONTROLS: CONTROLS, REGIME_ORDER: REGIME_ORDER, tryAct: tryAct,
     reactorNoise: reactorNoise, REACTOR_K: REACTOR_K, newReactor: newReactor, reactorStep: reactorStep, reactorView: reactorView, reactorScram: reactorScram,
     reactorRestart: reactorRestart, reactorSetRegime: reactorSetRegime, reactorSetValve: reactorSetValve, reactorSetPump: reactorSetPump,
