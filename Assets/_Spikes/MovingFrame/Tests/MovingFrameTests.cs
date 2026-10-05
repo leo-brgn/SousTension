@@ -299,6 +299,35 @@ namespace SousTension.Spikes.MovingFrame.Tests
         }
 
         [Test]
+        public void Snapshot_StoresLeaks_AndKeepsLastListWhenTheServerSendsNone()
+        {
+            var net = new FakeNetwork(); var clock = new FakeClock(); var model = new MovingFrameModel();
+            var c = new MovingFrameController(net, new ConstantInput(), clock, model);
+            Assert.AreEqual(0, model.Leaks.Length);
+            net.Enqueue(new StateSnapshot(1, 0.1, new[] { new PlayerState("me", 0, 0, 0) }, default, null, default, default, default, null, default, default,
+                new[] { new LeakState(7, 3, 3f, -1.5f, 2, "plate") }));
+            c.Tick(0);
+            Assert.AreEqual(1, model.Leaks.Length);
+            Assert.AreEqual(7, model.Leaks[0].Id); Assert.AreEqual(2, model.Leaks[0].Size); Assert.AreEqual("plate", model.Leaks[0].Type);
+            net.Enqueue(new StateSnapshot(2, 0.2, new[] { new PlayerState("me", 0, 0, 0) }));                   // older server: list kept
+            c.Tick(0);
+            Assert.AreEqual(1, model.Leaks.Length);
+            net.Enqueue(new StateSnapshot(3, 0.3, new[] { new PlayerState("me", 0, 0, 0) }, default, null, default, default, default, null, default, default,
+                new LeakState[0]));                                                                                // sealed: the list is now empty
+            c.Tick(0);
+            Assert.AreEqual(0, model.Leaks.Length);
+        }
+
+        [Test]
+        public void CargoState_CarriesTheKindAndWhetherAUsedPatchIsAway()
+        {
+            var crate = new CargoState("crate1", 0, 0, false, null, "");
+            Assert.AreEqual("crate", crate.Kind); Assert.IsTrue(crate.Active);
+            var patch = new CargoState("patch1", 0, 0, false, null, "", "patch", false);
+            Assert.AreEqual("patch", patch.Kind); Assert.IsFalse(patch.Active);
+        }
+
+        [Test]
         public void Snapshot_StoresAuthoritativeInterlockState_WithoutPredicting()
         {
             var net = new FakeNetwork(); var clock = new FakeClock(); var model = new MovingFrameModel();

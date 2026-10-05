@@ -8,7 +8,11 @@ var FRICTION = 0.25;        // Coulomb coefficient: loose cargo starts sliding p
 var CARGO_DEFS = [
   { id: "crate1", heavy: false, x: 2.0, z: -3.0 },
   { id: "crate2", heavy: false, x: -2.0, z: 4.0 },
-  { id: "fuel", heavy: true, x: -2.0, z: -5.0 }
+  { id: "fuel", heavy: true, x: -2.0, z: -5.0 },
+  // Hull patches (E6-02): the toolbox of compartment 2. Light, used up on a leak, back in the toolbox 30 s later.
+  { id: "patch1", kind: "patch", heavy: false, x: 0.6, z: 5.5 },
+  { id: "patch2", kind: "patch", heavy: false, x: 1.0, z: 5.5 },
+  { id: "patch3", kind: "patch", heavy: false, x: 1.4, z: 5.5 }
 ];
 // Boat tilt (must match BoatMotion.cs defaults: pitch 15 deg / 7 s, roll 20 deg / 5 s + 1 rad phase).
 var PITCH_AMP = 15 * Math.PI / 180, PITCH_PERIOD = 7;
@@ -27,7 +31,8 @@ function newCargo() {
   var out = [];
   for (var i = 0; i < CARGO_DEFS.length; i++) {
     var d = CARGO_DEFS[i];
-    out.push({ id: d.id, heavy: d.heavy, x: d.x, z: d.z, vx: 0, vz: 0, carriers: [], pend: "", pendTick: 0 });
+    out.push({ id: d.id, kind: d.kind || "crate", heavy: d.heavy, x: d.x, z: d.z, vx: 0, vz: 0, carriers: [], pend: "", pendTick: 0,
+               active: true, respawnTick: 0, homeX: d.x, homeZ: d.z });
   }
   return out;
 }
@@ -52,6 +57,7 @@ function tryGrab(cargo, playerId, pl, tick) {
   var best = null, bestD = GRAB_REACH;
   for (var i = 0; i < cargo.length; i++) {
     var c = cargo[i];
+    if (!c.active) continue;                                       // a used patch is not in the world until it respawns
     if (c.carriers.length >= (c.heavy ? 2 : 1)) continue;
     var dx = pl.x - c.x, dz = pl.z - c.z, d = Math.sqrt(dx * dx + dz * dz);
     if (d <= bestD) { best = c; bestD = d; }
@@ -84,6 +90,10 @@ function updateCargo(state, tick) {
   var up = boatUpHorizontal(tick * DT, tilt.trim, tilt.list);
   for (var i = 0; i < state.cargo.length; i++) {
     var c = state.cargo[i];
+    if (!c.active) {                                               // used patch: back in the toolbox after PATCH_RESPAWN_TICKS
+      if (tick >= c.respawnTick) { c.active = true; c.x = c.homeX; c.z = c.homeZ; c.vx = 0; c.vz = 0; }
+      continue;
+    }
     if (c.pend !== "" && tick - c.pendTick >= INTERLOCK_WINDOW_TICKS) c.pend = ""; // second carrier too late
     // A carrier that left the match releases the cargo
     var alive = [];
@@ -105,7 +115,7 @@ function cargoView(cargo) {
   var out = [];
   for (var i = 0; i < cargo.length; i++) {
     var c = cargo[i];
-    out.push({ id: c.id, x: c.x, z: c.z, h: c.heavy ? 1 : 0, c: c.carriers, p: c.pend });
+    out.push({ id: c.id, x: c.x, z: c.z, h: c.heavy ? 1 : 0, c: c.carriers, p: c.pend, k: c.kind, a: c.active ? 1 : 0 });
   }
   return out;
 }

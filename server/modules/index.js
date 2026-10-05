@@ -145,7 +145,11 @@ var FRICTION = 0.25;        // Coulomb coefficient: loose cargo starts sliding p
 var CARGO_DEFS = [
   { id: "crate1", heavy: false, x: 2.0, z: -3.0 },
   { id: "crate2", heavy: false, x: -2.0, z: 4.0 },
-  { id: "fuel", heavy: true, x: -2.0, z: -5.0 }
+  { id: "fuel", heavy: true, x: -2.0, z: -5.0 },
+  // Hull patches (E6-02): the toolbox of compartment 2. Light, used up on a leak, back in the toolbox 30 s later.
+  { id: "patch1", kind: "patch", heavy: false, x: 0.6, z: 5.5 },
+  { id: "patch2", kind: "patch", heavy: false, x: 1.0, z: 5.5 },
+  { id: "patch3", kind: "patch", heavy: false, x: 1.4, z: 5.5 }
 ];
 // Boat tilt (must match BoatMotion.cs defaults: pitch 15 deg / 7 s, roll 20 deg / 5 s + 1 rad phase).
 var PITCH_AMP = 15 * Math.PI / 180, PITCH_PERIOD = 7;
@@ -164,7 +168,8 @@ function newCargo() {
   var out = [];
   for (var i = 0; i < CARGO_DEFS.length; i++) {
     var d = CARGO_DEFS[i];
-    out.push({ id: d.id, heavy: d.heavy, x: d.x, z: d.z, vx: 0, vz: 0, carriers: [], pend: "", pendTick: 0 });
+    out.push({ id: d.id, kind: d.kind || "crate", heavy: d.heavy, x: d.x, z: d.z, vx: 0, vz: 0, carriers: [], pend: "", pendTick: 0,
+               active: true, respawnTick: 0, homeX: d.x, homeZ: d.z });
   }
   return out;
 }
@@ -189,6 +194,7 @@ function tryGrab(cargo, playerId, pl, tick) {
   var best = null, bestD = GRAB_REACH;
   for (var i = 0; i < cargo.length; i++) {
     var c = cargo[i];
+    if (!c.active) continue;                                       // a used patch is not in the world until it respawns
     if (c.carriers.length >= (c.heavy ? 2 : 1)) continue;
     var dx = pl.x - c.x, dz = pl.z - c.z, d = Math.sqrt(dx * dx + dz * dz);
     if (d <= bestD) { best = c; bestD = d; }
@@ -221,6 +227,10 @@ function updateCargo(state, tick) {
   var up = boatUpHorizontal(tick * DT, tilt.trim, tilt.list);
   for (var i = 0; i < state.cargo.length; i++) {
     var c = state.cargo[i];
+    if (!c.active) {                                               // used patch: back in the toolbox after PATCH_RESPAWN_TICKS
+      if (tick >= c.respawnTick) { c.active = true; c.x = c.homeX; c.z = c.homeZ; c.vx = 0; c.vz = 0; }
+      continue;
+    }
     if (c.pend !== "" && tick - c.pendTick >= INTERLOCK_WINDOW_TICKS) c.pend = ""; // second carrier too late
     // A carrier that left the match releases the cargo
     var alive = [];
@@ -242,7 +252,7 @@ function cargoView(cargo) {
   var out = [];
   for (var i = 0; i < cargo.length; i++) {
     var c = cargo[i];
-    out.push({ id: c.id, x: c.x, z: c.z, h: c.heavy ? 1 : 0, c: c.carriers, p: c.pend });
+    out.push({ id: c.id, x: c.x, z: c.z, h: c.heavy ? 1 : 0, c: c.carriers, p: c.pend, k: c.kind, a: c.active ? 1 : 0 });
   }
   return out;
 }
@@ -358,6 +368,89 @@ function waterView(w) {
   for (var i = 0; i < w.comps.length; i++) l.push(q(w.comps[i].w / WATER_COMPARTMENTS[i].volume, 1000));
   for (var d = 0; d < w.doors.length; d++) dr.push(w.doors[d].open ? 1 : 0);
   return { l: l, m: q(waterTotal(w) * WATER_DENSITY / 1000, 10), tr: q(t.trim, 100), li: q(t.list, 100), dr: dr, ov: q(w.rejected, 100) };
+}
+
+// ---- Hull leaks and their repair (E6-02) -------------------------------------------------------------------------------------
+// A leak is a hole in the hull (left or right wall of a compartment) that pours water into that compartment at the flow rate of its size
+// (waterAdd every tick, so the boat lists towards the leak's side) until it is repaired. PROTO: ONE leak at a time, scheduled by a seeded
+// event (first at ~90 s, the next one 60-120 s after the previous is sealed); other systems (E3-09 failure generator, E7 damage) create
+// leaks through leakCreate. Repair v0: carry a "hull patch" (a light cargo item, taken from the toolbox of compartment 2) to the leak and press
+// the interaction key; each patch lowers the leak one size (large -> medium -> small -> sealed) and is used up. The hammer / wrench / wedge
+// of the full repair kit wait for the one-hand inventory (E2-03/E2-04): the leak "type" is already there to hook them up.
+var LEAK_RATES = [0, 0.02, 0.08, 0.25];      // m3/s per size: 0 sealed, 1 small, 2 medium, 3 large
+var LEAK_REACH = 1.5;                        // m: a patch must be applied within this distance of the hole
+var LEAK_SEED = 5678;
+var LEAK_FIRST_TICK = 900;                   // first leak at 90 s
+var LEAK_GAP_MIN_TICKS = 600, LEAK_GAP_SPAN_TICKS = 600;   // next one 60-120 s after the previous is sealed
+var PATCH_RESPAWN_TICKS = 300;               // a used patch is back in the toolbox after 30 s
+
+function newLeaks() { return { list: [], nextId: 1, rng: LEAK_SEED | 0, nextTick: LEAK_FIRST_TICK }; }
+
+// Seeded PRNG (mulberry32, same family as the reactor's): the state is one uint32 in the leaks object.
+function leakRand(L) {
+  L.rng = (L.rng + 0x6D2B79F5) | 0;
+  var t = Math.imul(L.rng ^ (L.rng >>> 15), 1 | L.rng);
+  t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+  return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+}
+
+// Open a leak on the hull wall of a compartment. side -1 = left wall, +1 = right wall, z = position along the boat. size 1..3.
+function leakCreate(L, z, side, size) {
+  var s = side < 0 ? -1 : 1, sz = Math.max(1, Math.min(3, size | 0));
+  var leak = { id: L.nextId++, comp: compartmentAt(z), x: s * HALF_X, z: z, side: s, size: sz, type: sz === 1 ? "rivet" : "plate" };
+  L.list.push(leak);
+  return leak;
+}
+
+function leakRate(leak) { return LEAK_RATES[leak.size]; }
+
+// Nearest leak within reach of a player, or null.
+function nearestLeak(L, pl) {
+  var best = null, bestD = LEAK_REACH;
+  for (var i = 0; i < L.list.length; i++) {
+    var dx = pl.x - L.list[i].x, dz = pl.z - L.list[i].z, d = Math.sqrt(dx * dx + dz * dz);
+    if (d <= bestD) { best = L.list[i]; bestD = d; }
+  }
+  return best;
+}
+
+// The interaction key was pressed: a player carrying a patch next to a leak applies it. Returns true when the press was a repair.
+function tryRepair(state, id, pl, tick) {
+  var held = heldBy(state.cargo, id);
+  if (!held || held.kind !== "patch" || held.carriers.indexOf(id) < 0) return false;
+  var leak = nearestLeak(state.leaks, pl);
+  if (!leak) return false;
+  leak.size--;
+  held.active = false; held.carriers = []; held.vx = 0; held.vz = 0; held.respawnTick = tick + PATCH_RESPAWN_TICKS;
+  if (leak.size <= 0) {
+    state.leaks.list.splice(state.leaks.list.indexOf(leak), 1);
+    state.leaks.nextTick = tick + LEAK_GAP_MIN_TICKS + Math.floor(leakRand(state.leaks) * LEAK_GAP_SPAN_TICKS);
+  }
+  return true;
+}
+
+// One 10 Hz step: the scheduled event may open a leak (only when none is active), every open leak pours water.
+function leakStep(state, tick) {
+  var L = state.leaks;
+  if (L.list.length === 0 && tick >= L.nextTick) {
+    var c = Math.min(WATER_COMPARTMENTS.length - 1, Math.floor(leakRand(L) * WATER_COMPARTMENTS.length));
+    var comp = WATER_COMPARTMENTS[c];
+    var z = comp.z0 + 0.5 + leakRand(L) * (comp.z1 - comp.z0 - 1);
+    var side = leakRand(L) < 0.5 ? -1 : 1;
+    var r = leakRand(L), size = r < 0.5 ? 1 : (r < 0.85 ? 2 : 3);
+    leakCreate(L, z, side, size);
+  }
+  for (var i = 0; i < L.list.length; i++) waterAdd(state.water, L.list[i].comp, leakRate(L.list[i]) * DT, L.list[i].side);
+}
+
+// Broadcast (and resync): every open leak.
+function leaksView(L) {
+  var out = [];
+  for (var i = 0; i < L.list.length; i++) {
+    var k = L.list[i];
+    out.push({ id: k.id, c: k.comp, x: k.x, z: Math.round(k.z * 100) / 100, s: k.size, t: k.type });
+  }
+  return out;
 }
 
 // ---- Reactor RK-1 "Petit Soleil" (E3-02) -------------------------------------------------------------------
@@ -635,6 +728,7 @@ function leverView(lever, reactor) {
 
 // The interaction key was pressed by player `id`: dispatch to the nearest interactable in reach.
 function tryAct(state, id, pl, tick) {
+  if (tryRepair(state, id, pl, tick)) return;           // carrying a hull patch next to a leak: the press applies it (E6-02)
   var bestControl = null, bestControlD = Infinity;
   for (var i = 0; i < CONTROLS.length; i++) {
     var d = controlDistance(pl, CONTROLS[i]);
@@ -696,7 +790,7 @@ function restartView(state) {
 var matchInit = function (ctx, logger, nk, params) {
   logger.info("moving_frame match init");
   return {
-    state: { tick: 0, players: {}, order: [], cp: newCoupled(), cargo: newCargo(), reactor: newReactor(REACTOR_SEED, "veille"), lever: newLever(), boat: newBoat(), restart: newRestart(), water: newWater() },
+    state: { tick: 0, players: {}, order: [], cp: newCoupled(), cargo: newCargo(), reactor: newReactor(REACTOR_SEED, "veille"), lever: newLever(), boat: newBoat(), restart: newRestart(), water: newWater(), leaks: newLeaks() },
     tickRate: TICK_RATE,
     label: JSON.stringify({ name: MATCH_NAME })
   };
@@ -771,6 +865,7 @@ var matchLoop = function (ctx, logger, nk, dispatcher, tick, state, messages) {
   }
 
   evaluateCoupled(state, tick);
+  leakStep(state, tick);
   waterStep(state.water);
   updateCargo(state, tick);
   reactorStep(state.reactor);
@@ -784,7 +879,7 @@ var matchLoop = function (ctx, logger, nk, dispatcher, tick, state, messages) {
     out.push({ id: id, x: q.x, z: q.z, seq: q.seq });
   }
   state.tick = tick;
-  dispatcher.broadcastMessage(OP_STATE, JSON.stringify({ tick: tick, t: tick * DT, players: out, il: coupledView(state.cp, tick)[0], cp: coupledView(state.cp, tick), cargo: cargoView(state.cargo), rx: reactorView(state.reactor), sc: leverView(state.lever, state.reactor), rs: restartView(state), bw: waterView(state.water), boat: boatView(state.boat) }), null, null, true);
+  dispatcher.broadcastMessage(OP_STATE, JSON.stringify({ tick: tick, t: tick * DT, players: out, il: coupledView(state.cp, tick)[0], cp: coupledView(state.cp, tick), cargo: cargoView(state.cargo), rx: reactorView(state.reactor), sc: leverView(state.lever, state.reactor), rs: restartView(state), bw: waterView(state.water), lk: leaksView(state.leaks), boat: boatView(state.boat) }), null, null, true);
   return { state: state };
 };
 
@@ -840,6 +935,7 @@ if (typeof module !== "undefined" && module.exports) {
     LEVER_COVER_TICKS: LEVER_COVER_TICKS, SINK_RATE_MAX: SINK_RATE_MAX, SINK_RAMP_SECONDS: SINK_RAMP_SECONDS, newBoat: newBoat, boatStep: boatStep,
     VALVE_TURN_RATE: VALVE_TURN_RATE, reactorBreakPump: reactorBreakPump, reactorRepairPump: reactorRepairPump,
     RESTART_VALVE_MIN: RESTART_VALVE_MIN,
+    LEAK_RATES: LEAK_RATES, LEAK_REACH: LEAK_REACH, LEAK_FIRST_TICK: LEAK_FIRST_TICK, PATCH_RESPAWN_TICKS: PATCH_RESPAWN_TICKS, leakCreate: leakCreate, leakRate: leakRate,
     WATER_COMPARTMENTS: WATER_COMPARTMENTS, WATER_FLOW: WATER_FLOW, MAX_TRIM_DEG: MAX_TRIM_DEG, MAX_LIST_DEG: MAX_LIST_DEG, newWater: newWater, waterAdd: waterAdd,
     waterRemove: waterRemove, waterSetDoor: waterSetDoor, waterStep: waterStep, waterTotal: waterTotal, waterTilt: waterTilt, waterView: waterView, waterLevel: waterLevel, compartmentAt: compartmentAt,
     COUPLED_ACTIONS: COUPLED_ACTIONS, COUPLED_EFFECTS: COUPLED_EFFECTS, COUPLED_GRACE_TICKS: COUPLED_GRACE_TICKS,

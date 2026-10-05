@@ -83,6 +83,7 @@ function leverView(lever, reactor) {
 
 // The interaction key was pressed by player `id`: dispatch to the nearest interactable in reach.
 function tryAct(state, id, pl, tick) {
+  if (tryRepair(state, id, pl, tick)) return;           // carrying a hull patch next to a leak: the press applies it (E6-02)
   var bestControl = null, bestControlD = Infinity;
   for (var i = 0; i < CONTROLS.length; i++) {
     var d = controlDistance(pl, CONTROLS[i]);

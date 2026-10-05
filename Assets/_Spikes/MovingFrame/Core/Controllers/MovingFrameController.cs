@@ -68,6 +68,7 @@ namespace SousTension.Spikes.MovingFrame
             _model.SetBoat(snapshot.Boat);
             _model.SetRestart(snapshot.Restart);
             _model.SetWater(snapshot.Water);
+            _model.SetLeaks(snapshot.Leaks);
 
             foreach (var p in snapshot.Players)
             {
