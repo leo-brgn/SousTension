@@ -56,6 +56,7 @@ namespace SousTension.Spikes.MovingFrame
                 case "patch": return new Color(0.55f, 0.65f, 0.72f);
                 case "bucket": return new Color(0.2f, 0.55f, 0.75f);
                 case "flashlight": return new Color(0.95f, 0.9f, 0.5f);
+                case "manual": return new Color(0.93f, 0.9f, 0.78f);
                 case "fuel": return new Color(0.35f, 0.35f, 0.4f);
                 default: return new Color(0.6f, 0.4f, 0.2f);
             }

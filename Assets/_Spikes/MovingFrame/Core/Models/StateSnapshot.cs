@@ -159,6 +159,14 @@ namespace SousTension.Spikes.MovingFrame
         { Valid = true; Telegraph = telegraph; Speed = speed; Distance = distance; Noise = noise; }
     }
 
+    /// <summary>The OK-114 Operating Manual (E5-02): the page it is open at (shared by everybody) and how many pages it has.</summary>
+    public readonly struct ManualState
+    {
+        public readonly bool Valid;
+        public readonly int Page, PageCount;
+        public ManualState(int page, int pageCount) { Valid = true; Page = page; PageCount = pageCount; }
+    }
+
     /// <summary>Authoritative boat depth below patrol depth (E3-04): grows after a SCRAM. Display only.</summary>
     public readonly struct BoatDepthState
     {
@@ -185,12 +193,14 @@ namespace SousTension.Spikes.MovingFrame
         public readonly BilgeState Bilge;
         public readonly GridState Grid;
         public readonly PropulsionState Propulsion;
+        public readonly ManualState Manual;
         public readonly LeakState[] Leaks;   // null = the server sent no leak list (older server); empty = no leak
 
         public StateSnapshot(int tick, double serverTime, PlayerState[] players, InterlockState interlock = default, CargoState[] cargo = null, ReactorState reactor = default,
             ScramLeverState lever = default, BoatDepthState boat = default, CoupledActionState[] coupled = null,
-            RestartState restart = default, WaterState water = default, LeakState[] leaks = null, BilgeState bilge = default, GridState grid = default, PropulsionState propulsion = default)
+            RestartState restart = default, WaterState water = default, LeakState[] leaks = null, BilgeState bilge = default, GridState grid = default, PropulsionState propulsion = default, ManualState manual = default)
         {
+            Manual = manual;
             Propulsion = propulsion;
             Grid = grid;
             Bilge = bilge;

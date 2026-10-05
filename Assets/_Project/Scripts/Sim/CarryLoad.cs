@@ -18,6 +18,7 @@ namespace SousTension.Sim
                 case "patch": return 1f;
                 case "bucket": return 2f;
                 case "flashlight": return 0.5f;
+                case "manual": return 8f;
                 default: return 12f;          // crate
             }
         }

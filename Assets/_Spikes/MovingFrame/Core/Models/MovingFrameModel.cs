@@ -171,6 +171,19 @@ namespace SousTension.Spikes.MovingFrame
         public PropulsionState Propulsion { get; private set; }
         public void SetPropulsion(PropulsionState state) { if (state.Valid) Propulsion = state; }
 
+        /// <summary>The Operating Manual's page (E5-02), authoritative; a snapshot without it keeps the last known one.</summary>
+        public ManualState Manual { get; private set; }
+        public void SetManual(ManualState state) { if (state.Valid) Manual = state; }
+
+        /// <summary>True while the local player holds the Operating Manual (it is read with both hands).</summary>
+        public bool IsLocalReading()
+        {
+            if (string.IsNullOrEmpty(LocalId)) return false;
+            foreach (var id in HandsOf(LocalId))
+                if (!string.IsNullOrEmpty(id) && _cargoLatest.TryGetValue(id, out var c) && c.Kind == "manual") return true;
+            return false;
+        }
+
         public void SetLocal(float x, float z) { LocalX = x; LocalZ = z; }
 
         public void ApplyServerState(StateSnapshot snapshot, double localNow)

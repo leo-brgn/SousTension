@@ -40,6 +40,8 @@ namespace SousTension.Spikes.MovingFrame
         bool DropHeld { get; }
         bool StowHeld { get; }
         bool ThrowHeld { get; }
+        bool NextHeld { get; }      // turn the Manual's page forward (E5-02)
+        bool PrevHeld { get; }
     }
 
     /// <summary>Where the player looks (E2-04): the heading in radians about the boat's up axis, sent with every input so the server can aim a throw.</summary>
