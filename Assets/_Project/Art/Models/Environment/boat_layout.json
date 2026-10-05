@@ -1,0 +1,6656 @@
+{
+  "length": 28,
+  "width": 6,
+  "height": 2.5,
+  "rooms": [
+    {
+      "id": "01_Torpedoes",
+      "label": "Torpilles",
+      "start": 10,
+      "end": 14
+    },
+    {
+      "id": "02_Central",
+      "label": "Poste central",
+      "start": 4,
+      "end": 10
+    },
+    {
+      "id": "03_Radio",
+      "label": "Radio et sonar",
+      "start": 0,
+      "end": 4
+    },
+    {
+      "id": "04_Reactor",
+      "label": "Réacteur",
+      "start": -4,
+      "end": 0
+    },
+    {
+      "id": "05_Machines",
+      "label": "Machines",
+      "start": -8,
+      "end": -4
+    },
+    {
+      "id": "06_Living",
+      "label": "Sas et vie",
+      "start": -14,
+      "end": -8
+    }
+  ],
+  "instances": [
+    {
+      "id": "01_Torpedoes_EnvironmentHull_2m_000",
+      "room": "01_Torpedoes",
+      "kit": "Environment",
+      "asset": "EnvironmentHull_2m",
+      "position": [
+        0,
+        11,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "01_Torpedoes_BilgeFloor_2m_001",
+      "room": "01_Torpedoes",
+      "kit": "Structure",
+      "asset": "BilgeFloor_2m",
+      "position": [
+        0,
+        11,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "01_Torpedoes_EnvironmentHull_2m_002",
+      "room": "01_Torpedoes",
+      "kit": "Environment",
+      "asset": "EnvironmentHull_2m",
+      "position": [
+        0,
+        13,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "01_Torpedoes_BilgeFloor_2m_003",
+      "room": "01_Torpedoes",
+      "kit": "Structure",
+      "asset": "BilgeFloor_2m",
+      "position": [
+        0,
+        13,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "01_Torpedoes_FloorGrating_1m_004",
+      "room": "01_Torpedoes",
+      "kit": "Structure",
+      "asset": "FloorGrating_1m",
+      "position": [
+        -2.5,
+        10.5,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "01_Torpedoes_FloorGrating_1m_005",
+      "room": "01_Torpedoes",
+      "kit": "Structure",
+      "asset": "FloorGrating_1m",
+      "position": [
+        -1.5,
+        10.5,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "01_Torpedoes_FloorGrating_1m_006",
+      "room": "01_Torpedoes",
+      "kit": "Structure",
+      "asset": "FloorGrating_1m",
+      "position": [
+        -0.5,
+        10.5,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "01_Torpedoes_FloorGrating_1m_007",
+      "room": "01_Torpedoes",
+      "kit": "Structure",
+      "asset": "FloorGrating_1m",
+      "position": [
+        0.5,
+        10.5,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "01_Torpedoes_FloorGrating_1m_008",
+      "room": "01_Torpedoes",
+      "kit": "Structure",
+      "asset": "FloorGrating_1m",
+      "position": [
+        1.5,
+        10.5,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "01_Torpedoes_FloorGrating_1m_009",
+      "room": "01_Torpedoes",
+      "kit": "Structure",
+      "asset": "FloorGrating_1m",
+      "position": [
+        2.5,
+        10.5,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "01_Torpedoes_FloorGrating_1m_010",
+      "room": "01_Torpedoes",
+      "kit": "Structure",
+      "asset": "FloorGrating_1m",
+      "position": [
+        -2.5,
+        11.5,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "01_Torpedoes_FloorGrating_1m_011",
+      "room": "01_Torpedoes",
+      "kit": "Structure",
+      "asset": "FloorGrating_1m",
+      "position": [
+        -1.5,
+        11.5,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "01_Torpedoes_FloorGrating_1m_012",
+      "room": "01_Torpedoes",
+      "kit": "Structure",
+      "asset": "FloorGrating_1m",
+      "position": [
+        -0.5,
+        11.5,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "01_Torpedoes_FloorGrating_1m_013",
+      "room": "01_Torpedoes",
+      "kit": "Structure",
+      "asset": "FloorGrating_1m",
+      "position": [
+        0.5,
+        11.5,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "01_Torpedoes_FloorGrating_1m_014",
+      "room": "01_Torpedoes",
+      "kit": "Structure",
+      "asset": "FloorGrating_1m",
+      "position": [
+        1.5,
+        11.5,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "01_Torpedoes_FloorGrating_1m_015",
+      "room": "01_Torpedoes",
+      "kit": "Structure",
+      "asset": "FloorGrating_1m",
+      "position": [
+        2.5,
+        11.5,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "01_Torpedoes_FloorGrating_1m_016",
+      "room": "01_Torpedoes",
+      "kit": "Structure",
+      "asset": "FloorGrating_1m",
+      "position": [
+        -2.5,
+        12.5,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "01_Torpedoes_FloorGrating_1m_017",
+      "room": "01_Torpedoes",
+      "kit": "Structure",
+      "asset": "FloorGrating_1m",
+      "position": [
+        -1.5,
+        12.5,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "01_Torpedoes_FloorGrating_1m_018",
+      "room": "01_Torpedoes",
+      "kit": "Structure",
+      "asset": "FloorGrating_1m",
+      "position": [
+        -0.5,
+        12.5,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "01_Torpedoes_FloorGrating_1m_019",
+      "room": "01_Torpedoes",
+      "kit": "Structure",
+      "asset": "FloorGrating_1m",
+      "position": [
+        0.5,
+        12.5,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "01_Torpedoes_FloorGrating_1m_020",
+      "room": "01_Torpedoes",
+      "kit": "Structure",
+      "asset": "FloorGrating_1m",
+      "position": [
+        1.5,
+        12.5,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "01_Torpedoes_FloorGrating_1m_021",
+      "room": "01_Torpedoes",
+      "kit": "Structure",
+      "asset": "FloorGrating_1m",
+      "position": [
+        2.5,
+        12.5,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "01_Torpedoes_FloorGrating_1m_022",
+      "room": "01_Torpedoes",
+      "kit": "Structure",
+      "asset": "FloorGrating_1m",
+      "position": [
+        -2.5,
+        13.5,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "01_Torpedoes_FloorGrating_1m_023",
+      "room": "01_Torpedoes",
+      "kit": "Structure",
+      "asset": "FloorGrating_1m",
+      "position": [
+        -1.5,
+        13.5,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "01_Torpedoes_FloorGrating_1m_024",
+      "room": "01_Torpedoes",
+      "kit": "Structure",
+      "asset": "FloorGrating_1m",
+      "position": [
+        -0.5,
+        13.5,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "01_Torpedoes_FloorGrating_1m_025",
+      "room": "01_Torpedoes",
+      "kit": "Structure",
+      "asset": "FloorGrating_1m",
+      "position": [
+        0.5,
+        13.5,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "01_Torpedoes_FloorGrating_1m_026",
+      "room": "01_Torpedoes",
+      "kit": "Structure",
+      "asset": "FloorGrating_1m",
+      "position": [
+        1.5,
+        13.5,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "01_Torpedoes_FloorGrating_1m_027",
+      "room": "01_Torpedoes",
+      "kit": "Structure",
+      "asset": "FloorGrating_1m",
+      "position": [
+        2.5,
+        13.5,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "01_Torpedoes_CompartmentCeilingLight_028",
+      "room": "01_Torpedoes",
+      "kit": "Lighting",
+      "asset": "CompartmentCeilingLight",
+      "position": [
+        0,
+        12.0,
+        2.44
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "01_Torpedoes_EmergencyLamp_029",
+      "room": "01_Torpedoes",
+      "kit": "Lighting",
+      "asset": "EmergencyLamp",
+      "position": [
+        -2.92,
+        12.6,
+        1.95
+      ],
+      "rotation": [
+        0,
+        0,
+        90
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "01_Torpedoes_Interphone_030",
+      "room": "01_Torpedoes",
+      "kit": "Machines",
+      "asset": "Interphone",
+      "position": [
+        2.84,
+        12.9,
+        1.4
+      ],
+      "rotation": [
+        0,
+        0,
+        -90
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "01_Torpedoes_Pipe_Straight_1m_031",
+      "room": "01_Torpedoes",
+      "kit": "Structure",
+      "asset": "Pipe_Straight_1m",
+      "position": [
+        -2.7,
+        10.5,
+        2.12
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "01_Torpedoes_Pipe_Straight_1m_032",
+      "room": "01_Torpedoes",
+      "kit": "Structure",
+      "asset": "Pipe_Straight_1m",
+      "position": [
+        -2.7,
+        11.5,
+        2.12
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "01_Torpedoes_Pipe_Straight_1m_033",
+      "room": "01_Torpedoes",
+      "kit": "Structure",
+      "asset": "Pipe_Straight_1m",
+      "position": [
+        -2.7,
+        12.5,
+        2.12
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "01_Torpedoes_Pipe_Straight_1m_034",
+      "room": "01_Torpedoes",
+      "kit": "Structure",
+      "asset": "Pipe_Straight_1m",
+      "position": [
+        -2.7,
+        13.5,
+        2.12
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "01_Torpedoes_Plate_Torpedoes_035",
+      "room": "01_Torpedoes",
+      "kit": "Signage",
+      "asset": "Plate_Torpedoes",
+      "position": [
+        -2.885,
+        11.2,
+        1.78
+      ],
+      "rotation": [
+        0,
+        0,
+        90
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "02_Central_EnvironmentHull_2m_036",
+      "room": "02_Central",
+      "kit": "Environment",
+      "asset": "EnvironmentHull_2m",
+      "position": [
+        0,
+        5,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "02_Central_BilgeFloor_2m_037",
+      "room": "02_Central",
+      "kit": "Structure",
+      "asset": "BilgeFloor_2m",
+      "position": [
+        0,
+        5,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "02_Central_EnvironmentHull_2m_038",
+      "room": "02_Central",
+      "kit": "Environment",
+      "asset": "EnvironmentHull_2m",
+      "position": [
+        0,
+        7,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "02_Central_BilgeFloor_2m_039",
+      "room": "02_Central",
+      "kit": "Structure",
+      "asset": "BilgeFloor_2m",
+      "position": [
+        0,
+        7,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "02_Central_EnvironmentHull_2m_040",
+      "room": "02_Central",
+      "kit": "Environment",
+      "asset": "EnvironmentHull_2m",
+      "position": [
+        0,
+        9,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "02_Central_BilgeFloor_2m_041",
+      "room": "02_Central",
+      "kit": "Structure",
+      "asset": "BilgeFloor_2m",
+      "position": [
+        0,
+        9,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "02_Central_FloorGrating_1m_042",
+      "room": "02_Central",
+      "kit": "Structure",
+      "asset": "FloorGrating_1m",
+      "position": [
+        -2.5,
+        4.5,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "02_Central_FloorGrating_1m_043",
+      "room": "02_Central",
+      "kit": "Structure",
+      "asset": "FloorGrating_1m",
+      "position": [
+        -1.5,
+        4.5,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "02_Central_FloorGrating_1m_044",
+      "room": "02_Central",
+      "kit": "Structure",
+      "asset": "FloorGrating_1m",
+      "position": [
+        -0.5,
+        4.5,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "02_Central_FloorGrating_1m_045",
+      "room": "02_Central",
+      "kit": "Structure",
+      "asset": "FloorGrating_1m",
+      "position": [
+        0.5,
+        4.5,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "02_Central_FloorGrating_1m_046",
+      "room": "02_Central",
+      "kit": "Structure",
+      "asset": "FloorGrating_1m",
+      "position": [
+        1.5,
+        4.5,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "02_Central_FloorGrating_1m_047",
+      "room": "02_Central",
+      "kit": "Structure",
+      "asset": "FloorGrating_1m",
+      "position": [
+        2.5,
+        4.5,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "02_Central_FloorGrating_1m_048",
+      "room": "02_Central",
+      "kit": "Structure",
+      "asset": "FloorGrating_1m",
+      "position": [
+        -2.5,
+        5.5,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "02_Central_FloorGrating_1m_049",
+      "room": "02_Central",
+      "kit": "Structure",
+      "asset": "FloorGrating_1m",
+      "position": [
+        -1.5,
+        5.5,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "02_Central_FloorGrating_1m_050",
+      "room": "02_Central",
+      "kit": "Structure",
+      "asset": "FloorGrating_1m",
+      "position": [
+        -0.5,
+        5.5,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "02_Central_FloorGrating_1m_051",
+      "room": "02_Central",
+      "kit": "Structure",
+      "asset": "FloorGrating_1m",
+      "position": [
+        0.5,
+        5.5,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "02_Central_FloorGrating_1m_052",
+      "room": "02_Central",
+      "kit": "Structure",
+      "asset": "FloorGrating_1m",
+      "position": [
+        1.5,
+        5.5,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "02_Central_FloorGrating_1m_053",
+      "room": "02_Central",
+      "kit": "Structure",
+      "asset": "FloorGrating_1m",
+      "position": [
+        2.5,
+        5.5,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "02_Central_FloorGrating_1m_054",
+      "room": "02_Central",
+      "kit": "Structure",
+      "asset": "FloorGrating_1m",
+      "position": [
+        -2.5,
+        6.5,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "02_Central_FloorGrating_1m_055",
+      "room": "02_Central",
+      "kit": "Structure",
+      "asset": "FloorGrating_1m",
+      "position": [
+        -1.5,
+        6.5,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "02_Central_FloorGrating_1m_056",
+      "room": "02_Central",
+      "kit": "Structure",
+      "asset": "FloorGrating_1m",
+      "position": [
+        -0.5,
+        6.5,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "02_Central_FloorGrating_1m_057",
+      "room": "02_Central",
+      "kit": "Structure",
+      "asset": "FloorGrating_1m",
+      "position": [
+        0.5,
+        6.5,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "02_Central_FloorGrating_1m_058",
+      "room": "02_Central",
+      "kit": "Structure",
+      "asset": "FloorGrating_1m",
+      "position": [
+        1.5,
+        6.5,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "02_Central_FloorGrating_1m_059",
+      "room": "02_Central",
+      "kit": "Structure",
+      "asset": "FloorGrating_1m",
+      "position": [
+        2.5,
+        6.5,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "02_Central_FloorGrating_1m_060",
+      "room": "02_Central",
+      "kit": "Structure",
+      "asset": "FloorGrating_1m",
+      "position": [
+        -2.5,
+        7.5,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "02_Central_FloorGrating_1m_061",
+      "room": "02_Central",
+      "kit": "Structure",
+      "asset": "FloorGrating_1m",
+      "position": [
+        -1.5,
+        7.5,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "02_Central_FloorGrating_1m_062",
+      "room": "02_Central",
+      "kit": "Structure",
+      "asset": "FloorGrating_1m",
+      "position": [
+        -0.5,
+        7.5,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "02_Central_FloorGrating_1m_063",
+      "room": "02_Central",
+      "kit": "Structure",
+      "asset": "FloorGrating_1m",
+      "position": [
+        0.5,
+        7.5,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "02_Central_FloorGrating_1m_064",
+      "room": "02_Central",
+      "kit": "Structure",
+      "asset": "FloorGrating_1m",
+      "position": [
+        1.5,
+        7.5,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "02_Central_FloorGrating_1m_065",
+      "room": "02_Central",
+      "kit": "Structure",
+      "asset": "FloorGrating_1m",
+      "position": [
+        2.5,
+        7.5,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "02_Central_FloorGrating_1m_066",
+      "room": "02_Central",
+      "kit": "Structure",
+      "asset": "FloorGrating_1m",
+      "position": [
+        -2.5,
+        8.5,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "02_Central_FloorGrating_1m_067",
+      "room": "02_Central",
+      "kit": "Structure",
+      "asset": "FloorGrating_1m",
+      "position": [
+        -1.5,
+        8.5,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "02_Central_FloorGrating_1m_068",
+      "room": "02_Central",
+      "kit": "Structure",
+      "asset": "FloorGrating_1m",
+      "position": [
+        -0.5,
+        8.5,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "02_Central_FloorGrating_1m_069",
+      "room": "02_Central",
+      "kit": "Structure",
+      "asset": "FloorGrating_1m",
+      "position": [
+        0.5,
+        8.5,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "02_Central_FloorGrating_1m_070",
+      "room": "02_Central",
+      "kit": "Structure",
+      "asset": "FloorGrating_1m",
+      "position": [
+        1.5,
+        8.5,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "02_Central_FloorGrating_1m_071",
+      "room": "02_Central",
+      "kit": "Structure",
+      "asset": "FloorGrating_1m",
+      "position": [
+        2.5,
+        8.5,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "02_Central_FloorGrating_1m_072",
+      "room": "02_Central",
+      "kit": "Structure",
+      "asset": "FloorGrating_1m",
+      "position": [
+        -2.5,
+        9.5,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "02_Central_FloorGrating_1m_073",
+      "room": "02_Central",
+      "kit": "Structure",
+      "asset": "FloorGrating_1m",
+      "position": [
+        -1.5,
+        9.5,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "02_Central_FloorGrating_1m_074",
+      "room": "02_Central",
+      "kit": "Structure",
+      "asset": "FloorGrating_1m",
+      "position": [
+        -0.5,
+        9.5,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "02_Central_FloorGrating_1m_075",
+      "room": "02_Central",
+      "kit": "Structure",
+      "asset": "FloorGrating_1m",
+      "position": [
+        0.5,
+        9.5,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "02_Central_FloorGrating_1m_076",
+      "room": "02_Central",
+      "kit": "Structure",
+      "asset": "FloorGrating_1m",
+      "position": [
+        1.5,
+        9.5,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "02_Central_FloorGrating_1m_077",
+      "room": "02_Central",
+      "kit": "Structure",
+      "asset": "FloorGrating_1m",
+      "position": [
+        2.5,
+        9.5,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "02_Central_CompartmentCeilingLight_078",
+      "room": "02_Central",
+      "kit": "Lighting",
+      "asset": "CompartmentCeilingLight",
+      "position": [
+        0,
+        7.0,
+        2.44
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "02_Central_EmergencyLamp_079",
+      "room": "02_Central",
+      "kit": "Lighting",
+      "asset": "EmergencyLamp",
+      "position": [
+        -2.92,
+        7.6,
+        1.95
+      ],
+      "rotation": [
+        0,
+        0,
+        90
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "02_Central_Interphone_080",
+      "room": "02_Central",
+      "kit": "Machines",
+      "asset": "Interphone",
+      "position": [
+        2.84,
+        7.9,
+        1.4
+      ],
+      "rotation": [
+        0,
+        0,
+        -90
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "02_Central_Pipe_Straight_1m_081",
+      "room": "02_Central",
+      "kit": "Structure",
+      "asset": "Pipe_Straight_1m",
+      "position": [
+        -2.7,
+        4.5,
+        2.12
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "02_Central_Pipe_Straight_1m_082",
+      "room": "02_Central",
+      "kit": "Structure",
+      "asset": "Pipe_Straight_1m",
+      "position": [
+        -2.7,
+        5.5,
+        2.12
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "02_Central_Pipe_Straight_1m_083",
+      "room": "02_Central",
+      "kit": "Structure",
+      "asset": "Pipe_Straight_1m",
+      "position": [
+        -2.7,
+        6.5,
+        2.12
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "02_Central_Pipe_Straight_1m_084",
+      "room": "02_Central",
+      "kit": "Structure",
+      "asset": "Pipe_Straight_1m",
+      "position": [
+        -2.7,
+        7.5,
+        2.12
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "02_Central_Pipe_Straight_1m_085",
+      "room": "02_Central",
+      "kit": "Structure",
+      "asset": "Pipe_Straight_1m",
+      "position": [
+        -2.7,
+        8.5,
+        2.12
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "02_Central_Pipe_Straight_1m_086",
+      "room": "02_Central",
+      "kit": "Structure",
+      "asset": "Pipe_Straight_1m",
+      "position": [
+        -2.7,
+        9.5,
+        2.12
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "02_Central_Plate_Central_087",
+      "room": "02_Central",
+      "kit": "Signage",
+      "asset": "Plate_Central",
+      "position": [
+        -2.885,
+        6.2,
+        1.78
+      ],
+      "rotation": [
+        0,
+        0,
+        90
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "03_Radio_EnvironmentHull_2m_088",
+      "room": "03_Radio",
+      "kit": "Environment",
+      "asset": "EnvironmentHull_2m",
+      "position": [
+        0,
+        1,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "03_Radio_BilgeFloor_2m_089",
+      "room": "03_Radio",
+      "kit": "Structure",
+      "asset": "BilgeFloor_2m",
+      "position": [
+        0,
+        1,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "03_Radio_EnvironmentHull_2m_090",
+      "room": "03_Radio",
+      "kit": "Environment",
+      "asset": "EnvironmentHull_2m",
+      "position": [
+        0,
+        3,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "03_Radio_BilgeFloor_2m_091",
+      "room": "03_Radio",
+      "kit": "Structure",
+      "asset": "BilgeFloor_2m",
+      "position": [
+        0,
+        3,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "03_Radio_FloorGrating_1m_092",
+      "room": "03_Radio",
+      "kit": "Structure",
+      "asset": "FloorGrating_1m",
+      "position": [
+        -2.5,
+        0.5,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "03_Radio_FloorGrating_1m_093",
+      "room": "03_Radio",
+      "kit": "Structure",
+      "asset": "FloorGrating_1m",
+      "position": [
+        -1.5,
+        0.5,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "03_Radio_FloorGrating_1m_094",
+      "room": "03_Radio",
+      "kit": "Structure",
+      "asset": "FloorGrating_1m",
+      "position": [
+        -0.5,
+        0.5,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "03_Radio_FloorGrating_1m_095",
+      "room": "03_Radio",
+      "kit": "Structure",
+      "asset": "FloorGrating_1m",
+      "position": [
+        0.5,
+        0.5,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "03_Radio_FloorGrating_1m_096",
+      "room": "03_Radio",
+      "kit": "Structure",
+      "asset": "FloorGrating_1m",
+      "position": [
+        1.5,
+        0.5,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "03_Radio_FloorGrating_1m_097",
+      "room": "03_Radio",
+      "kit": "Structure",
+      "asset": "FloorGrating_1m",
+      "position": [
+        2.5,
+        0.5,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "03_Radio_FloorGrating_1m_098",
+      "room": "03_Radio",
+      "kit": "Structure",
+      "asset": "FloorGrating_1m",
+      "position": [
+        -2.5,
+        1.5,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "03_Radio_FloorGrating_1m_099",
+      "room": "03_Radio",
+      "kit": "Structure",
+      "asset": "FloorGrating_1m",
+      "position": [
+        -1.5,
+        1.5,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "03_Radio_FloorGrating_1m_100",
+      "room": "03_Radio",
+      "kit": "Structure",
+      "asset": "FloorGrating_1m",
+      "position": [
+        -0.5,
+        1.5,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "03_Radio_FloorGrating_1m_101",
+      "room": "03_Radio",
+      "kit": "Structure",
+      "asset": "FloorGrating_1m",
+      "position": [
+        0.5,
+        1.5,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "03_Radio_FloorGrating_1m_102",
+      "room": "03_Radio",
+      "kit": "Structure",
+      "asset": "FloorGrating_1m",
+      "position": [
+        1.5,
+        1.5,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "03_Radio_FloorGrating_1m_103",
+      "room": "03_Radio",
+      "kit": "Structure",
+      "asset": "FloorGrating_1m",
+      "position": [
+        2.5,
+        1.5,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "03_Radio_FloorGrating_1m_104",
+      "room": "03_Radio",
+      "kit": "Structure",
+      "asset": "FloorGrating_1m",
+      "position": [
+        -2.5,
+        2.5,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "03_Radio_FloorGrating_1m_105",
+      "room": "03_Radio",
+      "kit": "Structure",
+      "asset": "FloorGrating_1m",
+      "position": [
+        -1.5,
+        2.5,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "03_Radio_FloorGrating_1m_106",
+      "room": "03_Radio",
+      "kit": "Structure",
+      "asset": "FloorGrating_1m",
+      "position": [
+        -0.5,
+        2.5,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "03_Radio_FloorGrating_1m_107",
+      "room": "03_Radio",
+      "kit": "Structure",
+      "asset": "FloorGrating_1m",
+      "position": [
+        0.5,
+        2.5,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "03_Radio_FloorGrating_1m_108",
+      "room": "03_Radio",
+      "kit": "Structure",
+      "asset": "FloorGrating_1m",
+      "position": [
+        1.5,
+        2.5,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "03_Radio_FloorGrating_1m_109",
+      "room": "03_Radio",
+      "kit": "Structure",
+      "asset": "FloorGrating_1m",
+      "position": [
+        2.5,
+        2.5,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "03_Radio_FloorGrating_1m_110",
+      "room": "03_Radio",
+      "kit": "Structure",
+      "asset": "FloorGrating_1m",
+      "position": [
+        -2.5,
+        3.5,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "03_Radio_FloorGrating_1m_111",
+      "room": "03_Radio",
+      "kit": "Structure",
+      "asset": "FloorGrating_1m",
+      "position": [
+        -1.5,
+        3.5,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "03_Radio_FloorGrating_1m_112",
+      "room": "03_Radio",
+      "kit": "Structure",
+      "asset": "FloorGrating_1m",
+      "position": [
+        -0.5,
+        3.5,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "03_Radio_FloorGrating_1m_113",
+      "room": "03_Radio",
+      "kit": "Structure",
+      "asset": "FloorGrating_1m",
+      "position": [
+        0.5,
+        3.5,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "03_Radio_FloorGrating_1m_114",
+      "room": "03_Radio",
+      "kit": "Structure",
+      "asset": "FloorGrating_1m",
+      "position": [
+        1.5,
+        3.5,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "03_Radio_FloorGrating_1m_115",
+      "room": "03_Radio",
+      "kit": "Structure",
+      "asset": "FloorGrating_1m",
+      "position": [
+        2.5,
+        3.5,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "03_Radio_CompartmentCeilingLight_116",
+      "room": "03_Radio",
+      "kit": "Lighting",
+      "asset": "CompartmentCeilingLight",
+      "position": [
+        0,
+        2.0,
+        2.44
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "03_Radio_EmergencyLamp_117",
+      "room": "03_Radio",
+      "kit": "Lighting",
+      "asset": "EmergencyLamp",
+      "position": [
+        -2.92,
+        2.6,
+        1.95
+      ],
+      "rotation": [
+        0,
+        0,
+        90
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "03_Radio_Interphone_118",
+      "room": "03_Radio",
+      "kit": "Machines",
+      "asset": "Interphone",
+      "position": [
+        2.84,
+        2.9,
+        1.4
+      ],
+      "rotation": [
+        0,
+        0,
+        -90
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "03_Radio_Pipe_Straight_1m_119",
+      "room": "03_Radio",
+      "kit": "Structure",
+      "asset": "Pipe_Straight_1m",
+      "position": [
+        -2.7,
+        0.5,
+        2.12
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "03_Radio_Pipe_Straight_1m_120",
+      "room": "03_Radio",
+      "kit": "Structure",
+      "asset": "Pipe_Straight_1m",
+      "position": [
+        -2.7,
+        1.5,
+        2.12
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "03_Radio_Pipe_Straight_1m_121",
+      "room": "03_Radio",
+      "kit": "Structure",
+      "asset": "Pipe_Straight_1m",
+      "position": [
+        -2.7,
+        2.5,
+        2.12
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "03_Radio_Pipe_Straight_1m_122",
+      "room": "03_Radio",
+      "kit": "Structure",
+      "asset": "Pipe_Straight_1m",
+      "position": [
+        -2.7,
+        3.5,
+        2.12
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "03_Radio_Plate_Radio_123",
+      "room": "03_Radio",
+      "kit": "Signage",
+      "asset": "Plate_Radio",
+      "position": [
+        -2.885,
+        1.2,
+        1.78
+      ],
+      "rotation": [
+        0,
+        0,
+        90
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "04_Reactor_EnvironmentHull_2m_124",
+      "room": "04_Reactor",
+      "kit": "Environment",
+      "asset": "EnvironmentHull_2m",
+      "position": [
+        0,
+        -3,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "04_Reactor_BilgeFloor_2m_125",
+      "room": "04_Reactor",
+      "kit": "Structure",
+      "asset": "BilgeFloor_2m",
+      "position": [
+        0,
+        -3,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "04_Reactor_EnvironmentHull_2m_126",
+      "room": "04_Reactor",
+      "kit": "Environment",
+      "asset": "EnvironmentHull_2m",
+      "position": [
+        0,
+        -1,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "04_Reactor_BilgeFloor_2m_127",
+      "room": "04_Reactor",
+      "kit": "Structure",
+      "asset": "BilgeFloor_2m",
+      "position": [
+        0,
+        -1,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "04_Reactor_FloorGrating_1m_128",
+      "room": "04_Reactor",
+      "kit": "Structure",
+      "asset": "FloorGrating_1m",
+      "position": [
+        -2.5,
+        -3.5,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "04_Reactor_FloorGrating_1m_129",
+      "room": "04_Reactor",
+      "kit": "Structure",
+      "asset": "FloorGrating_1m",
+      "position": [
+        -1.5,
+        -3.5,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "04_Reactor_FloorGrating_1m_130",
+      "room": "04_Reactor",
+      "kit": "Structure",
+      "asset": "FloorGrating_1m",
+      "position": [
+        -0.5,
+        -3.5,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "04_Reactor_FloorGrating_1m_131",
+      "room": "04_Reactor",
+      "kit": "Structure",
+      "asset": "FloorGrating_1m",
+      "position": [
+        0.5,
+        -3.5,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "04_Reactor_FloorGrating_1m_132",
+      "room": "04_Reactor",
+      "kit": "Structure",
+      "asset": "FloorGrating_1m",
+      "position": [
+        1.5,
+        -3.5,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "04_Reactor_FloorGrating_1m_133",
+      "room": "04_Reactor",
+      "kit": "Structure",
+      "asset": "FloorGrating_1m",
+      "position": [
+        2.5,
+        -3.5,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "04_Reactor_FloorGrating_1m_134",
+      "room": "04_Reactor",
+      "kit": "Structure",
+      "asset": "FloorGrating_1m",
+      "position": [
+        -2.5,
+        -2.5,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "04_Reactor_FloorGrating_1m_135",
+      "room": "04_Reactor",
+      "kit": "Structure",
+      "asset": "FloorGrating_1m",
+      "position": [
+        -1.5,
+        -2.5,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "04_Reactor_FloorGrating_1m_136",
+      "room": "04_Reactor",
+      "kit": "Structure",
+      "asset": "FloorGrating_1m",
+      "position": [
+        -0.5,
+        -2.5,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "04_Reactor_FloorGrating_1m_137",
+      "room": "04_Reactor",
+      "kit": "Structure",
+      "asset": "FloorGrating_1m",
+      "position": [
+        0.5,
+        -2.5,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "04_Reactor_FloorGrating_1m_138",
+      "room": "04_Reactor",
+      "kit": "Structure",
+      "asset": "FloorGrating_1m",
+      "position": [
+        1.5,
+        -2.5,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "04_Reactor_FloorGrating_1m_139",
+      "room": "04_Reactor",
+      "kit": "Structure",
+      "asset": "FloorGrating_1m",
+      "position": [
+        2.5,
+        -2.5,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "04_Reactor_FloorGrating_1m_140",
+      "room": "04_Reactor",
+      "kit": "Structure",
+      "asset": "FloorGrating_1m",
+      "position": [
+        -2.5,
+        -1.5,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "04_Reactor_FloorGrating_1m_141",
+      "room": "04_Reactor",
+      "kit": "Structure",
+      "asset": "FloorGrating_1m",
+      "position": [
+        -1.5,
+        -1.5,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "04_Reactor_FloorGrating_1m_142",
+      "room": "04_Reactor",
+      "kit": "Structure",
+      "asset": "FloorGrating_1m",
+      "position": [
+        -0.5,
+        -1.5,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "04_Reactor_FloorGrating_1m_143",
+      "room": "04_Reactor",
+      "kit": "Structure",
+      "asset": "FloorGrating_1m",
+      "position": [
+        0.5,
+        -1.5,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "04_Reactor_FloorGrating_1m_144",
+      "room": "04_Reactor",
+      "kit": "Structure",
+      "asset": "FloorGrating_1m",
+      "position": [
+        1.5,
+        -1.5,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "04_Reactor_FloorGrating_1m_145",
+      "room": "04_Reactor",
+      "kit": "Structure",
+      "asset": "FloorGrating_1m",
+      "position": [
+        2.5,
+        -1.5,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "04_Reactor_FloorGrating_1m_146",
+      "room": "04_Reactor",
+      "kit": "Structure",
+      "asset": "FloorGrating_1m",
+      "position": [
+        -2.5,
+        -0.5,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "04_Reactor_FloorGrating_1m_147",
+      "room": "04_Reactor",
+      "kit": "Structure",
+      "asset": "FloorGrating_1m",
+      "position": [
+        -1.5,
+        -0.5,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "04_Reactor_FloorGrating_1m_148",
+      "room": "04_Reactor",
+      "kit": "Structure",
+      "asset": "FloorGrating_1m",
+      "position": [
+        -0.5,
+        -0.5,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "04_Reactor_FloorGrating_1m_149",
+      "room": "04_Reactor",
+      "kit": "Structure",
+      "asset": "FloorGrating_1m",
+      "position": [
+        0.5,
+        -0.5,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "04_Reactor_FloorGrating_1m_150",
+      "room": "04_Reactor",
+      "kit": "Structure",
+      "asset": "FloorGrating_1m",
+      "position": [
+        1.5,
+        -0.5,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "04_Reactor_FloorGrating_1m_151",
+      "room": "04_Reactor",
+      "kit": "Structure",
+      "asset": "FloorGrating_1m",
+      "position": [
+        2.5,
+        -0.5,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "04_Reactor_CompartmentCeilingLight_152",
+      "room": "04_Reactor",
+      "kit": "Lighting",
+      "asset": "CompartmentCeilingLight",
+      "position": [
+        0,
+        -2.0,
+        2.44
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "04_Reactor_EmergencyLamp_153",
+      "room": "04_Reactor",
+      "kit": "Lighting",
+      "asset": "EmergencyLamp",
+      "position": [
+        -2.92,
+        -1.4,
+        1.95
+      ],
+      "rotation": [
+        0,
+        0,
+        90
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "04_Reactor_Interphone_154",
+      "room": "04_Reactor",
+      "kit": "Machines",
+      "asset": "Interphone",
+      "position": [
+        2.84,
+        -1.1,
+        1.4
+      ],
+      "rotation": [
+        0,
+        0,
+        -90
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "04_Reactor_Pipe_Straight_1m_155",
+      "room": "04_Reactor",
+      "kit": "Structure",
+      "asset": "Pipe_Straight_1m",
+      "position": [
+        -2.7,
+        -3.5,
+        2.12
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "04_Reactor_Pipe_Straight_1m_156",
+      "room": "04_Reactor",
+      "kit": "Structure",
+      "asset": "Pipe_Straight_1m",
+      "position": [
+        -2.7,
+        -2.5,
+        2.12
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "04_Reactor_Pipe_Straight_1m_157",
+      "room": "04_Reactor",
+      "kit": "Structure",
+      "asset": "Pipe_Straight_1m",
+      "position": [
+        -2.7,
+        -1.5,
+        2.12
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "04_Reactor_Pipe_Straight_1m_158",
+      "room": "04_Reactor",
+      "kit": "Structure",
+      "asset": "Pipe_Straight_1m",
+      "position": [
+        -2.7,
+        -0.5,
+        2.12
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "04_Reactor_Plate_Reactor_159",
+      "room": "04_Reactor",
+      "kit": "Signage",
+      "asset": "Plate_Reactor",
+      "position": [
+        -2.885,
+        -2.8,
+        1.78
+      ],
+      "rotation": [
+        0,
+        0,
+        90
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "05_Machines_EnvironmentHull_2m_160",
+      "room": "05_Machines",
+      "kit": "Environment",
+      "asset": "EnvironmentHull_2m",
+      "position": [
+        0,
+        -7,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "05_Machines_BilgeFloor_2m_161",
+      "room": "05_Machines",
+      "kit": "Structure",
+      "asset": "BilgeFloor_2m",
+      "position": [
+        0,
+        -7,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "05_Machines_EnvironmentHull_2m_162",
+      "room": "05_Machines",
+      "kit": "Environment",
+      "asset": "EnvironmentHull_2m",
+      "position": [
+        0,
+        -5,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "05_Machines_BilgeFloor_2m_163",
+      "room": "05_Machines",
+      "kit": "Structure",
+      "asset": "BilgeFloor_2m",
+      "position": [
+        0,
+        -5,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "05_Machines_FloorGrating_1m_164",
+      "room": "05_Machines",
+      "kit": "Structure",
+      "asset": "FloorGrating_1m",
+      "position": [
+        -2.5,
+        -7.5,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "05_Machines_FloorGrating_1m_165",
+      "room": "05_Machines",
+      "kit": "Structure",
+      "asset": "FloorGrating_1m",
+      "position": [
+        -1.5,
+        -7.5,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "05_Machines_FloorGrating_1m_166",
+      "room": "05_Machines",
+      "kit": "Structure",
+      "asset": "FloorGrating_1m",
+      "position": [
+        -0.5,
+        -7.5,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "05_Machines_FloorGrating_1m_167",
+      "room": "05_Machines",
+      "kit": "Structure",
+      "asset": "FloorGrating_1m",
+      "position": [
+        0.5,
+        -7.5,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "05_Machines_FloorGrating_1m_168",
+      "room": "05_Machines",
+      "kit": "Structure",
+      "asset": "FloorGrating_1m",
+      "position": [
+        1.5,
+        -7.5,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "05_Machines_FloorGrating_1m_169",
+      "room": "05_Machines",
+      "kit": "Structure",
+      "asset": "FloorGrating_1m",
+      "position": [
+        2.5,
+        -7.5,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "05_Machines_FloorGrating_1m_170",
+      "room": "05_Machines",
+      "kit": "Structure",
+      "asset": "FloorGrating_1m",
+      "position": [
+        -2.5,
+        -6.5,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "05_Machines_FloorGrating_1m_171",
+      "room": "05_Machines",
+      "kit": "Structure",
+      "asset": "FloorGrating_1m",
+      "position": [
+        -1.5,
+        -6.5,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "05_Machines_FloorGrating_1m_172",
+      "room": "05_Machines",
+      "kit": "Structure",
+      "asset": "FloorGrating_1m",
+      "position": [
+        -0.5,
+        -6.5,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "05_Machines_FloorGrating_1m_173",
+      "room": "05_Machines",
+      "kit": "Structure",
+      "asset": "FloorGrating_1m",
+      "position": [
+        0.5,
+        -6.5,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "05_Machines_FloorGrating_1m_174",
+      "room": "05_Machines",
+      "kit": "Structure",
+      "asset": "FloorGrating_1m",
+      "position": [
+        1.5,
+        -6.5,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "05_Machines_FloorGrating_1m_175",
+      "room": "05_Machines",
+      "kit": "Structure",
+      "asset": "FloorGrating_1m",
+      "position": [
+        2.5,
+        -6.5,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "05_Machines_FloorGrating_1m_176",
+      "room": "05_Machines",
+      "kit": "Structure",
+      "asset": "FloorGrating_1m",
+      "position": [
+        -2.5,
+        -5.5,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "05_Machines_FloorGrating_1m_177",
+      "room": "05_Machines",
+      "kit": "Structure",
+      "asset": "FloorGrating_1m",
+      "position": [
+        -1.5,
+        -5.5,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "05_Machines_FloorGrating_1m_178",
+      "room": "05_Machines",
+      "kit": "Structure",
+      "asset": "FloorGrating_1m",
+      "position": [
+        -0.5,
+        -5.5,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "05_Machines_FloorGrating_1m_179",
+      "room": "05_Machines",
+      "kit": "Structure",
+      "asset": "FloorGrating_1m",
+      "position": [
+        0.5,
+        -5.5,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "05_Machines_FloorGrating_1m_180",
+      "room": "05_Machines",
+      "kit": "Structure",
+      "asset": "FloorGrating_1m",
+      "position": [
+        1.5,
+        -5.5,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "05_Machines_FloorGrating_1m_181",
+      "room": "05_Machines",
+      "kit": "Structure",
+      "asset": "FloorGrating_1m",
+      "position": [
+        2.5,
+        -5.5,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "05_Machines_FloorGrating_1m_182",
+      "room": "05_Machines",
+      "kit": "Structure",
+      "asset": "FloorGrating_1m",
+      "position": [
+        -2.5,
+        -4.5,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "05_Machines_FloorGrating_1m_183",
+      "room": "05_Machines",
+      "kit": "Structure",
+      "asset": "FloorGrating_1m",
+      "position": [
+        -1.5,
+        -4.5,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "05_Machines_FloorGrating_1m_184",
+      "room": "05_Machines",
+      "kit": "Structure",
+      "asset": "FloorGrating_1m",
+      "position": [
+        -0.5,
+        -4.5,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "05_Machines_FloorGrating_1m_185",
+      "room": "05_Machines",
+      "kit": "Structure",
+      "asset": "FloorGrating_1m",
+      "position": [
+        0.5,
+        -4.5,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "05_Machines_FloorGrating_1m_186",
+      "room": "05_Machines",
+      "kit": "Structure",
+      "asset": "FloorGrating_1m",
+      "position": [
+        1.5,
+        -4.5,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "05_Machines_FloorGrating_1m_187",
+      "room": "05_Machines",
+      "kit": "Structure",
+      "asset": "FloorGrating_1m",
+      "position": [
+        2.5,
+        -4.5,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "05_Machines_CompartmentCeilingLight_188",
+      "room": "05_Machines",
+      "kit": "Lighting",
+      "asset": "CompartmentCeilingLight",
+      "position": [
+        0,
+        -6.0,
+        2.44
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "05_Machines_EmergencyLamp_189",
+      "room": "05_Machines",
+      "kit": "Lighting",
+      "asset": "EmergencyLamp",
+      "position": [
+        -2.92,
+        -5.4,
+        1.95
+      ],
+      "rotation": [
+        0,
+        0,
+        90
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "05_Machines_Interphone_190",
+      "room": "05_Machines",
+      "kit": "Machines",
+      "asset": "Interphone",
+      "position": [
+        2.84,
+        -5.1,
+        1.4
+      ],
+      "rotation": [
+        0,
+        0,
+        -90
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "05_Machines_Pipe_Straight_1m_191",
+      "room": "05_Machines",
+      "kit": "Structure",
+      "asset": "Pipe_Straight_1m",
+      "position": [
+        -2.7,
+        -7.5,
+        2.12
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "05_Machines_Pipe_Straight_1m_192",
+      "room": "05_Machines",
+      "kit": "Structure",
+      "asset": "Pipe_Straight_1m",
+      "position": [
+        -2.7,
+        -6.5,
+        2.12
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "05_Machines_Pipe_Straight_1m_193",
+      "room": "05_Machines",
+      "kit": "Structure",
+      "asset": "Pipe_Straight_1m",
+      "position": [
+        -2.7,
+        -5.5,
+        2.12
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "05_Machines_Pipe_Straight_1m_194",
+      "room": "05_Machines",
+      "kit": "Structure",
+      "asset": "Pipe_Straight_1m",
+      "position": [
+        -2.7,
+        -4.5,
+        2.12
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "05_Machines_Plate_Machines_195",
+      "room": "05_Machines",
+      "kit": "Signage",
+      "asset": "Plate_Machines",
+      "position": [
+        -2.885,
+        -6.8,
+        1.78
+      ],
+      "rotation": [
+        0,
+        0,
+        90
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "06_Living_EnvironmentHull_2m_196",
+      "room": "06_Living",
+      "kit": "Environment",
+      "asset": "EnvironmentHull_2m",
+      "position": [
+        0,
+        -13,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "06_Living_BilgeFloor_2m_197",
+      "room": "06_Living",
+      "kit": "Structure",
+      "asset": "BilgeFloor_2m",
+      "position": [
+        0,
+        -13,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "06_Living_EnvironmentHull_2m_198",
+      "room": "06_Living",
+      "kit": "Environment",
+      "asset": "EnvironmentHull_2m",
+      "position": [
+        0,
+        -11,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "06_Living_BilgeFloor_2m_199",
+      "room": "06_Living",
+      "kit": "Structure",
+      "asset": "BilgeFloor_2m",
+      "position": [
+        0,
+        -11,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "06_Living_EnvironmentHull_2m_200",
+      "room": "06_Living",
+      "kit": "Environment",
+      "asset": "EnvironmentHull_2m",
+      "position": [
+        0,
+        -9,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "06_Living_BilgeFloor_2m_201",
+      "room": "06_Living",
+      "kit": "Structure",
+      "asset": "BilgeFloor_2m",
+      "position": [
+        0,
+        -9,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "06_Living_FloorGrating_1m_202",
+      "room": "06_Living",
+      "kit": "Structure",
+      "asset": "FloorGrating_1m",
+      "position": [
+        -2.5,
+        -13.5,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "06_Living_FloorGrating_1m_203",
+      "room": "06_Living",
+      "kit": "Structure",
+      "asset": "FloorGrating_1m",
+      "position": [
+        -1.5,
+        -13.5,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "06_Living_FloorGrating_1m_204",
+      "room": "06_Living",
+      "kit": "Structure",
+      "asset": "FloorGrating_1m",
+      "position": [
+        -0.5,
+        -13.5,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "06_Living_FloorGrating_1m_205",
+      "room": "06_Living",
+      "kit": "Structure",
+      "asset": "FloorGrating_1m",
+      "position": [
+        0.5,
+        -13.5,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "06_Living_FloorGrating_1m_206",
+      "room": "06_Living",
+      "kit": "Structure",
+      "asset": "FloorGrating_1m",
+      "position": [
+        1.5,
+        -13.5,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "06_Living_FloorGrating_1m_207",
+      "room": "06_Living",
+      "kit": "Structure",
+      "asset": "FloorGrating_1m",
+      "position": [
+        2.5,
+        -13.5,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "06_Living_FloorGrating_1m_208",
+      "room": "06_Living",
+      "kit": "Structure",
+      "asset": "FloorGrating_1m",
+      "position": [
+        -2.5,
+        -12.5,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "06_Living_FloorGrating_1m_209",
+      "room": "06_Living",
+      "kit": "Structure",
+      "asset": "FloorGrating_1m",
+      "position": [
+        -1.5,
+        -12.5,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "06_Living_FloorGrating_1m_210",
+      "room": "06_Living",
+      "kit": "Structure",
+      "asset": "FloorGrating_1m",
+      "position": [
+        -0.5,
+        -12.5,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "06_Living_FloorGrating_1m_211",
+      "room": "06_Living",
+      "kit": "Structure",
+      "asset": "FloorGrating_1m",
+      "position": [
+        0.5,
+        -12.5,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "06_Living_FloorGrating_1m_212",
+      "room": "06_Living",
+      "kit": "Structure",
+      "asset": "FloorGrating_1m",
+      "position": [
+        1.5,
+        -12.5,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "06_Living_FloorGrating_1m_213",
+      "room": "06_Living",
+      "kit": "Structure",
+      "asset": "FloorGrating_1m",
+      "position": [
+        2.5,
+        -12.5,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "06_Living_FloorGrating_1m_214",
+      "room": "06_Living",
+      "kit": "Structure",
+      "asset": "FloorGrating_1m",
+      "position": [
+        -2.5,
+        -11.5,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "06_Living_FloorGrating_1m_215",
+      "room": "06_Living",
+      "kit": "Structure",
+      "asset": "FloorGrating_1m",
+      "position": [
+        -1.5,
+        -11.5,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "06_Living_FloorGrating_1m_216",
+      "room": "06_Living",
+      "kit": "Structure",
+      "asset": "FloorGrating_1m",
+      "position": [
+        -0.5,
+        -11.5,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "06_Living_FloorGrating_1m_217",
+      "room": "06_Living",
+      "kit": "Structure",
+      "asset": "FloorGrating_1m",
+      "position": [
+        0.5,
+        -11.5,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "06_Living_FloorGrating_1m_218",
+      "room": "06_Living",
+      "kit": "Structure",
+      "asset": "FloorGrating_1m",
+      "position": [
+        1.5,
+        -11.5,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "06_Living_FloorGrating_1m_219",
+      "room": "06_Living",
+      "kit": "Structure",
+      "asset": "FloorGrating_1m",
+      "position": [
+        2.5,
+        -11.5,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "06_Living_FloorGrating_1m_220",
+      "room": "06_Living",
+      "kit": "Structure",
+      "asset": "FloorGrating_1m",
+      "position": [
+        -2.5,
+        -10.5,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "06_Living_FloorGrating_1m_221",
+      "room": "06_Living",
+      "kit": "Structure",
+      "asset": "FloorGrating_1m",
+      "position": [
+        -1.5,
+        -10.5,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "06_Living_FloorGrating_1m_222",
+      "room": "06_Living",
+      "kit": "Structure",
+      "asset": "FloorGrating_1m",
+      "position": [
+        -0.5,
+        -10.5,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "06_Living_FloorGrating_1m_223",
+      "room": "06_Living",
+      "kit": "Structure",
+      "asset": "FloorGrating_1m",
+      "position": [
+        0.5,
+        -10.5,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "06_Living_FloorGrating_1m_224",
+      "room": "06_Living",
+      "kit": "Structure",
+      "asset": "FloorGrating_1m",
+      "position": [
+        1.5,
+        -10.5,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "06_Living_FloorGrating_1m_225",
+      "room": "06_Living",
+      "kit": "Structure",
+      "asset": "FloorGrating_1m",
+      "position": [
+        2.5,
+        -10.5,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "06_Living_FloorGrating_1m_226",
+      "room": "06_Living",
+      "kit": "Structure",
+      "asset": "FloorGrating_1m",
+      "position": [
+        -2.5,
+        -9.5,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "06_Living_FloorGrating_1m_227",
+      "room": "06_Living",
+      "kit": "Structure",
+      "asset": "FloorGrating_1m",
+      "position": [
+        -1.5,
+        -9.5,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "06_Living_FloorGrating_1m_228",
+      "room": "06_Living",
+      "kit": "Structure",
+      "asset": "FloorGrating_1m",
+      "position": [
+        -0.5,
+        -9.5,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "06_Living_FloorGrating_1m_229",
+      "room": "06_Living",
+      "kit": "Structure",
+      "asset": "FloorGrating_1m",
+      "position": [
+        0.5,
+        -9.5,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "06_Living_FloorGrating_1m_230",
+      "room": "06_Living",
+      "kit": "Structure",
+      "asset": "FloorGrating_1m",
+      "position": [
+        1.5,
+        -9.5,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "06_Living_FloorGrating_1m_231",
+      "room": "06_Living",
+      "kit": "Structure",
+      "asset": "FloorGrating_1m",
+      "position": [
+        2.5,
+        -9.5,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "06_Living_FloorGrating_1m_232",
+      "room": "06_Living",
+      "kit": "Structure",
+      "asset": "FloorGrating_1m",
+      "position": [
+        -2.5,
+        -8.5,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "06_Living_FloorGrating_1m_233",
+      "room": "06_Living",
+      "kit": "Structure",
+      "asset": "FloorGrating_1m",
+      "position": [
+        -1.5,
+        -8.5,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "06_Living_FloorGrating_1m_234",
+      "room": "06_Living",
+      "kit": "Structure",
+      "asset": "FloorGrating_1m",
+      "position": [
+        -0.5,
+        -8.5,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "06_Living_FloorGrating_1m_235",
+      "room": "06_Living",
+      "kit": "Structure",
+      "asset": "FloorGrating_1m",
+      "position": [
+        0.5,
+        -8.5,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "06_Living_FloorGrating_1m_236",
+      "room": "06_Living",
+      "kit": "Structure",
+      "asset": "FloorGrating_1m",
+      "position": [
+        1.5,
+        -8.5,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "06_Living_FloorGrating_1m_237",
+      "room": "06_Living",
+      "kit": "Structure",
+      "asset": "FloorGrating_1m",
+      "position": [
+        2.5,
+        -8.5,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "06_Living_CompartmentCeilingLight_238",
+      "room": "06_Living",
+      "kit": "Lighting",
+      "asset": "CompartmentCeilingLight",
+      "position": [
+        0,
+        -11.0,
+        2.44
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "06_Living_EmergencyLamp_239",
+      "room": "06_Living",
+      "kit": "Lighting",
+      "asset": "EmergencyLamp",
+      "position": [
+        -2.92,
+        -10.4,
+        1.95
+      ],
+      "rotation": [
+        0,
+        0,
+        90
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "06_Living_Interphone_240",
+      "room": "06_Living",
+      "kit": "Machines",
+      "asset": "Interphone",
+      "position": [
+        2.84,
+        -10.1,
+        1.4
+      ],
+      "rotation": [
+        0,
+        0,
+        -90
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "06_Living_Pipe_Straight_1m_241",
+      "room": "06_Living",
+      "kit": "Structure",
+      "asset": "Pipe_Straight_1m",
+      "position": [
+        -2.7,
+        -13.5,
+        2.12
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "06_Living_Pipe_Straight_1m_242",
+      "room": "06_Living",
+      "kit": "Structure",
+      "asset": "Pipe_Straight_1m",
+      "position": [
+        -2.7,
+        -12.5,
+        2.12
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "06_Living_Pipe_Straight_1m_243",
+      "room": "06_Living",
+      "kit": "Structure",
+      "asset": "Pipe_Straight_1m",
+      "position": [
+        -2.7,
+        -11.5,
+        2.12
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "06_Living_Pipe_Straight_1m_244",
+      "room": "06_Living",
+      "kit": "Structure",
+      "asset": "Pipe_Straight_1m",
+      "position": [
+        -2.7,
+        -10.5,
+        2.12
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "06_Living_Pipe_Straight_1m_245",
+      "room": "06_Living",
+      "kit": "Structure",
+      "asset": "Pipe_Straight_1m",
+      "position": [
+        -2.7,
+        -9.5,
+        2.12
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "06_Living_Pipe_Straight_1m_246",
+      "room": "06_Living",
+      "kit": "Structure",
+      "asset": "Pipe_Straight_1m",
+      "position": [
+        -2.7,
+        -8.5,
+        2.12
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "06_Living_Plate_Living_247",
+      "room": "06_Living",
+      "kit": "Signage",
+      "asset": "Plate_Living",
+      "position": [
+        -2.885,
+        -11.8,
+        1.78
+      ],
+      "rotation": [
+        0,
+        0,
+        90
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "02_Central_Bulkhead_Left_248",
+      "room": "02_Central",
+      "kit": "Environment",
+      "asset": "Bulkhead_Left",
+      "position": [
+        0,
+        10,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "02_Central_HatchDoor_249",
+      "room": "02_Central",
+      "kit": "Structure",
+      "asset": "HatchDoor",
+      "position": [
+        -1.9,
+        9.9,
+        0.06
+      ],
+      "rotation": [
+        0,
+        0,
+        -105
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "02_Central_PrivacyBaffle_250",
+      "room": "02_Central",
+      "kit": "Environment",
+      "asset": "PrivacyBaffle",
+      "position": [
+        -1.45,
+        9.05,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "03_Radio_Bulkhead_Right_251",
+      "room": "03_Radio",
+      "kit": "Environment",
+      "asset": "Bulkhead_Right",
+      "position": [
+        0,
+        4,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "03_Radio_HatchDoor_252",
+      "room": "03_Radio",
+      "kit": "Structure",
+      "asset": "HatchDoor",
+      "position": [
+        1.0,
+        3.9,
+        0.06
+      ],
+      "rotation": [
+        0,
+        0,
+        105
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "03_Radio_PrivacyBaffle_253",
+      "room": "03_Radio",
+      "kit": "Environment",
+      "asset": "PrivacyBaffle",
+      "position": [
+        1.45,
+        3.05,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "04_Reactor_Bulkhead_Left_254",
+      "room": "04_Reactor",
+      "kit": "Environment",
+      "asset": "Bulkhead_Left",
+      "position": [
+        0,
+        0,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "04_Reactor_HatchDoor_255",
+      "room": "04_Reactor",
+      "kit": "Structure",
+      "asset": "HatchDoor",
+      "position": [
+        -1.9,
+        -0.1,
+        0.06
+      ],
+      "rotation": [
+        0,
+        0,
+        -105
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "04_Reactor_PrivacyBaffle_256",
+      "room": "04_Reactor",
+      "kit": "Environment",
+      "asset": "PrivacyBaffle",
+      "position": [
+        -1.45,
+        -0.95,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "05_Machines_Bulkhead_Right_257",
+      "room": "05_Machines",
+      "kit": "Environment",
+      "asset": "Bulkhead_Right",
+      "position": [
+        0,
+        -4,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "05_Machines_HatchDoor_258",
+      "room": "05_Machines",
+      "kit": "Structure",
+      "asset": "HatchDoor",
+      "position": [
+        1.0,
+        -4.1,
+        0.06
+      ],
+      "rotation": [
+        0,
+        0,
+        105
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "05_Machines_PrivacyBaffle_259",
+      "room": "05_Machines",
+      "kit": "Environment",
+      "asset": "PrivacyBaffle",
+      "position": [
+        1.45,
+        -4.95,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "06_Living_Bulkhead_Left_260",
+      "room": "06_Living",
+      "kit": "Environment",
+      "asset": "Bulkhead_Left",
+      "position": [
+        0,
+        -8,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "06_Living_HatchDoor_261",
+      "room": "06_Living",
+      "kit": "Structure",
+      "asset": "HatchDoor",
+      "position": [
+        -1.9,
+        -8.1,
+        0.06
+      ],
+      "rotation": [
+        0,
+        0,
+        -105
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "06_Living_PrivacyBaffle_262",
+      "room": "06_Living",
+      "kit": "Environment",
+      "asset": "PrivacyBaffle",
+      "position": [
+        -1.45,
+        -8.95,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "01_Torpedoes_Bulkhead_Solid_263",
+      "room": "01_Torpedoes",
+      "kit": "Structure",
+      "asset": "Bulkhead_Solid",
+      "position": [
+        0,
+        14,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "06_Living_Bulkhead_AirlockExit_264",
+      "room": "06_Living",
+      "kit": "Environment",
+      "asset": "Bulkhead_AirlockExit",
+      "position": [
+        0,
+        -14,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "02_Central_CentralDepthTrimConsole_265",
+      "room": "02_Central",
+      "kit": "Central",
+      "asset": "CentralDepthTrimConsole",
+      "position": [
+        -2.18,
+        7.3,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        90
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "02_Central_CentralSteeringWheel_266",
+      "room": "02_Central",
+      "kit": "Central",
+      "asset": "CentralSteeringWheel",
+      "position": [
+        -1.9,
+        8.3,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        90
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "02_Central_EngineTelegraphFivePosition_267",
+      "room": "02_Central",
+      "kit": "Central",
+      "asset": "EngineTelegraphFivePosition",
+      "position": [
+        -2.3,
+        5.75,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        90
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "02_Central_CentralChartTable_268",
+      "room": "02_Central",
+      "kit": "Central",
+      "asset": "CentralChartTable",
+      "position": [
+        2.05,
+        6.1,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        -90
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "02_Central_ChartPaperBlank_269",
+      "room": "02_Central",
+      "kit": "Central",
+      "asset": "ChartPaperBlank",
+      "position": [
+        0,
+        0,
+        0.936
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "02_Central_CentralChartTable_268",
+      "partStates": []
+    },
+    {
+      "id": "02_Central_ManualOK114OpenBinder_270",
+      "room": "02_Central",
+      "kit": "Central",
+      "asset": "ManualOK114OpenBinder",
+      "position": [
+        0.2,
+        0.05,
+        0.946
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "02_Central_CentralChartTable_268",
+      "partStates": []
+    },
+    {
+      "id": "02_Central_GreasePencil_271",
+      "room": "02_Central",
+      "kit": "Central",
+      "asset": "GreasePencil",
+      "position": [
+        -0.48,
+        -0.32,
+        0.94
+      ],
+      "rotation": [
+        90,
+        0,
+        0
+      ],
+      "parent": "02_Central_CentralChartTable_268",
+      "partStates": []
+    },
+    {
+      "id": "02_Central_CentralInstrumentConsole_272",
+      "room": "02_Central",
+      "kit": "Central",
+      "asset": "CentralInstrumentConsole",
+      "position": [
+        2.25,
+        8.05,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        -90
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "02_Central_PneumaticArrivalStation_273",
+      "room": "02_Central",
+      "kit": "Central",
+      "asset": "PneumaticArrivalStation",
+      "position": [
+        2.78,
+        5.0,
+        0.85
+      ],
+      "rotation": [
+        0,
+        0,
+        -90
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "02_Central_PneumaticCapsule_274",
+      "room": "02_Central",
+      "kit": "Central",
+      "asset": "PneumaticCapsule",
+      "position": [
+        0,
+        -0.3,
+        0.35
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "02_Central_PneumaticArrivalStation_273",
+      "partStates": []
+    },
+    {
+      "id": "02_Central_RolledOrderPaper_275",
+      "room": "02_Central",
+      "kit": "Central",
+      "asset": "RolledOrderPaper",
+      "position": [
+        0,
+        0,
+        0.06
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "02_Central_PneumaticCapsule_274",
+      "partStates": []
+    },
+    {
+      "id": "03_Radio_SonarConsole_276",
+      "room": "03_Radio",
+      "kit": "Radio",
+      "asset": "SonarConsole",
+      "position": [
+        -2.23,
+        2.1,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        90
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "03_Radio_SonarHeadphones_277",
+      "room": "03_Radio",
+      "kit": "Radio",
+      "asset": "SonarHeadphones",
+      "position": [
+        0.5,
+        -0.31,
+        0.7
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "03_Radio_SonarConsole_276",
+      "partStates": []
+    },
+    {
+      "id": "03_Radio_HeadphoneCableCoiled_278",
+      "room": "03_Radio",
+      "kit": "Radio",
+      "asset": "HeadphoneCableCoiled",
+      "position": [
+        0.5,
+        -0.31,
+        0.3
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "03_Radio_SonarConsole_276",
+      "partStates": []
+    },
+    {
+      "id": "03_Radio_HydrophoneCrankStation_279",
+      "room": "03_Radio",
+      "kit": "Radio",
+      "asset": "HydrophoneCrankStation",
+      "position": [
+        -2.86,
+        0.75,
+        0.85
+      ],
+      "rotation": [
+        0,
+        0,
+        90
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "03_Radio_ChartTable_280",
+      "room": "03_Radio",
+      "kit": "Environment",
+      "asset": "ChartTable",
+      "position": [
+        2.13,
+        2.1,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        -90
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "03_Radio_VLFRadioStation_281",
+      "room": "03_Radio",
+      "kit": "Radio",
+      "asset": "VLFRadioStation",
+      "position": [
+        -0.3,
+        0.1,
+        0.98
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "03_Radio_ChartTable_280",
+      "partStates": []
+    },
+    {
+      "id": "03_Radio_MechanicalCipherMachine_282",
+      "room": "03_Radio",
+      "kit": "Radio",
+      "asset": "MechanicalCipherMachine",
+      "position": [
+        0.48,
+        -0.03,
+        0.98
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "03_Radio_ChartTable_280",
+      "partStates": []
+    },
+    {
+      "id": "03_Radio_CipherMessagePad_283",
+      "room": "03_Radio",
+      "kit": "Radio",
+      "asset": "CipherMessagePad",
+      "position": [
+        0,
+        0.2,
+        0.39
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "03_Radio_MechanicalCipherMachine_282",
+      "partStates": []
+    },
+    {
+      "id": "03_Radio_MagneticTapeRecorder_284",
+      "room": "03_Radio",
+      "kit": "Radio",
+      "asset": "MagneticTapeRecorder",
+      "position": [
+        2.75,
+        0.72,
+        0.83
+      ],
+      "rotation": [
+        0,
+        0,
+        -90
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "03_Radio_TapeReelBlank_285",
+      "room": "03_Radio",
+      "kit": "Radio",
+      "asset": "TapeReelBlank",
+      "position": [
+        -0.205,
+        -0.155,
+        0.47
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "03_Radio_MagneticTapeRecorder_284",
+      "partStates": []
+    },
+    {
+      "id": "03_Radio_TapeReelRecorded_286",
+      "room": "03_Radio",
+      "kit": "Radio",
+      "asset": "TapeReelRecorded",
+      "position": [
+        0.205,
+        -0.155,
+        0.47
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "03_Radio_MagneticTapeRecorder_284",
+      "partStates": []
+    },
+    {
+      "id": "03_Radio_VLFAntennaDeployable_287",
+      "room": "03_Radio",
+      "kit": "Radio",
+      "asset": "VLFAntennaDeployable",
+      "position": [
+        2.7,
+        3.3,
+        0.65
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "04_Reactor_RK1_Console_288",
+      "room": "04_Reactor",
+      "kit": "Reactor",
+      "asset": "RK1_Console",
+      "position": [
+        -2.24,
+        -2,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        90
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "04_Reactor_GaugeRound_M_289",
+      "room": "04_Reactor",
+      "kit": "Instruments",
+      "asset": "GaugeRound_M",
+      "position": [
+        -0.54,
+        -0.1755307557046612,
+        1.1648972437936003
+      ],
+      "rotation": [
+        -22,
+        0,
+        0
+      ],
+      "parent": "04_Reactor_RK1_Console_288",
+      "partStates": []
+    },
+    {
+      "id": "04_Reactor_GaugeRound_M_290",
+      "room": "04_Reactor",
+      "kit": "Instruments",
+      "asset": "GaugeRound_M",
+      "position": [
+        -0.18000000000000005,
+        -0.1755307557046612,
+        1.1648972437936003
+      ],
+      "rotation": [
+        -22,
+        0,
+        0
+      ],
+      "parent": "04_Reactor_RK1_Console_288",
+      "partStates": []
+    },
+    {
+      "id": "04_Reactor_GaugeRound_M_291",
+      "room": "04_Reactor",
+      "kit": "Instruments",
+      "asset": "GaugeRound_M",
+      "position": [
+        0.17999999999999994,
+        -0.1755307557046612,
+        1.1648972437936003
+      ],
+      "rotation": [
+        -22,
+        0,
+        0
+      ],
+      "parent": "04_Reactor_RK1_Console_288",
+      "partStates": []
+    },
+    {
+      "id": "04_Reactor_GaugeRound_M_292",
+      "room": "04_Reactor",
+      "kit": "Instruments",
+      "asset": "GaugeRound_M",
+      "position": [
+        0.54,
+        -0.1755307557046612,
+        1.1648972437936003
+      ],
+      "rotation": [
+        -22,
+        0,
+        0
+      ],
+      "parent": "04_Reactor_RK1_Console_288",
+      "partStates": []
+    },
+    {
+      "id": "04_Reactor_SelectorRotary_293",
+      "room": "04_Reactor",
+      "kit": "Instruments",
+      "asset": "SelectorRotary",
+      "position": [
+        0,
+        -0.04441844800909199,
+        1.489411592891976
+      ],
+      "rotation": [
+        -22,
+        0,
+        0
+      ],
+      "parent": "04_Reactor_RK1_Console_288",
+      "partStates": []
+    },
+    {
+      "id": "04_Reactor_MachineBreaker_294",
+      "room": "04_Reactor",
+      "kit": "Machines",
+      "asset": "MachineBreaker",
+      "position": [
+        -0.49,
+        -0.314,
+        0.86
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "04_Reactor_RK1_Console_288",
+      "partStates": []
+    },
+    {
+      "id": "04_Reactor_MachineBreaker_295",
+      "room": "04_Reactor",
+      "kit": "Machines",
+      "asset": "MachineBreaker",
+      "position": [
+        -0.35,
+        -0.314,
+        0.86
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "04_Reactor_RK1_Console_288",
+      "partStates": []
+    },
+    {
+      "id": "04_Reactor_MachineBreaker_296",
+      "room": "04_Reactor",
+      "kit": "Machines",
+      "asset": "MachineBreaker",
+      "position": [
+        -0.20999999999999996,
+        -0.314,
+        0.86
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "04_Reactor_RK1_Console_288",
+      "partStates": []
+    },
+    {
+      "id": "04_Reactor_MachineBreaker_297",
+      "room": "04_Reactor",
+      "kit": "Machines",
+      "asset": "MachineBreaker",
+      "position": [
+        -0.06999999999999995,
+        -0.314,
+        0.86
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "04_Reactor_RK1_Console_288",
+      "partStates": []
+    },
+    {
+      "id": "04_Reactor_MachineBreaker_298",
+      "room": "04_Reactor",
+      "kit": "Machines",
+      "asset": "MachineBreaker",
+      "position": [
+        0.07000000000000006,
+        -0.314,
+        0.86
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "04_Reactor_RK1_Console_288",
+      "partStates": []
+    },
+    {
+      "id": "04_Reactor_MachineBreaker_299",
+      "room": "04_Reactor",
+      "kit": "Machines",
+      "asset": "MachineBreaker",
+      "position": [
+        0.21000000000000008,
+        -0.314,
+        0.86
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "04_Reactor_RK1_Console_288",
+      "partStates": []
+    },
+    {
+      "id": "04_Reactor_MachineBreaker_300",
+      "room": "04_Reactor",
+      "kit": "Machines",
+      "asset": "MachineBreaker",
+      "position": [
+        0.3500000000000001,
+        -0.314,
+        0.86
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "04_Reactor_RK1_Console_288",
+      "partStates": []
+    },
+    {
+      "id": "04_Reactor_MachineBreaker_301",
+      "room": "04_Reactor",
+      "kit": "Machines",
+      "asset": "MachineBreaker",
+      "position": [
+        0.4900000000000001,
+        -0.314,
+        0.86
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "04_Reactor_RK1_Console_288",
+      "partStates": []
+    },
+    {
+      "id": "04_Reactor_ScramLever_302",
+      "room": "04_Reactor",
+      "kit": "Reactor",
+      "asset": "ScramLever",
+      "position": [
+        -2.75,
+        -0.8,
+        1.15
+      ],
+      "rotation": [
+        0,
+        0,
+        90
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "04_Reactor_PrimaryPump_303",
+      "room": "04_Reactor",
+      "kit": "Primary",
+      "asset": "PrimaryPump",
+      "position": [
+        2.0,
+        -2.9,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        90
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "04_Reactor_PrimaryPump_304",
+      "room": "04_Reactor",
+      "kit": "Primary",
+      "asset": "PrimaryPump",
+      "position": [
+        2.0,
+        -1.1,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        90
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "04_Reactor_PrimaryValve_305",
+      "room": "04_Reactor",
+      "kit": "Primary",
+      "asset": "PrimaryValve",
+      "position": [
+        2.6,
+        -3.3,
+        1.2
+      ],
+      "rotation": [
+        0,
+        0,
+        -90
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "04_Reactor_PrimaryValve_306",
+      "room": "04_Reactor",
+      "kit": "Primary",
+      "asset": "PrimaryValve",
+      "position": [
+        2.6,
+        -2.5,
+        1.2
+      ],
+      "rotation": [
+        0,
+        0,
+        -90
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "04_Reactor_PrimaryValve_307",
+      "room": "04_Reactor",
+      "kit": "Primary",
+      "asset": "PrimaryValve",
+      "position": [
+        2.6,
+        -1.7,
+        1.2
+      ],
+      "rotation": [
+        0,
+        0,
+        -90
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "04_Reactor_PrimaryValve_308",
+      "room": "04_Reactor",
+      "kit": "Primary",
+      "asset": "PrimaryValve",
+      "position": [
+        2.6,
+        -0.9,
+        1.2
+      ],
+      "rotation": [
+        0,
+        0,
+        -90
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "05_Machines_ElectricalPanel_309",
+      "room": "05_Machines",
+      "kit": "Machines",
+      "asset": "ElectricalPanel",
+      "position": [
+        -2.69,
+        -5.6,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        90
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "05_Machines_MachineBreaker_310",
+      "room": "05_Machines",
+      "kit": "Machines",
+      "asset": "MachineBreaker",
+      "position": [
+        -0.4,
+        -0.25,
+        0.54
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "05_Machines_ElectricalPanel_309",
+      "partStates": []
+    },
+    {
+      "id": "05_Machines_MachineBreaker_311",
+      "room": "05_Machines",
+      "kit": "Machines",
+      "asset": "MachineBreaker",
+      "position": [
+        -0.2,
+        -0.25,
+        0.54
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "05_Machines_ElectricalPanel_309",
+      "partStates": []
+    },
+    {
+      "id": "05_Machines_MachineBreaker_312",
+      "room": "05_Machines",
+      "kit": "Machines",
+      "asset": "MachineBreaker",
+      "position": [
+        0.0,
+        -0.25,
+        0.54
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "05_Machines_ElectricalPanel_309",
+      "partStates": []
+    },
+    {
+      "id": "05_Machines_MachineBreaker_313",
+      "room": "05_Machines",
+      "kit": "Machines",
+      "asset": "MachineBreaker",
+      "position": [
+        0.20000000000000007,
+        -0.25,
+        0.54
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "05_Machines_ElectricalPanel_309",
+      "partStates": []
+    },
+    {
+      "id": "05_Machines_MachineBreaker_314",
+      "room": "05_Machines",
+      "kit": "Machines",
+      "asset": "MachineBreaker",
+      "position": [
+        0.4,
+        -0.25,
+        0.54
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "05_Machines_ElectricalPanel_309",
+      "partStates": []
+    },
+    {
+      "id": "05_Machines_MachineBreaker_315",
+      "room": "05_Machines",
+      "kit": "Machines",
+      "asset": "MachineBreaker",
+      "position": [
+        -0.4,
+        -0.25,
+        0.77
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "05_Machines_ElectricalPanel_309",
+      "partStates": []
+    },
+    {
+      "id": "05_Machines_MachineBreaker_316",
+      "room": "05_Machines",
+      "kit": "Machines",
+      "asset": "MachineBreaker",
+      "position": [
+        -0.2,
+        -0.25,
+        0.77
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "05_Machines_ElectricalPanel_309",
+      "partStates": []
+    },
+    {
+      "id": "05_Machines_MachineBreaker_317",
+      "room": "05_Machines",
+      "kit": "Machines",
+      "asset": "MachineBreaker",
+      "position": [
+        0.0,
+        -0.25,
+        0.77
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "05_Machines_ElectricalPanel_309",
+      "partStates": []
+    },
+    {
+      "id": "05_Machines_MachineBreaker_318",
+      "room": "05_Machines",
+      "kit": "Machines",
+      "asset": "MachineBreaker",
+      "position": [
+        0.20000000000000007,
+        -0.25,
+        0.77
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "05_Machines_ElectricalPanel_309",
+      "partStates": []
+    },
+    {
+      "id": "05_Machines_MachineBreaker_319",
+      "room": "05_Machines",
+      "kit": "Machines",
+      "asset": "MachineBreaker",
+      "position": [
+        0.4,
+        -0.25,
+        0.77
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "05_Machines_ElectricalPanel_309",
+      "partStates": []
+    },
+    {
+      "id": "05_Machines_MachineBreaker_320",
+      "room": "05_Machines",
+      "kit": "Machines",
+      "asset": "MachineBreaker",
+      "position": [
+        -0.4,
+        -0.25,
+        1.0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "05_Machines_ElectricalPanel_309",
+      "partStates": []
+    },
+    {
+      "id": "05_Machines_MachineBreaker_321",
+      "room": "05_Machines",
+      "kit": "Machines",
+      "asset": "MachineBreaker",
+      "position": [
+        -0.2,
+        -0.25,
+        1.0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "05_Machines_ElectricalPanel_309",
+      "partStates": []
+    },
+    {
+      "id": "05_Machines_MachineBreaker_322",
+      "room": "05_Machines",
+      "kit": "Machines",
+      "asset": "MachineBreaker",
+      "position": [
+        0.0,
+        -0.25,
+        1.0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "05_Machines_ElectricalPanel_309",
+      "partStates": []
+    },
+    {
+      "id": "05_Machines_MachineBreaker_323",
+      "room": "05_Machines",
+      "kit": "Machines",
+      "asset": "MachineBreaker",
+      "position": [
+        0.20000000000000007,
+        -0.25,
+        1.0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "05_Machines_ElectricalPanel_309",
+      "partStates": []
+    },
+    {
+      "id": "05_Machines_MachineBreaker_324",
+      "room": "05_Machines",
+      "kit": "Machines",
+      "asset": "MachineBreaker",
+      "position": [
+        0.4,
+        -0.25,
+        1.0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "05_Machines_ElectricalPanel_309",
+      "partStates": []
+    },
+    {
+      "id": "05_Machines_MachineBreaker_325",
+      "room": "05_Machines",
+      "kit": "Machines",
+      "asset": "MachineBreaker",
+      "position": [
+        -0.4,
+        -0.25,
+        1.23
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "05_Machines_ElectricalPanel_309",
+      "partStates": []
+    },
+    {
+      "id": "05_Machines_MachineBreaker_326",
+      "room": "05_Machines",
+      "kit": "Machines",
+      "asset": "MachineBreaker",
+      "position": [
+        -0.2,
+        -0.25,
+        1.23
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "05_Machines_ElectricalPanel_309",
+      "partStates": []
+    },
+    {
+      "id": "05_Machines_MachineBreaker_327",
+      "room": "05_Machines",
+      "kit": "Machines",
+      "asset": "MachineBreaker",
+      "position": [
+        0.0,
+        -0.25,
+        1.23
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "05_Machines_ElectricalPanel_309",
+      "partStates": []
+    },
+    {
+      "id": "05_Machines_MachineBreaker_328",
+      "room": "05_Machines",
+      "kit": "Machines",
+      "asset": "MachineBreaker",
+      "position": [
+        0.20000000000000007,
+        -0.25,
+        1.23
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "05_Machines_ElectricalPanel_309",
+      "partStates": []
+    },
+    {
+      "id": "05_Machines_MachineBreaker_329",
+      "room": "05_Machines",
+      "kit": "Machines",
+      "asset": "MachineBreaker",
+      "position": [
+        0.4,
+        -0.25,
+        1.23
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "05_Machines_ElectricalPanel_309",
+      "partStates": []
+    },
+    {
+      "id": "05_Machines_GaugeRound_M_330",
+      "room": "05_Machines",
+      "kit": "Instruments",
+      "asset": "GaugeRound_M",
+      "position": [
+        -0.32,
+        -0.24,
+        1.52
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "05_Machines_ElectricalPanel_309",
+      "partStates": []
+    },
+    {
+      "id": "05_Machines_GaugeRound_M_331",
+      "room": "05_Machines",
+      "kit": "Instruments",
+      "asset": "GaugeRound_M",
+      "position": [
+        0.32,
+        -0.24,
+        1.52
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "05_Machines_ElectricalPanel_309",
+      "partStates": []
+    },
+    {
+      "id": "05_Machines_TurbineReducer_332",
+      "room": "05_Machines",
+      "kit": "Machines",
+      "asset": "TurbineReducer",
+      "position": [
+        2.14,
+        -6.2,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        90
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "05_Machines_GaugeRound_S_333",
+      "room": "05_Machines",
+      "kit": "Instruments",
+      "asset": "GaugeRound_S",
+      "position": [
+        0.74,
+        -0.34,
+        0.71
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "05_Machines_TurbineReducer_332",
+      "partStates": []
+    },
+    {
+      "id": "05_Machines_BatteryBank_334",
+      "room": "05_Machines",
+      "kit": "Machines",
+      "asset": "BatteryBank",
+      "position": [
+        -1.85,
+        -6.8,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        90
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "05_Machines_GaugeRound_S_335",
+      "room": "05_Machines",
+      "kit": "Instruments",
+      "asset": "GaugeRound_S",
+      "position": [
+        0.49,
+        -0.15,
+        0.73
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "05_Machines_BatteryBank_334",
+      "partStates": []
+    },
+    {
+      "id": "04_Reactor_BilgePump_336",
+      "room": "04_Reactor",
+      "kit": "Machines",
+      "asset": "BilgePump",
+      "position": [
+        0,
+        -3.45,
+        -0.12
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "05_Machines_BilgePump_337",
+      "room": "05_Machines",
+      "kit": "Machines",
+      "asset": "BilgePump",
+      "position": [
+        0,
+        -7.35,
+        -0.12
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "01_Torpedoes_CargoTorpedoTube_338",
+      "room": "01_Torpedoes",
+      "kit": "Torpedoes",
+      "asset": "CargoTorpedoTube",
+      "position": [
+        -2.1,
+        12.35,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        180
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "01_Torpedoes_CargoTorpedoTube_339",
+      "room": "01_Torpedoes",
+      "kit": "Torpedoes",
+      "asset": "CargoTorpedoTube",
+      "position": [
+        -2.1,
+        12.35,
+        1.02
+      ],
+      "rotation": [
+        0,
+        0,
+        180
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "01_Torpedoes_CargoTorpedoTube_340",
+      "room": "01_Torpedoes",
+      "kit": "Torpedoes",
+      "asset": "CargoTorpedoTube",
+      "position": [
+        2.1,
+        12.35,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        180
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "01_Torpedoes_CargoTorpedoTube_341",
+      "room": "01_Torpedoes",
+      "kit": "Torpedoes",
+      "asset": "CargoTorpedoTube",
+      "position": [
+        2.1,
+        12.35,
+        1.02
+      ],
+      "rotation": [
+        0,
+        0,
+        180
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "01_Torpedoes_CargoRack_342",
+      "room": "01_Torpedoes",
+      "kit": "Torpedoes",
+      "asset": "CargoRack",
+      "position": [
+        0,
+        13.38,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "01_Torpedoes_CargoCrate_M_343",
+      "room": "01_Torpedoes",
+      "kit": "Environment",
+      "asset": "CargoCrate_M",
+      "position": [
+        0,
+        0,
+        0.18
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "01_Torpedoes_CargoRack_342",
+      "partStates": []
+    },
+    {
+      "id": "01_Torpedoes_CargoTieDownStrap_344",
+      "room": "01_Torpedoes",
+      "kit": "Torpedoes",
+      "asset": "CargoTieDownStrap",
+      "position": [
+        0,
+        0,
+        0.7
+      ],
+      "rotation": [
+        0,
+        0,
+        90
+      ],
+      "parent": "01_Torpedoes_CargoRack_342",
+      "partStates": []
+    },
+    {
+      "id": "01_Torpedoes_CargoCrate_M_345",
+      "room": "01_Torpedoes",
+      "kit": "Environment",
+      "asset": "CargoCrate_M",
+      "position": [
+        0,
+        0,
+        0.82
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "01_Torpedoes_CargoRack_342",
+      "partStates": []
+    },
+    {
+      "id": "01_Torpedoes_CargoTieDownStrap_346",
+      "room": "01_Torpedoes",
+      "kit": "Torpedoes",
+      "asset": "CargoTieDownStrap",
+      "position": [
+        0,
+        0,
+        1.3399999999999999
+      ],
+      "rotation": [
+        0,
+        0,
+        90
+      ],
+      "parent": "01_Torpedoes_CargoRack_342",
+      "partStates": []
+    },
+    {
+      "id": "06_Living_BunkBed_Double_347",
+      "room": "06_Living",
+      "kit": "Living",
+      "asset": "BunkBed_Double",
+      "position": [
+        -2.32,
+        -10.1,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        90
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "06_Living_GalleyStove_348",
+      "room": "06_Living",
+      "kit": "Living",
+      "asset": "GalleyStove",
+      "position": [
+        2.38,
+        -10.85,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        -90
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "06_Living_SoupPot_349",
+      "room": "06_Living",
+      "kit": "Living",
+      "asset": "SoupPot",
+      "position": [
+        -0.22,
+        0,
+        0.99
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "06_Living_GalleyStove_348",
+      "partStates": []
+    },
+    {
+      "id": "06_Living_DeconShowerCabin_350",
+      "room": "06_Living",
+      "kit": "Living",
+      "asset": "DeconShowerCabin",
+      "position": [
+        2.39,
+        -9.55,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        -90
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "06_Living_DeconWaterLance_351",
+      "room": "06_Living",
+      "kit": "Living",
+      "asset": "DeconWaterLance",
+      "position": [
+        -0.22,
+        0.38,
+        0.55
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "06_Living_DeconShowerCabin_350",
+      "partStates": []
+    },
+    {
+      "id": "06_Living_DivingSuitOnRack_352",
+      "room": "06_Living",
+      "kit": "Living",
+      "asset": "DivingSuitOnRack",
+      "position": [
+        2.65,
+        -8.55,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        -90
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "06_Living_DivingHelmet_353",
+      "room": "06_Living",
+      "kit": "Living",
+      "asset": "DivingHelmet",
+      "position": [
+        0,
+        0,
+        1.51
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "06_Living_DivingSuitOnRack_352",
+      "partStates": []
+    },
+    {
+      "id": "06_Living_PersonalLocker_354",
+      "room": "06_Living",
+      "kit": "Living",
+      "asset": "PersonalLocker",
+      "position": [
+        -2.15,
+        -13.7,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        180
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "06_Living_PersonalLocker_355",
+      "room": "06_Living",
+      "kit": "Living",
+      "asset": "PersonalLocker",
+      "position": [
+        -1.53,
+        -13.7,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        180
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "06_Living_PersonalLocker_356",
+      "room": "06_Living",
+      "kit": "Living",
+      "asset": "PersonalLocker",
+      "position": [
+        -0.91,
+        -13.7,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        180
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "06_Living_PersonalLocker_357",
+      "room": "06_Living",
+      "kit": "Living",
+      "asset": "PersonalLocker",
+      "position": [
+        -0.29,
+        -13.7,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        180
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "06_Living_DivingAirlockChamber_358",
+      "room": "06_Living",
+      "kit": "Living",
+      "asset": "DivingAirlockChamber",
+      "position": [
+        1.95,
+        -12.95,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        180
+      ],
+      "parent": "",
+      "partStates": [
+        {
+          "name": "Hatch0",
+          "rotation": [
+            0,
+            0,
+            -105
+          ]
+        }
+      ]
+    },
+    {
+      "id": "06_Living_UmbilicalReel_359",
+      "room": "06_Living",
+      "kit": "Living",
+      "asset": "UmbilicalReel",
+      "position": [
+        2.65,
+        -11.65,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        -90
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "06_Living_MessTable_360",
+      "room": "06_Living",
+      "kit": "Living",
+      "asset": "MessTable",
+      "position": [
+        -2.2,
+        -12.2,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        90
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "06_Living_MessBench_361",
+      "room": "06_Living",
+      "kit": "Living",
+      "asset": "MessBench",
+      "position": [
+        -1.45,
+        -12.2,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        -90
+      ],
+      "parent": "",
+      "partStates": []
+    },
+    {
+      "id": "06_Living_EnamelBowl_362",
+      "room": "06_Living",
+      "kit": "Living",
+      "asset": "EnamelBowl",
+      "position": [
+        -0.22,
+        0,
+        0.79
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "06_Living_MessTable_360",
+      "partStates": []
+    },
+    {
+      "id": "06_Living_EnamelSpoon_363",
+      "room": "06_Living",
+      "kit": "Living",
+      "asset": "EnamelSpoon",
+      "position": [
+        0.1,
+        -0.15,
+        0.79
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "parent": "06_Living_MessTable_360",
+      "partStates": []
+    }
+  ],
+  "stations": [
+    {
+      "room": "01_Torpedoes",
+      "position": [
+        -1.2,
+        12,
+        1.6
+      ]
+    },
+    {
+      "room": "02_Central",
+      "position": [
+        -1.1,
+        7.3,
+        1.6
+      ]
+    },
+    {
+      "room": "03_Radio",
+      "position": [
+        -1.1,
+        2,
+        1.6
+      ]
+    },
+    {
+      "room": "04_Reactor",
+      "position": [
+        -1.1,
+        -2,
+        1.6
+      ]
+    },
+    {
+      "room": "05_Machines",
+      "position": [
+        -1.2,
+        -5.6,
+        1.6
+      ]
+    },
+    {
+      "room": "06_Living",
+      "position": [
+        1.1,
+        -11.3,
+        1.6
+      ]
+    }
+  ]
+}

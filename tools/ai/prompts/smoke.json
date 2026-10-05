@@ -1,0 +1,10 @@
+{
+  "name": "smoke",
+  "kind": "tests",
+  "style": "key_art",
+  "size": [1344, 768],
+  "n": 1,
+  "entries": [
+    { "id": "smoke_fjord", "prompt": "an old rust-green nuclear submarine surfacing in a grey Nordic fjord at dawn, four tiny chubby mustached sailors in green caps waving from the conning tower, mist, tiny wooden jetty" }
+  ]
+}

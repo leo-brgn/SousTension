@@ -1,0 +1,55 @@
+{
+  "blender": "5.2.2 LTS",
+  "issue": 116,
+  "assets": [
+    {
+      "name": "PrimaryPump",
+      "triangles": 5020,
+      "parts": [
+        "Body",
+        "Rotor",
+        "Switch",
+        "Cover"
+      ],
+      "mounts": [
+        "Mount_Inlet",
+        "Mount_Outlet",
+        "Mount_Control",
+        "Mount_Floor",
+        "Mount_Leak"
+      ]
+    },
+    {
+      "name": "PrimaryPump_Broken",
+      "triangles": 5056,
+      "parts": [
+        "Body",
+        "Rotor",
+        "Switch",
+        "Cover"
+      ],
+      "mounts": [
+        "Mount_Inlet",
+        "Mount_Outlet",
+        "Mount_Control",
+        "Mount_Floor",
+        "Mount_Leak"
+      ]
+    },
+    {
+      "name": "PrimaryValve",
+      "triangles": 2912,
+      "parts": [
+        "Body",
+        "Wheel",
+        "Indicator"
+      ],
+      "mounts": [
+        "Mount_A",
+        "Mount_B",
+        "Mount_Interaction",
+        "Mount_Leak"
+      ]
+    }
+  ]
+}

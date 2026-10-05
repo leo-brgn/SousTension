@@ -1,0 +1,14 @@
+{
+  "name": "r3",
+  "kind": "comms",
+  "style": "key_art",
+  "size": [1344, 768],
+  "n": 3,
+  "seed": 4000,
+  "entries": [
+    { "id": "scram_dark", "style": "key_art_night", "rules": { "mean_range": [6, 232], "max_black_frac": 0.85, "min_std": 12 },
+      "prompt": "a submarine reactor room in almost total blackout, a pulsing red emergency lamp, a chubby mustached sailor in a green cap pulling down a huge red lever with both hands, other sailors in silhouette behind him, long red-lit shadows" },
+    { "id": "pneumatic_capsule",
+      "prompt": "a brass pneumatic tube wall station: a polished brass pipe coming out of a bottle-green riveted wall, a small brass capsule sliding out carrying a rolled paper letter, a chubby sailor's hand reaching to take it, warm wall lamp, tender and mysterious" }
+  ]
+}

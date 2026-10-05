@@ -1,0 +1,426 @@
+{
+  "count": 84,
+  "checks": "finite geometry, positive triangle area, UV0, vertex colors, category geometric uniqueness, rig weights/bones/4clips/5sampled poses",
+  "assets": [
+    {
+      "name": "Head_01",
+      "status": "Blender FBX roundtrip passed",
+      "triangles": 2024
+    },
+    {
+      "name": "Head_02",
+      "status": "Blender FBX roundtrip passed",
+      "triangles": 2024
+    },
+    {
+      "name": "Head_03",
+      "status": "Blender FBX roundtrip passed",
+      "triangles": 2024
+    },
+    {
+      "name": "Head_04",
+      "status": "Blender FBX roundtrip passed",
+      "triangles": 2024
+    },
+    {
+      "name": "Head_05",
+      "status": "Blender FBX roundtrip passed",
+      "triangles": 2024
+    },
+    {
+      "name": "Head_06",
+      "status": "Blender FBX roundtrip passed",
+      "triangles": 2024
+    },
+    {
+      "name": "Moustache_01",
+      "status": "Blender FBX roundtrip passed",
+      "triangles": 504
+    },
+    {
+      "name": "Moustache_02",
+      "status": "Blender FBX roundtrip passed",
+      "triangles": 504
+    },
+    {
+      "name": "Moustache_03",
+      "status": "Blender FBX roundtrip passed",
+      "triangles": 504
+    },
+    {
+      "name": "Moustache_04",
+      "status": "Blender FBX roundtrip passed",
+      "triangles": 504
+    },
+    {
+      "name": "Moustache_05",
+      "status": "Blender FBX roundtrip passed",
+      "triangles": 1008
+    },
+    {
+      "name": "Moustache_06",
+      "status": "Blender FBX roundtrip passed",
+      "triangles": 1008
+    },
+    {
+      "name": "Moustache_07",
+      "status": "Blender FBX roundtrip passed",
+      "triangles": 1008
+    },
+    {
+      "name": "Moustache_08",
+      "status": "Blender FBX roundtrip passed",
+      "triangles": 1008
+    },
+    {
+      "name": "Moustache_09",
+      "status": "Blender FBX roundtrip passed",
+      "triangles": 216
+    },
+    {
+      "name": "Moustache_10",
+      "status": "Blender FBX roundtrip passed",
+      "triangles": 216
+    },
+    {
+      "name": "Moustache_11",
+      "status": "Blender FBX roundtrip passed",
+      "triangles": 216
+    },
+    {
+      "name": "Moustache_12",
+      "status": "Blender FBX roundtrip passed",
+      "triangles": 720
+    },
+    {
+      "name": "Hair_01",
+      "status": "Blender FBX roundtrip passed",
+      "triangles": 1764
+    },
+    {
+      "name": "Hair_02",
+      "status": "Blender FBX roundtrip passed",
+      "triangles": 2016
+    },
+    {
+      "name": "Hair_03",
+      "status": "Blender FBX roundtrip passed",
+      "triangles": 2520
+    },
+    {
+      "name": "Hair_04",
+      "status": "Blender FBX roundtrip passed",
+      "triangles": 1764
+    },
+    {
+      "name": "Hair_05",
+      "status": "Blender FBX roundtrip passed",
+      "triangles": 2016
+    },
+    {
+      "name": "Hair_06",
+      "status": "Blender FBX roundtrip passed",
+      "triangles": 2520
+    },
+    {
+      "name": "Hair_07",
+      "status": "Blender FBX roundtrip passed",
+      "triangles": 1764
+    },
+    {
+      "name": "Hair_08",
+      "status": "Blender FBX roundtrip passed",
+      "triangles": 2772
+    },
+    {
+      "name": "PeakedCap",
+      "status": "Blender FBX roundtrip passed",
+      "triangles": 612
+    },
+    {
+      "name": "WatchBeanie",
+      "status": "Blender FBX roundtrip passed",
+      "triangles": 636
+    },
+    {
+      "name": "WoolBonnet",
+      "status": "Blender FBX roundtrip passed",
+      "triangles": 888
+    },
+    {
+      "name": "ServiceBeret",
+      "status": "Blender FBX roundtrip passed",
+      "triangles": 564
+    },
+    {
+      "name": "CookCap",
+      "status": "Blender FBX roundtrip passed",
+      "triangles": 1700
+    },
+    {
+      "name": "SideCap",
+      "status": "Blender FBX roundtrip passed",
+      "triangles": 360
+    },
+    {
+      "name": "EarflapCap",
+      "status": "Blender FBX roundtrip passed",
+      "triangles": 468
+    },
+    {
+      "name": "FlatCap",
+      "status": "Blender FBX roundtrip passed",
+      "triangles": 360
+    },
+    {
+      "name": "DeckHardhat",
+      "status": "Blender FBX roundtrip passed",
+      "triangles": 684
+    },
+    {
+      "name": "WinterHood",
+      "status": "Blender FBX roundtrip passed",
+      "triangles": 576
+    },
+    {
+      "name": "RoundBadge",
+      "status": "Blender FBX roundtrip passed",
+      "triangles": 60
+    },
+    {
+      "name": "SquareBadge",
+      "status": "Blender FBX roundtrip passed",
+      "triangles": 108
+    },
+    {
+      "name": "AnchorBadge",
+      "status": "Blender FBX roundtrip passed",
+      "triangles": 876
+    },
+    {
+      "name": "ChevronBadge",
+      "status": "Blender FBX roundtrip passed",
+      "triangles": 648
+    },
+    {
+      "name": "WingBadge",
+      "status": "Blender FBX roundtrip passed",
+      "triangles": 564
+    },
+    {
+      "name": "MedalSingle",
+      "status": "Blender FBX roundtrip passed",
+      "triangles": 72
+    },
+    {
+      "name": "MedalPair",
+      "status": "Blender FBX roundtrip passed",
+      "triangles": 144
+    },
+    {
+      "name": "RibbonBar",
+      "status": "Blender FBX roundtrip passed",
+      "triangles": 48
+    },
+    {
+      "name": "ServiceStars",
+      "status": "Blender FBX roundtrip passed",
+      "triangles": 756
+    },
+    {
+      "name": "Epaulette",
+      "status": "Blender FBX roundtrip passed",
+      "triangles": 120
+    },
+    {
+      "name": "DeckBelt",
+      "status": "Blender FBX roundtrip passed",
+      "triangles": 492
+    },
+    {
+      "name": "UtilityBelt",
+      "status": "Blender FBX roundtrip passed",
+      "triangles": 708
+    },
+    {
+      "name": "Suspenders",
+      "status": "Blender FBX roundtrip passed",
+      "triangles": 216
+    },
+    {
+      "name": "Scarf",
+      "status": "Blender FBX roundtrip passed",
+      "triangles": 600
+    },
+    {
+      "name": "Neckerchief",
+      "status": "Blender FBX roundtrip passed",
+      "triangles": 600
+    },
+    {
+      "name": "BowTie",
+      "status": "Blender FBX roundtrip passed",
+      "triangles": 504
+    },
+    {
+      "name": "Tie",
+      "status": "Blender FBX roundtrip passed",
+      "triangles": 360
+    },
+    {
+      "name": "GloveLeft",
+      "status": "Blender FBX roundtrip passed",
+      "triangles": 1512
+    },
+    {
+      "name": "GloveRight",
+      "status": "Blender FBX roundtrip passed",
+      "triangles": 1512
+    },
+    {
+      "name": "MittensPair",
+      "status": "Blender FBX roundtrip passed",
+      "triangles": 756
+    },
+    {
+      "name": "SpectaclesRound",
+      "status": "Blender FBX roundtrip passed",
+      "triangles": 780
+    },
+    {
+      "name": "SpectaclesSquare",
+      "status": "Blender FBX roundtrip passed",
+      "triangles": 444
+    },
+    {
+      "name": "Monocle",
+      "status": "Blender FBX roundtrip passed",
+      "triangles": 384
+    },
+    {
+      "name": "Goggles",
+      "status": "Blender FBX roundtrip passed",
+      "triangles": 828
+    },
+    {
+      "name": "EarDefenders",
+      "status": "Blender FBX roundtrip passed",
+      "triangles": 888
+    },
+    {
+      "name": "Whistle",
+      "status": "Blender FBX roundtrip passed",
+      "triangles": 632
+    },
+    {
+      "name": "PocketWatch",
+      "status": "Blender FBX roundtrip passed",
+      "triangles": 572
+    },
+    {
+      "name": "PocketNotebook",
+      "status": "Blender FBX roundtrip passed",
+      "triangles": 108
+    },
+    {
+      "name": "PenBundle",
+      "status": "Blender FBX roundtrip passed",
+      "triangles": 216
+    },
+    {
+      "name": "PencilClip",
+      "status": "Blender FBX roundtrip passed",
+      "triangles": 72
+    },
+    {
+      "name": "KeyRing",
+      "status": "Blender FBX roundtrip passed",
+      "triangles": 744
+    },
+    {
+      "name": "ToolPouch",
+      "status": "Blender FBX roundtrip passed",
+      "triangles": 216
+    },
+    {
+      "name": "Canteen",
+      "status": "Blender FBX roundtrip passed",
+      "triangles": 312
+    },
+    {
+      "name": "Satchel",
+      "status": "Blender FBX roundtrip passed",
+      "triangles": 216
+    },
+    {
+      "name": "ShoulderBag",
+      "status": "Blender FBX roundtrip passed",
+      "triangles": 600
+    },
+    {
+      "name": "Armband",
+      "status": "Blender FBX roundtrip passed",
+      "triangles": 492
+    },
+    {
+      "name": "WristCuff",
+      "status": "Blender FBX roundtrip passed",
+      "triangles": 492
+    },
+    {
+      "name": "CompassPendant",
+      "status": "Blender FBX roundtrip passed",
+      "triangles": 584
+    },
+    {
+      "name": "ClothPatch",
+      "status": "Blender FBX roundtrip passed",
+      "triangles": 108
+    },
+    {
+      "name": "NamePlateBlank",
+      "status": "Blender FBX roundtrip passed",
+      "triangles": 108
+    },
+    {
+      "name": "WakeUpSalts",
+      "status": "Blender FBX roundtrip passed",
+      "triangles": 484
+    },
+    {
+      "name": "Vareuse",
+      "status": "Blender FBX roundtrip passed",
+      "triangles": 12340
+    },
+    {
+      "name": "DressUniform",
+      "status": "Blender FBX roundtrip passed",
+      "triangles": 13924
+    },
+    {
+      "name": "CookApron",
+      "status": "Blender FBX roundtrip passed",
+      "triangles": 12520
+    },
+    {
+      "name": "RegulationPyjamas",
+      "status": "Blender FBX roundtrip passed",
+      "triangles": 12736
+    },
+    {
+      "name": "DivingSuit",
+      "status": "Blender FBX roundtrip passed",
+      "triangles": 10564
+    },
+    {
+      "name": "ContaminatedSailor",
+      "status": "Blender FBX roundtrip passed",
+      "triangles": 13060
+    },
+    {
+      "name": "CommanderVarga",
+      "status": "Blender FBX roundtrip passed",
+      "triangles": 13576
+    }
+  ]
+}

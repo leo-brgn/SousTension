@@ -1,0 +1,1165 @@
+{
+  "scope": "GDD release1.0 annex, P1/P2/P3 geometry V1; not painted artwork, polished animation or gameplay",
+  "fbx_count": 387,
+  "coverage_rows": 109,
+  "rows": [
+    {
+      "requirement": "Section de coque intérieure droite (module 2 m)",
+      "priority": "P1",
+      "models": [
+        "Structure/HullModule_2m"
+      ],
+      "status": "geometry_v1"
+    },
+    {
+      "requirement": "Section de coque courbe proue",
+      "priority": "P2",
+      "models": [
+        "Fixtures/HullInteriorCurvedBow"
+      ],
+      "status": "geometry_v1"
+    },
+    {
+      "requirement": "Section de coque courbe poupe",
+      "priority": "P2",
+      "models": [
+        "Fixtures/HullInteriorCurvedStern"
+      ],
+      "status": "geometry_v1"
+    },
+    {
+      "requirement": "Cloison pleine inter-compartiments",
+      "priority": "P1",
+      "models": [
+        "Structure/Bulkhead_Solid"
+      ],
+      "status": "geometry_v1"
+    },
+    {
+      "requirement": "Sas manuel de cloison 🔧",
+      "priority": "P1",
+      "models": [
+        "Structure/Bulkhead_Hatch",
+        "Structure/HatchDoor"
+      ],
+      "status": "geometry_v1"
+    },
+    {
+      "requirement": "Plancher caillebotis (module)",
+      "priority": "P1",
+      "models": [
+        "Structure/FloorGrating_1m"
+      ],
+      "status": "geometry_v1"
+    },
+    {
+      "requirement": "Fond de cale sous caillebotis",
+      "priority": "P1",
+      "models": [
+        "Structure/BilgeFloor_2m"
+      ],
+      "status": "geometry_v1"
+    },
+    {
+      "requirement": "Échelle verticale + trémie",
+      "priority": "P2",
+      "models": [
+        "Fixtures/ConningLadderHatch"
+      ],
+      "status": "geometry_v1"
+    },
+    {
+      "requirement": "Kiosque intérieur (habitacle périscope)",
+      "priority": "P2",
+      "models": [
+        "Fixtures/ConningTowerInterior"
+      ],
+      "status": "geometry_v1"
+    },
+    {
+      "requirement": "Coque extérieure complète classe Molosse",
+      "priority": "P2",
+      "models": [
+        "World/MolossHull_LOD0_Wear0",
+        "World/MolossHull_LOD0_Wear1",
+        "World/MolossHull_LOD0_Wear2",
+        "World/MolossHull_LOD1_Wear0",
+        "World/MolossHull_LOD1_Wear1",
+        "World/MolossHull_LOD1_Wear2",
+        "World/MolossHull_LOD2_Wear0",
+        "World/MolossHull_LOD2_Wear1",
+        "World/MolossHull_LOD2_Wear2"
+      ],
+      "status": "geometry_v1"
+    },
+    {
+      "requirement": "Barres de plongée, safran, hélice (ext.) 🔧",
+      "priority": "P2",
+      "models": [
+        "World/MolossDivingPlane",
+        "World/MolossRudder",
+        "World/MolossPropeller"
+      ],
+      "status": "geometry_v1"
+    },
+    {
+      "requirement": "Kiosque extérieur, antennes, périscope sorti",
+      "priority": "P2",
+      "models": [
+        "World/MolossConningTower",
+        "World/MolossAntenna",
+        "World/MolossPeriscopeHead"
+      ],
+      "status": "geometry_v1"
+    },
+    {
+      "requirement": "Variantes d'usure de coque ext. (3 niveaux)",
+      "priority": "P3",
+      "models": [
+        "World/MolossHull_LOD0_Wear0",
+        "World/MolossHull_LOD0_Wear1",
+        "World/MolossHull_LOD0_Wear2"
+      ],
+      "status": "geometry_v1"
+    },
+    {
+      "requirement": "Tuyauterie modulaire (droite, coude, T, vanne inline)",
+      "priority": "P1",
+      "models": [
+        "Structure/Pipe_Straight_1m",
+        "Structure/Pipe_Elbow",
+        "Structure/Pipe_Tee",
+        "Structure/Pipe_ValveInline"
+      ],
+      "status": "geometry_v1"
+    },
+    {
+      "requirement": "Chemin de câbles + boîtiers de jonction (kit)",
+      "priority": "P2",
+      "models": [
+        "Fixtures/CableTrayStraight",
+        "Fixtures/CableJunctionBox"
+      ],
+      "status": "geometry_v1"
+    },
+    {
+      "requirement": "Plaques gravées / panneaux réglementaires (kit, ~15 formes)",
+      "priority": "P2",
+      "models": [
+        "Signage/Plate_Torpedoes",
+        "Signage/Plate_Central",
+        "Signage/Plate_Radio",
+        "Signage/Plate_Reactor",
+        "Signage/Plate_Machines",
+        "Signage/Plate_Living",
+        "Signage/Plate_Primary",
+        "Signage/Plate_Bilge",
+        "Signage/Plate_Electric",
+        "Signage/Plate_Interphone",
+        "Signage/Plate_Manual",
+        "Signage/Plate_Pneumatic",
+        "Signage/Plate_Battery",
+        "Signage/Plate_Scram",
+        "Signage/Plate_Registry"
+      ],
+      "status": "geometry_v1"
+    },
+    {
+      "requirement": "Tube lance-torpilles (x4 visibles) 🔧",
+      "priority": "P2",
+      "models": [
+        "Torpedoes/CargoTorpedoTube"
+      ],
+      "status": "geometry_v1"
+    },
+    {
+      "requirement": "Râtelier de stockage cargo 🔧",
+      "priority": "P2",
+      "models": [
+        "Torpedoes/CargoRack"
+      ],
+      "status": "geometry_v1"
+    },
+    {
+      "requirement": "Sangles d'arrimage 🔧",
+      "priority": "P2",
+      "models": [
+        "Torpedoes/CargoTieDownStrap"
+      ],
+      "status": "geometry_v1"
+    },
+    {
+      "requirement": "Palan/rail de manutention plafond 🔧",
+      "priority": "P3",
+      "models": [
+        "Fixtures/CargoCeilingHoistRail",
+        "Fixtures/CargoCeilingHoist"
+      ],
+      "status": "geometry_v1"
+    },
+    {
+      "requirement": "Torpille d'exercice inerte (déco) 📦",
+      "priority": "P3",
+      "models": [
+        "Fixtures/InertTrainingTorpedo"
+      ],
+      "status": "geometry_v1"
+    },
+    {
+      "requirement": "Barre de direction (volant) 🔧",
+      "priority": "P1",
+      "models": [
+        "Central/CentralSteeringWheel"
+      ],
+      "status": "geometry_v1"
+    },
+    {
+      "requirement": "Pupitre de barre : profondeur/assiette (2 volants + indicateurs) 🔧",
+      "priority": "P1",
+      "models": [
+        "Central/CentralDepthTrimConsole"
+      ],
+      "status": "geometry_v1"
+    },
+    {
+      "requirement": "Télégraphe machine 🔧",
+      "priority": "P1",
+      "models": [
+        "Central/EngineTelegraphFivePosition"
+      ],
+      "status": "geometry_v1"
+    },
+    {
+      "requirement": "Périscope 🔧",
+      "priority": "P2",
+      "models": [
+        "Fixtures/PeriscopeInterior",
+        "Fixtures/PeriscopeExternalHead"
+      ],
+      "status": "geometry_v1"
+    },
+    {
+      "requirement": "Table à cartes + carte papier 🔧",
+      "priority": "P1",
+      "models": [
+        "Central/CentralChartTable",
+        "Central/ChartPaperBlank"
+      ],
+      "status": "geometry_v1"
+    },
+    {
+      "requirement": "Crayon gras 📦",
+      "priority": "P1",
+      "models": [
+        "Central/GreasePencil"
+      ],
+      "status": "geometry_v1"
+    },
+    {
+      "requirement": "Compas de relèvement, règle Cras, chronomètre 📦",
+      "priority": "P2",
+      "models": [
+        "Fixtures/BearingCompass",
+        "Fixtures/CrasNavigationRule",
+        "Fixtures/NavigationStopwatch"
+      ],
+      "status": "geometry_v1"
+    },
+    {
+      "requirement": "Le Manuel OK-114 📦🔧",
+      "priority": "P1",
+      "models": [
+        "Central/ManualOK114OpenBinder",
+        "Central/ManualOK114LoosePage"
+      ],
+      "status": "geometry_v1"
+    },
+    {
+      "requirement": "Pupitre central multi-instruments",
+      "priority": "P1",
+      "models": [
+        "Central/CentralInstrumentConsole"
+      ],
+      "status": "geometry_v1"
+    },
+    {
+      "requirement": "Tube pneumatique du Commandant 🔧",
+      "priority": "P1",
+      "models": [
+        "Central/PneumaticArrivalStation"
+      ],
+      "status": "geometry_v1"
+    },
+    {
+      "requirement": "Capsule pneumatique 📦",
+      "priority": "P1",
+      "models": [
+        "Central/PneumaticCapsule",
+        "Central/RolledOrderPaper"
+      ],
+      "status": "geometry_v1"
+    },
+    {
+      "requirement": "Horloge de bord",
+      "priority": "P2",
+      "models": [
+        "Fixtures/ShipClock"
+      ],
+      "status": "geometry_v1"
+    },
+    {
+      "requirement": "Tableau à craie + craie 🔧📦",
+      "priority": "P2",
+      "models": [
+        "Fixtures/Chalkboard",
+        "Fixtures/ChalkStick"
+      ],
+      "status": "geometry_v1"
+    },
+    {
+      "requirement": "Portrait officiel du Commandant (cadre)",
+      "priority": "P2",
+      "models": [
+        "Fixtures/CommandantPortraitFrame"
+      ],
+      "status": "geometry_v1"
+    },
+    {
+      "requirement": "Fauteuil du chef de quart",
+      "priority": "P2",
+      "models": [
+        "Fixtures/WatchOfficerChair"
+      ],
+      "status": "geometry_v1"
+    },
+    {
+      "requirement": "Console sonar à écran circulaire 🔧",
+      "priority": "P2",
+      "models": [
+        "Radio/SonarConsole"
+      ],
+      "status": "geometry_v1"
+    },
+    {
+      "requirement": "Casque d'écoute sonar 📦🔧",
+      "priority": "P2",
+      "models": [
+        "Radio/SonarHeadphones",
+        "Radio/HeadphoneCableCoiled"
+      ],
+      "status": "geometry_v1"
+    },
+    {
+      "requirement": "Hydrophone à manivelle 🔧",
+      "priority": "P2",
+      "models": [
+        "Radio/HydrophoneCrankStation"
+      ],
+      "status": "geometry_v1"
+    },
+    {
+      "requirement": "Enregistreur à bandes magnétiques 🔧",
+      "priority": "P2",
+      "models": [
+        "Radio/MagneticTapeRecorder"
+      ],
+      "status": "geometry_v1"
+    },
+    {
+      "requirement": "Bobine de bande vierge / enregistrée 📦",
+      "priority": "P2",
+      "models": [
+        "Radio/TapeReelBlank",
+        "Radio/TapeReelRecorded"
+      ],
+      "status": "geometry_v1"
+    },
+    {
+      "requirement": "Poste radio VLF + antenne déployable 🔧",
+      "priority": "P2",
+      "models": [
+        "Radio/VLFRadioStation",
+        "Radio/VLFAntennaDeployable"
+      ],
+      "status": "geometry_v1"
+    },
+    {
+      "requirement": "Machine à chiffrer (à clavier mécanique) 🔧",
+      "priority": "P2",
+      "models": [
+        "Radio/MechanicalCipherMachine"
+      ],
+      "status": "geometry_v1"
+    },
+    {
+      "requirement": "Feuillets de messages / bloc de chiffrement 📦",
+      "priority": "P2",
+      "models": [
+        "Radio/CipherMessagePad"
+      ],
+      "status": "geometry_v1"
+    },
+    {
+      "requirement": "Baie électronique à lampes (déco animée)",
+      "priority": "P3",
+      "models": [
+        "Fixtures/VacuumValveElectronicsRack"
+      ],
+      "status": "geometry_v1"
+    },
+    {
+      "requirement": "L'Émetteur du Signal (acte III) 🔧",
+      "priority": "P3",
+      "models": [
+        "Cargo/SignalEmitterFrame",
+        "Cargo/SignalEmitterPower",
+        "Cargo/SignalEmitterCoil",
+        "Cargo/SignalEmitterAerial",
+        "Cargo/SignalEmitterControls",
+        "Cargo/SignalEmitterAssembled"
+      ],
+      "status": "geometry_v1"
+    },
+    {
+      "requirement": "Tableau de commande RK-1 « Petit Soleil » 🔧",
+      "priority": "P1",
+      "models": [
+        "Reactor/RK1_Console",
+        "Reactor/Breaker",
+        "Instruments/SelectorRotary",
+        "Instruments/GaugeRound_M"
+      ],
+      "status": "geometry_v1"
+    },
+    {
+      "requirement": "Levier SCRAM 🔧",
+      "priority": "P1",
+      "models": [
+        "Reactor/ScramLever"
+      ],
+      "status": "geometry_v1"
+    },
+    {
+      "requirement": "Colonne des barres de contrôle (mécanisme apparent) 🔧",
+      "priority": "P2",
+      "models": [
+        "Fixtures/ControlRodDriveColumn"
+      ],
+      "status": "geometry_v1"
+    },
+    {
+      "requirement": "Hublot de visée du cœur",
+      "priority": "P2",
+      "models": [
+        "Fixtures/CoreViewingPorthole"
+      ],
+      "status": "geometry_v1"
+    },
+    {
+      "requirement": "Circuit primaire : pompes (x2) 🔧",
+      "priority": "P1",
+      "models": [
+        "Primary/PrimaryPump",
+        "Primary/PrimaryPump_Broken"
+      ],
+      "status": "geometry_v1"
+    },
+    {
+      "requirement": "Vannes principales primaire (x4, volants) 🔧",
+      "priority": "P1",
+      "models": [
+        "Primary/PrimaryValve"
+      ],
+      "status": "geometry_v1"
+    },
+    {
+      "requirement": "Échangeur / générateur de vapeur",
+      "priority": "P2",
+      "models": [
+        "Fixtures/SteamGenerator"
+      ],
+      "status": "geometry_v1"
+    },
+    {
+      "requirement": "Panneau dosimétrie mural + alarme",
+      "priority": "P2",
+      "models": [
+        "Fixtures/WallDosimetryAlarm"
+      ],
+      "status": "geometry_v1"
+    },
+    {
+      "requirement": "Rideau/portique de zone contrôlée",
+      "priority": "P3",
+      "models": [
+        "Fixtures/ControlledZoneStripCurtain"
+      ],
+      "status": "geometry_v1"
+    },
+    {
+      "requirement": "Bidon de bore d'urgence 📦",
+      "priority": "P3",
+      "models": [
+        "Fixtures/EmergencyBoronCan"
+      ],
+      "status": "geometry_v1"
+    },
+    {
+      "requirement": "Turbine + réducteur",
+      "priority": "P2",
+      "models": [
+        "Machines/TurbineReducer"
+      ],
+      "status": "geometry_v1"
+    },
+    {
+      "requirement": "Tableau électrique principal 🔧",
+      "priority": "P1",
+      "models": [
+        "Machines/ElectricalPanel",
+        "Machines/MachineBreaker"
+      ],
+      "status": "geometry_v1"
+    },
+    {
+      "requirement": "Batteries de secours (banc) 🔧",
+      "priority": "P2",
+      "models": [
+        "Machines/BatteryBank"
+      ],
+      "status": "geometry_v1"
+    },
+    {
+      "requirement": "Pompe de cale (x2) 🔧",
+      "priority": "P1",
+      "models": [
+        "Machines/BilgePump"
+      ],
+      "status": "geometry_v1"
+    },
+    {
+      "requirement": "Ligne d'arbre + presse-étoupe 🔧",
+      "priority": "P2",
+      "models": [
+        "Fixtures/PropellerShaftLine",
+        "Fixtures/ShaftStuffingBox"
+      ],
+      "status": "geometry_v1"
+    },
+    {
+      "requirement": "Compresseur d'air / cartouches CO₂ 🔧📦",
+      "priority": "P2",
+      "models": [
+        "Fixtures/AirCompressor",
+        "Fixtures/CO2CartridgeNew",
+        "Fixtures/CO2CartridgeUsed"
+      ],
+      "status": "geometry_v1"
+    },
+    {
+      "requirement": "Établi + panneau d'outils",
+      "priority": "P2",
+      "models": [
+        "Fixtures/MachineWorkbench",
+        "Fixtures/WorkshopToolboard"
+      ],
+      "status": "geometry_v1"
+    },
+    {
+      "requirement": "Interphone (combiné mural) 🔧",
+      "priority": "P1",
+      "models": [
+        "Machines/Interphone"
+      ],
+      "status": "geometry_v1"
+    },
+    {
+      "requirement": "Ventilateur de gaine 🔧",
+      "priority": "P3",
+      "models": [
+        "Fixtures/DuctVentilator"
+      ],
+      "status": "geometry_v1"
+    },
+    {
+      "requirement": "Sas de plongée (chambre + 2 portes + volants) 🔧",
+      "priority": "P2",
+      "models": [
+        "Living/DivingAirlockChamber"
+      ],
+      "status": "geometry_v1"
+    },
+    {
+      "requirement": "Scaphandre sur son support 🔧",
+      "priority": "P2",
+      "models": [
+        "Living/DivingSuitOnRack"
+      ],
+      "status": "geometry_v1"
+    },
+    {
+      "requirement": "Casque de scaphandre 📦",
+      "priority": "P2",
+      "models": [
+        "Living/DivingHelmet"
+      ],
+      "status": "geometry_v1"
+    },
+    {
+      "requirement": "Ombilical + touret 🔧",
+      "priority": "P2",
+      "models": [
+        "Living/UmbilicalReel"
+      ],
+      "status": "geometry_v1"
+    },
+    {
+      "requirement": "Douche de décontamination 🔧",
+      "priority": "P2",
+      "models": [
+        "Living/DeconShowerCabin"
+      ],
+      "status": "geometry_v1"
+    },
+    {
+      "requirement": "Lance à eau de décon 📦🔧",
+      "priority": "P2",
+      "models": [
+        "Living/DeconWaterLance"
+      ],
+      "status": "geometry_v1"
+    },
+    {
+      "requirement": "Couchettes superposées (x2 modules)",
+      "priority": "P2",
+      "models": [
+        "Living/BunkBed_Double"
+      ],
+      "status": "geometry_v1"
+    },
+    {
+      "requirement": "Cambuse : cuisinière + marmite de soupe 🔧",
+      "priority": "P2",
+      "models": [
+        "Living/GalleyStove",
+        "Living/SoupPot"
+      ],
+      "status": "geometry_v1"
+    },
+    {
+      "requirement": "Vaisselle en fer émaillé (kit 6 pièces) 📦",
+      "priority": "P2",
+      "models": [
+        "Living/EnamelBowl",
+        "Living/EnamelMug",
+        "Living/EnamelPlate",
+        "Living/EnamelPotLid",
+        "Living/EnamelSaucepan",
+        "Living/EnamelSpoon"
+      ],
+      "status": "geometry_v1"
+    },
+    {
+      "requirement": "Table + banquettes",
+      "priority": "P2",
+      "models": [
+        "Living/MessTable",
+        "Living/MessBench"
+      ],
+      "status": "geometry_v1"
+    },
+    {
+      "requirement": "Gramophone + disque de l'hymne 🔧📦",
+      "priority": "P3",
+      "models": [
+        "Fixtures/MessGramophone",
+        "Fixtures/AnthemGramophoneRecord"
+      ],
+      "status": "geometry_v1"
+    },
+    {
+      "requirement": "Casiers personnels (x4) 🔧",
+      "priority": "P3",
+      "models": [
+        "Living/PersonalLocker"
+      ],
+      "status": "geometry_v1"
+    },
+    {
+      "requirement": "Samovar 🔧",
+      "priority": "P3",
+      "models": [
+        "Fixtures/ElectricSamovar"
+      ],
+      "status": "geometry_v1"
+    },
+    {
+      "requirement": "WC marin + sa procédure murale 🔧",
+      "priority": "P3",
+      "models": [
+        "Fixtures/MarineToiletSevenValve",
+        "Fixtures/MarineToiletProcedureBlank"
+      ],
+      "status": "geometry_v1"
+    },
+    {
+      "requirement": "Porte du carré des officiers (fermée)",
+      "priority": "P2",
+      "models": [
+        "Living/OfficersQuartersDoor"
+      ],
+      "status": "geometry_v1"
+    },
+    {
+      "requirement": "Caisses réglementaires (S/M/L) 📦",
+      "priority": "Vivres, pièces, munitions d'exercice",
+      "models": [
+        "Environment/CargoCrate_S",
+        "Environment/CargoCrate_M",
+        "Environment/CargoCrate_L"
+      ],
+      "status": "geometry_v1"
+    },
+    {
+      "requirement": "Fûts 📦",
+      "priority": "Carburant, saumure, « NE PAS OUVRIR »",
+      "models": [
+        "Cargo/FuelDrum",
+        "Cargo/BrineDrum",
+        "Cargo/SealedDrum"
+      ],
+      "status": "geometry_v1"
+    },
+    {
+      "requirement": "Combustible nucléaire (château de transport) 📦",
+      "priority": "Très lourd, crépite, à 2 joueurs",
+      "models": [
+        "Cargo/NuclearFuelTransportCask"
+      ],
+      "status": "geometry_v1"
+    },
+    {
+      "requirement": "Pièces détachées 📦",
+      "priority": "Pompe neuve, cartouches, fusibles, joints, roulement",
+      "models": [
+        "Cargo/SpareFuseBox",
+        "Cargo/SpareGasket",
+        "Cargo/SpareBearing",
+        "Cargo/SpareImpeller",
+        "Cargo/SpareMotor",
+        "Cargo/SparePipeSection",
+        "Fixtures/CO2CartridgeNew",
+        "Fixtures/CO2CartridgeUsed",
+        "Primary/PrimaryPump"
+      ],
+      "status": "geometry_v1"
+    },
+    {
+      "requirement": "Objets d'épave à valeur 📦",
+      "priority": "Coffre, cloche de bateau, hélice de bronze, instruments anciens",
+      "models": [
+        "Cargo/SalvageChest",
+        "Cargo/SalvageShipBell",
+        "Cargo/SalvageBronzePropeller",
+        "Cargo/AntiqueSextant"
+      ],
+      "status": "geometry_v1"
+    },
+    {
+      "requirement": "Objets anachroniques (indices narratifs) 📦",
+      "priority": "Jet-ski cassé, conteneur moderne, canard gonflable, panneau solaire",
+      "models": [
+        "Cargo/BrokenJetSki",
+        "Cargo/ModernContainer",
+        "Cargo/InflatableDuck",
+        "Cargo/SolarPanel"
+      ],
+      "status": "geometry_v1"
+    },
+    {
+      "requirement": "Objets bruyants à haute valeur 📦",
+      "priority": "Balise active, boîte à musique bloquée",
+      "models": [
+        "Cargo/ActiveBeacon",
+        "Cargo/JammedMusicBox"
+      ],
+      "status": "geometry_v1"
+    },
+    {
+      "requirement": "Reliques kraviques (acte II) 📦",
+      "priority": "Radeau de 1983, journal de bord, médailles",
+      "models": [
+        "Cargo/LifeRaft1983",
+        "Cargo/OldLogbook",
+        "Cargo/KravicMedalCase"
+      ],
+      "status": "geometry_v1"
+    },
+    {
+      "requirement": "Les 5 pièces de l'Émetteur 📦",
+      "priority": "Voir §4",
+      "models": [
+        "Cargo/SignalEmitterFrame",
+        "Cargo/SignalEmitterPower",
+        "Cargo/SignalEmitterCoil",
+        "Cargo/SignalEmitterAerial",
+        "Cargo/SignalEmitterControls"
+      ],
+      "status": "geometry_v1"
+    },
+    {
+      "requirement": "La base du fjord : ponton, grue 🔧, atelier, bureau des tampons, tableau d'affichage 🔧, baraquements, phare",
+      "priority": "P2",
+      "models": [
+        "World/FjordWorkshop",
+        "World/FjordStampOffice",
+        "World/FjordBarracks",
+        "World/FjordStorageShed",
+        "World/FjordPontoon_4m",
+        "World/FjordGantryCrane",
+        "World/FjordNoticeBoard",
+        "World/FjordLighthouse",
+        "World/FjordMooringBollard",
+        "World/FjordGangway",
+        "World/FjordDockLadder",
+        "World/FjordFuelTank",
+        "World/FjordCargoPallet",
+        "World/FjordDockFence_2m",
+        "World/FjordWorkshopBench",
+        "World/FjordDockPowerPedestal"
+      ],
+      "status": "geometry_v1"
+    },
+    {
+      "requirement": "Terrain sous-marin : kit rochers (8), tombants, sable, forêt de kelp (cartes), cheminée hydrothermale",
+      "priority": "P2",
+      "models": [
+        "World/UnderwaterRock_00",
+        "World/UnderwaterRock_01",
+        "World/UnderwaterRock_02",
+        "World/UnderwaterRock_03",
+        "World/UnderwaterRock_04",
+        "World/UnderwaterRock_05",
+        "World/UnderwaterRock_06",
+        "World/UnderwaterRock_07",
+        "World/UnderwaterCliff",
+        "World/UnderwaterSandTile_8m",
+        "World/UnderwaterKelpCluster",
+        "World/HydrothermalVent"
+      ],
+      "status": "geometry_v1"
+    },
+    {
+      "requirement": "Épaves kraviques : cargo, chalutier, sous-marin jumeau (grand frisson garanti)",
+      "priority": "P2–P3",
+      "models": [
+        "World/WreckCargo",
+        "World/WreckTrawler",
+        "World/WreckTwinSub"
+      ],
+      "status": "geometry_v1"
+    },
+    {
+      "requirement": "Dépôt militaire sous-marin (structure + sas)",
+      "priority": "P2",
+      "models": [
+        "World/UnderwaterMilitaryDepot",
+        "World/DepotAirlock"
+      ],
+      "status": "geometry_v1"
+    },
+    {
+      "requirement": "Filets de pêche industriels 🔧",
+      "priority": "P2",
+      "models": [
+        "World/IndustrialFishingNet"
+      ],
+      "status": "geometry_v1"
+    },
+    {
+      "requirement": "Trafic civil de surface (coques vues du dessous) : ferry, porte-conteneurs, voilier, jet-ski, pédalo",
+      "priority": "P3",
+      "models": [
+        "World/CivilFerry",
+        "World/CivilContainerShip",
+        "World/CivilSailboat",
+        "World/CivilJetSki",
+        "World/CivilPedalBoat"
+      ],
+      "status": "geometry_v1"
+    },
+    {
+      "requirement": "Forces de l'Entente : frégate (surface + carène), avion de patrouille, bouée sonar 🔧, grenade d'exercice",
+      "priority": "P3",
+      "models": [
+        "World/EntenteFrigate_LOD0",
+        "World/EntenteFrigate_LOD1",
+        "World/EntentePatrolPlane",
+        "World/SonarBuoy",
+        "World/ExerciseGrenade"
+      ],
+      "status": "geometry_v1"
+    },
+    {
+      "requirement": "Parc éolien offshore, plateforme, bouées de chenal 🔧, iceberg (3), régate de fin (10 voiliers + foule low-poly)",
+      "priority": "P3",
+      "models": [
+        "World/OffshoreWindTurbine",
+        "World/OffshorePlatform",
+        "World/ChannelBuoy",
+        "World/Iceberg_0",
+        "World/Iceberg_1",
+        "World/Iceberg_2",
+        "World/RaceSpectatorLowPoly",
+        "World/RaceSailboat_01",
+        "World/RaceSailboat_02",
+        "World/RaceSailboat_03",
+        "World/RaceSailboat_04",
+        "World/RaceSailboat_05",
+        "World/RaceSailboat_06",
+        "World/RaceSailboat_07",
+        "World/RaceSailboat_08",
+        "World/RaceSailboat_09",
+        "World/RaceSailboat_10"
+      ],
+      "status": "geometry_v1"
+    },
+    {
+      "requirement": "Matelot de base (corps unique, pataud)",
+      "priority": "P1",
+      "models": [
+        "Crew/SailorBase",
+        "Crew/FirstPersonArms"
+      ],
+      "status": "geometry_v1"
+    },
+    {
+      "requirement": "Têtes (x6) + moustaches (x12) + coiffures (x8)",
+      "priority": "P2–P3",
+      "models": [
+        "CrewVariants/Head_01",
+        "CrewVariants/Head_02",
+        "CrewVariants/Head_03",
+        "CrewVariants/Head_04",
+        "CrewVariants/Head_05",
+        "CrewVariants/Head_06",
+        "CrewVariants/Moustache_01",
+        "CrewVariants/Moustache_02",
+        "CrewVariants/Moustache_03",
+        "CrewVariants/Moustache_04",
+        "CrewVariants/Moustache_05",
+        "CrewVariants/Moustache_06",
+        "CrewVariants/Moustache_07",
+        "CrewVariants/Moustache_08",
+        "CrewVariants/Moustache_09",
+        "CrewVariants/Moustache_10",
+        "CrewVariants/Moustache_11",
+        "CrewVariants/Moustache_12",
+        "CrewVariants/Hair_01",
+        "CrewVariants/Hair_02",
+        "CrewVariants/Hair_03",
+        "CrewVariants/Hair_04",
+        "CrewVariants/Hair_05",
+        "CrewVariants/Hair_06",
+        "CrewVariants/Hair_07",
+        "CrewVariants/Hair_08"
+      ],
+      "status": "geometry_v1"
+    },
+    {
+      "requirement": "Uniformes : tenue de bord (P1), vareuse, tenue de sortie, tablier de cuisine, pyjama réglementaire",
+      "priority": "P2–P3",
+      "models": [
+        "Crew/SailorBase",
+        "CrewVariants/Vareuse",
+        "CrewVariants/DressUniform",
+        "CrewVariants/CookApron",
+        "CrewVariants/RegulationPyjamas"
+      ],
+      "status": "geometry_v1"
+    },
+    {
+      "requirement": "Casquettes/bonnets (x10) + cosmétiques divers (x50 en 1.0 : la plupart = petits props)",
+      "priority": "P3",
+      "models": [
+        "CrewVariants/PeakedCap",
+        "CrewVariants/WatchBeanie",
+        "CrewVariants/WoolBonnet",
+        "CrewVariants/ServiceBeret",
+        "CrewVariants/CookCap",
+        "CrewVariants/SideCap",
+        "CrewVariants/EarflapCap",
+        "CrewVariants/FlatCap",
+        "CrewVariants/DeckHardhat",
+        "CrewVariants/WinterHood",
+        "CrewVariants/RoundBadge",
+        "CrewVariants/SquareBadge",
+        "CrewVariants/AnchorBadge",
+        "CrewVariants/ChevronBadge",
+        "CrewVariants/WingBadge",
+        "CrewVariants/MedalSingle",
+        "CrewVariants/MedalPair",
+        "CrewVariants/RibbonBar",
+        "CrewVariants/ServiceStars",
+        "CrewVariants/Epaulette",
+        "CrewVariants/DeckBelt",
+        "CrewVariants/UtilityBelt",
+        "CrewVariants/Suspenders",
+        "CrewVariants/Scarf",
+        "CrewVariants/Neckerchief",
+        "CrewVariants/BowTie",
+        "CrewVariants/Tie",
+        "CrewVariants/GloveLeft",
+        "CrewVariants/GloveRight",
+        "CrewVariants/MittensPair",
+        "CrewVariants/SpectaclesRound",
+        "CrewVariants/SpectaclesSquare",
+        "CrewVariants/Monocle",
+        "CrewVariants/Goggles",
+        "CrewVariants/EarDefenders",
+        "CrewVariants/Whistle",
+        "CrewVariants/PocketWatch",
+        "CrewVariants/PocketNotebook",
+        "CrewVariants/PenBundle",
+        "CrewVariants/PencilClip",
+        "CrewVariants/KeyRing",
+        "CrewVariants/ToolPouch",
+        "CrewVariants/Canteen",
+        "CrewVariants/Satchel",
+        "CrewVariants/ShoulderBag",
+        "CrewVariants/Armband",
+        "CrewVariants/WristCuff",
+        "CrewVariants/CompassPendant",
+        "CrewVariants/ClothPatch",
+        "CrewVariants/NamePlateBlank"
+      ],
+      "status": "geometry_v1"
+    },
+    {
+      "requirement": "Scaphandre porté (variante complète du personnage)",
+      "priority": "P2",
+      "models": [
+        "CrewVariants/DivingSuit"
+      ],
+      "status": "geometry_v1"
+    },
+    {
+      "requirement": "Version « contaminé » (surcouche shader + accessoires)",
+      "priority": "P2",
+      "models": [
+        "CrewVariants/ContaminatedSailor"
+      ],
+      "status": "geometry_v1"
+    },
+    {
+      "requirement": "État évanoui (pose ragdoll contrôlée + traînage)",
+      "priority": "P2",
+      "models": [
+        "Crew/SailorBase",
+        "CrewVariants/WakeUpSalts"
+      ],
+      "status": "geometry_v1"
+    },
+    {
+      "requirement": "Le Commandant Varga",
+      "priority": "P3",
+      "models": [
+        "CrewVariants/CommanderVarga"
+      ],
+      "status": "geometry_v1"
+    },
+    {
+      "requirement": "Kit transversal Instruments",
+      "priority": "P1/P2",
+      "models": [
+        "Instruments/ButtonGuarded",
+        "Instruments/CounterRollers",
+        "Instruments/Crank",
+        "Instruments/GaugeRound_L",
+        "Instruments/GaugeRound_M",
+        "Instruments/GaugeRound_S",
+        "Instruments/GaugeVertical",
+        "Instruments/LampDome",
+        "Instruments/LeverSwitch",
+        "Instruments/RatchetWheel",
+        "Instruments/SelectorRotary",
+        "Instruments/VUMeter",
+        "Instruments/ValveWheel_L",
+        "Instruments/ValveWheel_M",
+        "Instruments/ValveWheel_S"
+      ],
+      "status": "geometry_v1"
+    },
+    {
+      "requirement": "Kit transversal Tools",
+      "priority": "P1/P2",
+      "models": [
+        "Tools/AdjustableWrench",
+        "Tools/Blowtorch",
+        "Tools/Bucket",
+        "Tools/Crowbar",
+        "Tools/Extinguisher",
+        "Tools/Flashlight",
+        "Tools/Form_Incident",
+        "Tools/Form_K90B",
+        "Tools/Form_Maintenance",
+        "Tools/Form_Radiation",
+        "Tools/Form_Requisition",
+        "Tools/Hammer",
+        "Tools/Headlamp",
+        "Tools/HullPatch",
+        "Tools/InkPad",
+        "Tools/InkStamp",
+        "Tools/ManualLoosePage",
+        "Tools/MissionOrder",
+        "Tools/Mop",
+        "Tools/PatrolNote",
+        "Tools/RolledOrder",
+        "Tools/Screwdriver",
+        "Tools/WoodWedge",
+        "Tools/WristDosimeter"
+      ],
+      "status": "geometry_v1"
+    },
+    {
+      "requirement": "Kit transversal Damage",
+      "priority": "P1/P2",
+      "models": [
+        "Damage/BentHullPlate_1",
+        "Damage/BentHullPlate_2",
+        "Damage/BentHullPlate_3",
+        "Damage/BilgeWaterCompartment_4x6",
+        "Damage/BilgeWaterCompartment_6x8",
+        "Damage/BilgeWaterTile_2m",
+        "Damage/CherenkovGlowCard",
+        "Damage/CondensationDecal",
+        "Damage/ContaminationPuddle",
+        "Damage/FrostDecal",
+        "Damage/LeakAnchor_Large",
+        "Damage/LeakAnchor_Medium",
+        "Damage/LeakAnchor_Small",
+        "Damage/PoppedRivet",
+        "Damage/SparkAnchor",
+        "Damage/SteamCard"
+      ],
+      "status": "geometry_v1"
+    },
+    {
+      "requirement": "Kit transversal Lighting",
+      "priority": "P1/P2",
+      "models": [
+        "Lighting/CompartmentCeilingLight",
+        "Lighting/EmergencyLamp"
+      ],
+      "status": "geometry_v1"
+    }
+  ],
+  "unmapped": [],
+  "missing": [],
+  "limitations": [
+    "30 manual spreads,8 propaganda illustrations,portrait/photo and localization remain artwork placeholders",
+    "Generic clips are prototypes; no game IK, cloth/cable/fluid/vehicle simulation or ragdoll",
+    "crowd is instanced; scenery shells and partial wreck interiors require level assembly and playtests",
+    "12 upgrades are not specified as named3Dassets in the annex; no speculative upgrade designs added"
+  ]
+}

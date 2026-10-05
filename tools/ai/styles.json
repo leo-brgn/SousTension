@@ -1,0 +1,32 @@
+{
+  "key_art": {
+    "prefix": "Stylized 3D animated feature-film render of a retro Cold-War submarine comedy, chunky rounded shapes, tactile enamel, brass and bakelite materials, palette of bottle green, administrative cream and rust with a single red accent, soft warm cinematic lighting, symmetrical Wes Anderson framing, tender and humorous mood, ",
+    "suffix": ", highly detailed, clean readable composition, no text, no letters, no watermark, no logo",
+    "edit_suffix": ". Keep the same objects and shapes. Stylized 3D animated film look, tactile enamel and brass, palette of bottle green, cream and rust with a single red accent, no text."
+  },
+  "concept_paint": {
+    "prefix": "Loose concept-art painting in gouache and ink, rich textured brush strokes, retro Cold-War atmosphere, limited palette of bottle green, cream, rust and one red accent, ",
+    "suffix": ", expressive, charming, readable silhouettes, no text, no letters, no watermark",
+    "edit_suffix": ". Repaint as a loose gouache and ink concept painting, limited palette of bottle green, cream, rust and one red accent, no text."
+  },
+  "poster": {
+    "prefix": "Flat vintage propaganda poster illustration, bold geometric shapes, screen-print texture, limited palette of bottle green, cream, rust and one red accent, heroic yet absurdly tender tone, symmetrical composition, ",
+    "suffix": ", no text, no letters, no typography, no watermark",
+    "edit_suffix": ". Redraw as a flat vintage propaganda poster with bold shapes and screen-print texture, limited palette of bottle green, cream, rust and one red accent, no text."
+  },
+  "character_sheet": {
+    "prefix": "Character design on a plain cream background, stylized 3D render, egg-shaped chubby bodies, big mustaches, pataud and endearing proportions, bottle green uniforms with brass buttons, soft studio lighting, ",
+    "suffix": ", full body, front view, clean silhouettes, no text, no watermark",
+    "edit_suffix": ". Keep the character design clean on a plain cream background, stylized 3D render, no text."
+  },
+  "photo": {
+    "prefix": "Cinematic film still, shallow depth of field, natural light, grainy 35mm, ",
+    "suffix": ", realistic, no text, no watermark",
+    "edit_suffix": ". Make it look like a cinematic film still, realistic lighting, no text."
+  },
+  "key_art_night": {
+    "prefix": "Stylized 3D animated feature-film render, VERY DARK low-key lighting, deep shadows, near-total blackout lit only by a pulsing red emergency lamp and a few small glowing instruments, chunky rounded shapes, tactile enamel and brass, retro Cold-War humor, bottle green and rust palette with a single red accent, ",
+    "suffix": ", dramatic and funny, readable silhouettes, no text, no letters, no watermark",
+    "edit_suffix": ". Make the scene very dark with only red emergency light, stylized 3D animated film look, no text."
+  }
+}

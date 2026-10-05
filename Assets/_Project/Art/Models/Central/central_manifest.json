@@ -1,0 +1,965 @@
+{
+  "blender": "5.2.2 LTS",
+  "issue": 117,
+  "assets": [
+    {
+      "name": "CentralSteeringWheel",
+      "triangles": 1832,
+      "parts": [
+        "Pedestal",
+        "Wheel"
+      ],
+      "pivots": [
+        {
+          "name": "Pedestal",
+          "positionBlender": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "name": "Wheel",
+          "positionBlender": [
+            0,
+            -0.2,
+            0.98
+          ]
+        }
+      ],
+      "mounts": [
+        {
+          "name": "Mount_Hands",
+          "positionBlender": [
+            0,
+            -0.24,
+            0.98
+          ]
+        },
+        {
+          "name": "Mount_Floor",
+          "positionBlender": [
+            0,
+            0,
+            0
+          ]
+        }
+      ],
+      "massKg": null,
+      "massSource": null
+    },
+    {
+      "name": "CentralDepthTrimConsole",
+      "triangles": 4236,
+      "parts": [
+        "Cabinet",
+        "DepthNeedle",
+        "DepthWheel",
+        "TrimNeedle",
+        "TrimWheel"
+      ],
+      "pivots": [
+        {
+          "name": "Cabinet",
+          "positionBlender": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "name": "DepthNeedle",
+          "positionBlender": [
+            -0.29,
+            -0.247,
+            0.8
+          ]
+        },
+        {
+          "name": "DepthWheel",
+          "positionBlender": [
+            -0.29,
+            -0.24,
+            0.44
+          ]
+        },
+        {
+          "name": "TrimNeedle",
+          "positionBlender": [
+            0.29,
+            -0.247,
+            0.8
+          ]
+        },
+        {
+          "name": "TrimWheel",
+          "positionBlender": [
+            0.29,
+            -0.24,
+            0.44
+          ]
+        }
+      ],
+      "mounts": [
+        {
+          "name": "Mount_Floor",
+          "positionBlender": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "name": "Mount_Operator",
+          "positionBlender": [
+            0,
+            -0.8,
+            0.0
+          ]
+        }
+      ],
+      "massKg": null,
+      "massSource": null
+    },
+    {
+      "name": "EngineTelegraphFivePosition",
+      "triangles": 1680,
+      "parts": [
+        "Body",
+        "CommandHandle"
+      ],
+      "pivots": [
+        {
+          "name": "Body",
+          "positionBlender": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "name": "CommandHandle",
+          "positionBlender": [
+            0,
+            -0.145,
+            0.8
+          ]
+        }
+      ],
+      "mounts": [
+        {
+          "name": "Mount_Position0",
+          "positionBlender": [
+            -0.16632559387910575,
+            -0.12,
+            0.8605375653686435
+          ]
+        },
+        {
+          "name": "Mount_Position1",
+          "positionBlender": [
+            -0.10152302923413514,
+            -0.12,
+            0.9449899118391516
+          ]
+        },
+        {
+          "name": "Mount_Position2",
+          "positionBlender": [
+            0.0,
+            -0.12,
+            0.9770000000000001
+          ]
+        },
+        {
+          "name": "Mount_Position3",
+          "positionBlender": [
+            0.10152302923413514,
+            -0.12,
+            0.9449899118391516
+          ]
+        },
+        {
+          "name": "Mount_Position4",
+          "positionBlender": [
+            0.16632559387910575,
+            -0.12,
+            0.8605375653686435
+          ]
+        },
+        {
+          "name": "Mount_HandlePivot",
+          "positionBlender": [
+            0,
+            -0.145,
+            0.8
+          ]
+        }
+      ],
+      "massKg": null,
+      "massSource": null
+    },
+    {
+      "name": "CentralChartTable",
+      "triangles": 1080,
+      "parts": [
+        "Table",
+        "Drawer"
+      ],
+      "pivots": [
+        {
+          "name": "Table",
+          "positionBlender": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "name": "Drawer",
+          "positionBlender": [
+            0,
+            -0.44,
+            0.75
+          ]
+        }
+      ],
+      "mounts": [
+        {
+          "name": "Mount_ChartPaper",
+          "positionBlender": [
+            0,
+            0,
+            0.936
+          ]
+        },
+        {
+          "name": "Mount_Manual",
+          "positionBlender": [
+            0.42,
+            0.24,
+            0.936
+          ]
+        },
+        {
+          "name": "Mount_Pencil",
+          "positionBlender": [
+            -0.48,
+            -0.32,
+            0.94
+          ]
+        }
+      ],
+      "massKg": null,
+      "massSource": null
+    },
+    {
+      "name": "ChartPaperBlank",
+      "triangles": 156,
+      "parts": [
+        "DrawablePaper"
+      ],
+      "pivots": [
+        {
+          "name": "DrawablePaper",
+          "positionBlender": [
+            0,
+            0,
+            0
+          ]
+        }
+      ],
+      "mounts": [
+        {
+          "name": "Mount_DrawableSurface",
+          "positionBlender": [
+            0,
+            0,
+            0.005
+          ]
+        }
+      ],
+      "massKg": 0.025,
+      "massSource": "prototype assumption"
+    },
+    {
+      "name": "GreasePencil",
+      "triangles": 112,
+      "parts": [
+        "Pencil"
+      ],
+      "pivots": [
+        {
+          "name": "Pencil",
+          "positionBlender": [
+            0,
+            0,
+            0
+          ]
+        }
+      ],
+      "mounts": [
+        {
+          "name": "Mount_Tip",
+          "positionBlender": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "name": "Mount_Grip",
+          "positionBlender": [
+            0,
+            0,
+            0.075
+          ]
+        }
+      ],
+      "massKg": 0.035,
+      "massSource": "prototype assumption"
+    },
+    {
+      "name": "ManualOK114OpenBinder",
+      "triangles": 1812,
+      "parts": [
+        "Spine",
+        "LeftCover",
+        "LeftPageBlock",
+        "RightCover",
+        "RightPageBlock",
+        "TurnableLeaf00",
+        "TurnableLeaf01",
+        "TurnableLeaf02",
+        "TurnableLeaf03",
+        "TurnableLeaf04",
+        "TurnableLeaf05",
+        "TurnableLeaf06",
+        "TurnableLeaf07",
+        "TurnableLeaf08",
+        "TurnableLeaf09",
+        "TurnableLeaf10",
+        "TurnableLeaf11",
+        "TurnableLeaf12",
+        "TurnableLeaf13",
+        "TurnableLeaf14",
+        "TurnableLeaf15",
+        "TurnableLeaf16",
+        "TurnableLeaf17",
+        "TurnableLeaf18",
+        "TurnableLeaf19",
+        "TurnableLeaf20",
+        "TurnableLeaf21",
+        "TurnableLeaf22",
+        "TurnableLeaf23",
+        "TurnableLeaf24",
+        "TurnableLeaf25",
+        "TurnableLeaf26",
+        "TurnableLeaf27",
+        "TurnableLeaf28",
+        "TurnableLeaf29"
+      ],
+      "pivots": [
+        {
+          "name": "Spine",
+          "positionBlender": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "name": "LeftCover",
+          "positionBlender": [
+            -0.028,
+            0,
+            0.016
+          ]
+        },
+        {
+          "name": "LeftPageBlock",
+          "positionBlender": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "name": "RightCover",
+          "positionBlender": [
+            0.028,
+            0,
+            0.016
+          ]
+        },
+        {
+          "name": "RightPageBlock",
+          "positionBlender": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "name": "TurnableLeaf00",
+          "positionBlender": [
+            0.032,
+            0,
+            0.065
+          ]
+        },
+        {
+          "name": "TurnableLeaf01",
+          "positionBlender": [
+            0.032,
+            0,
+            0.06525
+          ]
+        },
+        {
+          "name": "TurnableLeaf02",
+          "positionBlender": [
+            0.032,
+            0,
+            0.0655
+          ]
+        },
+        {
+          "name": "TurnableLeaf03",
+          "positionBlender": [
+            0.032,
+            0,
+            0.06575
+          ]
+        },
+        {
+          "name": "TurnableLeaf04",
+          "positionBlender": [
+            0.032,
+            0,
+            0.066
+          ]
+        },
+        {
+          "name": "TurnableLeaf05",
+          "positionBlender": [
+            0.032,
+            0,
+            0.06625
+          ]
+        },
+        {
+          "name": "TurnableLeaf06",
+          "positionBlender": [
+            0.032,
+            0,
+            0.0665
+          ]
+        },
+        {
+          "name": "TurnableLeaf07",
+          "positionBlender": [
+            0.032,
+            0,
+            0.06675
+          ]
+        },
+        {
+          "name": "TurnableLeaf08",
+          "positionBlender": [
+            0.032,
+            0,
+            0.067
+          ]
+        },
+        {
+          "name": "TurnableLeaf09",
+          "positionBlender": [
+            0.032,
+            0,
+            0.06725
+          ]
+        },
+        {
+          "name": "TurnableLeaf10",
+          "positionBlender": [
+            0.032,
+            0,
+            0.0675
+          ]
+        },
+        {
+          "name": "TurnableLeaf11",
+          "positionBlender": [
+            0.032,
+            0,
+            0.06775
+          ]
+        },
+        {
+          "name": "TurnableLeaf12",
+          "positionBlender": [
+            0.032,
+            0,
+            0.068
+          ]
+        },
+        {
+          "name": "TurnableLeaf13",
+          "positionBlender": [
+            0.032,
+            0,
+            0.06825
+          ]
+        },
+        {
+          "name": "TurnableLeaf14",
+          "positionBlender": [
+            0.032,
+            0,
+            0.0685
+          ]
+        },
+        {
+          "name": "TurnableLeaf15",
+          "positionBlender": [
+            0.032,
+            0,
+            0.06875
+          ]
+        },
+        {
+          "name": "TurnableLeaf16",
+          "positionBlender": [
+            0.032,
+            0,
+            0.069
+          ]
+        },
+        {
+          "name": "TurnableLeaf17",
+          "positionBlender": [
+            0.032,
+            0,
+            0.06925
+          ]
+        },
+        {
+          "name": "TurnableLeaf18",
+          "positionBlender": [
+            0.032,
+            0,
+            0.0695
+          ]
+        },
+        {
+          "name": "TurnableLeaf19",
+          "positionBlender": [
+            0.032,
+            0,
+            0.06975
+          ]
+        },
+        {
+          "name": "TurnableLeaf20",
+          "positionBlender": [
+            0.032,
+            0,
+            0.07
+          ]
+        },
+        {
+          "name": "TurnableLeaf21",
+          "positionBlender": [
+            0.032,
+            0,
+            0.07025
+          ]
+        },
+        {
+          "name": "TurnableLeaf22",
+          "positionBlender": [
+            0.032,
+            0,
+            0.07050000000000001
+          ]
+        },
+        {
+          "name": "TurnableLeaf23",
+          "positionBlender": [
+            0.032,
+            0,
+            0.07075000000000001
+          ]
+        },
+        {
+          "name": "TurnableLeaf24",
+          "positionBlender": [
+            0.032,
+            0,
+            0.07100000000000001
+          ]
+        },
+        {
+          "name": "TurnableLeaf25",
+          "positionBlender": [
+            0.032,
+            0,
+            0.07125000000000001
+          ]
+        },
+        {
+          "name": "TurnableLeaf26",
+          "positionBlender": [
+            0.032,
+            0,
+            0.07150000000000001
+          ]
+        },
+        {
+          "name": "TurnableLeaf27",
+          "positionBlender": [
+            0.032,
+            0,
+            0.07175000000000001
+          ]
+        },
+        {
+          "name": "TurnableLeaf28",
+          "positionBlender": [
+            0.032,
+            0,
+            0.07200000000000001
+          ]
+        },
+        {
+          "name": "TurnableLeaf29",
+          "positionBlender": [
+            0.032,
+            0,
+            0.07225000000000001
+          ]
+        }
+      ],
+      "mounts": [
+        {
+          "name": "Mount_PageArtworkLeft",
+          "positionBlender": [
+            -0.166,
+            0,
+            0.065
+          ]
+        },
+        {
+          "name": "Mount_PageArtworkRight",
+          "positionBlender": [
+            0.17,
+            0,
+            0.073
+          ]
+        },
+        {
+          "name": "Mount_Grip",
+          "positionBlender": [
+            0,
+            0,
+            0.035
+          ]
+        }
+      ],
+      "massKg": 8.0,
+      "massSource": "GDD"
+    },
+    {
+      "name": "CentralInstrumentConsole",
+      "triangles": 3220,
+      "parts": [
+        "Cabinet"
+      ],
+      "pivots": [
+        {
+          "name": "Cabinet",
+          "positionBlender": [
+            0,
+            0,
+            0
+          ]
+        }
+      ],
+      "mounts": [
+        {
+          "name": "Mount_Gauge00",
+          "positionBlender": [
+            -0.56,
+            -0.255,
+            0.75
+          ]
+        },
+        {
+          "name": "Mount_Gauge01",
+          "positionBlender": [
+            -0.18500000000000005,
+            -0.255,
+            0.75
+          ]
+        },
+        {
+          "name": "Mount_Gauge02",
+          "positionBlender": [
+            0.18999999999999995,
+            -0.255,
+            0.75
+          ]
+        },
+        {
+          "name": "Mount_Gauge03",
+          "positionBlender": [
+            0.565,
+            -0.255,
+            0.75
+          ]
+        },
+        {
+          "name": "Mount_Gauge10",
+          "positionBlender": [
+            -0.56,
+            -0.255,
+            1.0
+          ]
+        },
+        {
+          "name": "Mount_Gauge11",
+          "positionBlender": [
+            -0.18500000000000005,
+            -0.255,
+            1.0
+          ]
+        },
+        {
+          "name": "Mount_Gauge12",
+          "positionBlender": [
+            0.18999999999999995,
+            -0.255,
+            1.0
+          ]
+        },
+        {
+          "name": "Mount_Gauge13",
+          "positionBlender": [
+            0.565,
+            -0.255,
+            1.0
+          ]
+        },
+        {
+          "name": "Mount_Control0",
+          "positionBlender": [
+            -0.55,
+            -0.22,
+            0.61
+          ]
+        },
+        {
+          "name": "Mount_Control1",
+          "positionBlender": [
+            -0.18000000000000005,
+            -0.22,
+            0.61
+          ]
+        },
+        {
+          "name": "Mount_Control2",
+          "positionBlender": [
+            0.18999999999999995,
+            -0.22,
+            0.61
+          ]
+        },
+        {
+          "name": "Mount_Control3",
+          "positionBlender": [
+            0.5599999999999998,
+            -0.22,
+            0.61
+          ]
+        },
+        {
+          "name": "Mount_Floor",
+          "positionBlender": [
+            0,
+            0,
+            0
+          ]
+        }
+      ],
+      "massKg": null,
+      "massSource": null
+    },
+    {
+      "name": "PneumaticArrivalStation",
+      "triangles": 2372,
+      "parts": [
+        "Housing",
+        "ArrivalHatch"
+      ],
+      "pivots": [
+        {
+          "name": "Housing",
+          "positionBlender": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "name": "ArrivalHatch",
+          "positionBlender": [
+            -0.13,
+            -0.175,
+            0.42
+          ]
+        }
+      ],
+      "mounts": [
+        {
+          "name": "Mount_Capsule",
+          "positionBlender": [
+            0,
+            0,
+            0.4
+          ]
+        },
+        {
+          "name": "Mount_AirInlet",
+          "positionBlender": [
+            0,
+            0,
+            1.02
+          ]
+        },
+        {
+          "name": "Mount_Whistle",
+          "positionBlender": [
+            0,
+            0.02,
+            0.8
+          ]
+        }
+      ],
+      "massKg": null,
+      "massSource": null
+    },
+    {
+      "name": "PneumaticCapsule",
+      "triangles": 1524,
+      "parts": [
+        "Body",
+        "Cap"
+      ],
+      "pivots": [
+        {
+          "name": "Body",
+          "positionBlender": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "name": "Cap",
+          "positionBlender": [
+            0.06,
+            0,
+            0.28
+          ]
+        }
+      ],
+      "mounts": [
+        {
+          "name": "Mount_RolledOrder",
+          "positionBlender": [
+            0,
+            0,
+            0.06
+          ]
+        },
+        {
+          "name": "Mount_Grip",
+          "positionBlender": [
+            0,
+            0,
+            0.14
+          ]
+        }
+      ],
+      "massKg": 0.45,
+      "massSource": "prototype assumption"
+    },
+    {
+      "name": "RolledOrderPaper",
+      "triangles": 492,
+      "parts": [
+        "Roll"
+      ],
+      "pivots": [
+        {
+          "name": "Roll",
+          "positionBlender": [
+            0,
+            0,
+            0
+          ]
+        }
+      ],
+      "mounts": [
+        {
+          "name": "Mount_Grip",
+          "positionBlender": [
+            0,
+            0,
+            0.1
+          ]
+        }
+      ],
+      "massKg": 0.008,
+      "massSource": "prototype assumption"
+    },
+    {
+      "name": "ManualOK114LoosePage",
+      "triangles": 12,
+      "parts": [
+        "DrawablePage"
+      ],
+      "pivots": [
+        {
+          "name": "DrawablePage",
+          "positionBlender": [
+            0,
+            0,
+            0
+          ]
+        }
+      ],
+      "mounts": [
+        {
+          "name": "Mount_Grip",
+          "positionBlender": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "name": "Mount_Artwork",
+          "positionBlender": [
+            0,
+            0,
+            0.0005
+          ]
+        }
+      ],
+      "massKg": 0.005,
+      "massSource": "prototype assumption"
+    }
+  ]
+}

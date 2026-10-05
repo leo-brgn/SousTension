@@ -1,0 +1,2405 @@
+{
+  "blender": "5.2.2 LTS",
+  "scope": "GDD V1 annex1 exterior + annex10 world art meshes",
+  "assets": [
+    {
+      "name": "MolossHull_LOD0_Wear0",
+      "triangles": 1220,
+      "parts": [
+        "Body"
+      ],
+      "mounts": [
+        "Mount_Tower",
+        "Mount_Propeller",
+        "Mount_Rudder",
+        "Mount_PlanePort",
+        "Mount_PlaneStarboard",
+        "Mount_Interior"
+      ],
+      "mount_details": [
+        {
+          "name": "Mount_Tower",
+          "position_z_up": [
+            0,
+            1,
+            2.85
+          ],
+          "rotation_xyz": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "name": "Mount_Propeller",
+          "position_z_up": [
+            0,
+            -18.3,
+            0
+          ],
+          "rotation_xyz": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "name": "Mount_Rudder",
+          "position_z_up": [
+            0,
+            -16,
+            0
+          ],
+          "rotation_xyz": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "name": "Mount_PlanePort",
+          "position_z_up": [
+            -3.3,
+            -12,
+            0
+          ],
+          "rotation_xyz": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "name": "Mount_PlaneStarboard",
+          "position_z_up": [
+            3.3,
+            -12,
+            0
+          ],
+          "rotation_xyz": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "name": "Mount_Interior",
+          "position_z_up": [
+            0,
+            0,
+            -1.5
+          ],
+          "rotation_xyz": [
+            0,
+            0,
+            0
+          ]
+        }
+      ]
+    },
+    {
+      "name": "MolossHull_LOD0_Wear1",
+      "triangles": 2300,
+      "parts": [
+        "Body"
+      ],
+      "mounts": [
+        "Mount_Tower",
+        "Mount_Propeller",
+        "Mount_Rudder",
+        "Mount_PlanePort",
+        "Mount_PlaneStarboard",
+        "Mount_Interior"
+      ],
+      "mount_details": [
+        {
+          "name": "Mount_Tower",
+          "position_z_up": [
+            0,
+            1,
+            2.85
+          ],
+          "rotation_xyz": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "name": "Mount_Propeller",
+          "position_z_up": [
+            0,
+            -18.3,
+            0
+          ],
+          "rotation_xyz": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "name": "Mount_Rudder",
+          "position_z_up": [
+            0,
+            -16,
+            0
+          ],
+          "rotation_xyz": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "name": "Mount_PlanePort",
+          "position_z_up": [
+            -3.3,
+            -12,
+            0
+          ],
+          "rotation_xyz": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "name": "Mount_PlaneStarboard",
+          "position_z_up": [
+            3.3,
+            -12,
+            0
+          ],
+          "rotation_xyz": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "name": "Mount_Interior",
+          "position_z_up": [
+            0,
+            0,
+            -1.5
+          ],
+          "rotation_xyz": [
+            0,
+            0,
+            0
+          ]
+        }
+      ]
+    },
+    {
+      "name": "MolossHull_LOD0_Wear2",
+      "triangles": 2840,
+      "parts": [
+        "Body"
+      ],
+      "mounts": [
+        "Mount_Tower",
+        "Mount_Propeller",
+        "Mount_Rudder",
+        "Mount_PlanePort",
+        "Mount_PlaneStarboard",
+        "Mount_Interior"
+      ],
+      "mount_details": [
+        {
+          "name": "Mount_Tower",
+          "position_z_up": [
+            0,
+            1,
+            2.85
+          ],
+          "rotation_xyz": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "name": "Mount_Propeller",
+          "position_z_up": [
+            0,
+            -18.3,
+            0
+          ],
+          "rotation_xyz": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "name": "Mount_Rudder",
+          "position_z_up": [
+            0,
+            -16,
+            0
+          ],
+          "rotation_xyz": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "name": "Mount_PlanePort",
+          "position_z_up": [
+            -3.3,
+            -12,
+            0
+          ],
+          "rotation_xyz": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "name": "Mount_PlaneStarboard",
+          "position_z_up": [
+            3.3,
+            -12,
+            0
+          ],
+          "rotation_xyz": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "name": "Mount_Interior",
+          "position_z_up": [
+            0,
+            0,
+            -1.5
+          ],
+          "rotation_xyz": [
+            0,
+            0,
+            0
+          ]
+        }
+      ]
+    },
+    {
+      "name": "MolossHull_LOD1_Wear0",
+      "triangles": 932,
+      "parts": [
+        "Body"
+      ],
+      "mounts": [
+        "Mount_Tower",
+        "Mount_Propeller",
+        "Mount_Rudder",
+        "Mount_PlanePort",
+        "Mount_PlaneStarboard",
+        "Mount_Interior"
+      ],
+      "mount_details": [
+        {
+          "name": "Mount_Tower",
+          "position_z_up": [
+            0,
+            1,
+            2.85
+          ],
+          "rotation_xyz": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "name": "Mount_Propeller",
+          "position_z_up": [
+            0,
+            -18.3,
+            0
+          ],
+          "rotation_xyz": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "name": "Mount_Rudder",
+          "position_z_up": [
+            0,
+            -16,
+            0
+          ],
+          "rotation_xyz": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "name": "Mount_PlanePort",
+          "position_z_up": [
+            -3.3,
+            -12,
+            0
+          ],
+          "rotation_xyz": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "name": "Mount_PlaneStarboard",
+          "position_z_up": [
+            3.3,
+            -12,
+            0
+          ],
+          "rotation_xyz": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "name": "Mount_Interior",
+          "position_z_up": [
+            0,
+            0,
+            -1.5
+          ],
+          "rotation_xyz": [
+            0,
+            0,
+            0
+          ]
+        }
+      ]
+    },
+    {
+      "name": "MolossHull_LOD1_Wear1",
+      "triangles": 1372,
+      "parts": [
+        "Body"
+      ],
+      "mounts": [
+        "Mount_Tower",
+        "Mount_Propeller",
+        "Mount_Rudder",
+        "Mount_PlanePort",
+        "Mount_PlaneStarboard",
+        "Mount_Interior"
+      ],
+      "mount_details": [
+        {
+          "name": "Mount_Tower",
+          "position_z_up": [
+            0,
+            1,
+            2.85
+          ],
+          "rotation_xyz": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "name": "Mount_Propeller",
+          "position_z_up": [
+            0,
+            -18.3,
+            0
+          ],
+          "rotation_xyz": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "name": "Mount_Rudder",
+          "position_z_up": [
+            0,
+            -16,
+            0
+          ],
+          "rotation_xyz": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "name": "Mount_PlanePort",
+          "position_z_up": [
+            -3.3,
+            -12,
+            0
+          ],
+          "rotation_xyz": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "name": "Mount_PlaneStarboard",
+          "position_z_up": [
+            3.3,
+            -12,
+            0
+          ],
+          "rotation_xyz": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "name": "Mount_Interior",
+          "position_z_up": [
+            0,
+            0,
+            -1.5
+          ],
+          "rotation_xyz": [
+            0,
+            0,
+            0
+          ]
+        }
+      ]
+    },
+    {
+      "name": "MolossHull_LOD1_Wear2",
+      "triangles": 1592,
+      "parts": [
+        "Body"
+      ],
+      "mounts": [
+        "Mount_Tower",
+        "Mount_Propeller",
+        "Mount_Rudder",
+        "Mount_PlanePort",
+        "Mount_PlaneStarboard",
+        "Mount_Interior"
+      ],
+      "mount_details": [
+        {
+          "name": "Mount_Tower",
+          "position_z_up": [
+            0,
+            1,
+            2.85
+          ],
+          "rotation_xyz": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "name": "Mount_Propeller",
+          "position_z_up": [
+            0,
+            -18.3,
+            0
+          ],
+          "rotation_xyz": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "name": "Mount_Rudder",
+          "position_z_up": [
+            0,
+            -16,
+            0
+          ],
+          "rotation_xyz": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "name": "Mount_PlanePort",
+          "position_z_up": [
+            -3.3,
+            -12,
+            0
+          ],
+          "rotation_xyz": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "name": "Mount_PlaneStarboard",
+          "position_z_up": [
+            3.3,
+            -12,
+            0
+          ],
+          "rotation_xyz": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "name": "Mount_Interior",
+          "position_z_up": [
+            0,
+            0,
+            -1.5
+          ],
+          "rotation_xyz": [
+            0,
+            0,
+            0
+          ]
+        }
+      ]
+    },
+    {
+      "name": "MolossHull_LOD2_Wear0",
+      "triangles": 248,
+      "parts": [
+        "Body"
+      ],
+      "mounts": [
+        "Mount_Tower",
+        "Mount_Propeller",
+        "Mount_Rudder",
+        "Mount_PlanePort",
+        "Mount_PlaneStarboard",
+        "Mount_Interior"
+      ],
+      "mount_details": [
+        {
+          "name": "Mount_Tower",
+          "position_z_up": [
+            0,
+            1,
+            2.85
+          ],
+          "rotation_xyz": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "name": "Mount_Propeller",
+          "position_z_up": [
+            0,
+            -18.3,
+            0
+          ],
+          "rotation_xyz": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "name": "Mount_Rudder",
+          "position_z_up": [
+            0,
+            -16,
+            0
+          ],
+          "rotation_xyz": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "name": "Mount_PlanePort",
+          "position_z_up": [
+            -3.3,
+            -12,
+            0
+          ],
+          "rotation_xyz": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "name": "Mount_PlaneStarboard",
+          "position_z_up": [
+            3.3,
+            -12,
+            0
+          ],
+          "rotation_xyz": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "name": "Mount_Interior",
+          "position_z_up": [
+            0,
+            0,
+            -1.5
+          ],
+          "rotation_xyz": [
+            0,
+            0,
+            0
+          ]
+        }
+      ]
+    },
+    {
+      "name": "MolossHull_LOD2_Wear1",
+      "triangles": 368,
+      "parts": [
+        "Body"
+      ],
+      "mounts": [
+        "Mount_Tower",
+        "Mount_Propeller",
+        "Mount_Rudder",
+        "Mount_PlanePort",
+        "Mount_PlaneStarboard",
+        "Mount_Interior"
+      ],
+      "mount_details": [
+        {
+          "name": "Mount_Tower",
+          "position_z_up": [
+            0,
+            1,
+            2.85
+          ],
+          "rotation_xyz": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "name": "Mount_Propeller",
+          "position_z_up": [
+            0,
+            -18.3,
+            0
+          ],
+          "rotation_xyz": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "name": "Mount_Rudder",
+          "position_z_up": [
+            0,
+            -16,
+            0
+          ],
+          "rotation_xyz": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "name": "Mount_PlanePort",
+          "position_z_up": [
+            -3.3,
+            -12,
+            0
+          ],
+          "rotation_xyz": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "name": "Mount_PlaneStarboard",
+          "position_z_up": [
+            3.3,
+            -12,
+            0
+          ],
+          "rotation_xyz": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "name": "Mount_Interior",
+          "position_z_up": [
+            0,
+            0,
+            -1.5
+          ],
+          "rotation_xyz": [
+            0,
+            0,
+            0
+          ]
+        }
+      ]
+    },
+    {
+      "name": "MolossHull_LOD2_Wear2",
+      "triangles": 428,
+      "parts": [
+        "Body"
+      ],
+      "mounts": [
+        "Mount_Tower",
+        "Mount_Propeller",
+        "Mount_Rudder",
+        "Mount_PlanePort",
+        "Mount_PlaneStarboard",
+        "Mount_Interior"
+      ],
+      "mount_details": [
+        {
+          "name": "Mount_Tower",
+          "position_z_up": [
+            0,
+            1,
+            2.85
+          ],
+          "rotation_xyz": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "name": "Mount_Propeller",
+          "position_z_up": [
+            0,
+            -18.3,
+            0
+          ],
+          "rotation_xyz": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "name": "Mount_Rudder",
+          "position_z_up": [
+            0,
+            -16,
+            0
+          ],
+          "rotation_xyz": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "name": "Mount_PlanePort",
+          "position_z_up": [
+            -3.3,
+            -12,
+            0
+          ],
+          "rotation_xyz": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "name": "Mount_PlaneStarboard",
+          "position_z_up": [
+            3.3,
+            -12,
+            0
+          ],
+          "rotation_xyz": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "name": "Mount_Interior",
+          "position_z_up": [
+            0,
+            0,
+            -1.5
+          ],
+          "rotation_xyz": [
+            0,
+            0,
+            0
+          ]
+        }
+      ]
+    },
+    {
+      "name": "MolossConningTower",
+      "triangles": 552,
+      "parts": [
+        "Body"
+      ],
+      "mounts": [
+        "Mount_Mast0",
+        "Mount_Mast1",
+        "Mount_Mast2"
+      ],
+      "mount_details": [
+        {
+          "name": "Mount_Mast0",
+          "position_z_up": [
+            0,
+            -0.9,
+            2.88
+          ],
+          "rotation_xyz": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "name": "Mount_Mast1",
+          "position_z_up": [
+            0,
+            0,
+            2.88
+          ],
+          "rotation_xyz": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "name": "Mount_Mast2",
+          "position_z_up": [
+            0,
+            0.9,
+            2.88
+          ],
+          "rotation_xyz": [
+            0,
+            0,
+            0
+          ]
+        }
+      ]
+    },
+    {
+      "name": "MolossPropeller",
+      "triangles": 120,
+      "parts": [
+        "Body",
+        "Blade0",
+        "Blade1",
+        "Blade2",
+        "Blade3",
+        "Blade4"
+      ],
+      "mounts": [
+        "Mount_Shaft"
+      ],
+      "mount_details": [
+        {
+          "name": "Mount_Shaft",
+          "position_z_up": [
+            0,
+            0,
+            0
+          ],
+          "rotation_xyz": [
+            0,
+            0,
+            0
+          ]
+        }
+      ]
+    },
+    {
+      "name": "MolossRudder",
+      "triangles": 12,
+      "parts": [
+        "Body"
+      ],
+      "mounts": [
+        "Mount_Pivot"
+      ],
+      "mount_details": [
+        {
+          "name": "Mount_Pivot",
+          "position_z_up": [
+            0,
+            0,
+            0
+          ],
+          "rotation_xyz": [
+            0,
+            0,
+            0
+          ]
+        }
+      ]
+    },
+    {
+      "name": "MolossDivingPlane",
+      "triangles": 108,
+      "parts": [
+        "Body"
+      ],
+      "mounts": [
+        "Mount_Pivot"
+      ],
+      "mount_details": [
+        {
+          "name": "Mount_Pivot",
+          "position_z_up": [
+            0,
+            0,
+            0
+          ],
+          "rotation_xyz": [
+            0,
+            0,
+            0
+          ]
+        }
+      ]
+    },
+    {
+      "name": "MolossAntenna",
+      "triangles": 88,
+      "parts": [
+        "Body"
+      ],
+      "mounts": [
+        "Mount_Extension"
+      ],
+      "mount_details": [
+        {
+          "name": "Mount_Extension",
+          "position_z_up": [
+            0,
+            0,
+            0
+          ],
+          "rotation_xyz": [
+            0,
+            0,
+            0
+          ]
+        }
+      ]
+    },
+    {
+      "name": "MolossPeriscopeHead",
+      "triangles": 276,
+      "parts": [
+        "Body"
+      ],
+      "mounts": [
+        "Mount_Extension"
+      ],
+      "mount_details": [
+        {
+          "name": "Mount_Extension",
+          "position_z_up": [
+            0,
+            0,
+            0
+          ],
+          "rotation_xyz": [
+            0,
+            0,
+            0
+          ]
+        }
+      ]
+    },
+    {
+      "name": "FjordWorkshop",
+      "triangles": 1068,
+      "parts": [
+        "Body"
+      ],
+      "mounts": [
+        "Mount_Entrance"
+      ],
+      "mount_details": [
+        {
+          "name": "Mount_Entrance",
+          "position_z_up": [
+            0,
+            -2.7,
+            0
+          ],
+          "rotation_xyz": [
+            0,
+            0,
+            0
+          ]
+        }
+      ]
+    },
+    {
+      "name": "FjordStampOffice",
+      "triangles": 944,
+      "parts": [
+        "Body"
+      ],
+      "mounts": [
+        "Mount_Entrance"
+      ],
+      "mount_details": [
+        {
+          "name": "Mount_Entrance",
+          "position_z_up": [
+            0,
+            -2.2,
+            0
+          ],
+          "rotation_xyz": [
+            0,
+            0,
+            0
+          ]
+        }
+      ]
+    },
+    {
+      "name": "FjordBarracks",
+      "triangles": 2060,
+      "parts": [
+        "Body"
+      ],
+      "mounts": [
+        "Mount_Entrance"
+      ],
+      "mount_details": [
+        {
+          "name": "Mount_Entrance",
+          "position_z_up": [
+            0,
+            -2.7,
+            0
+          ],
+          "rotation_xyz": [
+            0,
+            0,
+            0
+          ]
+        }
+      ]
+    },
+    {
+      "name": "FjordStorageShed",
+      "triangles": 1520,
+      "parts": [
+        "Body"
+      ],
+      "mounts": [
+        "Mount_Entrance"
+      ],
+      "mount_details": [
+        {
+          "name": "Mount_Entrance",
+          "position_z_up": [
+            0,
+            -1.7,
+            0
+          ],
+          "rotation_xyz": [
+            0,
+            0,
+            0
+          ]
+        }
+      ]
+    },
+    {
+      "name": "FjordPontoon_4m",
+      "triangles": 1364,
+      "parts": [
+        "Body"
+      ],
+      "mounts": [
+        "Mount_Start",
+        "Mount_End"
+      ],
+      "mount_details": [
+        {
+          "name": "Mount_Start",
+          "position_z_up": [
+            0,
+            -2,
+            0.55
+          ],
+          "rotation_xyz": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "name": "Mount_End",
+          "position_z_up": [
+            0,
+            2,
+            0.55
+          ],
+          "rotation_xyz": [
+            0,
+            0,
+            0
+          ]
+        }
+      ]
+    },
+    {
+      "name": "FjordGantryCrane",
+      "triangles": 760,
+      "parts": [
+        "Body",
+        "Trolley",
+        "Hook"
+      ],
+      "mounts": [
+        "Mount_Cargo"
+      ],
+      "mount_details": [
+        {
+          "name": "Mount_Cargo",
+          "position_z_up": [
+            0,
+            0,
+            2.55
+          ],
+          "rotation_xyz": [
+            0,
+            0,
+            0
+          ]
+        }
+      ]
+    },
+    {
+      "name": "FjordNoticeBoard",
+      "triangles": 756,
+      "parts": [
+        "Body"
+      ],
+      "mounts": [
+        "Mount_Posters"
+      ],
+      "mount_details": [
+        {
+          "name": "Mount_Posters",
+          "position_z_up": [
+            0,
+            -0.15,
+            1.6
+          ],
+          "rotation_xyz": [
+            0,
+            0,
+            0
+          ]
+        }
+      ]
+    },
+    {
+      "name": "FjordLighthouse",
+      "triangles": 304,
+      "parts": [
+        "Body"
+      ],
+      "mounts": [
+        "Mount_Beacon"
+      ],
+      "mount_details": [
+        {
+          "name": "Mount_Beacon",
+          "position_z_up": [
+            0,
+            0,
+            8.8
+          ],
+          "rotation_xyz": [
+            0,
+            0,
+            0
+          ]
+        }
+      ]
+    },
+    {
+      "name": "FjordMooringBollard",
+      "triangles": 196,
+      "parts": [
+        "Body"
+      ],
+      "mounts": [],
+      "mount_details": []
+    },
+    {
+      "name": "FjordGangway",
+      "triangles": 332,
+      "parts": [
+        "Body"
+      ],
+      "mounts": [],
+      "mount_details": []
+    },
+    {
+      "name": "FjordDockLadder",
+      "triangles": 360,
+      "parts": [
+        "Body"
+      ],
+      "mounts": [],
+      "mount_details": []
+    },
+    {
+      "name": "FjordFuelTank",
+      "triangles": 280,
+      "parts": [
+        "Body"
+      ],
+      "mounts": [
+        "Mount_Hose"
+      ],
+      "mount_details": [
+        {
+          "name": "Mount_Hose",
+          "position_z_up": [
+            0,
+            -1,
+            0.4
+          ],
+          "rotation_xyz": [
+            0,
+            0,
+            0
+          ]
+        }
+      ]
+    },
+    {
+      "name": "FjordCargoPallet",
+      "triangles": 864,
+      "parts": [
+        "Body"
+      ],
+      "mounts": [],
+      "mount_details": []
+    },
+    {
+      "name": "FjordDockFence_2m",
+      "triangles": 432,
+      "parts": [
+        "Body"
+      ],
+      "mounts": [],
+      "mount_details": []
+    },
+    {
+      "name": "FjordWorkshopBench",
+      "triangles": 648,
+      "parts": [
+        "Body"
+      ],
+      "mounts": [],
+      "mount_details": []
+    },
+    {
+      "name": "FjordDockPowerPedestal",
+      "triangles": 216,
+      "parts": [
+        "Body"
+      ],
+      "mounts": [
+        "Mount_PowerCable"
+      ],
+      "mount_details": [
+        {
+          "name": "Mount_PowerCable",
+          "position_z_up": [
+            0,
+            -0.24,
+            0.8
+          ],
+          "rotation_xyz": [
+            0,
+            0,
+            0
+          ]
+        }
+      ]
+    },
+    {
+      "name": "UnderwaterRock_00",
+      "triangles": 64,
+      "parts": [
+        "Body"
+      ],
+      "mounts": [],
+      "mount_details": []
+    },
+    {
+      "name": "UnderwaterRock_01",
+      "triangles": 100,
+      "parts": [
+        "Body"
+      ],
+      "mounts": [],
+      "mount_details": []
+    },
+    {
+      "name": "UnderwaterRock_02",
+      "triangles": 144,
+      "parts": [
+        "Body"
+      ],
+      "mounts": [],
+      "mount_details": []
+    },
+    {
+      "name": "UnderwaterRock_03",
+      "triangles": 64,
+      "parts": [
+        "Body"
+      ],
+      "mounts": [],
+      "mount_details": []
+    },
+    {
+      "name": "UnderwaterRock_04",
+      "triangles": 100,
+      "parts": [
+        "Body"
+      ],
+      "mounts": [],
+      "mount_details": []
+    },
+    {
+      "name": "UnderwaterRock_05",
+      "triangles": 144,
+      "parts": [
+        "Body"
+      ],
+      "mounts": [],
+      "mount_details": []
+    },
+    {
+      "name": "UnderwaterRock_06",
+      "triangles": 64,
+      "parts": [
+        "Body"
+      ],
+      "mounts": [],
+      "mount_details": []
+    },
+    {
+      "name": "UnderwaterRock_07",
+      "triangles": 100,
+      "parts": [
+        "Body"
+      ],
+      "mounts": [],
+      "mount_details": []
+    },
+    {
+      "name": "UnderwaterCliff",
+      "triangles": 144,
+      "parts": [
+        "Body"
+      ],
+      "mounts": [],
+      "mount_details": []
+    },
+    {
+      "name": "UnderwaterSandTile_8m",
+      "triangles": 1404,
+      "parts": [
+        "Body"
+      ],
+      "mounts": [],
+      "mount_details": []
+    },
+    {
+      "name": "UnderwaterKelpCluster",
+      "triangles": 224,
+      "parts": [
+        "Body"
+      ],
+      "mounts": [],
+      "mount_details": []
+    },
+    {
+      "name": "HydrothermalVent",
+      "triangles": 200,
+      "parts": [
+        "Body"
+      ],
+      "mounts": [
+        "Mount_VentParticles"
+      ],
+      "mount_details": [
+        {
+          "name": "Mount_VentParticles",
+          "position_z_up": [
+            0,
+            0,
+            2.05
+          ],
+          "rotation_xyz": [
+            0,
+            0,
+            0
+          ]
+        }
+      ]
+    },
+    {
+      "name": "WreckCargo",
+      "triangles": 1240,
+      "parts": [
+        "Body"
+      ],
+      "mounts": [
+        "Mount_ExplorableInterior",
+        "Mount_Entry",
+        "Mount_Propeller"
+      ],
+      "mount_details": [
+        {
+          "name": "Mount_ExplorableInterior",
+          "position_z_up": [
+            0,
+            0,
+            -0.35000000000000003
+          ],
+          "rotation_xyz": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "name": "Mount_Entry",
+          "position_z_up": [
+            0,
+            -5.3999999999999995,
+            0.5
+          ],
+          "rotation_xyz": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "name": "Mount_Propeller",
+          "position_z_up": [
+            0,
+            -8.280000000000001,
+            -0.75
+          ],
+          "rotation_xyz": [
+            0,
+            0,
+            0
+          ]
+        }
+      ]
+    },
+    {
+      "name": "WreckTrawler",
+      "triangles": 1324,
+      "parts": [
+        "Body"
+      ],
+      "mounts": [
+        "Mount_ExplorableInterior",
+        "Mount_Entry",
+        "Mount_Propeller"
+      ],
+      "mount_details": [
+        {
+          "name": "Mount_ExplorableInterior",
+          "position_z_up": [
+            0,
+            0,
+            -0.21000000000000002
+          ],
+          "rotation_xyz": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "name": "Mount_Entry",
+          "position_z_up": [
+            0,
+            -3.0,
+            0.30000000000000004
+          ],
+          "rotation_xyz": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "name": "Mount_Propeller",
+          "position_z_up": [
+            0,
+            -4.6000000000000005,
+            -0.44999999999999996
+          ],
+          "rotation_xyz": [
+            0,
+            0,
+            0
+          ]
+        }
+      ]
+    },
+    {
+      "name": "WreckTwinSub",
+      "triangles": 592,
+      "parts": [
+        "Body"
+      ],
+      "mounts": [
+        "Mount_ExplorableInterior",
+        "Mount_Entry"
+      ],
+      "mount_details": [
+        {
+          "name": "Mount_ExplorableInterior",
+          "position_z_up": [
+            0,
+            0,
+            0.48
+          ],
+          "rotation_xyz": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "name": "Mount_Entry",
+          "position_z_up": [
+            0,
+            -6,
+            0.48
+          ],
+          "rotation_xyz": [
+            0,
+            0,
+            0
+          ]
+        }
+      ]
+    },
+    {
+      "name": "CivilFerry",
+      "triangles": 1148,
+      "parts": [
+        "Body"
+      ],
+      "mounts": [
+        "Mount_Propeller"
+      ],
+      "mount_details": [
+        {
+          "name": "Mount_Propeller",
+          "position_z_up": [
+            0,
+            -9.200000000000001,
+            -0.75
+          ],
+          "rotation_xyz": [
+            0,
+            0,
+            0
+          ]
+        }
+      ]
+    },
+    {
+      "name": "CivilContainerShip",
+      "triangles": 1904,
+      "parts": [
+        "Body"
+      ],
+      "mounts": [
+        "Mount_Propeller"
+      ],
+      "mount_details": [
+        {
+          "name": "Mount_Propeller",
+          "position_z_up": [
+            0,
+            -16.560000000000002,
+            -1.05
+          ],
+          "rotation_xyz": [
+            0,
+            0,
+            0
+          ]
+        }
+      ]
+    },
+    {
+      "name": "CivilSailboat",
+      "triangles": 470,
+      "parts": [
+        "Body",
+        "MainSail"
+      ],
+      "mounts": [
+        "Mount_Skipper"
+      ],
+      "mount_details": [
+        {
+          "name": "Mount_Skipper",
+          "position_z_up": [
+            0,
+            -1.7,
+            0.55
+          ],
+          "rotation_xyz": [
+            0,
+            0,
+            0
+          ]
+        }
+      ]
+    },
+    {
+      "name": "EntenteFrigate_LOD0",
+      "triangles": 1256,
+      "parts": [
+        "Body",
+        "GunTurret"
+      ],
+      "mounts": [
+        "Mount_Propeller"
+      ],
+      "mount_details": [
+        {
+          "name": "Mount_Propeller",
+          "position_z_up": [
+            0,
+            -13.8,
+            -0.75
+          ],
+          "rotation_xyz": [
+            0,
+            0,
+            0
+          ]
+        }
+      ]
+    },
+    {
+      "name": "EntenteFrigate_LOD1",
+      "triangles": 572,
+      "parts": [
+        "Body",
+        "GunTurret"
+      ],
+      "mounts": [
+        "Mount_Propeller"
+      ],
+      "mount_details": [
+        {
+          "name": "Mount_Propeller",
+          "position_z_up": [
+            0,
+            -13.8,
+            -0.75
+          ],
+          "rotation_xyz": [
+            0,
+            0,
+            0
+          ]
+        }
+      ]
+    },
+    {
+      "name": "IndustrialFishingNet",
+      "triangles": 1560,
+      "parts": [
+        "Body"
+      ],
+      "mounts": [
+        "Mount_CornerA",
+        "Mount_CornerB",
+        "Mount_CornerC",
+        "Mount_CornerD"
+      ],
+      "mount_details": [
+        {
+          "name": "Mount_CornerA",
+          "position_z_up": [
+            -4,
+            -3,
+            0
+          ],
+          "rotation_xyz": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "name": "Mount_CornerB",
+          "position_z_up": [
+            4,
+            -3,
+            0
+          ],
+          "rotation_xyz": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "name": "Mount_CornerC",
+          "position_z_up": [
+            -4,
+            3,
+            0
+          ],
+          "rotation_xyz": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "name": "Mount_CornerD",
+          "position_z_up": [
+            4,
+            3,
+            0
+          ],
+          "rotation_xyz": [
+            0,
+            0,
+            0
+          ]
+        }
+      ]
+    },
+    {
+      "name": "UnderwaterMilitaryDepot",
+      "triangles": 756,
+      "parts": [
+        "Body"
+      ],
+      "mounts": [
+        "Mount_Airlock",
+        "Mount_Loot"
+      ],
+      "mount_details": [
+        {
+          "name": "Mount_Airlock",
+          "position_z_up": [
+            0,
+            -4,
+            0
+          ],
+          "rotation_xyz": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "name": "Mount_Loot",
+          "position_z_up": [
+            0,
+            0,
+            0.1
+          ],
+          "rotation_xyz": [
+            0,
+            0,
+            0
+          ]
+        }
+      ]
+    },
+    {
+      "name": "DepotAirlock",
+      "triangles": 768,
+      "parts": [
+        "Body",
+        "Door0",
+        "Door1"
+      ],
+      "mounts": [
+        "Mount_Entrance",
+        "Mount_Exit"
+      ],
+      "mount_details": [
+        {
+          "name": "Mount_Entrance",
+          "position_z_up": [
+            0,
+            -1.1,
+            0
+          ],
+          "rotation_xyz": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "name": "Mount_Exit",
+          "position_z_up": [
+            0,
+            1.1,
+            0
+          ],
+          "rotation_xyz": [
+            0,
+            0,
+            0
+          ]
+        }
+      ]
+    },
+    {
+      "name": "CivilJetSki",
+      "triangles": 304,
+      "parts": [
+        "Body"
+      ],
+      "mounts": [
+        "Mount_Rider"
+      ],
+      "mount_details": [
+        {
+          "name": "Mount_Rider",
+          "position_z_up": [
+            0,
+            -0.3,
+            0.65
+          ],
+          "rotation_xyz": [
+            0,
+            0,
+            0
+          ]
+        }
+      ]
+    },
+    {
+      "name": "CivilPedalBoat",
+      "triangles": 1568,
+      "parts": [
+        "Body",
+        "PaddleWheel"
+      ],
+      "mounts": [],
+      "mount_details": []
+    },
+    {
+      "name": "EntentePatrolPlane",
+      "triangles": 980,
+      "parts": [
+        "Body",
+        "Propeller-2.3",
+        "Propeller2.3"
+      ],
+      "mounts": [],
+      "mount_details": []
+    },
+    {
+      "name": "SonarBuoy",
+      "triangles": 184,
+      "parts": [
+        "Body"
+      ],
+      "mounts": [
+        "Mount_Light",
+        "Mount_Anchor",
+        "Mount_Sonar"
+      ],
+      "mount_details": [
+        {
+          "name": "Mount_Light",
+          "position_z_up": [
+            0,
+            0,
+            1.8
+          ],
+          "rotation_xyz": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "name": "Mount_Anchor",
+          "position_z_up": [
+            0,
+            0,
+            -0.1
+          ],
+          "rotation_xyz": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "name": "Mount_Sonar",
+          "position_z_up": [
+            0,
+            0,
+            -1.7
+          ],
+          "rotation_xyz": [
+            0,
+            0,
+            0
+          ]
+        }
+      ]
+    },
+    {
+      "name": "ChannelBuoy",
+      "triangles": 148,
+      "parts": [
+        "Body"
+      ],
+      "mounts": [
+        "Mount_Light",
+        "Mount_Anchor"
+      ],
+      "mount_details": [
+        {
+          "name": "Mount_Light",
+          "position_z_up": [
+            0,
+            0,
+            1.8
+          ],
+          "rotation_xyz": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "name": "Mount_Anchor",
+          "position_z_up": [
+            0,
+            0,
+            -0.1
+          ],
+          "rotation_xyz": [
+            0,
+            0,
+            0
+          ]
+        }
+      ]
+    },
+    {
+      "name": "ExerciseGrenade",
+      "triangles": 368,
+      "parts": [
+        "Body"
+      ],
+      "mounts": [],
+      "mount_details": []
+    },
+    {
+      "name": "OffshoreWindTurbine",
+      "triangles": 456,
+      "parts": [
+        "Body",
+        "Rotor",
+        "Blade0",
+        "Blade1",
+        "Blade2"
+      ],
+      "mounts": [
+        "Mount_Rotor"
+      ],
+      "mount_details": [
+        {
+          "name": "Mount_Rotor",
+          "position_z_up": [
+            0,
+            -1,
+            28
+          ],
+          "rotation_xyz": [
+            0,
+            0,
+            0
+          ]
+        }
+      ]
+    },
+    {
+      "name": "OffshorePlatform",
+      "triangles": 508,
+      "parts": [
+        "Body"
+      ],
+      "mounts": [
+        "Mount_Access"
+      ],
+      "mount_details": [
+        {
+          "name": "Mount_Access",
+          "position_z_up": [
+            0,
+            -4.8,
+            8.4
+          ],
+          "rotation_xyz": [
+            0,
+            0,
+            0
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Iceberg_0",
+      "triangles": 64,
+      "parts": [
+        "Body"
+      ],
+      "mounts": [],
+      "mount_details": []
+    },
+    {
+      "name": "Iceberg_1",
+      "triangles": 100,
+      "parts": [
+        "Body"
+      ],
+      "mounts": [],
+      "mount_details": []
+    },
+    {
+      "name": "Iceberg_2",
+      "triangles": 144,
+      "parts": [
+        "Body"
+      ],
+      "mounts": [],
+      "mount_details": []
+    },
+    {
+      "name": "RaceSpectatorLowPoly",
+      "triangles": 220,
+      "parts": [
+        "Body"
+      ],
+      "mounts": [],
+      "mount_details": []
+    },
+    {
+      "name": "RaceSailboat_01",
+      "triangles": 470,
+      "parts": [
+        "Body",
+        "MainSail"
+      ],
+      "mounts": [
+        "Mount_Skipper"
+      ],
+      "mount_details": [
+        {
+          "name": "Mount_Skipper",
+          "position_z_up": [
+            0,
+            -1.7,
+            0.55
+          ],
+          "rotation_xyz": [
+            0,
+            0,
+            0
+          ]
+        }
+      ]
+    },
+    {
+      "name": "RaceSailboat_02",
+      "triangles": 470,
+      "parts": [
+        "Body",
+        "MainSail"
+      ],
+      "mounts": [
+        "Mount_Skipper"
+      ],
+      "mount_details": [
+        {
+          "name": "Mount_Skipper",
+          "position_z_up": [
+            0,
+            -1.7,
+            0.55
+          ],
+          "rotation_xyz": [
+            0,
+            0,
+            0
+          ]
+        }
+      ]
+    },
+    {
+      "name": "RaceSailboat_03",
+      "triangles": 470,
+      "parts": [
+        "Body",
+        "MainSail"
+      ],
+      "mounts": [
+        "Mount_Skipper"
+      ],
+      "mount_details": [
+        {
+          "name": "Mount_Skipper",
+          "position_z_up": [
+            0,
+            -1.7,
+            0.55
+          ],
+          "rotation_xyz": [
+            0,
+            0,
+            0
+          ]
+        }
+      ]
+    },
+    {
+      "name": "RaceSailboat_04",
+      "triangles": 470,
+      "parts": [
+        "Body",
+        "MainSail"
+      ],
+      "mounts": [
+        "Mount_Skipper"
+      ],
+      "mount_details": [
+        {
+          "name": "Mount_Skipper",
+          "position_z_up": [
+            0,
+            -1.7,
+            0.55
+          ],
+          "rotation_xyz": [
+            0,
+            0,
+            0
+          ]
+        }
+      ]
+    },
+    {
+      "name": "RaceSailboat_05",
+      "triangles": 470,
+      "parts": [
+        "Body",
+        "MainSail"
+      ],
+      "mounts": [
+        "Mount_Skipper"
+      ],
+      "mount_details": [
+        {
+          "name": "Mount_Skipper",
+          "position_z_up": [
+            0,
+            -1.7,
+            0.55
+          ],
+          "rotation_xyz": [
+            0,
+            0,
+            0
+          ]
+        }
+      ]
+    },
+    {
+      "name": "RaceSailboat_06",
+      "triangles": 470,
+      "parts": [
+        "Body",
+        "MainSail"
+      ],
+      "mounts": [
+        "Mount_Skipper"
+      ],
+      "mount_details": [
+        {
+          "name": "Mount_Skipper",
+          "position_z_up": [
+            0,
+            -1.7,
+            0.55
+          ],
+          "rotation_xyz": [
+            0,
+            0,
+            0
+          ]
+        }
+      ]
+    },
+    {
+      "name": "RaceSailboat_07",
+      "triangles": 470,
+      "parts": [
+        "Body",
+        "MainSail"
+      ],
+      "mounts": [
+        "Mount_Skipper"
+      ],
+      "mount_details": [
+        {
+          "name": "Mount_Skipper",
+          "position_z_up": [
+            0,
+            -1.7,
+            0.55
+          ],
+          "rotation_xyz": [
+            0,
+            0,
+            0
+          ]
+        }
+      ]
+    },
+    {
+      "name": "RaceSailboat_08",
+      "triangles": 470,
+      "parts": [
+        "Body",
+        "MainSail"
+      ],
+      "mounts": [
+        "Mount_Skipper"
+      ],
+      "mount_details": [
+        {
+          "name": "Mount_Skipper",
+          "position_z_up": [
+            0,
+            -1.7,
+            0.55
+          ],
+          "rotation_xyz": [
+            0,
+            0,
+            0
+          ]
+        }
+      ]
+    },
+    {
+      "name": "RaceSailboat_09",
+      "triangles": 470,
+      "parts": [
+        "Body",
+        "MainSail"
+      ],
+      "mounts": [
+        "Mount_Skipper"
+      ],
+      "mount_details": [
+        {
+          "name": "Mount_Skipper",
+          "position_z_up": [
+            0,
+            -1.7,
+            0.55
+          ],
+          "rotation_xyz": [
+            0,
+            0,
+            0
+          ]
+        }
+      ]
+    },
+    {
+      "name": "RaceSailboat_10",
+      "triangles": 470,
+      "parts": [
+        "Body",
+        "MainSail"
+      ],
+      "mounts": [
+        "Mount_Skipper"
+      ],
+      "mount_details": [
+        {
+          "name": "Mount_Skipper",
+          "position_z_up": [
+            0,
+            -1.7,
+            0.55
+          ],
+          "rotation_xyz": [
+            0,
+            0,
+            0
+          ]
+        }
+      ]
+    }
+  ]
+}

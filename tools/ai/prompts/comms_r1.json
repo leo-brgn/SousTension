@@ -1,0 +1,20 @@
+{
+  "name": "r1",
+  "kind": "comms",
+  "style": "key_art",
+  "size": [1344, 768],
+  "n": 3,
+  "seed": 2000,
+  "entries": [
+    { "id": "key_fjord_wave", "prompt": "an old rust-green nuclear submarine surfacing in a grey Nordic fjord at dawn, four tiny chubby mustached sailors in green caps waving from the conning tower, mist, small wooden jetty" },
+    { "id": "scram_dark", "prompt": "a reactor control room plunged into darkness lit only by red emergency lights, a chubby mustached sailor pulling a huge red lever under a broken lead seal, steam, three panicking sailors in silhouette, big brass dials, bottle green enamel consoles" },
+    { "id": "decon_shower", "prompt": "a white-tiled decontamination cabin, one chubby mustached sailor in a rubber apron spraying another sailor with a fire hose, foam and steam, the sprayed sailor standing stiffly with arms raised, comedic, warm bright light" },
+    { "id": "periscope_slap", "prompt": "inside a submarine control room, a brass periscope handle rising and whacking a distracted chubby sailor in the face, comedic physics, hand-drawn charts on the walls, warm lamp light" },
+    { "id": "two_keys", "prompt": "a long submarine corridor with round hatches, two sailors at opposite far ends each turning a big key at the same moment, a hanging intercom handset swinging in the middle, dramatic one-point perspective, tense and comedic" },
+    { "id": "soup_tilt", "prompt": "a submarine galley tilting sharply, a giant soup pot sloshing over, chubby sailors sliding across the floor with enamel bowls flying through the air, steam, comedic chaos, cosy warm lighting" },
+    { "id": "pneumatic_capsule", "prompt": "a brass pneumatic tube station delivering a small capsule with a rolled typed letter, beside a heavy riveted green door with a thin line of warm light under it, mysterious and tender, dim lamp light" },
+    { "id": "regatta_surface", "prompt": "a rusty Cold-War submarine surfacing in the middle of a colorful sailing regatta on a sunny summer day, bewildered chubby sailors on the conning tower, yachts and spectators staring, comedic" },
+    { "id": "crew_lineup", "prompt": "four chubby mustached sailors in bottle green uniforms standing in a perfectly symmetrical row in a submarine corridor, deadpan expressions, a red emergency button on the wall behind them" },
+    { "id": "steam_header", "prompt": "wide panoramic poster composition, a submarine bow cutting through a grey sea toward a tiny sailboat, four sailors on deck, dramatic clouds, large empty sky at the top reserved for a logo" }
+  ]
+}

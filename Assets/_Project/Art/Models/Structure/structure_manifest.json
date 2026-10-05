@@ -1,0 +1,118 @@
+{
+  "blender": "5.2.2 LTS",
+  "assets": [
+    {
+      "name": "HullModule_2m",
+      "triangles": 4640,
+      "parts": [
+        "Shell",
+        "CableTray"
+      ],
+      "mounts": [
+        "Mount_Light",
+        "Mount_PipeLeft",
+        "Mount_PipeRight"
+      ]
+    },
+    {
+      "name": "Bulkhead_Solid",
+      "triangles": 1028,
+      "parts": [
+        "Plate"
+      ],
+      "mounts": []
+    },
+    {
+      "name": "Bulkhead_Hatch",
+      "triangles": 2336,
+      "parts": [
+        "Plate"
+      ],
+      "mounts": [
+        "Mount_Hinge",
+        "Mount_HatchCentre"
+      ]
+    },
+    {
+      "name": "HatchDoor",
+      "triangles": 3384,
+      "parts": [
+        "Door",
+        "Wheel",
+        "Latch0",
+        "Latch1",
+        "Latch2",
+        "Latch3",
+        "Latch4",
+        "Latch5"
+      ],
+      "mounts": [
+        "Mount_Hinge"
+      ]
+    },
+    {
+      "name": "FloorGrating_1m",
+      "triangles": 368,
+      "parts": [
+        "Grating"
+      ],
+      "mounts": []
+    },
+    {
+      "name": "BilgeFloor_2m",
+      "triangles": 972,
+      "parts": [
+        "Bilge"
+      ],
+      "mounts": [
+        "Mount_PumpSump"
+      ]
+    },
+    {
+      "name": "Pipe_Straight_1m",
+      "triangles": 648,
+      "parts": [
+        "Pipe"
+      ],
+      "mounts": [
+        "Mount_A",
+        "Mount_B"
+      ]
+    },
+    {
+      "name": "Pipe_Elbow",
+      "triangles": 808,
+      "parts": [
+        "Pipe"
+      ],
+      "mounts": [
+        "Mount_A",
+        "Mount_B"
+      ]
+    },
+    {
+      "name": "Pipe_Tee",
+      "triangles": 1164,
+      "parts": [
+        "Pipe"
+      ],
+      "mounts": [
+        "Mount_A",
+        "Mount_B",
+        "Mount_C"
+      ]
+    },
+    {
+      "name": "Pipe_ValveInline",
+      "triangles": 1364,
+      "parts": [
+        "Body",
+        "Wheel"
+      ],
+      "mounts": [
+        "Mount_A",
+        "Mount_B"
+      ]
+    }
+  ]
+}

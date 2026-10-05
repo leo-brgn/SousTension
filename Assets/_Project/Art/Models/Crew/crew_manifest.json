@@ -1,0 +1,37 @@
+{
+  "blender": "5.2.2 LTS",
+  "issues": [
+    112,
+    130
+  ],
+  "assets": [
+    {
+      "name": "SailorBase",
+      "bones": 27,
+      "mesh_parts": 1,
+      "clips": [
+        "Idle",
+        "Walk",
+        "ValveTurn",
+        "Faint"
+      ],
+      "weighted_vertices": 6198,
+      "blended_vertices": 284,
+      "weighting": "normalized two-bone elbow transitions; rigid hands/fingers/body components",
+      "animation_status": "prototype; Generic rig; game IK and Animator integration pending"
+    },
+    {
+      "name": "FirstPersonArms",
+      "bones": 17,
+      "mesh_parts": 1,
+      "clips": [
+        "HandsIdle",
+        "HandsGrip"
+      ],
+      "weighted_vertices": 2528,
+      "blended_vertices": 284,
+      "weighting": "normalized two-bone elbow transitions; rigid hands/fingers/body components",
+      "animation_status": "prototype; Generic rig; game IK and Animator integration pending"
+    }
+  ]
+}

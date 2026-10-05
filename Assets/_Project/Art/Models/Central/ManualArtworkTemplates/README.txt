@@ -1,0 +1,1 @@
+ART TEMPLATES ONLY. 30 blank double page layout PNGs, each 1024x512. No game procedures, localized text or diagrams have been approved. UV0 each leaf maps a full page; use left/right half of each spread in the page material. Manual geometry has 30 separately hinged leaves and an 8 kg GDD target mass. Final procedures and illustration content remain a game-design task.

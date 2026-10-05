@@ -1,0 +1,892 @@
+{
+  "issue": 120,
+  "blender": "5.2.2 LTS",
+  "scope": "P2 art kit, no gameplay",
+  "assets": [
+    {
+      "name": "SonarConsole",
+      "triangles": 1800,
+      "parts": [
+        "Cabinet",
+        "ScreenRenderTarget",
+        "GainKnob",
+        "RangeKnob",
+        "ServiceCover"
+      ],
+      "pivots": [
+        {
+          "name": "Cabinet",
+          "positionBlender": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "name": "ScreenRenderTarget",
+          "positionBlender": [
+            0,
+            -0.3,
+            0.98
+          ]
+        },
+        {
+          "name": "GainKnob",
+          "positionBlender": [
+            -0.4,
+            -0.3,
+            0.76
+          ]
+        },
+        {
+          "name": "RangeKnob",
+          "positionBlender": [
+            0.4,
+            -0.3,
+            0.76
+          ]
+        },
+        {
+          "name": "ServiceCover",
+          "positionBlender": [
+            -0.52,
+            -0.263,
+            0.25
+          ]
+        }
+      ],
+      "mounts": [
+        {
+          "name": "Mount_Screen",
+          "positionBlender": [
+            0,
+            -0.309,
+            0.98
+          ]
+        },
+        {
+          "name": "Mount_Headphones",
+          "positionBlender": [
+            0.5,
+            -0.31,
+            0.65
+          ]
+        },
+        {
+          "name": "Mount_Floor",
+          "positionBlender": [
+            0,
+            0,
+            0
+          ]
+        }
+      ]
+    },
+    {
+      "name": "MagneticTapeRecorder",
+      "triangles": 1600,
+      "parts": [
+        "Cabinet",
+        "LoadedTapePath",
+        "TransportButton00",
+        "TransportButton01",
+        "TransportButton02",
+        "TransportButton03"
+      ],
+      "pivots": [
+        {
+          "name": "Cabinet",
+          "positionBlender": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "name": "LoadedTapePath",
+          "positionBlender": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "name": "TransportButton00",
+          "positionBlender": [
+            -0.21,
+            -0.15,
+            0.135
+          ]
+        },
+        {
+          "name": "TransportButton01",
+          "positionBlender": [
+            -0.06999999999999998,
+            -0.15,
+            0.135
+          ]
+        },
+        {
+          "name": "TransportButton02",
+          "positionBlender": [
+            0.07000000000000003,
+            -0.15,
+            0.135
+          ]
+        },
+        {
+          "name": "TransportButton03",
+          "positionBlender": [
+            0.21000000000000005,
+            -0.15,
+            0.135
+          ]
+        }
+      ],
+      "mounts": [
+        {
+          "name": "Mount_LeftReel",
+          "positionBlender": [
+            -0.205,
+            -0.155,
+            0.47
+          ]
+        },
+        {
+          "name": "Mount_RightReel",
+          "positionBlender": [
+            0.205,
+            -0.155,
+            0.47
+          ]
+        },
+        {
+          "name": "Mount_Table",
+          "positionBlender": [
+            0,
+            0,
+            0
+          ]
+        }
+      ]
+    },
+    {
+      "name": "TapeReelBlank",
+      "triangles": 2576,
+      "parts": [
+        "Reel"
+      ],
+      "pivots": [
+        {
+          "name": "Reel",
+          "positionBlender": [
+            0,
+            0,
+            0
+          ]
+        }
+      ],
+      "mounts": [
+        {
+          "name": "Mount_Spindle",
+          "positionBlender": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "name": "Mount_Grip",
+          "positionBlender": [
+            0,
+            0,
+            0
+          ]
+        }
+      ]
+    },
+    {
+      "name": "TapeReelRecorded",
+      "triangles": 2588,
+      "parts": [
+        "Reel"
+      ],
+      "pivots": [
+        {
+          "name": "Reel",
+          "positionBlender": [
+            0,
+            0,
+            0
+          ]
+        }
+      ],
+      "mounts": [
+        {
+          "name": "Mount_Spindle",
+          "positionBlender": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "name": "Mount_Grip",
+          "positionBlender": [
+            0,
+            0,
+            0
+          ]
+        }
+      ]
+    },
+    {
+      "name": "SonarHeadphones",
+      "triangles": 1584,
+      "parts": [
+        "Headband",
+        "LeftEarcup",
+        "RightEarcup"
+      ],
+      "pivots": [
+        {
+          "name": "Headband",
+          "positionBlender": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "name": "LeftEarcup",
+          "positionBlender": [
+            -0.13,
+            0,
+            0.015
+          ]
+        },
+        {
+          "name": "RightEarcup",
+          "positionBlender": [
+            0.13,
+            0,
+            0.015
+          ]
+        }
+      ],
+      "mounts": [
+        {
+          "name": "Mount_Cable",
+          "positionBlender": [
+            -0.13,
+            0,
+            -0.033
+          ]
+        },
+        {
+          "name": "Mount_Head",
+          "positionBlender": [
+            0,
+            0,
+            0.04
+          ]
+        }
+      ]
+    },
+    {
+      "name": "HeadphoneCableCoiled",
+      "triangles": 2900,
+      "parts": [
+        "Cable"
+      ],
+      "pivots": [
+        {
+          "name": "Cable",
+          "positionBlender": [
+            0,
+            0,
+            0
+          ]
+        }
+      ],
+      "mounts": [
+        {
+          "name": "Mount_Headphones",
+          "positionBlender": [
+            0,
+            0,
+            -0.017
+          ]
+        },
+        {
+          "name": "Mount_RadioJack",
+          "positionBlender": [
+            0,
+            0,
+            0.406
+          ]
+        }
+      ]
+    },
+    {
+      "name": "HydrophoneCrankStation",
+      "triangles": 1108,
+      "parts": [
+        "Housing",
+        "OrientationCrank",
+        "CrankGrip"
+      ],
+      "pivots": [
+        {
+          "name": "Housing",
+          "positionBlender": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "name": "OrientationCrank",
+          "positionBlender": [
+            0,
+            -0.115,
+            0.27
+          ]
+        },
+        {
+          "name": "CrankGrip",
+          "positionBlender": [
+            0.17,
+            -0.04,
+            0
+          ]
+        }
+      ],
+      "mounts": [
+        {
+          "name": "Mount_Wall",
+          "positionBlender": [
+            0,
+            0.13,
+            0.22
+          ]
+        },
+        {
+          "name": "Mount_AcousticCable",
+          "positionBlender": [
+            0,
+            0.05,
+            0.44
+          ]
+        }
+      ]
+    },
+    {
+      "name": "VLFRadioStation",
+      "triangles": 1696,
+      "parts": [
+        "Cabinet",
+        "FrequencyNeedle",
+        "RadioKnob0",
+        "RadioKnob1",
+        "RadioKnob2"
+      ],
+      "pivots": [
+        {
+          "name": "Cabinet",
+          "positionBlender": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "name": "FrequencyNeedle",
+          "positionBlender": [
+            -0.24,
+            -0.167,
+            0.46
+          ]
+        },
+        {
+          "name": "RadioKnob0",
+          "positionBlender": [
+            -0.28,
+            -0.165,
+            0.19
+          ]
+        },
+        {
+          "name": "RadioKnob1",
+          "positionBlender": [
+            -0.010000000000000009,
+            -0.165,
+            0.19
+          ]
+        },
+        {
+          "name": "RadioKnob2",
+          "positionBlender": [
+            0.26,
+            -0.165,
+            0.19
+          ]
+        }
+      ],
+      "mounts": [
+        {
+          "name": "Mount_AntennaCable",
+          "positionBlender": [
+            0.47,
+            0.08,
+            0.62
+          ]
+        },
+        {
+          "name": "Mount_Table",
+          "positionBlender": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "name": "Mount_HeadphoneJack",
+          "positionBlender": [
+            -0.44,
+            -0.15,
+            0.2
+          ]
+        }
+      ]
+    },
+    {
+      "name": "VLFAntennaDeployable",
+      "triangles": 1540,
+      "parts": [
+        "MastHousing",
+        "ExtendableMast",
+        "DeploymentCrank"
+      ],
+      "pivots": [
+        {
+          "name": "MastHousing",
+          "positionBlender": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "name": "ExtendableMast",
+          "positionBlender": [
+            0,
+            0,
+            0.81
+          ]
+        },
+        {
+          "name": "DeploymentCrank",
+          "positionBlender": [
+            0.13,
+            -0.1,
+            0.28
+          ]
+        }
+      ],
+      "mounts": [
+        {
+          "name": "Mount_Ceiling",
+          "positionBlender": [
+            0,
+            0,
+            0.84
+          ]
+        },
+        {
+          "name": "Mount_AerialTip",
+          "positionBlender": [
+            0,
+            0,
+            1.65
+          ]
+        },
+        {
+          "name": "Mount_RadioCable",
+          "positionBlender": [
+            0,
+            0.15,
+            0.1
+          ]
+        }
+      ]
+    },
+    {
+      "name": "MechanicalCipherMachine",
+      "triangles": 8436,
+      "parts": [
+        "Case",
+        "Key_00_00",
+        "Key_00_01",
+        "Key_00_02",
+        "Key_00_03",
+        "Key_00_04",
+        "Key_00_05",
+        "Key_00_06",
+        "Key_00_07",
+        "Key_00_08",
+        "Key_00_09",
+        "Key_01_00",
+        "Key_01_01",
+        "Key_01_02",
+        "Key_01_03",
+        "Key_01_04",
+        "Key_01_05",
+        "Key_01_06",
+        "Key_01_07",
+        "Key_01_08",
+        "Key_01_09",
+        "Key_02_00",
+        "Key_02_01",
+        "Key_02_02",
+        "Key_02_03",
+        "Key_02_04",
+        "Key_02_05",
+        "Key_02_06",
+        "Key_02_07",
+        "Key_02_08",
+        "Key_02_09",
+        "PaperCarriage",
+        "SpaceBar"
+      ],
+      "pivots": [
+        {
+          "name": "Case",
+          "positionBlender": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "name": "Key_00_00",
+          "positionBlender": [
+            -0.248,
+            -0.115,
+            0.268
+          ]
+        },
+        {
+          "name": "Key_00_01",
+          "positionBlender": [
+            -0.193,
+            -0.115,
+            0.268
+          ]
+        },
+        {
+          "name": "Key_00_02",
+          "positionBlender": [
+            -0.138,
+            -0.115,
+            0.268
+          ]
+        },
+        {
+          "name": "Key_00_03",
+          "positionBlender": [
+            -0.08299999999999999,
+            -0.115,
+            0.268
+          ]
+        },
+        {
+          "name": "Key_00_04",
+          "positionBlender": [
+            -0.027999999999999997,
+            -0.115,
+            0.268
+          ]
+        },
+        {
+          "name": "Key_00_05",
+          "positionBlender": [
+            0.027000000000000024,
+            -0.115,
+            0.268
+          ]
+        },
+        {
+          "name": "Key_00_06",
+          "positionBlender": [
+            0.08200000000000002,
+            -0.115,
+            0.268
+          ]
+        },
+        {
+          "name": "Key_00_07",
+          "positionBlender": [
+            0.137,
+            -0.115,
+            0.268
+          ]
+        },
+        {
+          "name": "Key_00_08",
+          "positionBlender": [
+            0.192,
+            -0.115,
+            0.268
+          ]
+        },
+        {
+          "name": "Key_00_09",
+          "positionBlender": [
+            0.247,
+            -0.115,
+            0.268
+          ]
+        },
+        {
+          "name": "Key_01_00",
+          "positionBlender": [
+            -0.248,
+            -0.051000000000000004,
+            0.268
+          ]
+        },
+        {
+          "name": "Key_01_01",
+          "positionBlender": [
+            -0.193,
+            -0.051000000000000004,
+            0.268
+          ]
+        },
+        {
+          "name": "Key_01_02",
+          "positionBlender": [
+            -0.138,
+            -0.051000000000000004,
+            0.268
+          ]
+        },
+        {
+          "name": "Key_01_03",
+          "positionBlender": [
+            -0.08299999999999999,
+            -0.051000000000000004,
+            0.268
+          ]
+        },
+        {
+          "name": "Key_01_04",
+          "positionBlender": [
+            -0.027999999999999997,
+            -0.051000000000000004,
+            0.268
+          ]
+        },
+        {
+          "name": "Key_01_05",
+          "positionBlender": [
+            0.027000000000000024,
+            -0.051000000000000004,
+            0.268
+          ]
+        },
+        {
+          "name": "Key_01_06",
+          "positionBlender": [
+            0.08200000000000002,
+            -0.051000000000000004,
+            0.268
+          ]
+        },
+        {
+          "name": "Key_01_07",
+          "positionBlender": [
+            0.137,
+            -0.051000000000000004,
+            0.268
+          ]
+        },
+        {
+          "name": "Key_01_08",
+          "positionBlender": [
+            0.192,
+            -0.051000000000000004,
+            0.268
+          ]
+        },
+        {
+          "name": "Key_01_09",
+          "positionBlender": [
+            0.247,
+            -0.051000000000000004,
+            0.268
+          ]
+        },
+        {
+          "name": "Key_02_00",
+          "positionBlender": [
+            -0.248,
+            0.012999999999999998,
+            0.268
+          ]
+        },
+        {
+          "name": "Key_02_01",
+          "positionBlender": [
+            -0.193,
+            0.012999999999999998,
+            0.268
+          ]
+        },
+        {
+          "name": "Key_02_02",
+          "positionBlender": [
+            -0.138,
+            0.012999999999999998,
+            0.268
+          ]
+        },
+        {
+          "name": "Key_02_03",
+          "positionBlender": [
+            -0.08299999999999999,
+            0.012999999999999998,
+            0.268
+          ]
+        },
+        {
+          "name": "Key_02_04",
+          "positionBlender": [
+            -0.027999999999999997,
+            0.012999999999999998,
+            0.268
+          ]
+        },
+        {
+          "name": "Key_02_05",
+          "positionBlender": [
+            0.027000000000000024,
+            0.012999999999999998,
+            0.268
+          ]
+        },
+        {
+          "name": "Key_02_06",
+          "positionBlender": [
+            0.08200000000000002,
+            0.012999999999999998,
+            0.268
+          ]
+        },
+        {
+          "name": "Key_02_07",
+          "positionBlender": [
+            0.137,
+            0.012999999999999998,
+            0.268
+          ]
+        },
+        {
+          "name": "Key_02_08",
+          "positionBlender": [
+            0.192,
+            0.012999999999999998,
+            0.268
+          ]
+        },
+        {
+          "name": "Key_02_09",
+          "positionBlender": [
+            0.247,
+            0.012999999999999998,
+            0.268
+          ]
+        },
+        {
+          "name": "PaperCarriage",
+          "positionBlender": [
+            0,
+            0.17,
+            0.33
+          ]
+        },
+        {
+          "name": "SpaceBar",
+          "positionBlender": [
+            0,
+            -0.185,
+            0.24
+          ]
+        }
+      ],
+      "mounts": [
+        {
+          "name": "Mount_MessagePaper",
+          "positionBlender": [
+            0,
+            0.195,
+            0.39
+          ]
+        },
+        {
+          "name": "Mount_Table",
+          "positionBlender": [
+            0,
+            0,
+            0
+          ]
+        }
+      ]
+    },
+    {
+      "name": "CipherMessagePad",
+      "triangles": 144,
+      "parts": [
+        "Pad",
+        "TopMessageSheet"
+      ],
+      "pivots": [
+        {
+          "name": "Pad",
+          "positionBlender": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "name": "TopMessageSheet",
+          "positionBlender": [
+            0,
+            0.14,
+            0.011
+          ]
+        }
+      ],
+      "mounts": [
+        {
+          "name": "Mount_Artwork",
+          "positionBlender": [
+            0,
+            0,
+            0.012
+          ]
+        },
+        {
+          "name": "Mount_Grip",
+          "positionBlender": [
+            0,
+            0,
+            0.005
+          ]
+        }
+      ]
+    }
+  ]
+}

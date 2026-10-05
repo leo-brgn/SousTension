@@ -1,0 +1,261 @@
+{
+  "blender": "5.2.2 LTS",
+  "issue": 121,
+  "scope": "Development support meshes, no torpedo decoration or cargo gameplay",
+  "assets": [
+    {
+      "name": "CargoTorpedoTube",
+      "triangles": 4028,
+      "parts": [
+        "TubeBody",
+        "BreechDoor",
+        "LockWheel",
+        "Dog0",
+        "Dog1",
+        "Dog2",
+        "Dog3",
+        "Dog4",
+        "Dog5"
+      ],
+      "mounts": [
+        {
+          "name": "Mount_BreechHinge",
+          "position_z_up": [
+            -0.44,
+            -1.4449999999999998,
+            0.48
+          ],
+          "rotation_xyz_radians": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "name": "Mount_CargoInside",
+          "position_z_up": [
+            0,
+            0,
+            0.21
+          ],
+          "rotation_xyz_radians": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "name": "Mount_Front",
+          "position_z_up": [
+            0,
+            -1.4,
+            0.48
+          ],
+          "rotation_xyz_radians": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "name": "Mount_Back",
+          "position_z_up": [
+            0,
+            1.4,
+            0.48
+          ],
+          "rotation_xyz_radians": [
+            0,
+            0,
+            0
+          ]
+        }
+      ],
+      "animation_axes": {
+        "BreechDoor": "local Z (Unity Y)",
+        "LockWheel": "local Y (Unity Z)",
+        "Dogs": "local Y (Unity Z)"
+      }
+    },
+    {
+      "name": "CargoRack",
+      "triangles": 3528,
+      "parts": [
+        "Frame"
+      ],
+      "mounts": [
+        {
+          "name": "Mount_TieDown00",
+          "position_z_up": [
+            -0.56,
+            -0.46,
+            0.18
+          ],
+          "rotation_xyz_radians": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "name": "Mount_TieDown01",
+          "position_z_up": [
+            -0.56,
+            -0.46,
+            0.82
+          ],
+          "rotation_xyz_radians": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "name": "Mount_TieDown02",
+          "position_z_up": [
+            -0.56,
+            -0.46,
+            1.47
+          ],
+          "rotation_xyz_radians": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "name": "Mount_TieDown10",
+          "position_z_up": [
+            0.56,
+            -0.46,
+            0.18
+          ],
+          "rotation_xyz_radians": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "name": "Mount_TieDown11",
+          "position_z_up": [
+            0.56,
+            -0.46,
+            0.82
+          ],
+          "rotation_xyz_radians": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "name": "Mount_TieDown12",
+          "position_z_up": [
+            0.56,
+            -0.46,
+            1.47
+          ],
+          "rotation_xyz_radians": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "name": "Mount_CargoShelf0",
+          "position_z_up": [
+            0,
+            0,
+            0.18
+          ],
+          "rotation_xyz_radians": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "name": "Mount_CargoShelf1",
+          "position_z_up": [
+            0,
+            0,
+            0.82
+          ],
+          "rotation_xyz_radians": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "name": "Mount_CargoShelf2",
+          "position_z_up": [
+            0,
+            0,
+            1.47
+          ],
+          "rotation_xyz_radians": [
+            0,
+            0,
+            0
+          ]
+        }
+      ],
+      "animation_axes": {}
+    },
+    {
+      "name": "CargoTieDownStrap",
+      "triangles": 1032,
+      "parts": [
+        "Webbing",
+        "RatchetBody",
+        "RatchetHandle"
+      ],
+      "mounts": [
+        {
+          "name": "Mount_EndA",
+          "position_z_up": [
+            0,
+            -0.6,
+            0
+          ],
+          "rotation_xyz_radians": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "name": "Mount_EndB",
+          "position_z_up": [
+            0,
+            0.6,
+            0
+          ],
+          "rotation_xyz_radians": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "name": "Mount_CargoContact",
+          "position_z_up": [
+            0,
+            0,
+            0
+          ],
+          "rotation_xyz_radians": [
+            0,
+            0,
+            0
+          ]
+        }
+      ],
+      "animation_axes": {
+        "RatchetHandle": "local X"
+      }
+    }
+  ]
+}

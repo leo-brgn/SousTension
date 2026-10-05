@@ -1,0 +1,1123 @@
+{
+  "scope": "1.0 cargo geometry V1; masses require gameplay balancing",
+  "assets": [
+    {
+      "name": "FuelDrum",
+      "triangles": 1300,
+      "parts": [
+        "Body",
+        "Bung"
+      ],
+      "pivots": [
+        {
+          "name": "Body",
+          "position": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "name": "Bung",
+          "position": [
+            0.14,
+            0,
+            0.94
+          ]
+        }
+      ],
+      "mounts": [
+        {
+          "name": "Mount_Label",
+          "position": [
+            0,
+            -0.3,
+            0.5
+          ]
+        },
+        {
+          "name": "Mount_Grip",
+          "position": [
+            0,
+            0,
+            0.46
+          ]
+        }
+      ]
+    },
+    {
+      "name": "BrineDrum",
+      "triangles": 1300,
+      "parts": [
+        "Body",
+        "Bung"
+      ],
+      "pivots": [
+        {
+          "name": "Body",
+          "position": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "name": "Bung",
+          "position": [
+            0.14,
+            0,
+            0.94
+          ]
+        }
+      ],
+      "mounts": [
+        {
+          "name": "Mount_Label",
+          "position": [
+            0,
+            -0.3,
+            0.5
+          ]
+        },
+        {
+          "name": "Mount_Grip",
+          "position": [
+            0,
+            0,
+            0.46
+          ]
+        }
+      ]
+    },
+    {
+      "name": "SealedDrum",
+      "triangles": 1300,
+      "parts": [
+        "Body",
+        "Bung"
+      ],
+      "pivots": [
+        {
+          "name": "Body",
+          "position": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "name": "Bung",
+          "position": [
+            0.14,
+            0,
+            0.94
+          ]
+        }
+      ],
+      "mounts": [
+        {
+          "name": "Mount_Label",
+          "position": [
+            0,
+            -0.3,
+            0.5
+          ]
+        },
+        {
+          "name": "Mount_Grip",
+          "position": [
+            0,
+            0,
+            0.46
+          ]
+        }
+      ]
+    },
+    {
+      "name": "NuclearFuelTransportCask",
+      "triangles": 2968,
+      "parts": [
+        "ShieldBody",
+        "BoltedLid"
+      ],
+      "pivots": [
+        {
+          "name": "ShieldBody",
+          "position": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "name": "BoltedLid",
+          "position": [
+            0,
+            0,
+            1.03
+          ]
+        }
+      ],
+      "mounts": [
+        {
+          "name": "Mount_GripLeft",
+          "position": [
+            -0.44,
+            0,
+            0.72
+          ]
+        },
+        {
+          "name": "Mount_GripRight",
+          "position": [
+            0.44,
+            0,
+            0.72
+          ]
+        },
+        {
+          "name": "Mount_Radiation",
+          "position": [
+            0,
+            0,
+            0.5
+          ]
+        }
+      ]
+    },
+    {
+      "name": "SpareFuseBox",
+      "triangles": 504,
+      "parts": [
+        "Body"
+      ],
+      "pivots": [
+        {
+          "name": "Body",
+          "position": [
+            0,
+            0,
+            0
+          ]
+        }
+      ],
+      "mounts": [
+        {
+          "name": "Mount_Grip",
+          "position": [
+            0,
+            0,
+            0.12
+          ]
+        }
+      ]
+    },
+    {
+      "name": "SpareGasket",
+      "triangles": 256,
+      "parts": [
+        "Body"
+      ],
+      "pivots": [
+        {
+          "name": "Body",
+          "position": [
+            0,
+            0,
+            0
+          ]
+        }
+      ],
+      "mounts": [
+        {
+          "name": "Mount_Grip",
+          "position": [
+            0,
+            0,
+            0.12
+          ]
+        }
+      ]
+    },
+    {
+      "name": "SpareBearing",
+      "triangles": 2776,
+      "parts": [
+        "Body"
+      ],
+      "pivots": [
+        {
+          "name": "Body",
+          "position": [
+            0,
+            0,
+            0
+          ]
+        }
+      ],
+      "mounts": [
+        {
+          "name": "Mount_Grip",
+          "position": [
+            0,
+            0,
+            0.12
+          ]
+        }
+      ]
+    },
+    {
+      "name": "SpareImpeller",
+      "triangles": 1000,
+      "parts": [
+        "Body"
+      ],
+      "pivots": [
+        {
+          "name": "Body",
+          "position": [
+            0,
+            0,
+            0
+          ]
+        }
+      ],
+      "mounts": [
+        {
+          "name": "Mount_Grip",
+          "position": [
+            0,
+            0,
+            0.12
+          ]
+        }
+      ]
+    },
+    {
+      "name": "SpareMotor",
+      "triangles": 1456,
+      "parts": [
+        "Body"
+      ],
+      "pivots": [
+        {
+          "name": "Body",
+          "position": [
+            0,
+            0,
+            0
+          ]
+        }
+      ],
+      "mounts": [
+        {
+          "name": "Mount_Grip",
+          "position": [
+            0,
+            0,
+            0.12
+          ]
+        }
+      ]
+    },
+    {
+      "name": "SparePipeSection",
+      "triangles": 672,
+      "parts": [
+        "Body"
+      ],
+      "pivots": [
+        {
+          "name": "Body",
+          "position": [
+            0,
+            0,
+            0
+          ]
+        }
+      ],
+      "mounts": [
+        {
+          "name": "Mount_Grip",
+          "position": [
+            0,
+            0,
+            0.12
+          ]
+        }
+      ]
+    },
+    {
+      "name": "SalvageChest",
+      "triangles": 756,
+      "parts": [
+        "Case",
+        "Lid"
+      ],
+      "pivots": [
+        {
+          "name": "Case",
+          "position": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "name": "Lid",
+          "position": [
+            0,
+            0.23,
+            0.43
+          ]
+        }
+      ],
+      "mounts": [
+        {
+          "name": "Mount_Grip",
+          "position": [
+            0,
+            0,
+            0.215
+          ]
+        }
+      ]
+    },
+    {
+      "name": "SalvageShipBell",
+      "triangles": 1000,
+      "parts": [
+        "Bell",
+        "Clapper"
+      ],
+      "pivots": [
+        {
+          "name": "Bell",
+          "position": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "name": "Clapper",
+          "position": [
+            0,
+            0,
+            0.27
+          ]
+        }
+      ],
+      "mounts": [
+        {
+          "name": "Mount_Sound",
+          "position": [
+            0,
+            0,
+            0.15
+          ]
+        },
+        {
+          "name": "Mount_Grip",
+          "position": [
+            0,
+            0,
+            0.35
+          ]
+        }
+      ]
+    },
+    {
+      "name": "SalvageBronzePropeller",
+      "triangles": 580,
+      "parts": [
+        "Body"
+      ],
+      "pivots": [
+        {
+          "name": "Body",
+          "position": [
+            0,
+            0,
+            0
+          ]
+        }
+      ],
+      "mounts": [
+        {
+          "name": "Mount_Grip",
+          "position": [
+            0,
+            0,
+            0.055
+          ]
+        }
+      ]
+    },
+    {
+      "name": "AntiqueSextant",
+      "triangles": 768,
+      "parts": [
+        "Frame",
+        "IndexArm"
+      ],
+      "pivots": [
+        {
+          "name": "Frame",
+          "position": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "name": "IndexArm",
+          "position": [
+            0,
+            0,
+            0.15
+          ]
+        }
+      ],
+      "mounts": [
+        {
+          "name": "Mount_Grip",
+          "position": [
+            0,
+            0,
+            0.15
+          ]
+        }
+      ]
+    },
+    {
+      "name": "BrokenJetSki",
+      "triangles": 924,
+      "parts": [
+        "Hull"
+      ],
+      "pivots": [
+        {
+          "name": "Hull",
+          "position": [
+            0,
+            0,
+            0
+          ]
+        }
+      ],
+      "mounts": [
+        {
+          "name": "Mount_Grip",
+          "position": [
+            0,
+            0,
+            0.4
+          ]
+        }
+      ]
+    },
+    {
+      "name": "ModernContainer",
+      "triangles": 1028,
+      "parts": [
+        "Shell",
+        "DoorLeft",
+        "DoorRight"
+      ],
+      "pivots": [
+        {
+          "name": "Shell",
+          "position": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "name": "DoorLeft",
+          "position": [
+            -0.6,
+            -0.95,
+            0.06
+          ]
+        },
+        {
+          "name": "DoorRight",
+          "position": [
+            0.6,
+            -0.95,
+            0.06
+          ]
+        }
+      ],
+      "mounts": [
+        {
+          "name": "Mount_Grip",
+          "position": [
+            0,
+            0,
+            0.58
+          ]
+        }
+      ]
+    },
+    {
+      "name": "InflatableDuck",
+      "triangles": 892,
+      "parts": [
+        "Body"
+      ],
+      "pivots": [
+        {
+          "name": "Body",
+          "position": [
+            0,
+            0,
+            0
+          ]
+        }
+      ],
+      "mounts": [
+        {
+          "name": "Mount_Grip",
+          "position": [
+            0,
+            0,
+            0.18
+          ]
+        }
+      ]
+    },
+    {
+      "name": "SolarPanel",
+      "triangles": 216,
+      "parts": [
+        "Frame"
+      ],
+      "pivots": [
+        {
+          "name": "Frame",
+          "position": [
+            0,
+            0,
+            0
+          ]
+        }
+      ],
+      "mounts": [
+        {
+          "name": "Mount_Cable",
+          "position": [
+            0,
+            0.5,
+            0.025
+          ]
+        },
+        {
+          "name": "Mount_Grip",
+          "position": [
+            0,
+            0,
+            0.025
+          ]
+        }
+      ]
+    },
+    {
+      "name": "ActiveBeacon",
+      "triangles": 468,
+      "parts": [
+        "Housing",
+        "Lens"
+      ],
+      "pivots": [
+        {
+          "name": "Housing",
+          "position": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "name": "Lens",
+          "position": [
+            0,
+            0,
+            0.32
+          ]
+        }
+      ],
+      "mounts": [
+        {
+          "name": "Mount_Sound",
+          "position": [
+            0,
+            0,
+            0.2
+          ]
+        },
+        {
+          "name": "Mount_Light",
+          "position": [
+            0,
+            0,
+            0.36
+          ]
+        },
+        {
+          "name": "Mount_Grip",
+          "position": [
+            0,
+            0,
+            0.15
+          ]
+        }
+      ]
+    },
+    {
+      "name": "JammedMusicBox",
+      "triangles": 864,
+      "parts": [
+        "Case",
+        "Lid"
+      ],
+      "pivots": [
+        {
+          "name": "Case",
+          "position": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "name": "Lid",
+          "position": [
+            0,
+            0.1,
+            0.16
+          ]
+        }
+      ],
+      "mounts": [
+        {
+          "name": "Mount_Sound",
+          "position": [
+            0,
+            0,
+            0.13
+          ]
+        },
+        {
+          "name": "Mount_Grip",
+          "position": [
+            0,
+            0,
+            0.08
+          ]
+        }
+      ]
+    },
+    {
+      "name": "LifeRaft1983",
+      "triangles": 1284,
+      "parts": [
+        "Pontoons"
+      ],
+      "pivots": [
+        {
+          "name": "Pontoons",
+          "position": [
+            0,
+            0,
+            0
+          ]
+        }
+      ],
+      "mounts": [
+        {
+          "name": "Mount_Grip",
+          "position": [
+            0,
+            0,
+            0.2
+          ]
+        }
+      ]
+    },
+    {
+      "name": "OldLogbook",
+      "triangles": 336,
+      "parts": [
+        "Pages",
+        "FrontCover"
+      ],
+      "pivots": [
+        {
+          "name": "Pages",
+          "position": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "name": "FrontCover",
+          "position": [
+            -0.12,
+            0,
+            0.085
+          ]
+        }
+      ],
+      "mounts": [
+        {
+          "name": "Mount_Grip",
+          "position": [
+            0,
+            0,
+            0.045
+          ]
+        }
+      ]
+    },
+    {
+      "name": "KravicMedalCase",
+      "triangles": 384,
+      "parts": [
+        "Case",
+        "Lid"
+      ],
+      "pivots": [
+        {
+          "name": "Case",
+          "position": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "name": "Lid",
+          "position": [
+            0,
+            0.1,
+            0.16
+          ]
+        }
+      ],
+      "mounts": [
+        {
+          "name": "Mount_Sound",
+          "position": [
+            0,
+            0,
+            0.13
+          ]
+        },
+        {
+          "name": "Mount_Grip",
+          "position": [
+            0,
+            0,
+            0.08
+          ]
+        }
+      ]
+    },
+    {
+      "name": "SignalEmitterFrame",
+      "triangles": 756,
+      "parts": [
+        "Body"
+      ],
+      "pivots": [
+        {
+          "name": "Body",
+          "position": [
+            0,
+            0,
+            0
+          ]
+        }
+      ],
+      "mounts": [
+        {
+          "name": "Mount_Module1",
+          "position": [
+            0,
+            0,
+            0.12
+          ]
+        },
+        {
+          "name": "Mount_Module2",
+          "position": [
+            0,
+            0,
+            0.64
+          ]
+        },
+        {
+          "name": "Mount_Module3",
+          "position": [
+            0,
+            0,
+            1.12
+          ]
+        },
+        {
+          "name": "Mount_Module4",
+          "position": [
+            0,
+            -0.33,
+            0.78
+          ]
+        },
+        {
+          "name": "Mount_Grip",
+          "position": [
+            0,
+            0,
+            0.18
+          ]
+        }
+      ]
+    },
+    {
+      "name": "SignalEmitterPower",
+      "triangles": 696,
+      "parts": [
+        "Body"
+      ],
+      "pivots": [
+        {
+          "name": "Body",
+          "position": [
+            0,
+            0,
+            0
+          ]
+        }
+      ],
+      "mounts": [
+        {
+          "name": "Mount_Grip",
+          "position": [
+            0,
+            0,
+            0.18
+          ]
+        }
+      ]
+    },
+    {
+      "name": "SignalEmitterCoil",
+      "triangles": 3380,
+      "parts": [
+        "Body"
+      ],
+      "pivots": [
+        {
+          "name": "Body",
+          "position": [
+            0,
+            0,
+            0
+          ]
+        }
+      ],
+      "mounts": [
+        {
+          "name": "Mount_Grip",
+          "position": [
+            0,
+            0,
+            0.18
+          ]
+        }
+      ]
+    },
+    {
+      "name": "SignalEmitterAerial",
+      "triangles": 396,
+      "parts": [
+        "Body"
+      ],
+      "pivots": [
+        {
+          "name": "Body",
+          "position": [
+            0,
+            0,
+            0
+          ]
+        }
+      ],
+      "mounts": [
+        {
+          "name": "Mount_Grip",
+          "position": [
+            0,
+            0,
+            0.18
+          ]
+        }
+      ]
+    },
+    {
+      "name": "SignalEmitterControls",
+      "triangles": 288,
+      "parts": [
+        "Body",
+        "Knob-0.22",
+        "Knob0",
+        "Knob0.22"
+      ],
+      "pivots": [
+        {
+          "name": "Body",
+          "position": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "name": "Knob-0.22",
+          "position": [
+            -0.22,
+            -0.11,
+            0
+          ]
+        },
+        {
+          "name": "Knob0",
+          "position": [
+            0,
+            -0.11,
+            0
+          ]
+        },
+        {
+          "name": "Knob0.22",
+          "position": [
+            0.22,
+            -0.11,
+            0
+          ]
+        }
+      ],
+      "mounts": [
+        {
+          "name": "Mount_Meter",
+          "position": [
+            0,
+            -0.09,
+            0.06
+          ]
+        },
+        {
+          "name": "Mount_Grip",
+          "position": [
+            0,
+            0,
+            0.18
+          ]
+        }
+      ]
+    },
+    {
+      "name": "SignalEmitterAssembled",
+      "triangles": 5516,
+      "parts": [
+        "Module0_Body",
+        "Module1_Body",
+        "Module2_Body",
+        "Module3_Body",
+        "Module4_Body",
+        "Module4_Knob-0.22",
+        "Module4_Knob0",
+        "Module4_Knob0.22"
+      ],
+      "pivots": [
+        {
+          "name": "Module0_Body",
+          "position": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "name": "Module1_Body",
+          "position": [
+            0,
+            0,
+            0.12
+          ]
+        },
+        {
+          "name": "Module2_Body",
+          "position": [
+            0,
+            0,
+            0.64
+          ]
+        },
+        {
+          "name": "Module3_Body",
+          "position": [
+            0,
+            0,
+            1.12
+          ]
+        },
+        {
+          "name": "Module4_Body",
+          "position": [
+            0,
+            -0.33,
+            0.78
+          ]
+        },
+        {
+          "name": "Module4_Knob-0.22",
+          "position": [
+            -0.22,
+            -0.44,
+            0.78
+          ]
+        },
+        {
+          "name": "Module4_Knob0",
+          "position": [
+            0,
+            -0.44,
+            0.78
+          ]
+        },
+        {
+          "name": "Module4_Knob0.22",
+          "position": [
+            0.22,
+            -0.44,
+            0.78
+          ]
+        }
+      ],
+      "mounts": [
+        {
+          "name": "Mount_SignalOrigin",
+          "position": [
+            0,
+            0,
+            1.62
+          ]
+        }
+      ]
+    }
+  ]
+}

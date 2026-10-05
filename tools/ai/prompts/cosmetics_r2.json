@@ -1,0 +1,73 @@
+{
+  "name": "cosmetics_r2",
+  "kind": "brainstorm",
+  "style": "character_sheet",
+  "size": [
+    768,
+    768
+  ],
+  "n": 1,
+  "seed": 7000,
+  "entries": [
+    {
+      "id": "cosmetic_01",
+      "n": 1,
+      "prompt": "one single chubby egg-shaped sailor, handlebar mustache, wearing a peaked officer cap with a brass star, centered, front view, nothing else in the picture"
+    },
+    {
+      "id": "cosmetic_02",
+      "n": 1,
+      "prompt": "one single chubby egg-shaped sailor, walrus mustache, wearing a flat sailor cap with a ribbon, centered, front view, nothing else in the picture"
+    },
+    {
+      "id": "cosmetic_03",
+      "n": 1,
+      "prompt": "one single chubby egg-shaped sailor, thin pencil mustache, wearing a wool beanie with a pompom, centered, front view, nothing else in the picture"
+    },
+    {
+      "id": "cosmetic_04",
+      "n": 1,
+      "prompt": "one single chubby egg-shaped sailor, toothbrush mustache, wearing a fur-lined hat with ear flaps, centered, front view, nothing else in the picture"
+    },
+    {
+      "id": "cosmetic_05",
+      "n": 1,
+      "prompt": "one single chubby egg-shaped sailor, long imperial waxed mustache, wearing a beret tilted to the side, centered, front view, nothing else in the picture"
+    },
+    {
+      "id": "cosmetic_06",
+      "n": 1,
+      "prompt": "one single chubby egg-shaped sailor, chevron mustache, wearing a tall chef-like hat, centered, front view, nothing else in the picture"
+    },
+    {
+      "id": "cosmetic_07",
+      "n": 1,
+      "prompt": "one single chubby egg-shaped sailor, horseshoe mustache, wearing a pillbox cap with a chin strap, centered, front view, nothing else in the picture"
+    },
+    {
+      "id": "cosmetic_08",
+      "n": 1,
+      "prompt": "one single chubby egg-shaped sailor, giant bushy mustache, wearing a bowler hat, centered, front view, nothing else in the picture"
+    },
+    {
+      "id": "cosmetic_09",
+      "n": 1,
+      "prompt": "one single chubby egg-shaped sailor, tiny curled mustache, wearing a knit cap pulled over the ears, centered, front view, nothing else in the picture"
+    },
+    {
+      "id": "cosmetic_10",
+      "n": 1,
+      "prompt": "one single chubby egg-shaped sailor, droopy mustache with mutton chops, wearing a oversized peaked cap too big for his head, centered, front view, nothing else in the picture"
+    },
+    {
+      "id": "cosmetic_11",
+      "n": 1,
+      "prompt": "one single chubby egg-shaped sailor, painter-brush mustache, wearing a tricorn hat, centered, front view, nothing else in the picture"
+    },
+    {
+      "id": "cosmetic_12",
+      "n": 1,
+      "prompt": "one single chubby egg-shaped sailor, twin braided mustache, wearing a cap with a tiny periscope on top, centered, front view, nothing else in the picture"
+    }
+  ]
+}

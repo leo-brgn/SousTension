@@ -1,0 +1,29 @@
+{
+  "blender": "5.2.2 LTS",
+  "issue": 111,
+  "assets": [
+    {
+      "name": "CompartmentCeilingLight",
+      "triangles": 1204,
+      "parts": [
+        "Body",
+        "Lens"
+      ],
+      "mounts": [
+        "Mount_Light"
+      ]
+    },
+    {
+      "name": "EmergencyLamp",
+      "triangles": 1280,
+      "parts": [
+        "Body",
+        "Lens"
+      ],
+      "mounts": [
+        "Mount_Light",
+        "Mount_Wall"
+      ]
+    }
+  ]
+}
