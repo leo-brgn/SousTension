@@ -15,10 +15,11 @@ var PITCH_AMP = 15 * Math.PI / 180, PITCH_PERIOD = 7;
 var ROLL_AMP = 20 * Math.PI / 180, ROLL_PERIOD = 5;
 
 // Horizontal part of the world "up" vector expressed in boat-local axes: up_local = (cos p sin r, cos p cos r, -sin p).
-function boatUpHorizontal(t) {
+// trimDeg / listDeg (E6-01) are the offsets the water's weight adds to the scripted swell (same as BoatMotion.Evaluate with offsets).
+function boatUpHorizontal(t, trimDeg, listDeg) {
   var tau = 2 * Math.PI;
-  var p = PITCH_AMP * Math.sin(tau * t / PITCH_PERIOD);
-  var r = ROLL_AMP * Math.sin(tau * t / ROLL_PERIOD + 1.0);
+  var p = PITCH_AMP * Math.sin(tau * t / PITCH_PERIOD) + (trimDeg || 0) * Math.PI / 180;
+  var r = ROLL_AMP * Math.sin(tau * t / ROLL_PERIOD + 1.0) + (listDeg || 0) * Math.PI / 180;
   return { x: Math.cos(p) * Math.sin(r), z: -Math.sin(p) };
 }
 
@@ -79,7 +80,8 @@ function slideStep(c, up) {
 }
 
 function updateCargo(state, tick) {
-  var up = boatUpHorizontal(tick * DT);
+  var tilt = waterTilt(state.water);
+  var up = boatUpHorizontal(tick * DT, tilt.trim, tilt.list);
   for (var i = 0; i < state.cargo.length; i++) {
     var c = state.cargo[i];
     if (c.pend !== "" && tick - c.pendTick >= INTERLOCK_WINDOW_TICKS) c.pend = ""; // second carrier too late

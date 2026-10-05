@@ -76,5 +76,20 @@ namespace SousTension.Tests
             var w1 = motion.Evaluate(2).ToWorld(local);
             Assert.That(Vector3.Distance(w0, w1), Is.GreaterThan(0.1f));
         }
-    }
+    
+        [Test]
+        public void TrimAndListOffsets_AreAddedToTheSwell_AndZeroOffsetsChangeNothing()
+        {
+            var motion = new BoatMotion();
+            Assert.AreEqual(motion.Evaluate(7.7).Rotation, motion.Evaluate(7.7, 0f, 0f).Rotation);
+            // same formula as server/src/cargo.js boatUpHorizontal(t, trim, list): up_local = (cos p sin r, cos p cos r, -sin p)
+            const double tau = 2.0 * System.Math.PI;
+            double t = 7.7, trim = 5.0, list = -3.0;
+            double p = 15.0 * System.Math.PI / 180.0 * System.Math.Sin(tau * t / 7.0) + trim * System.Math.PI / 180.0;
+            double r = 20.0 * System.Math.PI / 180.0 * System.Math.Sin(tau * t / 5.0 + 1.0) + list * System.Math.PI / 180.0;
+            var up = Vector3.Transform(Vector3.UnitY, Quaternion.Inverse(motion.Evaluate(t, (float)trim, (float)list).Rotation));
+            Assert.AreEqual((float)(System.Math.Cos(p) * System.Math.Sin(r)), up.X, 1e-4f);
+            Assert.AreEqual((float)(-System.Math.Sin(p)), up.Z, 1e-4f);
+        }
+}
 }

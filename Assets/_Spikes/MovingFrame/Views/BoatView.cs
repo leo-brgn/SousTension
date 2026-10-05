@@ -18,7 +18,8 @@ namespace SousTension.Spikes.MovingFrame
         private void LateUpdate()
         {
             if (_model == null || !_model.HasServerTime) return;
-            var pose = _motion.Evaluate(_model.EstimateServerTime(_clock.Now));
+            var water = _model.Water;   // trim / list added by the weight of the water (zero until the server sends it)
+            var pose = _motion.Evaluate(_model.EstimateServerTime(_clock.Now), water.Valid ? water.TrimDeg : 0f, water.Valid ? water.ListDeg : 0f);
             transform.SetPositionAndRotation(
                 new Vector3(pose.Position.X, pose.Position.Y, pose.Position.Z),
                 new Quaternion(pose.Rotation.X, pose.Rotation.Y, pose.Rotation.Z, pose.Rotation.W));

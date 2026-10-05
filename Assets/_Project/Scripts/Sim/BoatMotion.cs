@@ -57,11 +57,17 @@ namespace SousTension.Sim
             SurgePeriod = surgePeriod;
         }
 
-        public BoatPose Evaluate(double timeSeconds)
+        public BoatPose Evaluate(double timeSeconds) => Evaluate(timeSeconds, 0f, 0f);
+
+        /// <summary>
+        /// Pose with the trim (pitch, + = bow down) and list (roll) that the water's weight adds to the scripted swell (E6-01). The offsets are
+        /// authoritative (server/src/water.js) and replicated; with both at zero this is the plain swell.
+        /// </summary>
+        public BoatPose Evaluate(double timeSeconds, float trimOffsetDeg, float listOffsetDeg)
         {
             double tau = 2.0 * Math.PI;
-            float pitch = DegToRad(PitchAmplitudeDeg) * (float)Math.Sin(tau * timeSeconds / PitchPeriod);
-            float roll = DegToRad(RollAmplitudeDeg) * (float)Math.Sin(tau * timeSeconds / RollPeriod + 1.0);
+            float pitch = DegToRad(PitchAmplitudeDeg) * (float)Math.Sin(tau * timeSeconds / PitchPeriod) + DegToRad(trimOffsetDeg);
+            float roll = DegToRad(RollAmplitudeDeg) * (float)Math.Sin(tau * timeSeconds / RollPeriod + 1.0) + DegToRad(listOffsetDeg);
             float heave = HeaveAmplitude * (float)Math.Sin(tau * timeSeconds / HeavePeriod + 2.0);
             float surge = SurgeAmplitude * (float)Math.Sin(tau * timeSeconds / SurgePeriod + 3.0);
 

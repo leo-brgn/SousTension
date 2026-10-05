@@ -46,7 +46,7 @@ Co-op 2–4 joueurs, première personne, parodie de sous-marin nucléaire (Steam
 ## Serveur Nakama (`server/`)
 
 - **Les sources sont dans `server/src/*.js`** ; `server/modules/index.js` est **généré** (Nakama exige un seul fichier). Après toute modification : `node server/build.js`, puis commiter les deux. Le CI échoue si `index.js` est périmé (`node server/build.js --check`).
-- Tests : `node --test server/test/match.test.js server/test/reactor.test.js` (sans Nakama), `node server/test/e2e.js` (Nakama lancé : `docker compose -f server/docker-compose.yml up -d`).
+- Tests : `node --test server/test/match.test.js server/test/reactor.test.js server/test/water.test.js` (sans Nakama), `node server/test/e2e.js` (Nakama lancé : `docker compose -f server/docker-compose.yml up -d`).
 - Le **réacteur est simulé uniquement côté serveur** (`server/src/reactor.js`, déterministe, graine ; conception : `docs/design/reactor-dependency-tree.md`). Le client affiche les jauges de `rx`, il ne simule ni ne prédit le réacteur.
 - Fins de ligne : sous Windows, git peut convertir en CRLF ; les scripts de build normalisent en LF.
 
