@@ -10,6 +10,7 @@ var MATCH_NAME = "moving_frame";
 var TICK_RATE = 10;
 var DT = 1 / TICK_RATE;
 var OP_INPUT = 1;      // client -> server : {seq, mx, mz}
+var OP_DEBUG = 3;      // server -> one client: the reply to a debug command, {lines: [...]} (E1-09, debug mode only)
 var OP_STATE = 2;      // server -> clients: {tick, t, players:[{id, x, z, seq}]}
 var MOVE_SPEED = 3.0;  // m/s
 var HALF_X = 3.0;      // boat interior half width (m)

@@ -21,7 +21,24 @@ namespace SousTension.Spikes.MovingFrame
 
         public void SetStatus(string status) => _status = status;
 
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
+        private bool _visible = true;
+
+        private void Update()
+        {
+            var kb = UnityEngine.InputSystem.Keyboard.current;
+            if (kb != null && kb.f2Key.wasPressedThisFrame) _visible = !_visible;      // F2 toggles the network overlay
+        }
+#endif
+
         private void OnGUI()
+        {
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
+            if (_visible) DrawOverlay();                                               // developer overlay: not in release builds
+#endif
+        }
+
+        private void DrawOverlay()
         {
             if (_model == null) return;
             double now = _clock.Now;

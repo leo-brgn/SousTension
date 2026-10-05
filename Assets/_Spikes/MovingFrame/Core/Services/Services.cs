@@ -14,8 +14,11 @@ namespace SousTension.Spikes.MovingFrame
         /// <summary>Raised from <see cref="Poll"/> on the caller's (main) thread only.</summary>
         event Action<StateSnapshot> StateReceived;
 
+        /// <summary>Lines of the server's answer to a debug command (E1-09), raised from <see cref="Poll"/> like the state.</summary>
+        event Action<string[]> DebugReceived;
+
         Task ConnectAsync(CancellationToken cancellationToken);
-        void SendInput(int seq, float moveX, float moveZ, bool act, bool grab, bool hold = false, string use = null, string hand = null, float yaw = 0f);
+        void SendInput(int seq, float moveX, float moveZ, bool act, bool grab, bool hold = false, string use = null, string hand = null, float yaw = 0f, string dbg = null);
 
         /// <summary>Deliver queued network events on the calling thread.</summary>
         void Poll();

@@ -22,11 +22,12 @@ namespace SousTension.Spikes.MovingFrame
         private readonly double _loss;
         private readonly double _retransmitDelay;
         private readonly Random _rng;
-        private readonly List<Delayed<(int seq, float mx, float mz, bool act, bool grab, bool hold, string use, string hand, float yaw)>> _outgoing = new List<Delayed<(int, float, float, bool, bool, bool, string, string, float)>>();
+        private readonly List<Delayed<(int seq, float mx, float mz, bool act, bool grab, bool hold, string use, string hand, float yaw, string dbg)>> _outgoing = new List<Delayed<(int, float, float, bool, bool, bool, string, string, float, string)>>();
         private readonly List<Delayed<StateSnapshot>> _incoming = new List<Delayed<StateSnapshot>>();
         private double _lastOutDue, _lastInDue;
 
         public event Action<StateSnapshot> StateReceived;
+        public event Action<string[]> DebugReceived;                       // debug replies are a developer channel: not delayed
 
         public SimulatedLatencyNetworkService(INetworkService inner, IClockService clock,
             double oneWayLatencySeconds, double jitterSeconds = 0.0, double lossRate = 0.0,
@@ -45,10 +46,10 @@ namespace SousTension.Spikes.MovingFrame
 
         public Task ConnectAsync(CancellationToken ct) => _inner.ConnectAsync(ct);
 
-        public void SendInput(int seq, float moveX, float moveZ, bool act, bool grab, bool hold = false, string use = null, string hand = null, float yaw = 0f)
+        public void SendInput(int seq, float moveX, float moveZ, bool act, bool grab, bool hold = false, string use = null, string hand = null, float yaw = 0f, string dbg = null)
         {
             _lastOutDue = Math.Max(_lastOutDue, _clock.Now + NextDelay());
-            _outgoing.Add(new Delayed<(int, float, float, bool, bool, bool, string, string, float)> { Due = _lastOutDue, Item = (seq, moveX, moveZ, act, grab, hold, use, hand, yaw) });
+            _outgoing.Add(new Delayed<(int, float, float, bool, bool, bool, string, string, float, string)> { Due = _lastOutDue, Item = (seq, moveX, moveZ, act, grab, hold, use, hand, yaw, dbg) });
         }
 
         private void OnInnerState(StateSnapshot s)
@@ -64,7 +65,7 @@ namespace SousTension.Spikes.MovingFrame
             while (_outgoing.Count > 0 && _outgoing[0].Due <= now)
             {
                 var o = _outgoing[0].Item; _outgoing.RemoveAt(0);
-                _inner.SendInput(o.seq, o.mx, o.mz, o.act, o.grab, o.hold, o.use, o.hand, o.yaw);
+                _inner.SendInput(o.seq, o.mx, o.mz, o.act, o.grab, o.hold, o.use, o.hand, o.yaw, o.dbg);
             }
             while (_incoming.Count > 0 && _incoming[0].Due <= now)
             {

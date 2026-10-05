@@ -31,6 +31,7 @@ namespace SousTension.Spikes.MovingFrame
         public void Read(out float moveX, out float moveZ, out bool act, out bool grab)
         {
             var kb = Keyboard.current;
+            if (DebugConsoleView.IsOpen) { moveX = 0f; moveZ = 0f; act = false; grab = false; return; }   // typing in the developer console: stand still
             float f = 0f, r = 0f;
             act = kb != null && kb.eKey.isPressed;
             grab = false;                      // the old F toggle is gone: F takes, G puts down, H stows (IHandsInput)

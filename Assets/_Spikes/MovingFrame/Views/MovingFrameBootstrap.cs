@@ -53,7 +53,9 @@ namespace SousTension.Spikes.MovingFrame
             // Model + Controller (aim and mouse button: AimView, bound to the camera below)
             var model = new MovingFrameModel();
             var aim = new GameObject("Aim").AddComponent<AimView>();
-            _controller = new MovingFrameController(network, input, clock, model, aim, aim, input, input);
+            var console = new DebugConsoleModel();
+            new GameObject("DebugConsole").AddComponent<DebugConsoleView>().Bind(console);
+            _controller = new MovingFrameController(network, input, clock, model, aim, aim, input, input, console);
 
             // Views
             var boat = BuildBoat();

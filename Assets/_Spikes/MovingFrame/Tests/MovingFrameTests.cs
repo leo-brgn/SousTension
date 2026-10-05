@@ -30,11 +30,13 @@ namespace SousTension.Spikes.MovingFrame.Tests
         public long BytesSent { get; private set; }
         public long BytesReceived { get; private set; }
         public event Action<StateSnapshot> StateReceived;
-        public readonly List<(int seq, float mx, float mz, bool act, bool grab, bool hold, string use, string hand, float yaw)> Sent = new List<(int, float, float, bool, bool, bool, string, string, float)>();
+        public event Action<string[]> DebugReceived;
+        public void RaiseDebug(string[] lines) => DebugReceived?.Invoke(lines);
+        public readonly List<(int seq, float mx, float mz, bool act, bool grab, bool hold, string use, string hand, float yaw, string dbg)> Sent = new List<(int, float, float, bool, bool, bool, string, string, float, string)>();
         private readonly Queue<StateSnapshot> _incoming = new Queue<StateSnapshot>();
 
         public Task ConnectAsync(CancellationToken ct) => Task.CompletedTask;
-        public void SendInput(int seq, float moveX, float moveZ, bool act, bool grab, bool hold = false, string use = null, string hand = null, float yaw = 0f) { Sent.Add((seq, moveX, moveZ, act, grab, hold, use, hand, yaw)); BytesSent += 24; }
+        public void SendInput(int seq, float moveX, float moveZ, bool act, bool grab, bool hold = false, string use = null, string hand = null, float yaw = 0f, string dbg = null) { Sent.Add((seq, moveX, moveZ, act, grab, hold, use, hand, yaw, dbg)); BytesSent += 24; }
         public void Enqueue(StateSnapshot s) => _incoming.Enqueue(s);
         public void Poll() { while (_incoming.Count > 0) StateReceived?.Invoke(_incoming.Dequeue()); }
         public void Dispose() { }
@@ -611,6 +613,56 @@ namespace SousTension.Spikes.MovingFrame.Tests
             StringAssert.Contains("Sommaire", ManualView.PageText(0));
             StringAssert.Contains("Redémarrage", ManualView.PageText(0), "the contents lists the procedures");
             StringAssert.Contains("1 / 6", ManualView.PageText(0));
+        }
+
+        // ---- Debug tools (E1-09) ----
+        [Test]
+        public void DebugConsole_SubmitQueuesOneCommandPerTick_InOrder_AndLogsIt()
+        {
+            var net = new FakeNetwork(); var clock = new FakeClock(); var model = new MovingFrameModel(); var console = new DebugConsoleModel();
+            var c = new MovingFrameController(net, new ConstantInput(), clock, model, null, null, null, null, console);
+            net.Enqueue(new StateSnapshot(1, 0.1, new[] { new PlayerState("me", 0, 0, 0) }));
+            c.Tick(0); net.Sent.Clear();
+            console.Submit("  leak 3 2 g  "); console.Submit("scram"); console.Submit("   "); console.Submit("");
+            c.Tick(0.3f);
+            Assert.AreEqual("leak 3 2 g", net.Sent[0].dbg, "trimmed, one per tick");
+            Assert.AreEqual("scram", net.Sent[1].dbg);
+            for (int i = 2; i < net.Sent.Count; i++) Assert.IsNull(net.Sent[i].dbg, "nothing more to send");
+            CollectionAssert.AreEqual(new[] { "> leak 3 2 g", "> scram" }, console.Log);
+        }
+
+        [Test]
+        public void DebugReplies_FromTheServer_AreLoggedInTheConsole()
+        {
+            var net = new FakeNetwork(); var clock = new FakeClock(); var model = new MovingFrameModel(); var console = new DebugConsoleModel();
+            var c = new MovingFrameController(net, new ConstantInput(), clock, model, null, null, null, null, console);
+            net.RaiseDebug(new[] { "leak 1 in compartment 3", "size 2" });
+            net.RaiseDebug(null);
+            CollectionAssert.AreEqual(new[] { "leak 1 in compartment 3", "size 2" }, console.Log);
+        }
+
+        [Test]
+        public void DebugConsole_HistoryRecall_RefusesLongLines_AndCapsTheLog()
+        {
+            var console = new DebugConsoleModel();
+            Assert.AreEqual("", console.Recall(-1));
+            console.Submit("one"); console.Submit("two"); console.Submit("two"); console.Submit("three");
+            CollectionAssert.AreEqual(new[] { "one", "two", "three" }, console.History, "an immediate repeat is not remembered twice");
+            Assert.AreEqual("three", console.Recall(-1));
+            Assert.AreEqual("two", console.Recall(-1));
+            Assert.AreEqual("one", console.Recall(-1));
+            Assert.AreEqual("one", console.Recall(-1), "stops at the oldest");
+            Assert.AreEqual("two", console.Recall(1));
+            Assert.AreEqual("three", console.Recall(1));
+            Assert.AreEqual("", console.Recall(1), "past the newest: empty line");
+            console.Submit(new string('x', DebugConsoleModel.MaxLineLength + 1));
+            StringAssert.Contains("too long", console.Log[console.Log.Count - 1]);
+            Assert.AreEqual("one", console.TakeCommand()); Assert.AreEqual("two", console.TakeCommand()); Assert.AreEqual("two", console.TakeCommand(), "a repeated command is still sent twice: only the history skips it");
+            Assert.AreEqual("three", console.TakeCommand());
+            Assert.IsNull(console.TakeCommand(), "the oversized line was refused, not queued");
+            for (int i = 0; i < DebugConsoleModel.MaxLog + 50; i++) console.AddReply(new[] { "line " + i });
+            Assert.AreEqual(DebugConsoleModel.MaxLog, console.Log.Count);
+            Assert.AreEqual("line " + (DebugConsoleModel.MaxLog + 49), console.Log[console.Log.Count - 1]);
         }
 
         [Test]

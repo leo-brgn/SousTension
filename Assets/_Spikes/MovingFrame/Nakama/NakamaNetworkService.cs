@@ -17,8 +17,10 @@ namespace SousTension.Spikes.MovingFrame
     {
         private const long OpInput = 1;
         private const long OpState = 2;
+        private const long OpDebug = 3;
 
-        [Serializable] private class InputDto { public int seq; public float mx; public float mz; public bool act; public bool grab; public bool hold; public string use; public string hand; public float ry; }
+        [Serializable] private class InputDto { public int seq; public float mx; public float mz; public bool act; public bool grab; public bool hold; public string use; public string hand; public float ry; public string dbg; }
+        [Serializable] private class DebugDto { public string[] lines; }
         [Serializable] private class PlayerDto { public string id; public float x; public float z; public int seq; public string[] hd; }
         [Serializable] private class InterlockDto { public int a; public int b; public string ab; public string bb; public string result; public int rt; public int n; }
         [Serializable] private class CoupledDto { public string id; public int a; public int b; public string ab; public string bb; public string result; public int rt; public int n; }
@@ -47,6 +49,8 @@ namespace SousTension.Spikes.MovingFrame
         private long _bytesSent, _bytesReceived;
 
         public event Action<StateSnapshot> StateReceived;
+        public event Action<string[]> DebugReceived;
+        private readonly System.Collections.Concurrent.ConcurrentQueue<string[]> _debugQueue = new System.Collections.Concurrent.ConcurrentQueue<string[]>();
         public string LocalUserId => _session?.UserId;
         public long BytesSent => Interlocked.Read(ref _bytesSent);
         public long BytesReceived => Interlocked.Read(ref _bytesReceived);
@@ -70,10 +74,10 @@ namespace SousTension.Spikes.MovingFrame
             await _socket.JoinMatchAsync(_matchId);
         }
 
-        public void SendInput(int seq, float moveX, float moveZ, bool act, bool grab, bool hold = false, string use = null, string hand = null, float yaw = 0f)
+        public void SendInput(int seq, float moveX, float moveZ, bool act, bool grab, bool hold = false, string use = null, string hand = null, float yaw = 0f, string dbg = null)
         {
             if (_socket == null || !_socket.IsConnected) return;
-            var json = JsonUtility.ToJson(new InputDto { seq = seq, mx = moveX, mz = moveZ, act = act, grab = grab, hold = hold, use = use ?? "", hand = hand ?? "", ry = yaw });
+            var json = JsonUtility.ToJson(new InputDto { seq = seq, mx = moveX, mz = moveZ, act = act, grab = grab, hold = hold, use = use ?? "", hand = hand ?? "", ry = yaw, dbg = dbg ?? "" });
             var bytes = Encoding.UTF8.GetBytes(json);
             Interlocked.Add(ref _bytesSent, bytes.Length);
             _ = SendAsync(bytes);
@@ -87,6 +91,12 @@ namespace SousTension.Spikes.MovingFrame
 
         private void OnMatchState(IMatchState state)
         {
+            if (state.OpCode == OpDebug)
+            {
+                var reply = JsonUtility.FromJson<DebugDto>(Encoding.UTF8.GetString(state.State));
+                if (reply?.lines != null) _debugQueue.Enqueue(reply.lines);
+                return;
+            }
             if (state.OpCode != OpState) return;
             Interlocked.Add(ref _bytesReceived, state.State.Length);
             var dto = JsonUtility.FromJson<StateDto>(Encoding.UTF8.GetString(state.State));
@@ -151,6 +161,7 @@ namespace SousTension.Spikes.MovingFrame
         public void Poll()
         {
             while (_queue.TryDequeue(out var snapshot)) StateReceived?.Invoke(snapshot);
+            while (_debugQueue.TryDequeue(out var lines)) DebugReceived?.Invoke(lines);
         }
 
         public void Dispose()
