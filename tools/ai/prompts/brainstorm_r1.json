@@ -1,0 +1,21 @@
+{
+  "name": "r1",
+  "kind": "brainstorm",
+  "style": "concept_paint",
+  "size": [1024, 1024],
+  "n": 3,
+  "seed": 5000,
+  "entries": [
+    { "id": "sailor_variants", "style": "character_sheet", "n": 4, "prompt": "a lineup of four different chubby mustached sailors, each with a different mustache shape and cap, front view, standing side by side" },
+    { "id": "cosmetics_catalog", "style": "character_sheet", "n": 4, "prompt": "a catalog sheet of twelve funny regulation mustaches and military caps arranged in a neat grid, each item isolated on the cream background" },
+    { "id": "poster_procedure", "style": "poster", "prompt": "a heroic sailor holding a huge thick manual binder like a shield in front of a rising sun, radiating lines" },
+    { "id": "poster_two_keys", "style": "poster", "prompt": "two sailors each holding a big key at opposite edges of the poster, linked by a taut glowing line, symmetrical composition" },
+    { "id": "poster_soup", "style": "poster", "prompt": "a steaming bowl of soup raised like a national monument, tiny sailors saluting at its base" },
+    { "id": "sub_exterior", "n": 4, "prompt": "side view concept art of the old submarine KMS Irrevocable, Molosse class, rusted bottle green hull patched with mismatched plates, hand-drawn marks, brass conning tower fittings" },
+    { "id": "fjord_base", "size": [1344, 768], "prompt": "a secret fjord naval base seen from the water, wooden jetty, a loading crane, a small stamp-office hut, barracks and a lighthouse, grey misty light" },
+    { "id": "crew_emblem", "style": "poster", "n": 4, "prompt": "circular emblem badge design for a submarine crew: a submarine silhouette inside a cog and laurel wreath with a star, retro heraldic, flat colors" },
+    { "id": "color_script", "size": [1344, 768], "prompt": "a four-panel color script of the same submarine corridor going from bright white light to orange to red emergency light to total darkness as power fails" },
+    { "id": "commander_door", "prompt": "the mysterious riveted door of the officers' mess with warm light under it, pneumatic tubes, hand-written graffiti marks all over the walls, melancholic and tender" },
+    { "id": "reactor_room", "size": [1344, 768], "n": 4, "prompt": "the reactor compartment with a bottle green enamel control cabinet with a sloped panel, brass gauges, a huge red scram lever in a barred cage and a small porthole showing a blue glow" }
+  ]
+}

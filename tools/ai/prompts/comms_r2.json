@@ -1,0 +1,15 @@
+{
+  "name": "r2",
+  "kind": "comms",
+  "style": "key_art",
+  "size": [1344, 768],
+  "n": 3,
+  "seed": 3000,
+  "entries": [
+    { "id": "scram_dark", "style": "key_art_night", "prompt": "a submarine control room in almost total blackout, the only light is a pulsing red emergency lamp and the red glow of a huge lever being pulled down by a chubby mustached sailor in a green cap, long shadows, silhouettes of other sailors behind him" },
+    { "id": "periscope_slap", "prompt": "a chubby sailor in a green cap struck on the head by a tall brass periscope tube rising up from a hole in the floor, his cap flying off, little stars, other sailors laughing in the background, a control room with charts on the walls" },
+    { "id": "soup_tilt", "prompt": "inside a ship's galley the whole room is tilted, a big cooking pot of steaming soup sliding and spilling across the wooden floor, three chubby sailors in aprons sliding with enamel bowls flying, comedic chaos" },
+    { "id": "pneumatic_capsule", "prompt": "close-up of a small brass pneumatic tube capsule with a rolled paper letter popping out of a brass wall pipe, in front of a heavy riveted bottle-green door with a thin line of warm light under it, dim wall lamp, mysterious and tender" },
+    { "id": "steam_header", "prompt": "wide cinematic poster: a single old rust-green submarine bow cutting through a grey sea toward a tiny sailboat on the horizon, four tiny sailors on the conning tower, dramatic clouds, a large empty cream sky at the top reserved for a logo" }
+  ]
+}

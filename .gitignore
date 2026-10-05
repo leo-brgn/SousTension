@@ -98,3 +98,7 @@ results-*.xml
 scratch_out/
 blender/__pycache__/
 *.blend1
+
+# Visuels générés par IA locale (ComfyUI) pour la communication et le brainstorming : volumineux, non commités
+ai_gen/
+build_pbr/

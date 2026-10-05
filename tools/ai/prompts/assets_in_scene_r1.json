@@ -1,0 +1,16 @@
+{
+  "name": "r1",
+  "kind": "comms",
+  "style": "key_art",
+  "n": 3,
+  "seed": 8000,
+  "timeout": 1200,
+  "entries": [
+    { "id": "scram_in_scene", "edit_from": "scratch_out/prev/ScramLever_three_quarter.png", "style": "key_art",
+      "instruction": "Place this exact red SCRAM lever in a dimly lit retro submarine reactor compartment, mounted on a bottle green enamel wall between riveted pipes, warm lamp light and a faint blue glow, a chubby mustached sailor's hand reaching for it" },
+    { "id": "console_in_scene", "edit_from": "scratch_out/prev/RK1_Console_three_quarter.png", "style": "key_art",
+      "instruction": "Place this exact green enamel control console in a retro submarine reactor compartment with riveted bulkheads, brass pipes and warm lamp light, brass gauges mounted on its sloped panel, one chubby mustached sailor reading a huge manual next to it" },
+    { "id": "hatch_in_scene", "edit_from": "scratch_out/prev2/HatchDoor_three_quarter.png", "style": "key_art",
+      "instruction": "Place this exact round-wheel hatch door in a submarine bulkhead inside a long corridor, riveted green plates, caged ceiling lamps, a chubby mustached sailor turning the wheel, warm light spilling through the gap" }
+  ]
+}
