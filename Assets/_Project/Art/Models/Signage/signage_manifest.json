@@ -1,0 +1,111 @@
+{
+  "issue": 132,
+  "lettering": "baked mesh; ASCII prototype labels",
+  "assets": [
+    {
+      "name": "Plate_Torpedoes",
+      "label": "01  TORPILLES",
+      "triangles": 984,
+      "width": 0.66,
+      "height": 0.15
+    },
+    {
+      "name": "Plate_Central",
+      "label": "02  POSTE CENTRAL",
+      "triangles": 1292,
+      "width": 0.78,
+      "height": 0.15
+    },
+    {
+      "name": "Plate_Radio",
+      "label": "03  RADIO / SONAR",
+      "triangles": 1360,
+      "width": 0.78,
+      "height": 0.15
+    },
+    {
+      "name": "Plate_Reactor",
+      "label": "04  REACTEUR",
+      "triangles": 1084,
+      "width": 0.66,
+      "height": 0.15
+    },
+    {
+      "name": "Plate_Machines",
+      "label": "05  MACHINES",
+      "triangles": 976,
+      "width": 0.66,
+      "height": 0.15
+    },
+    {
+      "name": "Plate_Living",
+      "label": "06  SAS ET VIE",
+      "triangles": 992,
+      "width": 0.66,
+      "height": 0.15
+    },
+    {
+      "name": "Plate_Primary",
+      "label": "CIRCUIT PRIMAIRE",
+      "triangles": 1292,
+      "width": 0.65,
+      "height": 0.12
+    },
+    {
+      "name": "Plate_Bilge",
+      "label": "POMPE DE CALE",
+      "triangles": 1008,
+      "width": 0.58,
+      "height": 0.12
+    },
+    {
+      "name": "Plate_Electric",
+      "label": "TABLEAU ELECTRIQUE",
+      "triangles": 1386,
+      "width": 0.76,
+      "height": 0.12
+    },
+    {
+      "name": "Plate_Interphone",
+      "label": "INTERPHONE",
+      "triangles": 872,
+      "width": 0.36,
+      "height": 0.1
+    },
+    {
+      "name": "Plate_Manual",
+      "label": "MANUEL OK-114",
+      "triangles": 852,
+      "width": 0.52,
+      "height": 0.12
+    },
+    {
+      "name": "Plate_Pneumatic",
+      "label": "COURRIER PNEUMATIQUE",
+      "triangles": 1710,
+      "width": 0.78,
+      "height": 0.12
+    },
+    {
+      "name": "Plate_Battery",
+      "label": "BATTERIES",
+      "triangles": 916,
+      "width": 0.38,
+      "height": 0.12
+    },
+    {
+      "name": "Plate_Scram",
+      "label": "SCRAM",
+      "triangles": 776,
+      "width": 0.28,
+      "height": 0.12
+    },
+    {
+      "name": "Plate_Registry",
+      "label": "MOLOSSE / KR-114",
+      "triangles": 1160,
+      "width": 0.68,
+      "height": 0.2
+    }
+  ]
+}

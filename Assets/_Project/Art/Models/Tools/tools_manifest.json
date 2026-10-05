@@ -1,0 +1,616 @@
+{
+  "blender": "5.2.2 LTS",
+  "issue": 122,
+  "notes": [
+    "Paper meshes intentionally blank; localized typography and form content require runtime print/decal material.",
+    "Dosimeter has independent dose and health indicators; game and wrist rig integration required."
+  ],
+  "assets": [
+    {
+      "name": "Hammer",
+      "triangles": 308,
+      "parts": [
+        "Body"
+      ],
+      "mounts": [
+        "Mount_Grip"
+      ],
+      "bounds_blender_z_up": {
+        "min": [
+          -0.13500000536441803,
+          -0.04500000178813934,
+          -0.02000001072883606
+        ],
+        "max": [
+          0.10999999940395355,
+          0.04500000178813934,
+          0.39499998092651367
+        ]
+      },
+      "collider_hint": "box approximation for portable pickup; water/cards no collider",
+      "prototype_mass_kg": 1.2
+    },
+    {
+      "name": "AdjustableWrench",
+      "triangles": 856,
+      "parts": [
+        "Body",
+        "SlidingJaw",
+        "AdjustmentWheel"
+      ],
+      "mounts": [
+        "Mount_Grip"
+      ],
+      "bounds_blender_z_up": {
+        "min": [
+          -0.04500000178813934,
+          -0.014999999664723873,
+          -0.017000000923871994
+        ],
+        "max": [
+          0.04899999871850014,
+          0.014999999664723873,
+          0.3344999849796295
+        ]
+      },
+      "collider_hint": "box approximation for portable pickup; water/cards no collider",
+      "prototype_mass_kg": 0.7
+    },
+    {
+      "name": "HullPatch",
+      "triangles": 296,
+      "parts": [
+        "Body"
+      ],
+      "mounts": [
+        "Mount_Grip",
+        "Mount_Seal"
+      ],
+      "bounds_blender_z_up": {
+        "min": [
+          -0.1899999976158142,
+          -0.15000000596046448,
+          0.0
+        ],
+        "max": [
+          0.1899999976158142,
+          0.15000000596046448,
+          0.03400000184774399
+        ]
+      },
+      "collider_hint": "box approximation for portable pickup; water/cards no collider",
+      "prototype_mass_kg": 4.0
+    },
+    {
+      "name": "WoodWedge",
+      "triangles": 8,
+      "parts": [
+        "Body"
+      ],
+      "mounts": [
+        "Mount_Grip"
+      ],
+      "bounds_blender_z_up": {
+        "min": [
+          -0.11999999731779099,
+          -0.04500000178813934,
+          0.0
+        ],
+        "max": [
+          0.11999999731779099,
+          0.04500000178813934,
+          0.06499999761581421
+        ]
+      },
+      "collider_hint": "box approximation for portable pickup; water/cards no collider",
+      "prototype_mass_kg": 0.25
+    },
+    {
+      "name": "Flashlight",
+      "triangles": 768,
+      "parts": [
+        "Body"
+      ],
+      "mounts": [
+        "Mount_Grip",
+        "Mount_Light"
+      ],
+      "bounds_blender_z_up": {
+        "min": [
+          -0.05700000002980232,
+          -0.05700000002980232,
+          -0.015000000596046448
+        ],
+        "max": [
+          0.05700000002980232,
+          0.05700000002980232,
+          0.27649998664855957
+        ]
+      },
+      "collider_hint": "box approximation for portable pickup; water/cards no collider",
+      "prototype_mass_kg": 0.5
+    },
+    {
+      "name": "Bucket",
+      "triangles": 844,
+      "parts": [
+        "Body",
+        "Handle"
+      ],
+      "mounts": [
+        "Mount_Grip"
+      ],
+      "bounds_blender_z_up": {
+        "min": [
+          -0.17599999904632568,
+          -0.16699999570846558,
+          0.0
+        ],
+        "max": [
+          0.17599999904632568,
+          0.16699999570846558,
+          0.26899999380111694
+        ]
+      },
+      "collider_hint": "box approximation for portable pickup; water/cards no collider",
+      "prototype_mass_kg": 1.0
+    },
+    {
+      "name": "Mop",
+      "triangles": 488,
+      "parts": [
+        "Body"
+      ],
+      "mounts": [
+        "Mount_Grip"
+      ],
+      "bounds_blender_z_up": {
+        "min": [
+          -0.125,
+          -0.032499998807907104,
+          -0.09799999743700027
+        ],
+        "max": [
+          0.125,
+          0.032499998807907104,
+          1.2000000476837158
+        ]
+      },
+      "collider_hint": "box approximation for portable pickup; water/cards no collider",
+      "prototype_mass_kg": 1.0
+    },
+    {
+      "name": "Screwdriver",
+      "triangles": 260,
+      "parts": [
+        "Body"
+      ],
+      "mounts": [
+        "Mount_Grip"
+      ],
+      "bounds_blender_z_up": {
+        "min": [
+          -0.02377641387283802,
+          -0.02500000037252903,
+          0.0
+        ],
+        "max": [
+          0.02377641387283802,
+          0.02500000037252903,
+          0.3174999952316284
+        ]
+      },
+      "collider_hint": "box approximation for portable pickup; water/cards no collider",
+      "prototype_mass_kg": 0.2
+    },
+    {
+      "name": "Crowbar",
+      "triangles": 412,
+      "parts": [
+        "Body"
+      ],
+      "mounts": [
+        "Mount_Grip"
+      ],
+      "bounds_blender_z_up": {
+        "min": [
+          -0.07850000262260437,
+          -0.013000003062188625,
+          -0.007000001147389412
+        ],
+        "max": [
+          0.017500000074505806,
+          0.013000000268220901,
+          0.5984999537467957
+        ]
+      },
+      "collider_hint": "box approximation for portable pickup; water/cards no collider",
+      "prototype_mass_kg": 1.5
+    },
+    {
+      "name": "WristDosimeter",
+      "triangles": 820,
+      "parts": [
+        "Body",
+        "DoseNeedle",
+        "HealthNeedle"
+      ],
+      "mounts": [
+        "Mount_Grip",
+        "Mount_Wrist"
+      ],
+      "bounds_blender_z_up": {
+        "min": [
+          -0.05000000074505806,
+          -0.04349999874830246,
+          -0.06499999761581421
+        ],
+        "max": [
+          0.05000000074505806,
+          0.08300000429153442,
+          0.06499999761581421
+        ]
+      },
+      "collider_hint": "box approximation for portable pickup; water/cards no collider",
+      "prototype_mass_kg": 0.25
+    },
+    {
+      "name": "InkStamp",
+      "triangles": 524,
+      "parts": [
+        "Body"
+      ],
+      "mounts": [
+        "Mount_Grip"
+      ],
+      "bounds_blender_z_up": {
+        "min": [
+          -0.054999999701976776,
+          -0.032499998807907104,
+          0.0
+        ],
+        "max": [
+          0.054999999701976776,
+          0.032499998807907104,
+          0.11900000274181366
+        ]
+      },
+      "collider_hint": "box approximation for portable pickup; water/cards no collider",
+      "prototype_mass_kg": 0.2
+    },
+    {
+      "name": "InkPad",
+      "triangles": 216,
+      "parts": [
+        "Body"
+      ],
+      "mounts": [
+        "Mount_Grip"
+      ],
+      "bounds_blender_z_up": {
+        "min": [
+          -0.07000000029802322,
+          -0.04500000178813934,
+          0.0
+        ],
+        "max": [
+          0.07000000029802322,
+          0.04500000178813934,
+          0.036000002175569534
+        ]
+      },
+      "collider_hint": "box approximation for portable pickup; water/cards no collider",
+      "prototype_mass_kg": 0.15
+    },
+    {
+      "name": "ManualLoosePage",
+      "triangles": 108,
+      "parts": [
+        "Body"
+      ],
+      "mounts": [
+        "Mount_Grip",
+        "Mount_PrintFront",
+        "Mount_PrintBack"
+      ],
+      "bounds_blender_z_up": {
+        "min": [
+          -0.10499999672174454,
+          -0.148499995470047,
+          0.0
+        ],
+        "max": [
+          0.10499999672174454,
+          0.148499995470047,
+          0.00139999995008111
+        ]
+      },
+      "collider_hint": "box approximation for portable pickup; water/cards no collider",
+      "prototype_mass_kg": 0.01
+    },
+    {
+      "name": "MissionOrder",
+      "triangles": 108,
+      "parts": [
+        "Body"
+      ],
+      "mounts": [
+        "Mount_Grip",
+        "Mount_PrintFront",
+        "Mount_PrintBack"
+      ],
+      "bounds_blender_z_up": {
+        "min": [
+          -0.10499999672174454,
+          -0.148499995470047,
+          0.0
+        ],
+        "max": [
+          0.10499999672174454,
+          0.148499995470047,
+          0.00139999995008111
+        ]
+      },
+      "collider_hint": "box approximation for portable pickup; water/cards no collider",
+      "prototype_mass_kg": 0.01
+    },
+    {
+      "name": "PatrolNote",
+      "triangles": 108,
+      "parts": [
+        "Body"
+      ],
+      "mounts": [
+        "Mount_Grip",
+        "Mount_PrintFront",
+        "Mount_PrintBack"
+      ],
+      "bounds_blender_z_up": {
+        "min": [
+          -0.10499999672174454,
+          -0.148499995470047,
+          0.0
+        ],
+        "max": [
+          0.10499999672174454,
+          0.148499995470047,
+          0.00139999995008111
+        ]
+      },
+      "collider_hint": "box approximation for portable pickup; water/cards no collider",
+      "prototype_mass_kg": 0.01
+    },
+    {
+      "name": "Form_K90B",
+      "triangles": 108,
+      "parts": [
+        "Body"
+      ],
+      "mounts": [
+        "Mount_Grip",
+        "Mount_PrintFront",
+        "Mount_PrintBack"
+      ],
+      "bounds_blender_z_up": {
+        "min": [
+          -0.10499999672174454,
+          -0.148499995470047,
+          0.0
+        ],
+        "max": [
+          0.10499999672174454,
+          0.148499995470047,
+          0.00139999995008111
+        ]
+      },
+      "collider_hint": "box approximation for portable pickup; water/cards no collider",
+      "prototype_mass_kg": 0.01
+    },
+    {
+      "name": "Form_Maintenance",
+      "triangles": 108,
+      "parts": [
+        "Body"
+      ],
+      "mounts": [
+        "Mount_Grip",
+        "Mount_PrintFront",
+        "Mount_PrintBack"
+      ],
+      "bounds_blender_z_up": {
+        "min": [
+          -0.10499999672174454,
+          -0.148499995470047,
+          0.0
+        ],
+        "max": [
+          0.10499999672174454,
+          0.148499995470047,
+          0.00139999995008111
+        ]
+      },
+      "collider_hint": "box approximation for portable pickup; water/cards no collider",
+      "prototype_mass_kg": 0.01
+    },
+    {
+      "name": "Form_Incident",
+      "triangles": 108,
+      "parts": [
+        "Body"
+      ],
+      "mounts": [
+        "Mount_Grip",
+        "Mount_PrintFront",
+        "Mount_PrintBack"
+      ],
+      "bounds_blender_z_up": {
+        "min": [
+          -0.10499999672174454,
+          -0.148499995470047,
+          0.0
+        ],
+        "max": [
+          0.10499999672174454,
+          0.148499995470047,
+          0.00139999995008111
+        ]
+      },
+      "collider_hint": "box approximation for portable pickup; water/cards no collider",
+      "prototype_mass_kg": 0.01
+    },
+    {
+      "name": "Form_Requisition",
+      "triangles": 108,
+      "parts": [
+        "Body"
+      ],
+      "mounts": [
+        "Mount_Grip",
+        "Mount_PrintFront",
+        "Mount_PrintBack"
+      ],
+      "bounds_blender_z_up": {
+        "min": [
+          -0.10499999672174454,
+          -0.148499995470047,
+          0.0
+        ],
+        "max": [
+          0.10499999672174454,
+          0.148499995470047,
+          0.00139999995008111
+        ]
+      },
+      "collider_hint": "box approximation for portable pickup; water/cards no collider",
+      "prototype_mass_kg": 0.01
+    },
+    {
+      "name": "Form_Radiation",
+      "triangles": 108,
+      "parts": [
+        "Body"
+      ],
+      "mounts": [
+        "Mount_Grip",
+        "Mount_PrintFront",
+        "Mount_PrintBack"
+      ],
+      "bounds_blender_z_up": {
+        "min": [
+          -0.10499999672174454,
+          -0.148499995470047,
+          0.0
+        ],
+        "max": [
+          0.10499999672174454,
+          0.148499995470047,
+          0.00139999995008111
+        ]
+      },
+      "collider_hint": "box approximation for portable pickup; water/cards no collider",
+      "prototype_mass_kg": 0.01
+    },
+    {
+      "name": "RolledOrder",
+      "triangles": 416,
+      "parts": [
+        "Body"
+      ],
+      "mounts": [
+        "Mount_Grip"
+      ],
+      "bounds_blender_z_up": {
+        "min": [
+          -0.10499999672174454,
+          -0.028999999165534973,
+          -0.028999999165534973
+        ],
+        "max": [
+          0.10499999672174454,
+          0.028999999165534973,
+          0.028999999165534973
+        ]
+      },
+      "collider_hint": "box approximation for portable pickup; water/cards no collider",
+      "prototype_mass_kg": 0.03
+    },
+    {
+      "name": "Headlamp",
+      "triangles": 644,
+      "parts": [
+        "Body"
+      ],
+      "mounts": [
+        "Mount_Grip",
+        "Mount_Light",
+        "Mount_Head"
+      ],
+      "bounds_blender_z_up": {
+        "min": [
+          -0.10599999874830246,
+          -0.10499999672174454,
+          -0.03400000184774399
+        ],
+        "max": [
+          0.10599999874830246,
+          0.14100000262260437,
+          0.03400000184774399
+        ]
+      },
+      "collider_hint": "box approximation for portable pickup; water/cards no collider",
+      "prototype_mass_kg": 0.3
+    },
+    {
+      "name": "Extinguisher",
+      "triangles": 1016,
+      "parts": [
+        "Body",
+        "SqueezeLever"
+      ],
+      "mounts": [
+        "Mount_Grip",
+        "Mount_Nozzle"
+      ],
+      "bounds_blender_z_up": {
+        "min": [
+          -0.09000000357627869,
+          -0.09299999475479126,
+          0.03999999165534973
+        ],
+        "max": [
+          0.1509999930858612,
+          0.09000000357627869,
+          0.5299999713897705
+        ]
+      },
+      "collider_hint": "box approximation for portable pickup; water/cards no collider",
+      "prototype_mass_kg": 4
+    },
+    {
+      "name": "Blowtorch",
+      "triangles": 772,
+      "parts": [
+        "Body",
+        "FuelKnob"
+      ],
+      "mounts": [
+        "Mount_Grip",
+        "Mount_Flame"
+      ],
+      "bounds_blender_z_up": {
+        "min": [
+          -0.12600000202655792,
+          -0.06300000101327896,
+          0.0
+        ],
+        "max": [
+          0.17000000178813934,
+          0.06300000101327896,
+          0.2839999794960022
+        ]
+      },
+      "collider_hint": "box approximation for portable pickup; water/cards no collider",
+      "prototype_mass_kg": 1.0
+    }
+  ]
+}

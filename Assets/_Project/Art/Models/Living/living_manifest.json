@@ -1,0 +1,207 @@
+{
+  "blender": "5.2.2 LTS",
+  "issue": 119,
+  "notes": [
+    "Art meshes only; soup spilling, airlock cycle, decontamination and diving suit wearable rig require gameplay integration.",
+    "Officers door modeled with independent pivot but intended closed in current narrative."
+  ],
+  "assets": [
+    {
+      "name": "BunkBed_Double",
+      "triangles": 1480,
+      "parts": [
+        "Frame"
+      ],
+      "mounts": [
+        "Mount_Sleep0",
+        "Mount_Sleep1"
+      ]
+    },
+    {
+      "name": "PersonalLocker",
+      "triangles": 1404,
+      "parts": [
+        "Cabinet",
+        "Door"
+      ],
+      "mounts": [
+        "Mount_Storage"
+      ]
+    },
+    {
+      "name": "GalleyStove",
+      "triangles": 2172,
+      "parts": [
+        "Body",
+        "HeatKnob-0.22",
+        "HeatKnob0.22",
+        "OvenDoor"
+      ],
+      "mounts": [
+        "Mount_Pot"
+      ]
+    },
+    {
+      "name": "SoupPot",
+      "triangles": 1952,
+      "parts": [
+        "Pot",
+        "SoupSurface"
+      ],
+      "mounts": [
+        "Mount_Spill"
+      ]
+    },
+    {
+      "name": "MessTable",
+      "triangles": 412,
+      "parts": [
+        "Body"
+      ],
+      "mounts": []
+    },
+    {
+      "name": "MessBench",
+      "triangles": 432,
+      "parts": [
+        "Body"
+      ],
+      "mounts": []
+    },
+    {
+      "name": "DeconShowerCabin",
+      "triangles": 1868,
+      "parts": [
+        "Cabin",
+        "MixingLever"
+      ],
+      "mounts": [
+        "Mount_Spray",
+        "Mount_Hose"
+      ]
+    },
+    {
+      "name": "DeconWaterLance",
+      "triangles": 256,
+      "parts": [
+        "Body",
+        "Trigger"
+      ],
+      "mounts": [
+        "Mount_Grip",
+        "Mount_Spray",
+        "Mount_Hose"
+      ]
+    },
+    {
+      "name": "DivingHelmet",
+      "triangles": 1476,
+      "parts": [
+        "Body"
+      ],
+      "mounts": [
+        "Mount_Neck",
+        "Mount_Air"
+      ]
+    },
+    {
+      "name": "DivingSuitOnRack",
+      "triangles": 3340,
+      "parts": [
+        "Rack",
+        "Suit"
+      ],
+      "mounts": [
+        "Mount_Helmet"
+      ]
+    },
+    {
+      "name": "UmbilicalReel",
+      "triangles": 3640,
+      "parts": [
+        "Frame",
+        "Drum",
+        "Crank"
+      ],
+      "mounts": [
+        "Mount_Umbilical"
+      ]
+    },
+    {
+      "name": "OfficersQuartersDoor",
+      "triangles": 1340,
+      "parts": [
+        "Frame",
+        "Door"
+      ],
+      "mounts": [
+        "Mount_LightUnderDoor",
+        "Mount_PneumaticSlot"
+      ]
+    },
+    {
+      "name": "DivingAirlockChamber",
+      "triangles": 3016,
+      "parts": [
+        "Chamber",
+        "Hatch0",
+        "Wheel0",
+        "Hatch1",
+        "Wheel1"
+      ],
+      "mounts": [
+        "Mount_WaterLevel",
+        "Mount_Entrance",
+        "Mount_Exit"
+      ]
+    },
+    {
+      "name": "EnamelPlate",
+      "triangles": 524,
+      "parts": [
+        "Body"
+      ],
+      "mounts": []
+    },
+    {
+      "name": "EnamelBowl",
+      "triangles": 524,
+      "parts": [
+        "Body"
+      ],
+      "mounts": []
+    },
+    {
+      "name": "EnamelMug",
+      "triangles": 780,
+      "parts": [
+        "Body"
+      ],
+      "mounts": []
+    },
+    {
+      "name": "EnamelSaucepan",
+      "triangles": 568,
+      "parts": [
+        "Body"
+      ],
+      "mounts": []
+    },
+    {
+      "name": "EnamelSpoon",
+      "triangles": 360,
+      "parts": [
+        "Body"
+      ],
+      "mounts": []
+    },
+    {
+      "name": "EnamelPotLid",
+      "triangles": 344,
+      "parts": [
+        "Body"
+      ],
+      "mounts": []
+    }
+  ]
+}

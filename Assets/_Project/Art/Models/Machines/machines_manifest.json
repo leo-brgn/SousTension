@@ -1,0 +1,106 @@
+{
+  "blender": "5.2.2 LTS",
+  "issue": 118,
+  "assets": [
+    {
+      "name": "ElectricalPanel",
+      "triangles": 2940,
+      "parts": [
+        "Body",
+        "AccessDoor"
+      ],
+      "mounts": [
+        "Mount_Breaker00",
+        "Mount_Breaker01",
+        "Mount_Breaker02",
+        "Mount_Breaker03",
+        "Mount_Breaker04",
+        "Mount_Breaker05",
+        "Mount_Breaker06",
+        "Mount_Breaker07",
+        "Mount_Breaker08",
+        "Mount_Breaker09",
+        "Mount_Breaker10",
+        "Mount_Breaker11",
+        "Mount_Breaker12",
+        "Mount_Breaker13",
+        "Mount_Breaker14",
+        "Mount_Breaker15",
+        "Mount_Breaker16",
+        "Mount_Breaker17",
+        "Mount_Breaker18",
+        "Mount_Breaker19",
+        "Mount_GaugeLeft",
+        "Mount_GaugeRight",
+        "Mount_Wall"
+      ]
+    },
+    {
+      "name": "MachineBreaker",
+      "triangles": 472,
+      "parts": [
+        "Body",
+        "Lever"
+      ],
+      "mounts": [
+        "Mount_Interaction"
+      ]
+    },
+    {
+      "name": "BilgePump",
+      "triangles": 3100,
+      "parts": [
+        "Body",
+        "Cap",
+        "Rotor"
+      ],
+      "mounts": [
+        "Mount_Inlet",
+        "Mount_Outlet",
+        "Mount_Floor",
+        "Mount_Leak"
+      ]
+    },
+    {
+      "name": "Interphone",
+      "triangles": 3704,
+      "parts": [
+        "Body",
+        "Handset",
+        "Cord"
+      ],
+      "mounts": [
+        "Mount_Wall",
+        "Mount_HandsetGrip"
+      ]
+    },
+    {
+      "name": "TurbineReducer",
+      "triangles": 10012,
+      "parts": [
+        "Body",
+        "Rotor",
+        "Cover"
+      ],
+      "mounts": [
+        "Mount_Shaft",
+        "Mount_SteamInlet",
+        "Mount_Gauge",
+        "Mount_Floor"
+      ]
+    },
+    {
+      "name": "BatteryBank",
+      "triangles": 4036,
+      "parts": [
+        "Body",
+        "TerminalCover"
+      ],
+      "mounts": [
+        "Mount_Voltmeter",
+        "Mount_Sparks",
+        "Mount_Floor"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,393 @@
+{
+  "blender": "5.2.2 LTS",
+  "issue": 122,
+  "notes": [
+    "Support meshes only: steam, water, frost, condensation, contamination and Cherenkov cards require runtime transparent/emissive VFX shaders.",
+    "Water surfaces contain regular 16x16 quad grids for compartment water level and vertex displacement.",
+    "Effect surfaces include normalized UVMap; anchors use local -Y outward emission."
+  ],
+  "assets": [
+    {
+      "name": "LeakAnchor_Small",
+      "triangles": 96,
+      "parts": [
+        "RupturedSeal"
+      ],
+      "mounts": [
+        "Mount_Jet"
+      ],
+      "bounds_blender_z_up": {
+        "min": [
+          -0.019999999552965164,
+          -0.006000000983476639,
+          -0.019999999552965164
+        ],
+        "max": [
+          0.019999999552965164,
+          0.006000000983476639,
+          0.019999999552965164
+        ]
+      },
+      "collider_hint": "box approximation for portable pickup; water/cards no collider",
+      "prototype_mass_kg": null
+    },
+    {
+      "name": "LeakAnchor_Medium",
+      "triangles": 96,
+      "parts": [
+        "RupturedSeal"
+      ],
+      "mounts": [
+        "Mount_Jet"
+      ],
+      "bounds_blender_z_up": {
+        "min": [
+          -0.05000000074505806,
+          -0.006000002380460501,
+          -0.05000000074505806
+        ],
+        "max": [
+          0.05000000074505806,
+          0.006000002380460501,
+          0.05000000074505806
+        ]
+      },
+      "collider_hint": "box approximation for portable pickup; water/cards no collider",
+      "prototype_mass_kg": null
+    },
+    {
+      "name": "LeakAnchor_Large",
+      "triangles": 96,
+      "parts": [
+        "RupturedSeal"
+      ],
+      "mounts": [
+        "Mount_Jet"
+      ],
+      "bounds_blender_z_up": {
+        "min": [
+          -0.10000000149011612,
+          -0.00600000424310565,
+          -0.10000000149011612
+        ],
+        "max": [
+          0.10000000149011612,
+          0.00600000424310565,
+          0.10000000149011612
+        ]
+      },
+      "collider_hint": "box approximation for portable pickup; water/cards no collider",
+      "prototype_mass_kg": null
+    },
+    {
+      "name": "PoppedRivet",
+      "triangles": 204,
+      "parts": [
+        "Body"
+      ],
+      "mounts": [],
+      "bounds_blender_z_up": {
+        "min": [
+          -0.02800000086426735,
+          -0.02800000086426735,
+          0.0
+        ],
+        "max": [
+          0.02800000086426735,
+          0.02800000086426735,
+          0.06499999761581421
+        ]
+      },
+      "collider_hint": "box approximation for portable pickup; water/cards no collider",
+      "prototype_mass_kg": null
+    },
+    {
+      "name": "BentHullPlate_1",
+      "triangles": 128,
+      "parts": [
+        "Body"
+      ],
+      "mounts": [
+        "Mount_DamageCentre"
+      ],
+      "bounds_blender_z_up": {
+        "min": [
+          -0.25,
+          -0.20000000298023224,
+          -0.044693902134895325
+        ],
+        "max": [
+          0.25,
+          0.20000000298023224,
+          0.044693902134895325
+        ]
+      },
+      "collider_hint": "box approximation for portable pickup; water/cards no collider",
+      "prototype_mass_kg": null
+    },
+    {
+      "name": "BentHullPlate_2",
+      "triangles": 128,
+      "parts": [
+        "Body"
+      ],
+      "mounts": [
+        "Mount_DamageCentre"
+      ],
+      "bounds_blender_z_up": {
+        "min": [
+          -0.32499998807907104,
+          -0.25,
+          -0.08947274833917618
+        ],
+        "max": [
+          0.32499998807907104,
+          0.25,
+          0.08947274833917618
+        ]
+      },
+      "collider_hint": "box approximation for portable pickup; water/cards no collider",
+      "prototype_mass_kg": null
+    },
+    {
+      "name": "BentHullPlate_3",
+      "triangles": 128,
+      "parts": [
+        "Body"
+      ],
+      "mounts": [
+        "Mount_DamageCentre"
+      ],
+      "bounds_blender_z_up": {
+        "min": [
+          -0.4000000059604645,
+          -0.30000001192092896,
+          -0.13146942853927612
+        ],
+        "max": [
+          0.4000000059604645,
+          0.30000001192092896,
+          0.13146942853927612
+        ]
+      },
+      "collider_hint": "box approximation for portable pickup; water/cards no collider",
+      "prototype_mass_kg": null
+    },
+    {
+      "name": "BilgeWaterTile_2m",
+      "triangles": 512,
+      "parts": [
+        "WaterSurface"
+      ],
+      "mounts": [
+        "Mount_WaterLevel"
+      ],
+      "bounds_blender_z_up": {
+        "min": [
+          -1.0,
+          -1.0,
+          0.0
+        ],
+        "max": [
+          1.0,
+          1.0,
+          0.0
+        ]
+      },
+      "collider_hint": "box approximation for portable pickup; water/cards no collider",
+      "prototype_mass_kg": null
+    },
+    {
+      "name": "BilgeWaterCompartment_4x6",
+      "triangles": 512,
+      "parts": [
+        "WaterSurface"
+      ],
+      "mounts": [
+        "Mount_WaterLevel"
+      ],
+      "bounds_blender_z_up": {
+        "min": [
+          -2.0,
+          -3.0,
+          0.0
+        ],
+        "max": [
+          2.0,
+          3.0,
+          0.0
+        ]
+      },
+      "collider_hint": "box approximation for portable pickup; water/cards no collider",
+      "prototype_mass_kg": null
+    },
+    {
+      "name": "BilgeWaterCompartment_6x8",
+      "triangles": 512,
+      "parts": [
+        "WaterSurface"
+      ],
+      "mounts": [
+        "Mount_WaterLevel"
+      ],
+      "bounds_blender_z_up": {
+        "min": [
+          -3.0,
+          -4.0,
+          0.0
+        ],
+        "max": [
+          3.0,
+          4.0,
+          0.0
+        ]
+      },
+      "collider_hint": "box approximation for portable pickup; water/cards no collider",
+      "prototype_mass_kg": null
+    },
+    {
+      "name": "SteamCard",
+      "triangles": 32,
+      "parts": [
+        "EffectSurface"
+      ],
+      "mounts": [
+        "Mount_Effect"
+      ],
+      "bounds_blender_z_up": {
+        "min": [
+          -0.5,
+          0.0,
+          -0.75
+        ],
+        "max": [
+          0.5,
+          0.0,
+          0.75
+        ]
+      },
+      "collider_hint": "box approximation for portable pickup; water/cards no collider",
+      "prototype_mass_kg": null
+    },
+    {
+      "name": "CondensationDecal",
+      "triangles": 32,
+      "parts": [
+        "EffectSurface"
+      ],
+      "mounts": [
+        "Mount_Effect"
+      ],
+      "bounds_blender_z_up": {
+        "min": [
+          -0.5,
+          0.0,
+          -0.5
+        ],
+        "max": [
+          0.5,
+          0.0,
+          0.5
+        ]
+      },
+      "collider_hint": "box approximation for portable pickup; water/cards no collider",
+      "prototype_mass_kg": null
+    },
+    {
+      "name": "FrostDecal",
+      "triangles": 32,
+      "parts": [
+        "EffectSurface"
+      ],
+      "mounts": [
+        "Mount_Effect"
+      ],
+      "bounds_blender_z_up": {
+        "min": [
+          -0.5,
+          0.0,
+          -0.5
+        ],
+        "max": [
+          0.5,
+          0.0,
+          0.5
+        ]
+      },
+      "collider_hint": "box approximation for portable pickup; water/cards no collider",
+      "prototype_mass_kg": null
+    },
+    {
+      "name": "ContaminationPuddle",
+      "triangles": 32,
+      "parts": [
+        "EffectSurface"
+      ],
+      "mounts": [
+        "Mount_Effect"
+      ],
+      "bounds_blender_z_up": {
+        "min": [
+          -0.6000000238418579,
+          -0.4000000059604645,
+          0.0
+        ],
+        "max": [
+          0.6000000238418579,
+          0.4000000059604645,
+          0.0
+        ]
+      },
+      "collider_hint": "box approximation for portable pickup; water/cards no collider",
+      "prototype_mass_kg": null
+    },
+    {
+      "name": "CherenkovGlowCard",
+      "triangles": 32,
+      "parts": [
+        "EffectSurface"
+      ],
+      "mounts": [
+        "Mount_Effect"
+      ],
+      "bounds_blender_z_up": {
+        "min": [
+          -0.20000000298023224,
+          0.0,
+          -0.20000000298023224
+        ],
+        "max": [
+          0.20000000298023224,
+          0.0,
+          0.20000000298023224
+        ]
+      },
+      "collider_hint": "box approximation for portable pickup; water/cards no collider",
+      "prototype_mass_kg": null
+    },
+    {
+      "name": "SparkAnchor",
+      "triangles": 164,
+      "parts": [
+        "ExposedContact"
+      ],
+      "mounts": [
+        "Mount_Sparks"
+      ],
+      "bounds_blender_z_up": {
+        "min": [
+          -0.03999999910593033,
+          -0.0430000014603138,
+          -0.029999999329447746
+        ],
+        "max": [
+          0.03999999910593033,
+          0.012500000186264515,
+          0.029999999329447746
+        ]
+      },
+      "collider_hint": "box approximation for portable pickup; water/cards no collider",
+      "prototype_mass_kg": null
+    }
+  ]
+}

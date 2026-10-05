@@ -1,0 +1,2196 @@
+{
+  "blender": "5.2.2 LTS",
+  "scope": "V1 interior geometry, blank artwork supports",
+  "assets": [
+    {
+      "name": "HullInteriorCurvedBow",
+      "triangles": 1680,
+      "parts": [
+        "Shell"
+      ],
+      "pivots": [
+        {
+          "name": "Shell",
+          "positionBlender": [
+            0,
+            0,
+            0
+          ]
+        }
+      ],
+      "mounts": [
+        {
+          "name": "Mount_StraightSection",
+          "positionBlender": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "name": "Mount_EndBulkhead",
+          "positionBlender": [
+            0,
+            3,
+            0
+          ]
+        }
+      ]
+    },
+    {
+      "name": "HullInteriorCurvedStern",
+      "triangles": 1680,
+      "parts": [
+        "Shell"
+      ],
+      "pivots": [
+        {
+          "name": "Shell",
+          "positionBlender": [
+            0,
+            0,
+            0
+          ]
+        }
+      ],
+      "mounts": [
+        {
+          "name": "Mount_StraightSection",
+          "positionBlender": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "name": "Mount_EndBulkhead",
+          "positionBlender": [
+            0,
+            -3,
+            0
+          ]
+        }
+      ]
+    },
+    {
+      "name": "ConningLadderHatch",
+      "triangles": 3384,
+      "parts": [
+        "Ladder",
+        "HatchLid",
+        "HatchWheel"
+      ],
+      "pivots": [
+        {
+          "name": "Ladder",
+          "positionBlender": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "name": "HatchLid",
+          "positionBlender": [
+            -0.49,
+            0,
+            2.62
+          ]
+        },
+        {
+          "name": "HatchWheel",
+          "positionBlender": [
+            0.49,
+            0,
+            0.08
+          ]
+        }
+      ],
+      "mounts": [
+        {
+          "name": "Mount_ConningTower",
+          "positionBlender": [
+            0,
+            0,
+            2.55
+          ]
+        }
+      ]
+    },
+    {
+      "name": "ConningTowerInterior",
+      "triangles": 3440,
+      "parts": [
+        "CurvedWalls"
+      ],
+      "pivots": [
+        {
+          "name": "CurvedWalls",
+          "positionBlender": [
+            0,
+            0,
+            0
+          ]
+        }
+      ],
+      "mounts": [
+        {
+          "name": "Mount_Ladder",
+          "positionBlender": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "name": "Mount_Periscope",
+          "positionBlender": [
+            0.35,
+            0.2,
+            0
+          ]
+        }
+      ]
+    },
+    {
+      "name": "PeriscopeInterior",
+      "triangles": 1984,
+      "parts": [
+        "FixedSleeve",
+        "SlidingMast",
+        "RotatingEyepiece",
+        "FoldHandleLeft",
+        "FoldHandleRight",
+        "ElevationCrank"
+      ],
+      "pivots": [
+        {
+          "name": "FixedSleeve",
+          "positionBlender": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "name": "SlidingMast",
+          "positionBlender": [
+            0,
+            0,
+            1.2
+          ]
+        },
+        {
+          "name": "RotatingEyepiece",
+          "positionBlender": [
+            0,
+            0,
+            -0.1
+          ]
+        },
+        {
+          "name": "FoldHandleLeft",
+          "positionBlender": [
+            -0.115,
+            0,
+            0
+          ]
+        },
+        {
+          "name": "FoldHandleRight",
+          "positionBlender": [
+            0.115,
+            0,
+            0
+          ]
+        },
+        {
+          "name": "ElevationCrank",
+          "positionBlender": [
+            0.0,
+            -0.15,
+            0.62
+          ]
+        }
+      ],
+      "mounts": [
+        {
+          "name": "Mount_ExternalHead",
+          "positionBlender": [
+            0,
+            0,
+            2.58
+          ]
+        },
+        {
+          "name": "Mount_Floor",
+          "positionBlender": [
+            0,
+            0,
+            0
+          ]
+        }
+      ]
+    },
+    {
+      "name": "PeriscopeExternalHead",
+      "triangles": 356,
+      "parts": [
+        "Head"
+      ],
+      "pivots": [
+        {
+          "name": "Head",
+          "positionBlender": [
+            0,
+            0,
+            0
+          ]
+        }
+      ],
+      "mounts": [
+        {
+          "name": "Mount_Mast",
+          "positionBlender": [
+            0,
+            0,
+            0
+          ]
+        }
+      ]
+    },
+    {
+      "name": "CableTrayStraight",
+      "triangles": 1872,
+      "parts": [
+        "Tray"
+      ],
+      "pivots": [
+        {
+          "name": "Tray",
+          "positionBlender": [
+            0,
+            0,
+            0
+          ]
+        }
+      ],
+      "mounts": [
+        {
+          "name": "Mount_A",
+          "positionBlender": [
+            0,
+            -1,
+            0
+          ]
+        },
+        {
+          "name": "Mount_B",
+          "positionBlender": [
+            0,
+            1,
+            0
+          ]
+        }
+      ]
+    },
+    {
+      "name": "CableJunctionBox",
+      "triangles": 508,
+      "parts": [
+        "Housing",
+        "ServiceLid"
+      ],
+      "pivots": [
+        {
+          "name": "Housing",
+          "positionBlender": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "name": "ServiceLid",
+          "positionBlender": [
+            -0.16,
+            -0.04,
+            0
+          ]
+        }
+      ],
+      "mounts": [
+        {
+          "name": "Mount_Wall",
+          "positionBlender": [
+            0,
+            0.11,
+            0
+          ]
+        }
+      ]
+    },
+    {
+      "name": "BearingCompass",
+      "triangles": 820,
+      "parts": [
+        "Bowl",
+        "CompassRose"
+      ],
+      "pivots": [
+        {
+          "name": "Bowl",
+          "positionBlender": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "name": "CompassRose",
+          "positionBlender": [
+            0,
+            0,
+            0.08
+          ]
+        }
+      ],
+      "mounts": [
+        {
+          "name": "Mount_Grip",
+          "positionBlender": [
+            0,
+            0,
+            0.03
+          ]
+        }
+      ]
+    },
+    {
+      "name": "CrasNavigationRule",
+      "triangles": 1504,
+      "parts": [
+        "Rule"
+      ],
+      "pivots": [
+        {
+          "name": "Rule",
+          "positionBlender": [
+            0,
+            0,
+            0
+          ]
+        }
+      ],
+      "mounts": [
+        {
+          "name": "Mount_Grip",
+          "positionBlender": [
+            0,
+            0,
+            0.003
+          ]
+        }
+      ]
+    },
+    {
+      "name": "NavigationStopwatch",
+      "triangles": 1320,
+      "parts": [
+        "Case",
+        "HourHand",
+        "MinuteHand",
+        "SecondHand"
+      ],
+      "pivots": [
+        {
+          "name": "Case",
+          "positionBlender": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "name": "HourHand",
+          "positionBlender": [
+            0,
+            -0.01155,
+            0
+          ]
+        },
+        {
+          "name": "MinuteHand",
+          "positionBlender": [
+            0,
+            -0.01155,
+            0
+          ]
+        },
+        {
+          "name": "SecondHand",
+          "positionBlender": [
+            0,
+            -0.01155,
+            0
+          ]
+        }
+      ],
+      "mounts": [
+        {
+          "name": "Mount_Grip",
+          "positionBlender": [
+            0,
+            0.0066,
+            0
+          ]
+        }
+      ]
+    },
+    {
+      "name": "ShipClock",
+      "triangles": 876,
+      "parts": [
+        "Case",
+        "HourHand",
+        "MinuteHand",
+        "SecondHand"
+      ],
+      "pivots": [
+        {
+          "name": "Case",
+          "positionBlender": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "name": "HourHand",
+          "positionBlender": [
+            0,
+            -0.0399,
+            0
+          ]
+        },
+        {
+          "name": "MinuteHand",
+          "positionBlender": [
+            0,
+            -0.0399,
+            0
+          ]
+        },
+        {
+          "name": "SecondHand",
+          "positionBlender": [
+            0,
+            -0.0399,
+            0
+          ]
+        }
+      ],
+      "mounts": [
+        {
+          "name": "Mount_Wall",
+          "positionBlender": [
+            0,
+            0.0228,
+            0
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Chalkboard",
+      "triangles": 540,
+      "parts": [
+        "ArtworkSurface",
+        "Frame"
+      ],
+      "pivots": [
+        {
+          "name": "ArtworkSurface",
+          "positionBlender": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "name": "Frame",
+          "positionBlender": [
+            0,
+            0,
+            0
+          ]
+        }
+      ],
+      "mounts": [
+        {
+          "name": "Mount_Wall",
+          "positionBlender": [
+            0,
+            0.006,
+            0
+          ]
+        },
+        {
+          "name": "Mount_Artwork",
+          "positionBlender": [
+            0,
+            -0.003,
+            0
+          ]
+        }
+      ]
+    },
+    {
+      "name": "ChalkStick",
+      "triangles": 92,
+      "parts": [
+        "Stick"
+      ],
+      "pivots": [
+        {
+          "name": "Stick",
+          "positionBlender": [
+            0,
+            0,
+            0
+          ]
+        }
+      ],
+      "mounts": [
+        {
+          "name": "Mount_Tip",
+          "positionBlender": [
+            0,
+            0,
+            0
+          ]
+        }
+      ]
+    },
+    {
+      "name": "CommandantPortraitFrame",
+      "triangles": 540,
+      "parts": [
+        "ArtworkSurface",
+        "Frame"
+      ],
+      "pivots": [
+        {
+          "name": "ArtworkSurface",
+          "positionBlender": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "name": "Frame",
+          "positionBlender": [
+            0,
+            0,
+            0
+          ]
+        }
+      ],
+      "mounts": [
+        {
+          "name": "Mount_Wall",
+          "positionBlender": [
+            0,
+            0.006,
+            0
+          ]
+        },
+        {
+          "name": "Mount_Artwork",
+          "positionBlender": [
+            0,
+            -0.003,
+            0
+          ]
+        }
+      ]
+    },
+    {
+      "name": "WatchOfficerChair",
+      "triangles": 1268,
+      "parts": [
+        "Frame",
+        "SwivelSeat"
+      ],
+      "pivots": [
+        {
+          "name": "Frame",
+          "positionBlender": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "name": "SwivelSeat",
+          "positionBlender": [
+            0,
+            0,
+            0.52
+          ]
+        }
+      ],
+      "mounts": [
+        {
+          "name": "Mount_SeatedPlayer",
+          "positionBlender": [
+            0,
+            0,
+            0.61
+          ]
+        }
+      ]
+    },
+    {
+      "name": "VacuumValveElectronicsRack",
+      "triangles": 9576,
+      "parts": [
+        "Rack",
+        "VacuumTube_01_00",
+        "VacuumTube_01_01",
+        "VacuumTube_01_02",
+        "VacuumTube_01_03",
+        "VacuumTube_01_04",
+        "VacuumTube_01_05",
+        "VacuumTube_06_00",
+        "VacuumTube_06_01",
+        "VacuumTube_06_02",
+        "VacuumTube_06_03",
+        "VacuumTube_06_04",
+        "VacuumTube_06_05",
+        "VacuumTube_11_00",
+        "VacuumTube_11_01",
+        "VacuumTube_11_02",
+        "VacuumTube_11_03",
+        "VacuumTube_11_04",
+        "VacuumTube_11_05",
+        "VacuumTube_16_00",
+        "VacuumTube_16_01",
+        "VacuumTube_16_02",
+        "VacuumTube_16_03",
+        "VacuumTube_16_04",
+        "VacuumTube_16_05"
+      ],
+      "pivots": [
+        {
+          "name": "Rack",
+          "positionBlender": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "name": "VacuumTube_01_00",
+          "positionBlender": [
+            -0.35,
+            0.02,
+            0.16
+          ]
+        },
+        {
+          "name": "VacuumTube_01_01",
+          "positionBlender": [
+            -0.20999999999999996,
+            0.02,
+            0.16
+          ]
+        },
+        {
+          "name": "VacuumTube_01_02",
+          "positionBlender": [
+            -0.06999999999999995,
+            0.02,
+            0.16
+          ]
+        },
+        {
+          "name": "VacuumTube_01_03",
+          "positionBlender": [
+            0.07000000000000006,
+            0.02,
+            0.16
+          ]
+        },
+        {
+          "name": "VacuumTube_01_04",
+          "positionBlender": [
+            0.21000000000000008,
+            0.02,
+            0.16
+          ]
+        },
+        {
+          "name": "VacuumTube_01_05",
+          "positionBlender": [
+            0.3500000000000001,
+            0.02,
+            0.16
+          ]
+        },
+        {
+          "name": "VacuumTube_06_00",
+          "positionBlender": [
+            -0.35,
+            0.02,
+            0.6599999999999999
+          ]
+        },
+        {
+          "name": "VacuumTube_06_01",
+          "positionBlender": [
+            -0.20999999999999996,
+            0.02,
+            0.6599999999999999
+          ]
+        },
+        {
+          "name": "VacuumTube_06_02",
+          "positionBlender": [
+            -0.06999999999999995,
+            0.02,
+            0.6599999999999999
+          ]
+        },
+        {
+          "name": "VacuumTube_06_03",
+          "positionBlender": [
+            0.07000000000000006,
+            0.02,
+            0.6599999999999999
+          ]
+        },
+        {
+          "name": "VacuumTube_06_04",
+          "positionBlender": [
+            0.21000000000000008,
+            0.02,
+            0.6599999999999999
+          ]
+        },
+        {
+          "name": "VacuumTube_06_05",
+          "positionBlender": [
+            0.3500000000000001,
+            0.02,
+            0.6599999999999999
+          ]
+        },
+        {
+          "name": "VacuumTube_11_00",
+          "positionBlender": [
+            -0.35,
+            0.02,
+            1.1600000000000001
+          ]
+        },
+        {
+          "name": "VacuumTube_11_01",
+          "positionBlender": [
+            -0.20999999999999996,
+            0.02,
+            1.1600000000000001
+          ]
+        },
+        {
+          "name": "VacuumTube_11_02",
+          "positionBlender": [
+            -0.06999999999999995,
+            0.02,
+            1.1600000000000001
+          ]
+        },
+        {
+          "name": "VacuumTube_11_03",
+          "positionBlender": [
+            0.07000000000000006,
+            0.02,
+            1.1600000000000001
+          ]
+        },
+        {
+          "name": "VacuumTube_11_04",
+          "positionBlender": [
+            0.21000000000000008,
+            0.02,
+            1.1600000000000001
+          ]
+        },
+        {
+          "name": "VacuumTube_11_05",
+          "positionBlender": [
+            0.3500000000000001,
+            0.02,
+            1.1600000000000001
+          ]
+        },
+        {
+          "name": "VacuumTube_16_00",
+          "positionBlender": [
+            -0.35,
+            0.02,
+            1.6600000000000001
+          ]
+        },
+        {
+          "name": "VacuumTube_16_01",
+          "positionBlender": [
+            -0.20999999999999996,
+            0.02,
+            1.6600000000000001
+          ]
+        },
+        {
+          "name": "VacuumTube_16_02",
+          "positionBlender": [
+            -0.06999999999999995,
+            0.02,
+            1.6600000000000001
+          ]
+        },
+        {
+          "name": "VacuumTube_16_03",
+          "positionBlender": [
+            0.07000000000000006,
+            0.02,
+            1.6600000000000001
+          ]
+        },
+        {
+          "name": "VacuumTube_16_04",
+          "positionBlender": [
+            0.21000000000000008,
+            0.02,
+            1.6600000000000001
+          ]
+        },
+        {
+          "name": "VacuumTube_16_05",
+          "positionBlender": [
+            0.3500000000000001,
+            0.02,
+            1.6600000000000001
+          ]
+        }
+      ],
+      "mounts": [
+        {
+          "name": "Mount_Power",
+          "positionBlender": [
+            0,
+            0.38,
+            0.12
+          ]
+        }
+      ]
+    },
+    {
+      "name": "ControlRodDriveColumn",
+      "triangles": 1584,
+      "parts": [
+        "Frame",
+        "ControlRod00",
+        "ControlRod01",
+        "ControlRod02",
+        "ControlRod03"
+      ],
+      "pivots": [
+        {
+          "name": "Frame",
+          "positionBlender": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "name": "ControlRod00",
+          "positionBlender": [
+            -0.21,
+            0,
+            0.16
+          ]
+        },
+        {
+          "name": "ControlRod01",
+          "positionBlender": [
+            -0.06999999999999998,
+            0,
+            0.16
+          ]
+        },
+        {
+          "name": "ControlRod02",
+          "positionBlender": [
+            0.07000000000000003,
+            0,
+            0.16
+          ]
+        },
+        {
+          "name": "ControlRod03",
+          "positionBlender": [
+            0.21000000000000005,
+            0,
+            0.16
+          ]
+        }
+      ],
+      "mounts": [
+        {
+          "name": "Mount_Core",
+          "positionBlender": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "name": "Mount_Actuator",
+          "positionBlender": [
+            0,
+            0,
+            2.1
+          ]
+        }
+      ]
+    },
+    {
+      "name": "CoreViewingPorthole",
+      "triangles": 604,
+      "parts": [
+        "Flange",
+        "CherenkovGlass"
+      ],
+      "pivots": [
+        {
+          "name": "Flange",
+          "positionBlender": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "name": "CherenkovGlass",
+          "positionBlender": [
+            0,
+            0,
+            0
+          ]
+        }
+      ],
+      "mounts": [
+        {
+          "name": "Mount_CoreGlow",
+          "positionBlender": [
+            0,
+            0.045,
+            0
+          ]
+        }
+      ]
+    },
+    {
+      "name": "SteamGenerator",
+      "triangles": 2304,
+      "parts": [
+        "PressureVessel"
+      ],
+      "pivots": [
+        {
+          "name": "PressureVessel",
+          "positionBlender": [
+            0,
+            0,
+            0
+          ]
+        }
+      ],
+      "mounts": [
+        {
+          "name": "Mount_SteamOutlet",
+          "positionBlender": [
+            0,
+            0,
+            2.15
+          ]
+        },
+        {
+          "name": "Mount_PrimaryA",
+          "positionBlender": [
+            -0.65,
+            0,
+            0.85
+          ]
+        },
+        {
+          "name": "Mount_PrimaryB",
+          "positionBlender": [
+            0.65,
+            0,
+            0.85
+          ]
+        },
+        {
+          "name": "Mount_SteamLeak",
+          "positionBlender": [
+            0,
+            0,
+            1.94
+          ]
+        }
+      ]
+    },
+    {
+      "name": "WallDosimetryAlarm",
+      "triangles": 648,
+      "parts": [
+        "Panel",
+        "DoseNeedle",
+        "AlarmLens"
+      ],
+      "pivots": [
+        {
+          "name": "Panel",
+          "positionBlender": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "name": "DoseNeedle",
+          "positionBlender": [
+            -0.12,
+            -0.05,
+            -0.02
+          ]
+        },
+        {
+          "name": "AlarmLens",
+          "positionBlender": [
+            0,
+            -0.04,
+            0.23
+          ]
+        }
+      ],
+      "mounts": [
+        {
+          "name": "Mount_AlarmAudio",
+          "positionBlender": [
+            0,
+            0.05,
+            0.28
+          ]
+        }
+      ]
+    },
+    {
+      "name": "ControlledZoneStripCurtain",
+      "triangles": 1296,
+      "parts": [
+        "Portal",
+        "FlexibleStrip00",
+        "FlexibleStrip01",
+        "FlexibleStrip02",
+        "FlexibleStrip03",
+        "FlexibleStrip04",
+        "FlexibleStrip05",
+        "FlexibleStrip06",
+        "FlexibleStrip07",
+        "FlexibleStrip08"
+      ],
+      "pivots": [
+        {
+          "name": "Portal",
+          "positionBlender": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "name": "FlexibleStrip00",
+          "positionBlender": [
+            -0.56,
+            0,
+            2.12
+          ]
+        },
+        {
+          "name": "FlexibleStrip01",
+          "positionBlender": [
+            -0.42000000000000004,
+            0,
+            2.12
+          ]
+        },
+        {
+          "name": "FlexibleStrip02",
+          "positionBlender": [
+            -0.28,
+            0,
+            2.12
+          ]
+        },
+        {
+          "name": "FlexibleStrip03",
+          "positionBlender": [
+            -0.14,
+            0,
+            2.12
+          ]
+        },
+        {
+          "name": "FlexibleStrip04",
+          "positionBlender": [
+            0.0,
+            0,
+            2.12
+          ]
+        },
+        {
+          "name": "FlexibleStrip05",
+          "positionBlender": [
+            0.14,
+            0,
+            2.12
+          ]
+        },
+        {
+          "name": "FlexibleStrip06",
+          "positionBlender": [
+            0.28,
+            0,
+            2.12
+          ]
+        },
+        {
+          "name": "FlexibleStrip07",
+          "positionBlender": [
+            0.42000000000000004,
+            0,
+            2.12
+          ]
+        },
+        {
+          "name": "FlexibleStrip08",
+          "positionBlender": [
+            0.56,
+            0,
+            2.12
+          ]
+        }
+      ],
+      "mounts": [
+        {
+          "name": "Mount_Doorway",
+          "positionBlender": [
+            0,
+            0,
+            0
+          ]
+        }
+      ]
+    },
+    {
+      "name": "EmergencyBoronCan",
+      "triangles": 728,
+      "parts": [
+        "Can",
+        "ScrewCap"
+      ],
+      "pivots": [
+        {
+          "name": "Can",
+          "positionBlender": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "name": "ScrewCap",
+          "positionBlender": [
+            0.08,
+            0,
+            0.47
+          ]
+        }
+      ],
+      "mounts": [
+        {
+          "name": "Mount_Label",
+          "positionBlender": [
+            0,
+            -0.088,
+            0.25
+          ]
+        },
+        {
+          "name": "Mount_Grip",
+          "positionBlender": [
+            0,
+            0,
+            0.54
+          ]
+        }
+      ]
+    },
+    {
+      "name": "PropellerShaftLine",
+      "triangles": 1268,
+      "parts": [
+        "BearingSupports",
+        "RotatingShaft"
+      ],
+      "pivots": [
+        {
+          "name": "BearingSupports",
+          "positionBlender": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "name": "RotatingShaft",
+          "positionBlender": [
+            0,
+            0,
+            0.34
+          ]
+        }
+      ],
+      "mounts": [
+        {
+          "name": "Mount_Turbine",
+          "positionBlender": [
+            0,
+            -1.05,
+            0.34
+          ]
+        },
+        {
+          "name": "Mount_StuffingBox",
+          "positionBlender": [
+            0,
+            1.05,
+            0.34
+          ]
+        }
+      ]
+    },
+    {
+      "name": "ShaftStuffingBox",
+      "triangles": 784,
+      "parts": [
+        "Sleeve",
+        "PackingCompressionNut"
+      ],
+      "pivots": [
+        {
+          "name": "Sleeve",
+          "positionBlender": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "name": "PackingCompressionNut",
+          "positionBlender": [
+            0,
+            -0.19,
+            0
+          ]
+        }
+      ],
+      "mounts": [
+        {
+          "name": "Mount_Shaft",
+          "positionBlender": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "name": "Mount_Leak",
+          "positionBlender": [
+            0,
+            -0.24,
+            -0.1
+          ]
+        }
+      ]
+    },
+    {
+      "name": "AirCompressor",
+      "triangles": 2140,
+      "parts": [
+        "Reservoir",
+        "Flywheel"
+      ],
+      "pivots": [
+        {
+          "name": "Reservoir",
+          "positionBlender": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "name": "Flywheel",
+          "positionBlender": [
+            -0.24,
+            -0.19,
+            0.68
+          ]
+        }
+      ],
+      "mounts": [
+        {
+          "name": "Mount_AirOutlet",
+          "positionBlender": [
+            0.48,
+            0,
+            0.38
+          ]
+        },
+        {
+          "name": "Mount_Filter",
+          "positionBlender": [
+            0,
+            0.26,
+            0.7
+          ]
+        }
+      ]
+    },
+    {
+      "name": "CO2CartridgeNew",
+      "triangles": 1340,
+      "parts": [
+        "Canister"
+      ],
+      "pivots": [
+        {
+          "name": "Canister",
+          "positionBlender": [
+            0,
+            0,
+            0
+          ]
+        }
+      ],
+      "mounts": [
+        {
+          "name": "Mount_Filter",
+          "positionBlender": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "name": "Mount_Grip",
+          "positionBlender": [
+            0,
+            0,
+            0.22
+          ]
+        }
+      ]
+    },
+    {
+      "name": "CO2CartridgeUsed",
+      "triangles": 1424,
+      "parts": [
+        "Canister"
+      ],
+      "pivots": [
+        {
+          "name": "Canister",
+          "positionBlender": [
+            0,
+            0,
+            0
+          ]
+        }
+      ],
+      "mounts": [
+        {
+          "name": "Mount_Filter",
+          "positionBlender": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "name": "Mount_Grip",
+          "positionBlender": [
+            0,
+            0,
+            0.22
+          ]
+        }
+      ]
+    },
+    {
+      "name": "MachineWorkbench",
+      "triangles": 1092,
+      "parts": [
+        "Bench",
+        "ViceFixedJaw",
+        "ViceMovingJaw"
+      ],
+      "pivots": [
+        {
+          "name": "Bench",
+          "positionBlender": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "name": "ViceFixedJaw",
+          "positionBlender": [
+            0.44,
+            -0.3,
+            0.97
+          ]
+        },
+        {
+          "name": "ViceMovingJaw",
+          "positionBlender": [
+            0.44,
+            -0.43,
+            1.05
+          ]
+        }
+      ],
+      "mounts": [
+        {
+          "name": "Mount_Toolboard",
+          "positionBlender": [
+            0,
+            0.3,
+            1.35
+          ]
+        }
+      ]
+    },
+    {
+      "name": "WorkshopToolboard",
+      "triangles": 2208,
+      "parts": [
+        "Pegboard"
+      ],
+      "pivots": [
+        {
+          "name": "Pegboard",
+          "positionBlender": [
+            0,
+            0,
+            0
+          ]
+        }
+      ],
+      "mounts": [
+        {
+          "name": "Mount_Tool00",
+          "positionBlender": [
+            -0.45,
+            -0.085,
+            0.16
+          ]
+        },
+        {
+          "name": "Mount_Tool01",
+          "positionBlender": [
+            -0.30000000000000004,
+            -0.085,
+            0.16
+          ]
+        },
+        {
+          "name": "Mount_Tool02",
+          "positionBlender": [
+            -0.15000000000000002,
+            -0.085,
+            0.16
+          ]
+        },
+        {
+          "name": "Mount_Tool03",
+          "positionBlender": [
+            -5.551115123125783e-17,
+            -0.085,
+            0.16
+          ]
+        },
+        {
+          "name": "Mount_Tool04",
+          "positionBlender": [
+            0.14999999999999997,
+            -0.085,
+            0.16
+          ]
+        },
+        {
+          "name": "Mount_Tool05",
+          "positionBlender": [
+            0.3,
+            -0.085,
+            0.16
+          ]
+        },
+        {
+          "name": "Mount_Tool06",
+          "positionBlender": [
+            0.4499999999999999,
+            -0.085,
+            0.16
+          ]
+        }
+      ]
+    },
+    {
+      "name": "DuctVentilator",
+      "triangles": 2448,
+      "parts": [
+        "Duct",
+        "FanRotor"
+      ],
+      "pivots": [
+        {
+          "name": "Duct",
+          "positionBlender": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "name": "FanRotor",
+          "positionBlender": [
+            0,
+            0,
+            0
+          ]
+        }
+      ],
+      "mounts": [
+        {
+          "name": "Mount_DuctA",
+          "positionBlender": [
+            0,
+            -0.19,
+            0
+          ]
+        },
+        {
+          "name": "Mount_DuctB",
+          "positionBlender": [
+            0,
+            0.19,
+            0
+          ]
+        }
+      ]
+    },
+    {
+      "name": "MessGramophone",
+      "triangles": 1592,
+      "parts": [
+        "Cabinet",
+        "Turntable",
+        "Tonearm"
+      ],
+      "pivots": [
+        {
+          "name": "Cabinet",
+          "positionBlender": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "name": "Turntable",
+          "positionBlender": [
+            0,
+            0,
+            0.29
+          ]
+        },
+        {
+          "name": "Tonearm",
+          "positionBlender": [
+            0.17,
+            0.12,
+            0.32
+          ]
+        }
+      ],
+      "mounts": [
+        {
+          "name": "Mount_Record",
+          "positionBlender": [
+            0,
+            0,
+            0.314
+          ]
+        }
+      ]
+    },
+    {
+      "name": "AnthemGramophoneRecord",
+      "triangles": 2560,
+      "parts": [
+        "Record"
+      ],
+      "pivots": [
+        {
+          "name": "Record",
+          "positionBlender": [
+            0,
+            0,
+            0
+          ]
+        }
+      ],
+      "mounts": [
+        {
+          "name": "Mount_Spindle",
+          "positionBlender": [
+            0,
+            0,
+            0
+          ]
+        }
+      ]
+    },
+    {
+      "name": "ElectricSamovar",
+      "triangles": 2900,
+      "parts": [
+        "Boiler",
+        "TapHandle",
+        "BoilerLid"
+      ],
+      "pivots": [
+        {
+          "name": "Boiler",
+          "positionBlender": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "name": "TapHandle",
+          "positionBlender": [
+            0,
+            -0.22,
+            0.27
+          ]
+        },
+        {
+          "name": "BoilerLid",
+          "positionBlender": [
+            0,
+            0,
+            0.54
+          ]
+        }
+      ],
+      "mounts": [
+        {
+          "name": "Mount_PowerCable",
+          "positionBlender": [
+            0,
+            0.14,
+            0.07
+          ]
+        },
+        {
+          "name": "Mount_WaterStream",
+          "positionBlender": [
+            0,
+            -0.27,
+            0.12
+          ]
+        }
+      ]
+    },
+    {
+      "name": "MarineToiletSevenValve",
+      "triangles": 7484,
+      "parts": [
+        "BowlAndPump",
+        "ProcedureValve00",
+        "ProcedureValve01",
+        "ProcedureValve02",
+        "ProcedureValve03",
+        "ProcedureValve04",
+        "ProcedureValve05",
+        "ProcedureValve06",
+        "SeatLid"
+      ],
+      "pivots": [
+        {
+          "name": "BowlAndPump",
+          "positionBlender": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "name": "ProcedureValve00",
+          "positionBlender": [
+            -0.42,
+            0.1,
+            0.72
+          ]
+        },
+        {
+          "name": "ProcedureValve01",
+          "positionBlender": [
+            -0.16999999999999998,
+            0.1,
+            0.72
+          ]
+        },
+        {
+          "name": "ProcedureValve02",
+          "positionBlender": [
+            0.08000000000000002,
+            0.1,
+            0.72
+          ]
+        },
+        {
+          "name": "ProcedureValve03",
+          "positionBlender": [
+            0.33,
+            0.1,
+            0.72
+          ]
+        },
+        {
+          "name": "ProcedureValve04",
+          "positionBlender": [
+            -0.42,
+            0.1,
+            1.0
+          ]
+        },
+        {
+          "name": "ProcedureValve05",
+          "positionBlender": [
+            -0.16999999999999998,
+            0.1,
+            1.0
+          ]
+        },
+        {
+          "name": "ProcedureValve06",
+          "positionBlender": [
+            0.08000000000000002,
+            0.1,
+            1.0
+          ]
+        },
+        {
+          "name": "SeatLid",
+          "positionBlender": [
+            0,
+            0.22,
+            0.49
+          ]
+        }
+      ],
+      "mounts": [
+        {
+          "name": "Mount_ValveLabel00",
+          "positionBlender": [
+            -0.42,
+            0.19,
+            0.82
+          ]
+        },
+        {
+          "name": "Mount_ValveLabel01",
+          "positionBlender": [
+            -0.16999999999999998,
+            0.19,
+            0.82
+          ]
+        },
+        {
+          "name": "Mount_ValveLabel02",
+          "positionBlender": [
+            0.08000000000000002,
+            0.19,
+            0.82
+          ]
+        },
+        {
+          "name": "Mount_ValveLabel03",
+          "positionBlender": [
+            0.33,
+            0.19,
+            0.82
+          ]
+        },
+        {
+          "name": "Mount_ValveLabel04",
+          "positionBlender": [
+            -0.42,
+            0.19,
+            1.1
+          ]
+        },
+        {
+          "name": "Mount_ValveLabel05",
+          "positionBlender": [
+            -0.16999999999999998,
+            0.19,
+            1.1
+          ]
+        },
+        {
+          "name": "Mount_ValveLabel06",
+          "positionBlender": [
+            0.08000000000000002,
+            0.19,
+            1.1
+          ]
+        },
+        {
+          "name": "Mount_Procedure",
+          "positionBlender": [
+            0,
+            0.31,
+            1.28
+          ]
+        },
+        {
+          "name": "Mount_Inlet",
+          "positionBlender": [
+            0.3,
+            0.25,
+            0.04
+          ]
+        },
+        {
+          "name": "Mount_Outlet",
+          "positionBlender": [
+            0,
+            0.12,
+            0.02
+          ]
+        }
+      ]
+    },
+    {
+      "name": "MarineToiletProcedureBlank",
+      "triangles": 540,
+      "parts": [
+        "ArtworkSurface",
+        "Frame"
+      ],
+      "pivots": [
+        {
+          "name": "ArtworkSurface",
+          "positionBlender": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "name": "Frame",
+          "positionBlender": [
+            0,
+            0,
+            0
+          ]
+        }
+      ],
+      "mounts": [
+        {
+          "name": "Mount_Wall",
+          "positionBlender": [
+            0,
+            0.006,
+            0
+          ]
+        },
+        {
+          "name": "Mount_Artwork",
+          "positionBlender": [
+            0,
+            -0.003,
+            0
+          ]
+        }
+      ]
+    },
+    {
+      "name": "CargoCeilingHoistRail",
+      "triangles": 540,
+      "parts": [
+        "Rail"
+      ],
+      "pivots": [
+        {
+          "name": "Rail",
+          "positionBlender": [
+            0,
+            0,
+            0
+          ]
+        }
+      ],
+      "mounts": [
+        {
+          "name": "Mount_Hoist",
+          "positionBlender": [
+            0,
+            0,
+            -0.11
+          ]
+        },
+        {
+          "name": "Mount_A",
+          "positionBlender": [
+            0,
+            -1.5,
+            0
+          ]
+        },
+        {
+          "name": "Mount_B",
+          "positionBlender": [
+            0,
+            1.5,
+            0
+          ]
+        }
+      ]
+    },
+    {
+      "name": "CargoCeilingHoist",
+      "triangles": 3268,
+      "parts": [
+        "Trolley",
+        "ChainAndHook"
+      ],
+      "pivots": [
+        {
+          "name": "Trolley",
+          "positionBlender": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "name": "ChainAndHook",
+          "positionBlender": [
+            0,
+            0,
+            -0.24
+          ]
+        }
+      ],
+      "mounts": [
+        {
+          "name": "Mount_Rail",
+          "positionBlender": [
+            0,
+            0,
+            0.05
+          ]
+        },
+        {
+          "name": "Mount_Load",
+          "positionBlender": [
+            0,
+            0,
+            -0.84
+          ]
+        }
+      ]
+    },
+    {
+      "name": "InertTrainingTorpedo",
+      "triangles": 1828,
+      "parts": [
+        "Body",
+        "TailPropeller"
+      ],
+      "pivots": [
+        {
+          "name": "Body",
+          "positionBlender": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "name": "TailPropeller",
+          "positionBlender": [
+            0,
+            1.74,
+            0
+          ]
+        }
+      ],
+      "mounts": [
+        {
+          "name": "Mount_LiftingPoint",
+          "positionBlender": [
+            0,
+            0,
+            0.245
+          ]
+        },
+        {
+          "name": "Mount_Grip",
+          "positionBlender": [
+            0,
+            0,
+            0
+          ]
+        }
+      ]
+    },
+    {
+      "name": "PropagandaPosterBlank",
+      "triangles": 108,
+      "parts": [
+        "ArtworkSurface"
+      ],
+      "pivots": [
+        {
+          "name": "ArtworkSurface",
+          "positionBlender": [
+            0,
+            0,
+            0
+          ]
+        }
+      ],
+      "mounts": [
+        {
+          "name": "Mount_Wall",
+          "positionBlender": [
+            0,
+            0.006,
+            0
+          ]
+        },
+        {
+          "name": "Mount_Artwork",
+          "positionBlender": [
+            0,
+            -0.003,
+            0
+          ]
+        }
+      ]
+    },
+    {
+      "name": "PeriodPhotographBlank",
+      "triangles": 108,
+      "parts": [
+        "ArtworkSurface"
+      ],
+      "pivots": [
+        {
+          "name": "ArtworkSurface",
+          "positionBlender": [
+            0,
+            0,
+            0
+          ]
+        }
+      ],
+      "mounts": [
+        {
+          "name": "Mount_Wall",
+          "positionBlender": [
+            0,
+            0.006,
+            0
+          ]
+        },
+        {
+          "name": "Mount_Artwork",
+          "positionBlender": [
+            0,
+            -0.003,
+            0
+          ]
+        }
+      ]
+    },
+    {
+      "name": "PaperLabelBlank",
+      "triangles": 108,
+      "parts": [
+        "ArtworkSurface"
+      ],
+      "pivots": [
+        {
+          "name": "ArtworkSurface",
+          "positionBlender": [
+            0,
+            0,
+            0
+          ]
+        }
+      ],
+      "mounts": [
+        {
+          "name": "Mount_Wall",
+          "positionBlender": [
+            0,
+            0.006,
+            0
+          ]
+        },
+        {
+          "name": "Mount_Artwork",
+          "positionBlender": [
+            0,
+            -0.003,
+            0
+          ]
+        }
+      ]
+    }
+  ]
+}

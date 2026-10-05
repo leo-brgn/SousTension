@@ -1,0 +1,1892 @@
+{
+  "blender": "5.2.2 LTS",
+  "annex": 11,
+  "coverage": {
+    "heads": 6,
+    "moustaches": 12,
+    "hair": 8,
+    "headwear": 10,
+    "cosmetics_including_headwear": 50,
+    "uniform_variants": 4,
+    "rigged_characters": 7,
+    "wake_up_salts": 1
+  },
+  "assets": [
+    {
+      "name": "Head_01",
+      "triangles": 2024,
+      "category": "head",
+      "skeletonBone": "Head",
+      "massKg": 0.08,
+      "massSource": "prototype assumption",
+      "offsetBlenderRigAxes": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "boneLocalOffsetBlender": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "anchorRestPositionBlender": [
+        0.0,
+        0.0,
+        1.350000023841858
+      ]
+    },
+    {
+      "name": "Head_02",
+      "triangles": 2024,
+      "category": "head",
+      "skeletonBone": "Head",
+      "massKg": 0.08,
+      "massSource": "prototype assumption",
+      "offsetBlenderRigAxes": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "boneLocalOffsetBlender": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "anchorRestPositionBlender": [
+        0.0,
+        0.0,
+        1.350000023841858
+      ]
+    },
+    {
+      "name": "Head_03",
+      "triangles": 2024,
+      "category": "head",
+      "skeletonBone": "Head",
+      "massKg": 0.08,
+      "massSource": "prototype assumption",
+      "offsetBlenderRigAxes": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "boneLocalOffsetBlender": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "anchorRestPositionBlender": [
+        0.0,
+        0.0,
+        1.350000023841858
+      ]
+    },
+    {
+      "name": "Head_04",
+      "triangles": 2024,
+      "category": "head",
+      "skeletonBone": "Head",
+      "massKg": 0.08,
+      "massSource": "prototype assumption",
+      "offsetBlenderRigAxes": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "boneLocalOffsetBlender": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "anchorRestPositionBlender": [
+        0.0,
+        0.0,
+        1.350000023841858
+      ]
+    },
+    {
+      "name": "Head_05",
+      "triangles": 2024,
+      "category": "head",
+      "skeletonBone": "Head",
+      "massKg": 0.08,
+      "massSource": "prototype assumption",
+      "offsetBlenderRigAxes": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "boneLocalOffsetBlender": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "anchorRestPositionBlender": [
+        0.0,
+        0.0,
+        1.350000023841858
+      ]
+    },
+    {
+      "name": "Head_06",
+      "triangles": 2024,
+      "category": "head",
+      "skeletonBone": "Head",
+      "massKg": 0.08,
+      "massSource": "prototype assumption",
+      "offsetBlenderRigAxes": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "boneLocalOffsetBlender": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "anchorRestPositionBlender": [
+        0.0,
+        0.0,
+        1.350000023841858
+      ]
+    },
+    {
+      "name": "Moustache_01",
+      "triangles": 504,
+      "category": "moustache",
+      "skeletonBone": "Head",
+      "massKg": 0.08,
+      "massSource": "prototype assumption",
+      "offsetBlenderRigAxes": [
+        0.0,
+        -0.23499999940395355,
+        0.10000000149011612
+      ],
+      "boneLocalOffsetBlender": [
+        0.0,
+        0.09999999403953552,
+        0.23499999940395355
+      ],
+      "anchorRestPositionBlender": [
+        0.0,
+        0.0,
+        1.350000023841858
+      ]
+    },
+    {
+      "name": "Moustache_02",
+      "triangles": 504,
+      "category": "moustache",
+      "skeletonBone": "Head",
+      "massKg": 0.08,
+      "massSource": "prototype assumption",
+      "offsetBlenderRigAxes": [
+        0.0,
+        -0.23499999940395355,
+        0.10000000149011612
+      ],
+      "boneLocalOffsetBlender": [
+        0.0,
+        0.09999999403953552,
+        0.23499999940395355
+      ],
+      "anchorRestPositionBlender": [
+        0.0,
+        0.0,
+        1.350000023841858
+      ]
+    },
+    {
+      "name": "Moustache_03",
+      "triangles": 504,
+      "category": "moustache",
+      "skeletonBone": "Head",
+      "massKg": 0.08,
+      "massSource": "prototype assumption",
+      "offsetBlenderRigAxes": [
+        0.0,
+        -0.23499999940395355,
+        0.10000000149011612
+      ],
+      "boneLocalOffsetBlender": [
+        0.0,
+        0.09999999403953552,
+        0.23499999940395355
+      ],
+      "anchorRestPositionBlender": [
+        0.0,
+        0.0,
+        1.350000023841858
+      ]
+    },
+    {
+      "name": "Moustache_04",
+      "triangles": 504,
+      "category": "moustache",
+      "skeletonBone": "Head",
+      "massKg": 0.08,
+      "massSource": "prototype assumption",
+      "offsetBlenderRigAxes": [
+        0.0,
+        -0.23499999940395355,
+        0.10000000149011612
+      ],
+      "boneLocalOffsetBlender": [
+        0.0,
+        0.09999999403953552,
+        0.23499999940395355
+      ],
+      "anchorRestPositionBlender": [
+        0.0,
+        0.0,
+        1.350000023841858
+      ]
+    },
+    {
+      "name": "Moustache_05",
+      "triangles": 1008,
+      "category": "moustache",
+      "skeletonBone": "Head",
+      "massKg": 0.08,
+      "massSource": "prototype assumption",
+      "offsetBlenderRigAxes": [
+        0.0,
+        -0.23499999940395355,
+        0.10000000149011612
+      ],
+      "boneLocalOffsetBlender": [
+        0.0,
+        0.09999999403953552,
+        0.23499999940395355
+      ],
+      "anchorRestPositionBlender": [
+        0.0,
+        0.0,
+        1.350000023841858
+      ]
+    },
+    {
+      "name": "Moustache_06",
+      "triangles": 1008,
+      "category": "moustache",
+      "skeletonBone": "Head",
+      "massKg": 0.08,
+      "massSource": "prototype assumption",
+      "offsetBlenderRigAxes": [
+        0.0,
+        -0.23499999940395355,
+        0.10000000149011612
+      ],
+      "boneLocalOffsetBlender": [
+        0.0,
+        0.09999999403953552,
+        0.23499999940395355
+      ],
+      "anchorRestPositionBlender": [
+        0.0,
+        0.0,
+        1.350000023841858
+      ]
+    },
+    {
+      "name": "Moustache_07",
+      "triangles": 1008,
+      "category": "moustache",
+      "skeletonBone": "Head",
+      "massKg": 0.08,
+      "massSource": "prototype assumption",
+      "offsetBlenderRigAxes": [
+        0.0,
+        -0.23499999940395355,
+        0.10000000149011612
+      ],
+      "boneLocalOffsetBlender": [
+        0.0,
+        0.09999999403953552,
+        0.23499999940395355
+      ],
+      "anchorRestPositionBlender": [
+        0.0,
+        0.0,
+        1.350000023841858
+      ]
+    },
+    {
+      "name": "Moustache_08",
+      "triangles": 1008,
+      "category": "moustache",
+      "skeletonBone": "Head",
+      "massKg": 0.08,
+      "massSource": "prototype assumption",
+      "offsetBlenderRigAxes": [
+        0.0,
+        -0.23499999940395355,
+        0.10000000149011612
+      ],
+      "boneLocalOffsetBlender": [
+        0.0,
+        0.09999999403953552,
+        0.23499999940395355
+      ],
+      "anchorRestPositionBlender": [
+        0.0,
+        0.0,
+        1.350000023841858
+      ]
+    },
+    {
+      "name": "Moustache_09",
+      "triangles": 216,
+      "category": "moustache",
+      "skeletonBone": "Head",
+      "massKg": 0.08,
+      "massSource": "prototype assumption",
+      "offsetBlenderRigAxes": [
+        0.0,
+        -0.23499999940395355,
+        0.10000000149011612
+      ],
+      "boneLocalOffsetBlender": [
+        0.0,
+        0.09999999403953552,
+        0.23499999940395355
+      ],
+      "anchorRestPositionBlender": [
+        0.0,
+        0.0,
+        1.350000023841858
+      ]
+    },
+    {
+      "name": "Moustache_10",
+      "triangles": 216,
+      "category": "moustache",
+      "skeletonBone": "Head",
+      "massKg": 0.08,
+      "massSource": "prototype assumption",
+      "offsetBlenderRigAxes": [
+        0.0,
+        -0.23499999940395355,
+        0.10000000149011612
+      ],
+      "boneLocalOffsetBlender": [
+        0.0,
+        0.09999999403953552,
+        0.23499999940395355
+      ],
+      "anchorRestPositionBlender": [
+        0.0,
+        0.0,
+        1.350000023841858
+      ]
+    },
+    {
+      "name": "Moustache_11",
+      "triangles": 216,
+      "category": "moustache",
+      "skeletonBone": "Head",
+      "massKg": 0.08,
+      "massSource": "prototype assumption",
+      "offsetBlenderRigAxes": [
+        0.0,
+        -0.23499999940395355,
+        0.10000000149011612
+      ],
+      "boneLocalOffsetBlender": [
+        0.0,
+        0.09999999403953552,
+        0.23499999940395355
+      ],
+      "anchorRestPositionBlender": [
+        0.0,
+        0.0,
+        1.350000023841858
+      ]
+    },
+    {
+      "name": "Moustache_12",
+      "triangles": 720,
+      "category": "moustache",
+      "skeletonBone": "Head",
+      "massKg": 0.08,
+      "massSource": "prototype assumption",
+      "offsetBlenderRigAxes": [
+        0.0,
+        -0.23499999940395355,
+        0.10000000149011612
+      ],
+      "boneLocalOffsetBlender": [
+        0.0,
+        0.09999999403953552,
+        0.23499999940395355
+      ],
+      "anchorRestPositionBlender": [
+        0.0,
+        0.0,
+        1.350000023841858
+      ]
+    },
+    {
+      "name": "Hair_01",
+      "triangles": 1764,
+      "category": "hair",
+      "skeletonBone": "Head",
+      "massKg": 0.08,
+      "massSource": "prototype assumption",
+      "offsetBlenderRigAxes": [
+        0.0,
+        0.0,
+        0.18000000715255737
+      ],
+      "boneLocalOffsetBlender": [
+        0.0,
+        0.17999999225139618,
+        0.0
+      ],
+      "anchorRestPositionBlender": [
+        0.0,
+        0.0,
+        1.350000023841858
+      ]
+    },
+    {
+      "name": "Hair_02",
+      "triangles": 2016,
+      "category": "hair",
+      "skeletonBone": "Head",
+      "massKg": 0.08,
+      "massSource": "prototype assumption",
+      "offsetBlenderRigAxes": [
+        0.0,
+        0.0,
+        0.18000000715255737
+      ],
+      "boneLocalOffsetBlender": [
+        0.0,
+        0.17999999225139618,
+        0.0
+      ],
+      "anchorRestPositionBlender": [
+        0.0,
+        0.0,
+        1.350000023841858
+      ]
+    },
+    {
+      "name": "Hair_03",
+      "triangles": 2520,
+      "category": "hair",
+      "skeletonBone": "Head",
+      "massKg": 0.08,
+      "massSource": "prototype assumption",
+      "offsetBlenderRigAxes": [
+        0.0,
+        0.0,
+        0.18000000715255737
+      ],
+      "boneLocalOffsetBlender": [
+        0.0,
+        0.17999999225139618,
+        0.0
+      ],
+      "anchorRestPositionBlender": [
+        0.0,
+        0.0,
+        1.350000023841858
+      ]
+    },
+    {
+      "name": "Hair_04",
+      "triangles": 1764,
+      "category": "hair",
+      "skeletonBone": "Head",
+      "massKg": 0.08,
+      "massSource": "prototype assumption",
+      "offsetBlenderRigAxes": [
+        0.0,
+        0.0,
+        0.18000000715255737
+      ],
+      "boneLocalOffsetBlender": [
+        0.0,
+        0.17999999225139618,
+        0.0
+      ],
+      "anchorRestPositionBlender": [
+        0.0,
+        0.0,
+        1.350000023841858
+      ]
+    },
+    {
+      "name": "Hair_05",
+      "triangles": 2016,
+      "category": "hair",
+      "skeletonBone": "Head",
+      "massKg": 0.08,
+      "massSource": "prototype assumption",
+      "offsetBlenderRigAxes": [
+        0.0,
+        0.0,
+        0.18000000715255737
+      ],
+      "boneLocalOffsetBlender": [
+        0.0,
+        0.17999999225139618,
+        0.0
+      ],
+      "anchorRestPositionBlender": [
+        0.0,
+        0.0,
+        1.350000023841858
+      ]
+    },
+    {
+      "name": "Hair_06",
+      "triangles": 2520,
+      "category": "hair",
+      "skeletonBone": "Head",
+      "massKg": 0.08,
+      "massSource": "prototype assumption",
+      "offsetBlenderRigAxes": [
+        0.0,
+        0.0,
+        0.18000000715255737
+      ],
+      "boneLocalOffsetBlender": [
+        0.0,
+        0.17999999225139618,
+        0.0
+      ],
+      "anchorRestPositionBlender": [
+        0.0,
+        0.0,
+        1.350000023841858
+      ]
+    },
+    {
+      "name": "Hair_07",
+      "triangles": 1764,
+      "category": "hair",
+      "skeletonBone": "Head",
+      "massKg": 0.08,
+      "massSource": "prototype assumption",
+      "offsetBlenderRigAxes": [
+        0.0,
+        0.0,
+        0.18000000715255737
+      ],
+      "boneLocalOffsetBlender": [
+        0.0,
+        0.17999999225139618,
+        0.0
+      ],
+      "anchorRestPositionBlender": [
+        0.0,
+        0.0,
+        1.350000023841858
+      ]
+    },
+    {
+      "name": "Hair_08",
+      "triangles": 2772,
+      "category": "hair",
+      "skeletonBone": "Head",
+      "massKg": 0.08,
+      "massSource": "prototype assumption",
+      "offsetBlenderRigAxes": [
+        0.0,
+        0.0,
+        0.18000000715255737
+      ],
+      "boneLocalOffsetBlender": [
+        0.0,
+        0.17999999225139618,
+        0.0
+      ],
+      "anchorRestPositionBlender": [
+        0.0,
+        0.0,
+        1.350000023841858
+      ]
+    },
+    {
+      "name": "PeakedCap",
+      "triangles": 612,
+      "category": "headwear",
+      "skeletonBone": "Head",
+      "massKg": 0.08,
+      "massSource": "prototype assumption",
+      "offsetBlenderRigAxes": [
+        0.0,
+        0.0,
+        0.4000000059604645
+      ],
+      "boneLocalOffsetBlender": [
+        0.0,
+        0.3999999761581421,
+        0.0
+      ],
+      "anchorRestPositionBlender": [
+        0.0,
+        0.0,
+        1.350000023841858
+      ]
+    },
+    {
+      "name": "WatchBeanie",
+      "triangles": 636,
+      "category": "headwear",
+      "skeletonBone": "Head",
+      "massKg": 0.08,
+      "massSource": "prototype assumption",
+      "offsetBlenderRigAxes": [
+        0.0,
+        0.0,
+        0.4000000059604645
+      ],
+      "boneLocalOffsetBlender": [
+        0.0,
+        0.3999999761581421,
+        0.0
+      ],
+      "anchorRestPositionBlender": [
+        0.0,
+        0.0,
+        1.350000023841858
+      ]
+    },
+    {
+      "name": "WoolBonnet",
+      "triangles": 888,
+      "category": "headwear",
+      "skeletonBone": "Head",
+      "massKg": 0.08,
+      "massSource": "prototype assumption",
+      "offsetBlenderRigAxes": [
+        0.0,
+        0.0,
+        0.4000000059604645
+      ],
+      "boneLocalOffsetBlender": [
+        0.0,
+        0.3999999761581421,
+        0.0
+      ],
+      "anchorRestPositionBlender": [
+        0.0,
+        0.0,
+        1.350000023841858
+      ]
+    },
+    {
+      "name": "ServiceBeret",
+      "triangles": 564,
+      "category": "headwear",
+      "skeletonBone": "Head",
+      "massKg": 0.08,
+      "massSource": "prototype assumption",
+      "offsetBlenderRigAxes": [
+        0.0,
+        0.0,
+        0.4000000059604645
+      ],
+      "boneLocalOffsetBlender": [
+        0.0,
+        0.3999999761581421,
+        0.0
+      ],
+      "anchorRestPositionBlender": [
+        0.0,
+        0.0,
+        1.350000023841858
+      ]
+    },
+    {
+      "name": "CookCap",
+      "triangles": 1700,
+      "category": "headwear",
+      "skeletonBone": "Head",
+      "massKg": 0.08,
+      "massSource": "prototype assumption",
+      "offsetBlenderRigAxes": [
+        0.0,
+        0.0,
+        0.4000000059604645
+      ],
+      "boneLocalOffsetBlender": [
+        0.0,
+        0.3999999761581421,
+        0.0
+      ],
+      "anchorRestPositionBlender": [
+        0.0,
+        0.0,
+        1.350000023841858
+      ]
+    },
+    {
+      "name": "SideCap",
+      "triangles": 360,
+      "category": "headwear",
+      "skeletonBone": "Head",
+      "massKg": 0.08,
+      "massSource": "prototype assumption",
+      "offsetBlenderRigAxes": [
+        0.0,
+        0.0,
+        0.4000000059604645
+      ],
+      "boneLocalOffsetBlender": [
+        0.0,
+        0.3999999761581421,
+        0.0
+      ],
+      "anchorRestPositionBlender": [
+        0.0,
+        0.0,
+        1.350000023841858
+      ]
+    },
+    {
+      "name": "EarflapCap",
+      "triangles": 468,
+      "category": "headwear",
+      "skeletonBone": "Head",
+      "massKg": 0.08,
+      "massSource": "prototype assumption",
+      "offsetBlenderRigAxes": [
+        0.0,
+        0.0,
+        0.4000000059604645
+      ],
+      "boneLocalOffsetBlender": [
+        0.0,
+        0.3999999761581421,
+        0.0
+      ],
+      "anchorRestPositionBlender": [
+        0.0,
+        0.0,
+        1.350000023841858
+      ]
+    },
+    {
+      "name": "FlatCap",
+      "triangles": 360,
+      "category": "headwear",
+      "skeletonBone": "Head",
+      "massKg": 0.08,
+      "massSource": "prototype assumption",
+      "offsetBlenderRigAxes": [
+        0.0,
+        0.0,
+        0.4000000059604645
+      ],
+      "boneLocalOffsetBlender": [
+        0.0,
+        0.3999999761581421,
+        0.0
+      ],
+      "anchorRestPositionBlender": [
+        0.0,
+        0.0,
+        1.350000023841858
+      ]
+    },
+    {
+      "name": "DeckHardhat",
+      "triangles": 684,
+      "category": "headwear",
+      "skeletonBone": "Head",
+      "massKg": 0.08,
+      "massSource": "prototype assumption",
+      "offsetBlenderRigAxes": [
+        0.0,
+        0.0,
+        0.4000000059604645
+      ],
+      "boneLocalOffsetBlender": [
+        0.0,
+        0.3999999761581421,
+        0.0
+      ],
+      "anchorRestPositionBlender": [
+        0.0,
+        0.0,
+        1.350000023841858
+      ]
+    },
+    {
+      "name": "WinterHood",
+      "triangles": 576,
+      "category": "headwear",
+      "skeletonBone": "Head",
+      "massKg": 0.08,
+      "massSource": "prototype assumption",
+      "offsetBlenderRigAxes": [
+        0.0,
+        0.0,
+        0.4000000059604645
+      ],
+      "boneLocalOffsetBlender": [
+        0.0,
+        0.3999999761581421,
+        0.0
+      ],
+      "anchorRestPositionBlender": [
+        0.0,
+        0.0,
+        1.350000023841858
+      ]
+    },
+    {
+      "name": "RoundBadge",
+      "triangles": 60,
+      "category": "cosmetic",
+      "skeletonBone": "Spine",
+      "massKg": 0.08,
+      "massSource": "prototype assumption",
+      "offsetBlenderRigAxes": [
+        0.1599999964237213,
+        -0.27000001072883606,
+        0.17000000178813934
+      ],
+      "boneLocalOffsetBlender": [
+        0.1599999964237213,
+        0.17000000178813934,
+        0.27000001072883606
+      ],
+      "anchorRestPositionBlender": [
+        0.0,
+        0.0,
+        0.8299999833106995
+      ]
+    },
+    {
+      "name": "SquareBadge",
+      "triangles": 108,
+      "category": "cosmetic",
+      "skeletonBone": "Spine",
+      "massKg": 0.08,
+      "massSource": "prototype assumption",
+      "offsetBlenderRigAxes": [
+        0.1599999964237213,
+        -0.27000001072883606,
+        0.17000000178813934
+      ],
+      "boneLocalOffsetBlender": [
+        0.1599999964237213,
+        0.17000000178813934,
+        0.27000001072883606
+      ],
+      "anchorRestPositionBlender": [
+        0.0,
+        0.0,
+        0.8299999833106995
+      ]
+    },
+    {
+      "name": "AnchorBadge",
+      "triangles": 876,
+      "category": "cosmetic",
+      "skeletonBone": "Spine",
+      "massKg": 0.08,
+      "massSource": "prototype assumption",
+      "offsetBlenderRigAxes": [
+        0.1599999964237213,
+        -0.27000001072883606,
+        0.17000000178813934
+      ],
+      "boneLocalOffsetBlender": [
+        0.1599999964237213,
+        0.17000000178813934,
+        0.27000001072883606
+      ],
+      "anchorRestPositionBlender": [
+        0.0,
+        0.0,
+        0.8299999833106995
+      ]
+    },
+    {
+      "name": "ChevronBadge",
+      "triangles": 648,
+      "category": "cosmetic",
+      "skeletonBone": "UpperArm_L",
+      "massKg": 0.08,
+      "massSource": "prototype assumption",
+      "offsetBlenderRigAxes": [
+        0.03999999910593033,
+        0.0,
+        -0.10000000149011612
+      ],
+      "boneLocalOffsetBlender": [
+        -0.027979396283626556,
+        0.10081934928894043,
+        -0.025546394288539886
+      ],
+      "anchorRestPositionBlender": [
+        0.33000001311302185,
+        0.0,
+        1.2799999713897705
+      ]
+    },
+    {
+      "name": "WingBadge",
+      "triangles": 564,
+      "category": "cosmetic",
+      "skeletonBone": "Spine",
+      "massKg": 0.08,
+      "massSource": "prototype assumption",
+      "offsetBlenderRigAxes": [
+        0.1599999964237213,
+        -0.27000001072883606,
+        0.17000000178813934
+      ],
+      "boneLocalOffsetBlender": [
+        0.1599999964237213,
+        0.17000000178813934,
+        0.27000001072883606
+      ],
+      "anchorRestPositionBlender": [
+        0.0,
+        0.0,
+        0.8299999833106995
+      ]
+    },
+    {
+      "name": "MedalSingle",
+      "triangles": 72,
+      "category": "cosmetic",
+      "skeletonBone": "Spine",
+      "massKg": 0.08,
+      "massSource": "prototype assumption",
+      "offsetBlenderRigAxes": [
+        0.1599999964237213,
+        -0.27000001072883606,
+        0.17000000178813934
+      ],
+      "boneLocalOffsetBlender": [
+        0.1599999964237213,
+        0.17000000178813934,
+        0.27000001072883606
+      ],
+      "anchorRestPositionBlender": [
+        0.0,
+        0.0,
+        0.8299999833106995
+      ]
+    },
+    {
+      "name": "MedalPair",
+      "triangles": 144,
+      "category": "cosmetic",
+      "skeletonBone": "Spine",
+      "massKg": 0.08,
+      "massSource": "prototype assumption",
+      "offsetBlenderRigAxes": [
+        0.1599999964237213,
+        -0.27000001072883606,
+        0.17000000178813934
+      ],
+      "boneLocalOffsetBlender": [
+        0.1599999964237213,
+        0.17000000178813934,
+        0.27000001072883606
+      ],
+      "anchorRestPositionBlender": [
+        0.0,
+        0.0,
+        0.8299999833106995
+      ]
+    },
+    {
+      "name": "RibbonBar",
+      "triangles": 48,
+      "category": "cosmetic",
+      "skeletonBone": "Spine",
+      "massKg": 0.08,
+      "massSource": "prototype assumption",
+      "offsetBlenderRigAxes": [
+        0.1599999964237213,
+        -0.27000001072883606,
+        0.17000000178813934
+      ],
+      "boneLocalOffsetBlender": [
+        0.1599999964237213,
+        0.17000000178813934,
+        0.27000001072883606
+      ],
+      "anchorRestPositionBlender": [
+        0.0,
+        0.0,
+        0.8299999833106995
+      ]
+    },
+    {
+      "name": "ServiceStars",
+      "triangles": 756,
+      "category": "cosmetic",
+      "skeletonBone": "Spine",
+      "massKg": 0.08,
+      "massSource": "prototype assumption",
+      "offsetBlenderRigAxes": [
+        0.1599999964237213,
+        -0.27000001072883606,
+        0.17000000178813934
+      ],
+      "boneLocalOffsetBlender": [
+        0.1599999964237213,
+        0.17000000178813934,
+        0.27000001072883606
+      ],
+      "anchorRestPositionBlender": [
+        0.0,
+        0.0,
+        0.8299999833106995
+      ]
+    },
+    {
+      "name": "Epaulette",
+      "triangles": 120,
+      "category": "cosmetic",
+      "skeletonBone": "Spine",
+      "massKg": 0.08,
+      "massSource": "prototype assumption",
+      "offsetBlenderRigAxes": [
+        0.1599999964237213,
+        -0.27000001072883606,
+        0.17000000178813934
+      ],
+      "boneLocalOffsetBlender": [
+        0.1599999964237213,
+        0.17000000178813934,
+        0.27000001072883606
+      ],
+      "anchorRestPositionBlender": [
+        0.0,
+        0.0,
+        0.8299999833106995
+      ]
+    },
+    {
+      "name": "DeckBelt",
+      "triangles": 492,
+      "category": "cosmetic",
+      "skeletonBone": "Hips",
+      "massKg": 0.08,
+      "massSource": "prototype assumption",
+      "offsetBlenderRigAxes": [
+        0.0,
+        0.0,
+        0.20000000298023224
+      ],
+      "boneLocalOffsetBlender": [
+        0.0,
+        0.20000000298023224,
+        0.0
+      ],
+      "anchorRestPositionBlender": [
+        0.0,
+        0.0,
+        0.47999998927116394
+      ]
+    },
+    {
+      "name": "UtilityBelt",
+      "triangles": 708,
+      "category": "cosmetic",
+      "skeletonBone": "Hips",
+      "massKg": 0.08,
+      "massSource": "prototype assumption",
+      "offsetBlenderRigAxes": [
+        0.0,
+        0.0,
+        0.20000000298023224
+      ],
+      "boneLocalOffsetBlender": [
+        0.0,
+        0.20000000298023224,
+        0.0
+      ],
+      "anchorRestPositionBlender": [
+        0.0,
+        0.0,
+        0.47999998927116394
+      ]
+    },
+    {
+      "name": "Suspenders",
+      "triangles": 216,
+      "category": "cosmetic",
+      "skeletonBone": "Spine",
+      "massKg": 0.08,
+      "massSource": "prototype assumption",
+      "offsetBlenderRigAxes": [
+        0.0,
+        -0.27000001072883606,
+        0.15000000596046448
+      ],
+      "boneLocalOffsetBlender": [
+        0.0,
+        0.15000000596046448,
+        0.27000001072883606
+      ],
+      "anchorRestPositionBlender": [
+        0.0,
+        0.0,
+        0.8299999833106995
+      ]
+    },
+    {
+      "name": "Scarf",
+      "triangles": 600,
+      "category": "cosmetic",
+      "skeletonBone": "Neck",
+      "massKg": 0.08,
+      "massSource": "prototype assumption",
+      "offsetBlenderRigAxes": [
+        0.0,
+        -0.14000000059604645,
+        0.17000000178813934
+      ],
+      "boneLocalOffsetBlender": [
+        0.0,
+        0.16999998688697815,
+        0.14000000059604645
+      ],
+      "anchorRestPositionBlender": [
+        0.0,
+        0.0,
+        1.1200000047683716
+      ]
+    },
+    {
+      "name": "Neckerchief",
+      "triangles": 600,
+      "category": "cosmetic",
+      "skeletonBone": "Neck",
+      "massKg": 0.08,
+      "massSource": "prototype assumption",
+      "offsetBlenderRigAxes": [
+        0.0,
+        -0.14000000059604645,
+        0.17000000178813934
+      ],
+      "boneLocalOffsetBlender": [
+        0.0,
+        0.16999998688697815,
+        0.14000000059604645
+      ],
+      "anchorRestPositionBlender": [
+        0.0,
+        0.0,
+        1.1200000047683716
+      ]
+    },
+    {
+      "name": "BowTie",
+      "triangles": 504,
+      "category": "cosmetic",
+      "skeletonBone": "Neck",
+      "massKg": 0.08,
+      "massSource": "prototype assumption",
+      "offsetBlenderRigAxes": [
+        0.0,
+        -0.14000000059604645,
+        0.17000000178813934
+      ],
+      "boneLocalOffsetBlender": [
+        0.0,
+        0.16999998688697815,
+        0.14000000059604645
+      ],
+      "anchorRestPositionBlender": [
+        0.0,
+        0.0,
+        1.1200000047683716
+      ]
+    },
+    {
+      "name": "Tie",
+      "triangles": 360,
+      "category": "cosmetic",
+      "skeletonBone": "Spine",
+      "massKg": 0.08,
+      "massSource": "prototype assumption",
+      "offsetBlenderRigAxes": [
+        0.1599999964237213,
+        -0.27000001072883606,
+        0.17000000178813934
+      ],
+      "boneLocalOffsetBlender": [
+        0.1599999964237213,
+        0.17000000178813934,
+        0.27000001072883606
+      ],
+      "anchorRestPositionBlender": [
+        0.0,
+        0.0,
+        0.8299999833106995
+      ]
+    },
+    {
+      "name": "GloveLeft",
+      "triangles": 1512,
+      "category": "cosmetic",
+      "skeletonBone": "Hand_L",
+      "massKg": 0.08,
+      "massSource": "prototype assumption",
+      "offsetBlenderRigAxes": [
+        0.0,
+        0.0,
+        -0.05999999865889549
+      ],
+      "boneLocalOffsetBlender": [
+        -0.015230796299874783,
+        0.05788583680987358,
+        -0.00415385328233242
+      ],
+      "anchorRestPositionBlender": [
+        0.6499999761581421,
+        -0.02500000037252903,
+        0.8299999833106995
+      ]
+    },
+    {
+      "name": "GloveRight",
+      "triangles": 1512,
+      "category": "cosmetic",
+      "skeletonBone": "Hand_R",
+      "massKg": 0.08,
+      "massSource": "prototype assumption",
+      "offsetBlenderRigAxes": [
+        0.0,
+        0.0,
+        -0.05999999865889549
+      ],
+      "boneLocalOffsetBlender": [
+        0.015230796299874783,
+        0.05788583680987358,
+        -0.00415385328233242
+      ],
+      "anchorRestPositionBlender": [
+        -0.6499999761581421,
+        -0.02500000037252903,
+        0.8299999833106995
+      ]
+    },
+    {
+      "name": "MittensPair",
+      "triangles": 756,
+      "category": "cosmetic",
+      "skeletonBone": "Hand_L",
+      "massKg": 0.08,
+      "massSource": "prototype assumption",
+      "offsetBlenderRigAxes": [
+        0.0,
+        0.0,
+        -0.05999999865889549
+      ],
+      "boneLocalOffsetBlender": [
+        -0.015230796299874783,
+        0.05788583680987358,
+        -0.00415385328233242
+      ],
+      "anchorRestPositionBlender": [
+        0.6499999761581421,
+        -0.02500000037252903,
+        0.8299999833106995
+      ]
+    },
+    {
+      "name": "SpectaclesRound",
+      "triangles": 780,
+      "category": "cosmetic",
+      "skeletonBone": "Head",
+      "massKg": 0.08,
+      "massSource": "prototype assumption",
+      "offsetBlenderRigAxes": [
+        0.0,
+        -0.2199999988079071,
+        0.2199999988079071
+      ],
+      "boneLocalOffsetBlender": [
+        0.0,
+        0.2199999839067459,
+        0.2199999988079071
+      ],
+      "anchorRestPositionBlender": [
+        0.0,
+        0.0,
+        1.350000023841858
+      ]
+    },
+    {
+      "name": "SpectaclesSquare",
+      "triangles": 444,
+      "category": "cosmetic",
+      "skeletonBone": "Head",
+      "massKg": 0.08,
+      "massSource": "prototype assumption",
+      "offsetBlenderRigAxes": [
+        0.0,
+        -0.2199999988079071,
+        0.2199999988079071
+      ],
+      "boneLocalOffsetBlender": [
+        0.0,
+        0.2199999839067459,
+        0.2199999988079071
+      ],
+      "anchorRestPositionBlender": [
+        0.0,
+        0.0,
+        1.350000023841858
+      ]
+    },
+    {
+      "name": "Monocle",
+      "triangles": 384,
+      "category": "cosmetic",
+      "skeletonBone": "Head",
+      "massKg": 0.08,
+      "massSource": "prototype assumption",
+      "offsetBlenderRigAxes": [
+        0.0,
+        -0.2199999988079071,
+        0.2199999988079071
+      ],
+      "boneLocalOffsetBlender": [
+        0.0,
+        0.2199999839067459,
+        0.2199999988079071
+      ],
+      "anchorRestPositionBlender": [
+        0.0,
+        0.0,
+        1.350000023841858
+      ]
+    },
+    {
+      "name": "Goggles",
+      "triangles": 828,
+      "category": "cosmetic",
+      "skeletonBone": "Head",
+      "massKg": 0.08,
+      "massSource": "prototype assumption",
+      "offsetBlenderRigAxes": [
+        0.0,
+        -0.2199999988079071,
+        0.2199999988079071
+      ],
+      "boneLocalOffsetBlender": [
+        0.0,
+        0.2199999839067459,
+        0.2199999988079071
+      ],
+      "anchorRestPositionBlender": [
+        0.0,
+        0.0,
+        1.350000023841858
+      ]
+    },
+    {
+      "name": "EarDefenders",
+      "triangles": 888,
+      "category": "cosmetic",
+      "skeletonBone": "Head",
+      "massKg": 0.08,
+      "massSource": "prototype assumption",
+      "offsetBlenderRigAxes": [
+        0.0,
+        -0.2199999988079071,
+        0.2199999988079071
+      ],
+      "boneLocalOffsetBlender": [
+        0.0,
+        0.2199999839067459,
+        0.2199999988079071
+      ],
+      "anchorRestPositionBlender": [
+        0.0,
+        0.0,
+        1.350000023841858
+      ]
+    },
+    {
+      "name": "Whistle",
+      "triangles": 632,
+      "category": "cosmetic",
+      "skeletonBone": "Spine",
+      "massKg": 0.08,
+      "massSource": "prototype assumption",
+      "offsetBlenderRigAxes": [
+        0.1599999964237213,
+        -0.27000001072883606,
+        0.17000000178813934
+      ],
+      "boneLocalOffsetBlender": [
+        0.1599999964237213,
+        0.17000000178813934,
+        0.27000001072883606
+      ],
+      "anchorRestPositionBlender": [
+        0.0,
+        0.0,
+        0.8299999833106995
+      ]
+    },
+    {
+      "name": "PocketWatch",
+      "triangles": 572,
+      "category": "cosmetic",
+      "skeletonBone": "Spine",
+      "massKg": 0.08,
+      "massSource": "prototype assumption",
+      "offsetBlenderRigAxes": [
+        0.1599999964237213,
+        -0.27000001072883606,
+        0.17000000178813934
+      ],
+      "boneLocalOffsetBlender": [
+        0.1599999964237213,
+        0.17000000178813934,
+        0.27000001072883606
+      ],
+      "anchorRestPositionBlender": [
+        0.0,
+        0.0,
+        0.8299999833106995
+      ]
+    },
+    {
+      "name": "PocketNotebook",
+      "triangles": 108,
+      "category": "cosmetic",
+      "skeletonBone": "Spine",
+      "massKg": 0.08,
+      "massSource": "prototype assumption",
+      "offsetBlenderRigAxes": [
+        0.1599999964237213,
+        -0.27000001072883606,
+        0.17000000178813934
+      ],
+      "boneLocalOffsetBlender": [
+        0.1599999964237213,
+        0.17000000178813934,
+        0.27000001072883606
+      ],
+      "anchorRestPositionBlender": [
+        0.0,
+        0.0,
+        0.8299999833106995
+      ]
+    },
+    {
+      "name": "PenBundle",
+      "triangles": 216,
+      "category": "cosmetic",
+      "skeletonBone": "Spine",
+      "massKg": 0.08,
+      "massSource": "prototype assumption",
+      "offsetBlenderRigAxes": [
+        0.1599999964237213,
+        -0.27000001072883606,
+        0.17000000178813934
+      ],
+      "boneLocalOffsetBlender": [
+        0.1599999964237213,
+        0.17000000178813934,
+        0.27000001072883606
+      ],
+      "anchorRestPositionBlender": [
+        0.0,
+        0.0,
+        0.8299999833106995
+      ]
+    },
+    {
+      "name": "PencilClip",
+      "triangles": 72,
+      "category": "cosmetic",
+      "skeletonBone": "Spine",
+      "massKg": 0.08,
+      "massSource": "prototype assumption",
+      "offsetBlenderRigAxes": [
+        0.1599999964237213,
+        -0.27000001072883606,
+        0.17000000178813934
+      ],
+      "boneLocalOffsetBlender": [
+        0.1599999964237213,
+        0.17000000178813934,
+        0.27000001072883606
+      ],
+      "anchorRestPositionBlender": [
+        0.0,
+        0.0,
+        0.8299999833106995
+      ]
+    },
+    {
+      "name": "KeyRing",
+      "triangles": 744,
+      "category": "cosmetic",
+      "skeletonBone": "Hips",
+      "massKg": 0.08,
+      "massSource": "prototype assumption",
+      "offsetBlenderRigAxes": [
+        0.25,
+        -0.20000000298023224,
+        0.20000000298023224
+      ],
+      "boneLocalOffsetBlender": [
+        0.25,
+        0.20000000298023224,
+        0.20000000298023224
+      ],
+      "anchorRestPositionBlender": [
+        0.0,
+        0.0,
+        0.47999998927116394
+      ]
+    },
+    {
+      "name": "ToolPouch",
+      "triangles": 216,
+      "category": "cosmetic",
+      "skeletonBone": "Hips",
+      "massKg": 0.08,
+      "massSource": "prototype assumption",
+      "offsetBlenderRigAxes": [
+        0.25,
+        -0.20000000298023224,
+        0.20000000298023224
+      ],
+      "boneLocalOffsetBlender": [
+        0.25,
+        0.20000000298023224,
+        0.20000000298023224
+      ],
+      "anchorRestPositionBlender": [
+        0.0,
+        0.0,
+        0.47999998927116394
+      ]
+    },
+    {
+      "name": "Canteen",
+      "triangles": 312,
+      "category": "cosmetic",
+      "skeletonBone": "Hips",
+      "massKg": 0.08,
+      "massSource": "prototype assumption",
+      "offsetBlenderRigAxes": [
+        0.25,
+        -0.20000000298023224,
+        0.20000000298023224
+      ],
+      "boneLocalOffsetBlender": [
+        0.25,
+        0.20000000298023224,
+        0.20000000298023224
+      ],
+      "anchorRestPositionBlender": [
+        0.0,
+        0.0,
+        0.47999998927116394
+      ]
+    },
+    {
+      "name": "Satchel",
+      "triangles": 216,
+      "category": "cosmetic",
+      "skeletonBone": "Hips",
+      "massKg": 0.08,
+      "massSource": "prototype assumption",
+      "offsetBlenderRigAxes": [
+        0.25,
+        -0.20000000298023224,
+        0.20000000298023224
+      ],
+      "boneLocalOffsetBlender": [
+        0.25,
+        0.20000000298023224,
+        0.20000000298023224
+      ],
+      "anchorRestPositionBlender": [
+        0.0,
+        0.0,
+        0.47999998927116394
+      ]
+    },
+    {
+      "name": "ShoulderBag",
+      "triangles": 600,
+      "category": "cosmetic",
+      "skeletonBone": "Spine",
+      "massKg": 0.08,
+      "massSource": "prototype assumption",
+      "offsetBlenderRigAxes": [
+        0.1599999964237213,
+        -0.27000001072883606,
+        0.17000000178813934
+      ],
+      "boneLocalOffsetBlender": [
+        0.1599999964237213,
+        0.17000000178813934,
+        0.27000001072883606
+      ],
+      "anchorRestPositionBlender": [
+        0.0,
+        0.0,
+        0.8299999833106995
+      ]
+    },
+    {
+      "name": "Armband",
+      "triangles": 492,
+      "category": "cosmetic",
+      "skeletonBone": "UpperArm_L",
+      "massKg": 0.08,
+      "massSource": "prototype assumption",
+      "offsetBlenderRigAxes": [
+        0.03999999910593033,
+        0.0,
+        -0.10000000149011612
+      ],
+      "boneLocalOffsetBlender": [
+        -0.027979396283626556,
+        0.10081934928894043,
+        -0.025546394288539886
+      ],
+      "anchorRestPositionBlender": [
+        0.33000001311302185,
+        0.0,
+        1.2799999713897705
+      ]
+    },
+    {
+      "name": "WristCuff",
+      "triangles": 492,
+      "category": "cosmetic",
+      "skeletonBone": "Forearm_L",
+      "massKg": 0.08,
+      "massSource": "prototype assumption",
+      "offsetBlenderRigAxes": [
+        0.019999999552965164,
+        0.0,
+        -0.07000000029802322
+      ],
+      "boneLocalOffsetBlender": [
+        -0.015235794708132744,
+        0.07118743658065796,
+        0.0004715891554951668
+      ],
+      "anchorRestPositionBlender": [
+        0.5400000214576721,
+        0.0,
+        1.0499999523162842
+      ]
+    },
+    {
+      "name": "CompassPendant",
+      "triangles": 584,
+      "category": "cosmetic",
+      "skeletonBone": "Spine",
+      "massKg": 0.08,
+      "massSource": "prototype assumption",
+      "offsetBlenderRigAxes": [
+        0.1599999964237213,
+        -0.27000001072883606,
+        0.17000000178813934
+      ],
+      "boneLocalOffsetBlender": [
+        0.1599999964237213,
+        0.17000000178813934,
+        0.27000001072883606
+      ],
+      "anchorRestPositionBlender": [
+        0.0,
+        0.0,
+        0.8299999833106995
+      ]
+    },
+    {
+      "name": "ClothPatch",
+      "triangles": 108,
+      "category": "cosmetic",
+      "skeletonBone": "Spine",
+      "massKg": 0.08,
+      "massSource": "prototype assumption",
+      "offsetBlenderRigAxes": [
+        0.1599999964237213,
+        -0.27000001072883606,
+        0.17000000178813934
+      ],
+      "boneLocalOffsetBlender": [
+        0.1599999964237213,
+        0.17000000178813934,
+        0.27000001072883606
+      ],
+      "anchorRestPositionBlender": [
+        0.0,
+        0.0,
+        0.8299999833106995
+      ]
+    },
+    {
+      "name": "NamePlateBlank",
+      "triangles": 108,
+      "category": "cosmetic",
+      "skeletonBone": "Spine",
+      "massKg": 0.08,
+      "massSource": "prototype assumption",
+      "offsetBlenderRigAxes": [
+        0.1599999964237213,
+        -0.27000001072883606,
+        0.17000000178813934
+      ],
+      "boneLocalOffsetBlender": [
+        0.1599999964237213,
+        0.17000000178813934,
+        0.27000001072883606
+      ],
+      "anchorRestPositionBlender": [
+        0.0,
+        0.0,
+        0.8299999833106995
+      ]
+    },
+    {
+      "name": "WakeUpSalts",
+      "triangles": 484,
+      "category": "portable",
+      "skeletonBone": "Hand_R",
+      "massKg": 0.12,
+      "massSource": "prototype assumption",
+      "offsetBlenderRigAxes": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "boneLocalOffsetBlender": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "anchorRestPositionBlender": [
+        -0.6499999761581421,
+        -0.02500000037252903,
+        0.8299999833106995
+      ]
+    },
+    {
+      "name": "Vareuse",
+      "triangles": 12340,
+      "category": "rigged_character",
+      "skeleton": "Crew/SailorBase",
+      "bones": 27,
+      "clips": [
+        "Idle",
+        "Walk",
+        "ValveTurn",
+        "Faint"
+      ],
+      "kind": "Vareuse",
+      "limitations": "Generic prototype clips, no IK/ragdoll; contamination is static geometry/color, not shader simulation"
+    },
+    {
+      "name": "DressUniform",
+      "triangles": 13924,
+      "category": "rigged_character",
+      "skeleton": "Crew/SailorBase",
+      "bones": 27,
+      "clips": [
+        "Idle",
+        "Walk",
+        "ValveTurn",
+        "Faint"
+      ],
+      "kind": "DressUniform",
+      "limitations": "Generic prototype clips, no IK/ragdoll; contamination is static geometry/color, not shader simulation"
+    },
+    {
+      "name": "CookApron",
+      "triangles": 12520,
+      "category": "rigged_character",
+      "skeleton": "Crew/SailorBase",
+      "bones": 27,
+      "clips": [
+        "Idle",
+        "Walk",
+        "ValveTurn",
+        "Faint"
+      ],
+      "kind": "CookApron",
+      "limitations": "Generic prototype clips, no IK/ragdoll; contamination is static geometry/color, not shader simulation"
+    },
+    {
+      "name": "RegulationPyjamas",
+      "triangles": 12736,
+      "category": "rigged_character",
+      "skeleton": "Crew/SailorBase",
+      "bones": 27,
+      "clips": [
+        "Idle",
+        "Walk",
+        "ValveTurn",
+        "Faint"
+      ],
+      "kind": "RegulationPyjamas",
+      "limitations": "Generic prototype clips, no IK/ragdoll; contamination is static geometry/color, not shader simulation"
+    },
+    {
+      "name": "DivingSuit",
+      "triangles": 10564,
+      "category": "rigged_character",
+      "skeleton": "Crew/SailorBase",
+      "bones": 27,
+      "clips": [
+        "Idle",
+        "Walk",
+        "ValveTurn",
+        "Faint"
+      ],
+      "kind": "DivingSuit",
+      "limitations": "Generic prototype clips, no IK/ragdoll; contamination is static geometry/color, not shader simulation"
+    },
+    {
+      "name": "ContaminatedSailor",
+      "triangles": 13060,
+      "category": "rigged_character",
+      "skeleton": "Crew/SailorBase",
+      "bones": 27,
+      "clips": [
+        "Idle",
+        "Walk",
+        "ValveTurn",
+        "Faint"
+      ],
+      "kind": "ContaminatedSailor",
+      "limitations": "Generic prototype clips, no IK/ragdoll; contamination is static geometry/color, not shader simulation"
+    },
+    {
+      "name": "CommanderVarga",
+      "triangles": 13576,
+      "category": "rigged_character",
+      "skeleton": "Crew/SailorBase",
+      "bones": 27,
+      "clips": [
+        "Idle",
+        "Walk",
+        "ValveTurn",
+        "Faint"
+      ],
+      "kind": "CommanderVarga",
+      "limitations": "Generic prototype clips, no IK/ragdoll; contamination is static geometry/color, not shader simulation"
+    }
+  ]
+}

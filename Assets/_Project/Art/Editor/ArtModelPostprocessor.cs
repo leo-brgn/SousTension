@@ -28,7 +28,7 @@ namespace SousTension.EditorTools
             m.meshCompression = ModelImporterMeshCompression.Off;
             m.isReadable = false;
             m.preserveHierarchy = true;
-            m.generateSecondaryUV = false;
+            // Preserve importer UV2 requests made by the baked showcase builder.
         }
 
         private void OnPostprocessModel(GameObject root)

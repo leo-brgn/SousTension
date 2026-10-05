@@ -7,7 +7,7 @@ Conventions : 1 unité = 1 m ; Z = haut ; l'AXE LONGITUDINAL du bateau est Y (av
 Profil intérieur du bateau : 6,0 m de large (x de -3 à +3), pont à z = 0, plafond à z = 2,5, pans coupés de 0,4 m en haut.
 Les modules de coque font 2 m le long de Y et s'emboîtent bout à bout (origine au centre du module, au niveau du pont).
 """
-import sys, os, math
+import sys, os, math, json
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from lib import *
 
@@ -127,8 +127,8 @@ def hatch_door(name="HatchDoor"):
     a = Asset(name)
     ow, oh = 0.90, 1.70
     door = a.part("Door", location=(0, 0, 0))              # pivot = charnière (côté -x), le battant s\x27étend vers +x
-    door.box((ow / 2, -0.04, oh / 2), (ow - 0.04, 0.09, oh - 0.04), C["bottle_d"], bevel=0.07, seg=3)          # battant (coins arrondis)
-    door.box((ow / 2, -0.095, oh / 2), (ow - 0.20, 0.03, oh - 0.20), C["bottle"], bevel=0.05, seg=3)           # panneau en relief
+    door.box((ow / 2, -0.04, oh / 2), (ow - 0.04, 0.09, oh - 0.04), C["bottle_d"], bevel=0.025, seg=3)          # battant (coins arrondis)
+    door.box((ow / 2, -0.095, oh / 2), (ow - 0.20, 0.03, oh - 0.20), C["bottle"], bevel=0.009, seg=3)           # panneau en relief
     door.torus((ow / 2, -0.09, oh / 2), 0.24, 0.025, C["steel"], axis="Y", major_segs=24, minor_segs=6)         # couronne autour du volant
     for i in range(6):                                                                                          # rivets de la couronne
         ang = math.tau * i / 6
@@ -186,12 +186,14 @@ def bilge_floor(name="BilgeFloor_2m"):
 
 
 def pipe_flange(part, centre, axis, r, color):
-    part.cyl(centre, r * 1.7, 0.03, color, axis=axis, segs=18, bevel=0.004)
+    part.disc_ring(centre, r * 0.78, r * 1.7, 0.03, color, axis=axis, segs=18)
     for i in range(6):
         ang = math.tau * i / 6
         o = (math.cos(ang) * r * 1.38, math.sin(ang) * r * 1.38)
         if axis == "Y":
             p = (centre[0] + o[0], centre[1], centre[2] + o[1])
+        elif axis == "X":
+            p = (centre[0], centre[1] + o[0], centre[2] + o[1])
         else:
             p = (centre[0] + o[0], centre[1] + o[1], centre[2])
         part.cyl(p, r * 0.22, 0.045, C["steel_l"], axis=axis, segs=6)
@@ -217,6 +219,7 @@ def pipe_elbow(name="Pipe_Elbow"):
     r, R = 0.06, 0.25
     # tore d\x27axe Z, centre en (R, 0, 0) : le quart de tour part de (0,0,0) (tangent à Y) vers (R, R, 0)
     p.torus((R, 0, 0), R, r, C["steel"], axis="Z", major_segs=10, minor_segs=14, arc=math.pi / 2)
+    for v in p.bm.verts: v.co.x = 2 * R - v.co.x
     pipe_flange(p, (0, -0.005, 0), "Y", r, C["steel_d"])
     pipe_flange(p, (R + 0.005 - 0.0, R, 0), "X", r, C["steel_d"])
     a.mount("Mount_A", (0, 0, 0))
@@ -272,9 +275,16 @@ if __name__ == "__main__":
     assets = build_all()
     for a in assets:
         a.build()
+    bpy.context.view_layer.update()
     for a in assets:
+        for part in a.parts:
+            assert 'Col' in part.ob.data.color_attributes
+            assert all(math.isfinite(c) for v in part.ob.data.vertices for c in v.co)
         path = a.export(out_dir)
         print("EXPORT %-18s %5d triangles  %s" % (a.name, a.stats(), os.path.basename(path)))
+    with open(os.path.join(out_dir, 'structure_manifest.json'), 'w') as f:
+        json.dump({'blender':bpy.app.version_string, 'assets':[{'name':a.name,'triangles':a.stats(),'parts':[p.name for p in a.parts],'mounts':[m[0] for m in a.mounts]} for a in assets]},f,indent=2)
+    bpy.ops.wm.save_as_mainfile(filepath=os.path.join(os.path.dirname(__file__), 'sources', 'Structure.blend'))
     if preview:
         os.makedirs(preview, exist_ok=True)
         render_each(assets, preview, views=(("three_quarter", (0.8, -1.0, 0.6)),))

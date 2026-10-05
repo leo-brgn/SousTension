@@ -1,5 +1,5 @@
 """
-Bibliothèque de modélisation procédurale pour Sous Pression (Blender 4.0, aucun asset téléchargé).
+Bibliothèque de modélisation procédurale pour Sous Pression (Blender 5.2, aucun asset téléchargé).
 
 Principes
 - Unités : 1 unité Blender = 1 m. Blender est en Z vers le haut ; l'export FBX convertit en Y vers le haut pour Unity.
@@ -15,7 +15,7 @@ Utilisation (dans un script de kit) :
     p.cyl((0,0,0), 0.2, 0.05, C["brass"], axis="Y", bevel=0.01)
     a.mount("Mount_Face", (0, -0.03, 0))
 """
-import bpy, bmesh, math, os, sys, random
+import bpy, bmesh, math, os, sys, random, zlib
 from mathutils import Vector, Matrix, Euler
 
 # ------------------------------------------------------------------ couleurs
@@ -70,7 +70,7 @@ class Part:
         self.col = self.bm.loops.layers.color.new("Col")
         self.location = (0.0, 0.0, 0.0)       # position du pivot dans l'asset
         self.rotation = (0.0, 0.0, 0.0)       # rotation de repos (radians, XYZ)
-        self.rng = random.Random(hash(name) & 0xFFFF)
+        self.rng = random.Random(zlib.crc32((asset.name + "/" + name).encode("utf-8")))
         self.ob = None
 
     # --- utilitaires internes
@@ -265,6 +265,7 @@ class Asset:
         self.name = name
         self.parts = []
         self.mounts = []        # (nom, position, rotation)
+        self.mount_objects = []
         self.root = None
         Asset.registry.append(self)
 
@@ -294,6 +295,7 @@ class Asset:
             e.rotation_euler = rot
             bpy.context.scene.collection.objects.link(e)
             e.parent = root
+            self.mount_objects.append(e)
         return root
 
     def stats(self):
@@ -305,17 +307,33 @@ class Asset:
         return tris
 
     def export(self, out_dir):
+        # Blender names are scene-global. Repeated Body/Mount_* objects otherwise
+        # acquire .001 suffixes, which break stable paths in the exported prefab.
+        original_names = [(ob, ob.name) for ob in bpy.data.objects]
+        for i, (ob, _) in enumerate(original_names):
+            ob.name = "__ExportTemporary_%d" % i
+        self.root.name = self.name
+        for part in self.parts:
+            part.ob.name = part.name
+        for ob, (name, _, _) in zip(self.mount_objects, self.mounts):
+            ob.name = name
         bpy.ops.object.select_all(action="DESELECT")
         self.root.select_set(True)
         for ch in self.root.children_recursive:
             ch.select_set(True)
         bpy.context.view_layer.objects.active = self.root
         path = os.path.join(out_dir, self.name + ".fbx")
-        bpy.ops.export_scene.fbx(
-            filepath=path, use_selection=True, object_types={"MESH", "EMPTY"},
-            apply_unit_scale=True, apply_scale_options="FBX_SCALE_UNITS", bake_space_transform=True,
-            axis_forward="-Z", axis_up="Y", mesh_smooth_type="FACE", add_leaf_bones=False,
-            colors_type="LINEAR", use_mesh_modifiers=True, use_custom_props=False)
+        try:
+            bpy.ops.export_scene.fbx(
+                filepath=path, use_selection=True, object_types={"MESH", "EMPTY"},
+                apply_unit_scale=True, apply_scale_options="FBX_SCALE_UNITS", bake_space_transform=not any(p.parent is not None for p in self.parts),
+                axis_forward="-Z", axis_up="Y", mesh_smooth_type="FACE", add_leaf_bones=False,
+                colors_type="LINEAR", use_mesh_modifiers=True, use_custom_props=False)
+        finally:
+            for i, (ob, _) in enumerate(original_names):
+                ob.name = "__RestoreTemporary_%d" % i
+            for ob, name in original_names:
+                ob.name = name
         return path
 
 
@@ -406,14 +424,21 @@ def render_each(assets, out_dir, views=(("front", (0.0, -1.0, 0.0)), ("three_qua
             hide = other is not a
             for ob in [other.root] + list(other.root.children_recursive):
                 ob.hide_render = hide
+        bpy.context.view_layer.update()
         lo, hi = _bbox(a)
         centre = (lo + hi) / 2
         size = max((hi - lo).x, (hi - lo).y, (hi - lo).z)
         for vname, vdir in views:
             d = Vector(vdir).normalized()
-            cam_data.ortho_scale = size * 1.25 * max(1.0, resolution[0] / resolution[1] * 0.75)
             cam.location = centre + d * 30
             cam.rotation_euler = (centre - cam.location).to_track_quat("-Z", "Y").to_euler()
+            # Fit the projected bounds, including diagonals in three-quarter views.
+            inverse_rotation = cam.rotation_euler.to_matrix().transposed()
+            corners = [inverse_rotation @ (Vector((x, y, z)) - centre)
+                       for x in (lo.x, hi.x) for y in (lo.y, hi.y) for z in (lo.z, hi.z)]
+            width = max(p.x for p in corners) - min(p.x for p in corners)
+            height = max(p.y for p in corners) - min(p.y for p in corners)
+            cam_data.ortho_scale = max(width, height * resolution[0] / resolution[1]) * 1.15
             scn.render.filepath = os.path.join(out_dir, "%s_%s.png" % (a.name, vname))
             bpy.ops.render.render(write_still=True)
     for a in assets:
