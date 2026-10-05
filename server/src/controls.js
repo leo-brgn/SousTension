@@ -62,11 +62,12 @@ function tryHold(state, pl) {
   if (c && c.valve !== undefined) holdValve(state.reactor, c.valve);
 }
 
-function newLever() { return { cover: 0 }; }   // cover = ticks left before the cover falls shut (0 = closed)
+// cover = ticks left before the cover falls shut (0 = closed); reset = the lever was put back after a SCRAM (restart step 1, E3-05)
+function newLever() { return { cover: 0, reset: false }; }
 
 // First press lifts the cover, second press (cover open) pulls the lever. Returns true when the SCRAM was triggered.
 function useScramLever(lever, reactor) {
-  if (reactor.scram) return false;
+  if (reactor.scram) { lever.reset = true; return false; }   // a press on a pulled lever puts it back (restart step 1); the latch stays until the restart
   if (lever.cover <= 0) { lever.cover = LEVER_COVER_TICKS; return false; }
   reactorScram(reactor);
   lever.cover = 0;

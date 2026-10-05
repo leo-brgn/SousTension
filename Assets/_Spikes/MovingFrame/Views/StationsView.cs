@@ -14,6 +14,7 @@ namespace SousTension.Spikes.MovingFrame
         {
             ("demo", new Vector3(0f, 0f, -9f), new Vector3(0f, 0f, 9f)),
             ("demo2", new Vector3(-2.5f, 0f, 6f), new Vector3(2.5f, 0f, -7f)),
+            ("reactor_restart", new Vector3(-2.5f, 0f, -5f), new Vector3(2.5f, 0f, 8.5f)),
         };
 
         private sealed class Pair
