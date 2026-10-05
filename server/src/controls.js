@@ -24,6 +24,10 @@ var CONTROLS = [
   { id: "bilge1", x: 2.5, z: -5.0, reach: 0.9, bilge: 1 }
 ];
 var VALVE_TURN_RATE = 0.25;        // valve opening per second while the wheel is held (4 s from closed to open)
+(function addBreakerControls() {                        // the 20 breakers of the main panel (E3-07): floor tiles at the stern, left wall
+  for (var i = 0; i < BREAKERS.length; i++)
+    CONTROLS.push({ id: "breaker_" + BREAKERS[i].id, x: BREAKERS[i].x, z: BREAKERS[i].z, reach: BREAKERS[i].reach, breaker: i });
+})();
 var LEVER_COVER_TICKS = 60;        // 6 s at 10 Hz
 var REGIME_ORDER = ["veille", "croisiere", "pleine"];
 
@@ -99,6 +103,7 @@ function tryAct(state, id, pl, tick) {
     else if (bestControl.id === "scram") useScramLever(state.lever, state.reactor);
     else if (bestControl.pump !== undefined) togglePump(state.reactor, bestControl.pump);
     else if (bestControl.bilge !== undefined) bilgeToggle(state.bilge, bestControl.bilge);
+    else if (bestControl.breaker !== undefined) breakerToggle(state.power, bestControl.breaker);
     return;
   }
   if (cmd) tryActivate(state.cp, id, pl, tick);

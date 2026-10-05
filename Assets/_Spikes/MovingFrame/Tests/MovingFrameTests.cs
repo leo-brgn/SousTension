@@ -344,6 +344,23 @@ namespace SousTension.Spikes.MovingFrame.Tests
         }
 
         [Test]
+        public void Snapshot_StoresTheElectricalGrid_AndKeepsLastStateWhenMissing()
+        {
+            var net = new FakeNetwork(); var clock = new FakeClock(); var model = new MovingFrameModel();
+            var c = new MovingFrameController(net, new ConstantInput(), clock, model);
+            Assert.IsFalse(model.Grid.Valid);
+            var breakers = new int[20]; for (int i = 0; i < 20; i++) breakers[i] = 1; breakers[8] = 2; breakers[3] = 0;
+            net.Enqueue(new StateSnapshot(1, 0.1, new[] { new PlayerState("me", 0, 0, 0) }, default, null, default, default, default, null, default, default, null, default,
+                new GridState(0.35f, 0.8f, false, breakers, new[] { 1, 1, 1, 0, 1, 1 }, 5.35f, 2f)));
+            c.Tick(0);
+            Assert.AreEqual(0.35f, model.Grid.Voltage, 1e-5f); Assert.AreEqual(0.8f, model.Grid.Battery, 1e-5f);
+            Assert.AreEqual(2, model.Grid.Breakers[8]); Assert.AreEqual(0, model.Grid.Breakers[3]); Assert.AreEqual(0, model.Grid.LightBands[3]);
+            net.Enqueue(new StateSnapshot(2, 0.2, new[] { new PlayerState("me", 0, 0, 0) }));                   // older server
+            c.Tick(0);
+            Assert.AreEqual(0.35f, model.Grid.Voltage, 1e-5f);
+        }
+
+        [Test]
         public void Snapshot_StoresAuthoritativeInterlockState_WithoutPredicting()
         {
             var net = new FakeNetwork(); var clock = new FakeClock(); var model = new MovingFrameModel();

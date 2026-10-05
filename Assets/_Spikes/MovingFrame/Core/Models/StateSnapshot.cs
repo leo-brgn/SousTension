@@ -131,6 +131,20 @@ namespace SousTension.Spikes.MovingFrame
         public BilgeState(int[] state, bool[] running) { Valid = true; State = state ?? new int[0]; Running = running ?? new bool[0]; }
     }
 
+    /// <summary>The electrical network (E3-07): bus voltage, emergency battery, breakers and the light band of each compartment.</summary>
+    public readonly struct GridState
+    {
+        public readonly bool Valid;
+        public readonly float Voltage;       // 0..1 bus voltage
+        public readonly float Battery;       // 0..1 emergency battery charge
+        public readonly bool Emergency;      // emergency (red) lights on: the grid is dark and the battery is not empty
+        public readonly int[] Breakers;      // per breaker: 0 open, 1 closed, 2 tripped
+        public readonly int[] LightBands;    // per compartment: 3 white, 2 orange, 1 red, 0 dark
+        public readonly float Demand, Surplus;   // MWe
+        public GridState(float voltage, float battery, bool emergency, int[] breakers, int[] lightBands, float demand, float surplus)
+        { Valid = true; Voltage = voltage; Battery = battery; Emergency = emergency; Breakers = breakers ?? new int[0]; LightBands = lightBands ?? new int[0]; Demand = demand; Surplus = surplus; }
+    }
+
     /// <summary>Authoritative boat depth below patrol depth (E3-04): grows after a SCRAM. Display only.</summary>
     public readonly struct BoatDepthState
     {
@@ -155,12 +169,14 @@ namespace SousTension.Spikes.MovingFrame
         public readonly RestartState Restart;
         public readonly WaterState Water;
         public readonly BilgeState Bilge;
+        public readonly GridState Grid;
         public readonly LeakState[] Leaks;   // null = the server sent no leak list (older server); empty = no leak
 
         public StateSnapshot(int tick, double serverTime, PlayerState[] players, InterlockState interlock = default, CargoState[] cargo = null, ReactorState reactor = default,
             ScramLeverState lever = default, BoatDepthState boat = default, CoupledActionState[] coupled = null,
-            RestartState restart = default, WaterState water = default, LeakState[] leaks = null, BilgeState bilge = default)
+            RestartState restart = default, WaterState water = default, LeakState[] leaks = null, BilgeState bilge = default, GridState grid = default)
         {
+            Grid = grid;
             Bilge = bilge;
             Leaks = leaks;
             Water = water;
