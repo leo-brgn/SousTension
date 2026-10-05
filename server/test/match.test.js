@@ -446,3 +446,92 @@ test("boat: the descent is deterministic (same inputs, same depth)", () => {
   const run = () => { const c = lockSetup(["a"]); m.reactorScram(c.state.reactor); for (let i = 0; i < 250; i++) tickWith(c, []); return c.state.boat.depth; };
   assert.strictEqual(run(), run());
 });
+
+// ---- Primary valves and pumps (E3-06): valves are turned by HOLDING the key, pumps by a press, a broken pump will not start ----
+function inputHold(ctx, id) {
+  ctx.seq[id] = (ctx.seq[id] || 0) + 1;
+  return { opCode: m.OP_INPUT, sender: presence(id), data: JSON.stringify({ seq: ctx.seq[id], mx: 0, mz: 0, act: false, hold: true }) };
+}
+function ctl(id) { return m.CONTROLS.find((c) => c.id === id); }
+function rxOf(c) { return lastView(c).rx; }
+
+test("valve: holding the key near a wheel opens it at VALVE_TURN_RATE per second, then stops at fully open", () => {
+  const c = lockSetup(["a"]);
+  c.state.reactor.valves = [0, 0, 0, 0];
+  place(c, "a", ctl("valve1").x - 0.5, ctl("valve1").z);
+  for (let i = 0; i < 20; i++) tickWith(c, [inputHold(c, "a")]);              // 2 s
+  assert.ok(Math.abs(c.state.reactor.valves[1] - 2 * m.VALVE_TURN_RATE) < 1e-9, "valve1=" + c.state.reactor.valves[1]);
+  for (let i = 0; i < 100; i++) tickWith(c, [inputHold(c, "a")]);
+  assert.strictEqual(c.state.reactor.valves[1], 1);
+  assert.deepStrictEqual([c.state.reactor.valves[0], c.state.reactor.valves[2], c.state.reactor.valves[3]], [0, 0, 0]);
+});
+
+test("valve: out of reach (1.0 m) holding does nothing; a single press (no hold) does nothing either", () => {
+  const c = lockSetup(["a"]);
+  c.state.reactor.valves = [0, 0, 0, 0];
+  place(c, "a", ctl("valve2").x - 1.1, ctl("valve2").z);
+  for (let i = 0; i < 10; i++) tickWith(c, [inputHold(c, "a")]);
+  assert.strictEqual(c.state.reactor.valves[2], 0);
+  place(c, "a", ctl("valve2").x - 0.5, ctl("valve2").z);
+  tickWith(c, [inputAct(c, "a", true)]);
+  assert.strictEqual(c.state.reactor.valves[2], 0);
+});
+
+test("valve: holding the key near the selector or the lever does not turn any wheel", () => {
+  const c = lockSetup(["a"]);
+  c.state.reactor.valves = [0, 0, 0, 0];
+  place(c, "a", REGIME_POS.x + 0.5, REGIME_POS.z);
+  for (let i = 0; i < 10; i++) tickWith(c, [inputHold(c, "a")]);
+  assert.deepStrictEqual(c.state.reactor.valves, [0, 0, 0, 0]);
+  assert.strictEqual(c.state.reactor.regime, "veille");
+});
+
+test("pump: one press toggles run/stop, the flow follows, and it is visible in the broadcast (pu: 1 running, 0 stopped)", () => {
+  const c = lockSetup(["a"]);
+  place(c, "a", ctl("pump0").x - 0.5, ctl("pump0").z);
+  for (let i = 0; i < 50; i++) tickWith(c, []);
+  const before = rxOf(c).F;
+  tickWith(c, [inputAct(c, "a", true)]);
+  assert.deepStrictEqual(rxOf(c).pu, [0, 1]);
+  for (let i = 0; i < 100; i++) tickWith(c, []);
+  assert.ok(rxOf(c).F < before, "one pump less, less flow");
+  tickWith(c, [inputAct(c, "a", true)]);
+  assert.deepStrictEqual(rxOf(c).pu, [1, 1]);
+});
+
+test("pump: a broken pump shows 2, cannot be started, and a repaired one stays stopped until a player starts it", () => {
+  const c = lockSetup(["a"]);
+  place(c, "a", ctl("pump1").x - 0.5, ctl("pump1").z);
+  m.reactorBreakPump(c.state.reactor, 1);
+  tickWith(c, []);
+  assert.deepStrictEqual(rxOf(c).pu, [1, 2]);
+  tickWith(c, [inputAct(c, "a", true)]);
+  assert.deepStrictEqual(rxOf(c).pu, [1, 2]);
+  m.reactorRepairPump(c.state.reactor, 1);
+  tickWith(c, []);
+  assert.deepStrictEqual(rxOf(c).pu, [1, 0]);
+  tickWith(c, [inputAct(c, "a", true)]);
+  assert.deepStrictEqual(rxOf(c).pu, [1, 1]);
+});
+
+test("pumps: both stopped leaves only natural circulation and no sudden leak (the core heats up slowly)", () => {
+  const c = lockSetup(["a"]);
+  m.reactorBreakPump(c.state.reactor, 0); m.reactorBreakPump(c.state.reactor, 1);
+  for (let i = 0; i < 100; i++) tickWith(c, []);                              // 10 s
+  assert.ok(Math.abs(rxOf(c).F - m.REACTOR_K.flowNat) < 1e-6, "F=" + rxOf(c).F);
+  assert.strictEqual(rxOf(c).leak, 0);
+  assert.strictEqual(rxOf(c).auto, 0);
+});
+
+test("valve and pump state is always in the broadcast (reconnection resync)", () => {
+  const c = lockSetup(["a"]);
+  c.state.reactor.valves = [0.25, 0.5, 0.75, 1];
+  tickWith(c, []);
+  assert.deepStrictEqual(rxOf(c).v, [0.25, 0.5, 0.75, 1]);
+  assert.deepStrictEqual(rxOf(c).pu, [1, 1]);
+});
+
+test("valve: holding sets a deterministic opening (same inputs, same valves, with the seeded drift)", () => {
+  const run = () => { const c = lockSetup(["a"]); place(c, "a", ctl("valve0").x - 0.5, ctl("valve0").z); for (let i = 0; i < 300; i++) tickWith(c, [inputHold(c, "a")]); return JSON.stringify(c.state.reactor.valves); };
+  assert.strictEqual(run(), run());
+});

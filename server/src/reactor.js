@@ -49,7 +49,7 @@ function newReactor(seed, regime) {
   var r = {
     t: 0, seed: seed, rng: seed | 0, regime: regime,
     R: R, Pf: K.pMax * R, A: K.pMax * R, T: K.tIn + 20, S: 30, E: 0,
-    valves: [1, 1, 1, 1], pumps: [true, true],
+    valves: [1, 1, 1, 1], pumps: [true, true], pumpBroken: [false, false],
     scram: false, autoScram: false, leak: false, critTimer: 0,
     nextDrift: K.firstDriftSeconds, driftEnabled: false,
     eta: 0, flow: 0, P: 0
@@ -71,9 +71,24 @@ function reactorSetValve(r, index, position) {
   return true;
 }
 
+// A broken pump (E3-06) cannot be started; stopping one is always possible.
 function reactorSetPump(r, index, on) {
   if (index < 0 || index > 1) return false;
+  if (on && r.pumpBroken[index]) return false;
   r.pumps[index] = !!on;
+  return true;
+}
+
+// Breakdown / repair of a primary pump. Nothing triggers a breakdown yet (the failure generator is E3-09) and the spare part that
+// repairs one is E5/E9; a repaired pump stays stopped until a player starts it.
+function reactorBreakPump(r, index) {
+  if (index < 0 || index > 1) return false;
+  r.pumpBroken[index] = true; r.pumps[index] = false;
+  return true;
+}
+function reactorRepairPump(r, index) {
+  if (index < 0 || index > 1) return false;
+  r.pumpBroken[index] = false;
   return true;
 }
 
@@ -144,7 +159,7 @@ function reactorView(r) {
   return {
     reg: r.regime, R: q(r.R), nz: q(reactorNoise(r)), P: q(r.P), T: q(r.T), S: q(r.S), E: q(r.E), eta: q(r.eta), F: q(r.flow),
     v: [q(r.valves[0]), q(r.valves[1]), q(r.valves[2]), q(r.valves[3])],
-    pu: [r.pumps[0] ? 1 : 0, r.pumps[1] ? 1 : 0],
+    pu: [r.pumpBroken[0] ? 2 : (r.pumps[0] ? 1 : 0), r.pumpBroken[1] ? 2 : (r.pumps[1] ? 1 : 0)],   // 0 stopped, 1 running, 2 broken
     scram: r.scram ? 1 : 0, auto: r.autoScram ? 1 : 0, leak: r.leak ? 1 : 0,
     warn: r.T >= REACTOR_K.tWarn ? 1 : 0, crit: r.T >= REACTOR_K.tCrit ? 1 : 0
   };

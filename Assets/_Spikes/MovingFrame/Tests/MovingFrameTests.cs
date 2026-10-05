@@ -25,11 +25,11 @@ namespace SousTension.Spikes.MovingFrame.Tests
         public long BytesSent { get; private set; }
         public long BytesReceived { get; private set; }
         public event Action<StateSnapshot> StateReceived;
-        public readonly List<(int seq, float mx, float mz, bool act, bool grab)> Sent = new List<(int, float, float, bool, bool)>();
+        public readonly List<(int seq, float mx, float mz, bool act, bool grab, bool hold)> Sent = new List<(int, float, float, bool, bool, bool)>();
         private readonly Queue<StateSnapshot> _incoming = new Queue<StateSnapshot>();
 
         public Task ConnectAsync(CancellationToken ct) => Task.CompletedTask;
-        public void SendInput(int seq, float moveX, float moveZ, bool act, bool grab) { Sent.Add((seq, moveX, moveZ, act, grab)); BytesSent += 24; }
+        public void SendInput(int seq, float moveX, float moveZ, bool act, bool grab, bool hold = false) { Sent.Add((seq, moveX, moveZ, act, grab, hold)); BytesSent += 24; }
         public void Enqueue(StateSnapshot s) => _incoming.Enqueue(s);
         public void Poll() { while (_incoming.Count > 0) StateReceived?.Invoke(_incoming.Dequeue()); }
         public void Dispose() { }
@@ -215,6 +215,35 @@ namespace SousTension.Spikes.MovingFrame.Tests
             c.Tick(0);
             Assert.IsTrue(model.Lever.Pulled);
             Assert.AreEqual(2.5f, model.Boat.Depth, 1e-5f);
+        }
+
+        [Test]
+        public void HeldInteractionKey_IsSentAsHoldEveryTick_WhileActIsOnlyTheFirstPress()
+        {
+            var net = new FakeNetwork(); var clock = new FakeClock(); var model = new MovingFrameModel();
+            var input = new ConstantInput { Act = true };
+            var c = new MovingFrameController(net, input, clock, model);
+            net.Enqueue(new StateSnapshot(1, 0.1, new[] { new PlayerState("me", 0, 0, 0) }));
+            c.Tick(0);
+            net.Sent.Clear();
+            clock.Now += 0.3; c.Tick(0.3f);
+            Assert.GreaterOrEqual(net.Sent.Count, 3);
+            foreach (var s in net.Sent) Assert.IsTrue(s.hold, "the key is still down: hold every tick");
+            Assert.AreEqual(1, net.Sent.FindAll(s => s.act).Count, "act is the press edge only");
+        }
+
+        [Test]
+        public void Snapshot_StoresPumpStates_IncludingBroken()
+        {
+            var net = new FakeNetwork(); var clock = new FakeClock(); var model = new MovingFrameModel();
+            var c = new MovingFrameController(net, new ConstantInput(), clock, model);
+            var rx = new ReactorState("veille", 0.1f, 0f, 10f, 291f, 30f, 4f, 0.6f, 0.6f,
+                new[] { 1f, 0.5f, 0.25f, 0f }, new[] { true, false }, false, false, false, false, false, new[] { false, true });
+            net.Enqueue(new StateSnapshot(1, 0.1, new[] { new PlayerState("me", 0, 0, 0) }, default, null, rx));
+            c.Tick(0);
+            Assert.IsTrue(model.Reactor.Pumps[0]); Assert.IsFalse(model.Reactor.Pumps[1]);
+            Assert.IsFalse(model.Reactor.PumpBroken[0]); Assert.IsTrue(model.Reactor.PumpBroken[1]);
+            Assert.AreEqual(0.25f, model.Reactor.Valves[2], 1e-5f);
         }
 
         [Test]

@@ -8,10 +8,20 @@
 //   scram  : the SCRAM lever under its sealed cover (E3-04), 1 m from the selector. Two presses, one player, no vote: the first lifts
 //            the cover (it falls shut again after LEVER_COVER_TICKS), the second, cover open, pulls the lever. This is the one critical
 //            action that is deliberately NOT under the Rule of Two Players (GDD 3.3). Pulling it again does nothing; restarting is E3-05.
+//   valve0..3 : the four primary-circuit valve handwheels (E3-06), right wall. HOLD the interaction key to turn one open (VALVE_TURN_RATE per
+//            second); drift closes them, only players open them. One player is enough.
+//   pump0..1  : the two primary pumps' switches (E3-06). One press toggles run/stop; a broken pump cannot be started (repair is E5/E9).
 var CONTROLS = [
   { id: "regime", x: -2.5, z: -1.7, reach: 2.0 },
-  { id: "scram", x: -2.5, z: -2.7, reach: 1.5 }
+  { id: "scram", x: -2.5, z: -2.7, reach: 1.5 },
+  { id: "valve0", x: 2.5, z: -3.0, reach: 1.0, valve: 0 },
+  { id: "valve1", x: 2.5, z: -1.5, reach: 1.0, valve: 1 },
+  { id: "valve2", x: 2.5, z: 0.0, reach: 1.0, valve: 2 },
+  { id: "valve3", x: 2.5, z: 1.5, reach: 1.0, valve: 3 },
+  { id: "pump0", x: 2.5, z: 3.5, reach: 1.2, pump: 0 },
+  { id: "pump1", x: 2.5, z: 5.0, reach: 1.2, pump: 1 }
 ];
+var VALVE_TURN_RATE = 0.25;        // valve opening per second while the wheel is held (4 s from closed to open)
 var LEVER_COVER_TICKS = 60;        // 6 s at 10 Hz
 var REGIME_ORDER = ["veille", "croisiere", "pleine"];
 
@@ -25,6 +35,31 @@ function useRegimeSelector(reactor) {
   if (reactor.scram) return false;
   var next = REGIME_ORDER[(REGIME_ORDER.indexOf(reactor.regime) + 1) % REGIME_ORDER.length];
   return reactorSetRegime(reactor, next);
+}
+
+// Hold the interaction key near a valve wheel: it turns open by VALVE_TURN_RATE * DT per applied input (one input per tick).
+function holdValve(reactor, index) {
+  return reactorSetValve(reactor, index, reactor.valves[index] + VALVE_TURN_RATE * DT);
+}
+
+function togglePump(reactor, index) {
+  return reactorSetPump(reactor, index, !reactor.pumps[index]);
+}
+
+// The nearest control within its reach (or null).
+function nearestControl(pl) {
+  var best = null, bestD = Infinity;
+  for (var i = 0; i < CONTROLS.length; i++) {
+    var d = controlDistance(pl, CONTROLS[i]);
+    if (d <= CONTROLS[i].reach && d < bestD) { best = CONTROLS[i]; bestD = d; }
+  }
+  return best;
+}
+
+// The interaction key is HELD (input flag `hold`, sent every tick while the key is down): only valve wheels use it.
+function tryHold(state, pl) {
+  var c = nearestControl(pl);
+  if (c && c.valve !== undefined) holdValve(state.reactor, c.valve);
 }
 
 function newLever() { return { cover: 0 }; }   // cover = ticks left before the cover falls shut (0 = closed)
@@ -61,6 +96,7 @@ function tryAct(state, id, pl, tick) {
   if (bestControl && bestControlD < bestStationD) {
     if (bestControl.id === "regime") useRegimeSelector(state.reactor);
     else if (bestControl.id === "scram") useScramLever(state.lever, state.reactor);
+    else if (bestControl.pump !== undefined) togglePump(state.reactor, bestControl.pump);
     return;
   }
   if (bestStationD < Infinity) tryActivate(state.il, id, pl, tick);

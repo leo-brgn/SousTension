@@ -53,12 +53,15 @@ namespace SousTension.Spikes.MovingFrame
         public readonly float Noise;         // 0..4 plant noise (follows the rods)
         public readonly float Power, Temp, Steam, Electricity, Supply, Flow;   // MWth, degC, bar, MWe, 0..1, 0..~1.2
         public readonly float[] Valves;      // 4 main primary valves, 0..1
-        public readonly bool[] Pumps;        // 2 primary pumps
+        public readonly bool[] Pumps;        // 2 primary pumps (running)
+        public readonly bool[] PumpBroken;   // 2 primary pumps (broken: cannot be started)
         public readonly bool Scram, AutoScram, Leak, Warn, Crit;
 
         public ReactorState(string regime, float rods, float noise, float power, float temp, float steam, float electricity,
-            float supply, float flow, float[] valves, bool[] pumps, bool scram, bool autoScram, bool leak, bool warn, bool crit)
+            float supply, float flow, float[] valves, bool[] pumps, bool scram, bool autoScram, bool leak, bool warn, bool crit,
+            bool[] pumpBroken = null)
         {
+            PumpBroken = pumpBroken ?? new bool[2];
             Valid = true; Regime = regime ?? "veille"; Rods = rods; Noise = noise; Power = power; Temp = temp; Steam = steam;
             Electricity = electricity; Supply = supply; Flow = flow; Valves = valves ?? new float[4]; Pumps = pumps ?? new bool[2];
             Scram = scram; AutoScram = autoScram; Leak = leak; Warn = warn; Crit = crit;

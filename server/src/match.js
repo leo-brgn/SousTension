@@ -52,7 +52,7 @@ var matchLoop = function (ctx, logger, nk, dispatcher, tick, state, messages) {
     if (typeof input.seq !== "number" || input.seq <= p.lastQueued) continue;
     p.lastQueued = input.seq;
     p.queue.push({ seq: input.seq, mx: +input.mx || 0, mz: +input.mz || 0, act: input.act === true || input.act === 1,
-                  grab: input.grab === true || input.grab === 1 });
+                  grab: input.grab === true || input.grab === 1, hold: input.hold === true || input.hold === 1 });
     while (p.queue.length > MAX_QUEUED_INPUTS) p.queue.shift();
   }
 
@@ -67,6 +67,7 @@ var matchLoop = function (ctx, logger, nk, dispatcher, tick, state, messages) {
       var next = pl.queue.shift();
       stepPlayer(pl, next.mx, next.mz);
       if (next.act) tryAct(state, state.order[k], pl, tick);
+      if (next.hold) tryHold(state, pl);
       if (next.grab) tryGrab(state.cargo, state.order[k], pl, tick);
       pl.seq = next.seq;
       pl.applied += 1;
@@ -141,6 +142,7 @@ if (typeof module !== "undefined" && module.exports) {
     TICK_RATE: TICK_RATE, DT: DT, STATIONS: STATIONS, STATION_REACH: STATION_REACH, INTERLOCK_WINDOW_TICKS: INTERLOCK_WINDOW_TICKS, MAX_ALLOWANCE: MAX_ALLOWANCE, MOVE_SPEED: MOVE_SPEED, HALF_X: HALF_X, HALF_Z: HALF_Z,
     OP_INPUT: OP_INPUT, OP_STATE: OP_STATE,
     LEVER_COVER_TICKS: LEVER_COVER_TICKS, SINK_RATE_MAX: SINK_RATE_MAX, SINK_RAMP_SECONDS: SINK_RAMP_SECONDS, newBoat: newBoat, boatStep: boatStep,
+    VALVE_TURN_RATE: VALVE_TURN_RATE, reactorBreakPump: reactorBreakPump, reactorRepairPump: reactorRepairPump,
     CONTROLS: CONTROLS, REGIME_ORDER: REGIME_ORDER, tryAct: tryAct,
     reactorNoise: reactorNoise, REACTOR_K: REACTOR_K, newReactor: newReactor, reactorStep: reactorStep, reactorView: reactorView, reactorScram: reactorScram,
     reactorRestart: reactorRestart, reactorSetRegime: reactorSetRegime, reactorSetValve: reactorSetValve, reactorSetPump: reactorSetPump,

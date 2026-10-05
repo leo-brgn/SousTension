@@ -18,7 +18,7 @@ namespace SousTension.Spikes.MovingFrame
         private const long OpInput = 1;
         private const long OpState = 2;
 
-        [Serializable] private class InputDto { public int seq; public float mx; public float mz; public bool act; public bool grab; }
+        [Serializable] private class InputDto { public int seq; public float mx; public float mz; public bool act; public bool grab; public bool hold; }
         [Serializable] private class PlayerDto { public string id; public float x; public float z; public int seq; }
         [Serializable] private class InterlockDto { public int a; public int b; public string ab; public string bb; public string result; public int rt; public int n; }
         [Serializable] private class CargoDto { public string id; public float x; public float z; public int h; public string[] c; public string p; }
@@ -62,10 +62,10 @@ namespace SousTension.Spikes.MovingFrame
             await _socket.JoinMatchAsync(_matchId);
         }
 
-        public void SendInput(int seq, float moveX, float moveZ, bool act, bool grab)
+        public void SendInput(int seq, float moveX, float moveZ, bool act, bool grab, bool hold = false)
         {
             if (_socket == null || !_socket.IsConnected) return;
-            var json = JsonUtility.ToJson(new InputDto { seq = seq, mx = moveX, mz = moveZ, act = act, grab = grab });
+            var json = JsonUtility.ToJson(new InputDto { seq = seq, mx = moveX, mz = moveZ, act = act, grab = grab, hold = hold });
             var bytes = Encoding.UTF8.GetBytes(json);
             Interlocked.Add(ref _bytesSent, bytes.Length);
             _ = SendAsync(bytes);
@@ -101,7 +101,8 @@ namespace SousTension.Spikes.MovingFrame
                 var x = dto.rx;
                 reactor = new ReactorState(x.reg, x.R, x.nz, x.P, x.T, x.S, x.E, x.eta, x.F, x.v,
                     new[] { x.pu != null && x.pu.Length > 0 && x.pu[0] == 1, x.pu != null && x.pu.Length > 1 && x.pu[1] == 1 },
-                    x.scram == 1, x.auto == 1, x.leak == 1, x.warn == 1, x.crit == 1);
+                    x.scram == 1, x.auto == 1, x.leak == 1, x.warn == 1, x.crit == 1,
+                    new[] { x.pu != null && x.pu.Length > 0 && x.pu[0] == 2, x.pu != null && x.pu.Length > 1 && x.pu[1] == 2 });
             }
             var lever = dto.sc != null ? new ScramLeverState(dto.sc.cv == 1, dto.sc.pl == 1) : default;
             var boat = dto.boat != null ? new BoatDepthState(dto.boat.d, dto.boat.vz) : default;

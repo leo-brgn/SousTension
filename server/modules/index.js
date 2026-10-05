@@ -233,7 +233,7 @@ function newReactor(seed, regime) {
   var r = {
     t: 0, seed: seed, rng: seed | 0, regime: regime,
     R: R, Pf: K.pMax * R, A: K.pMax * R, T: K.tIn + 20, S: 30, E: 0,
-    valves: [1, 1, 1, 1], pumps: [true, true],
+    valves: [1, 1, 1, 1], pumps: [true, true], pumpBroken: [false, false],
     scram: false, autoScram: false, leak: false, critTimer: 0,
     nextDrift: K.firstDriftSeconds, driftEnabled: false,
     eta: 0, flow: 0, P: 0
@@ -255,9 +255,24 @@ function reactorSetValve(r, index, position) {
   return true;
 }
 
+// A broken pump (E3-06) cannot be started; stopping one is always possible.
 function reactorSetPump(r, index, on) {
   if (index < 0 || index > 1) return false;
+  if (on && r.pumpBroken[index]) return false;
   r.pumps[index] = !!on;
+  return true;
+}
+
+// Breakdown / repair of a primary pump. Nothing triggers a breakdown yet (the failure generator is E3-09) and the spare part that
+// repairs one is E5/E9; a repaired pump stays stopped until a player starts it.
+function reactorBreakPump(r, index) {
+  if (index < 0 || index > 1) return false;
+  r.pumpBroken[index] = true; r.pumps[index] = false;
+  return true;
+}
+function reactorRepairPump(r, index) {
+  if (index < 0 || index > 1) return false;
+  r.pumpBroken[index] = false;
   return true;
 }
 
@@ -328,7 +343,7 @@ function reactorView(r) {
   return {
     reg: r.regime, R: q(r.R), nz: q(reactorNoise(r)), P: q(r.P), T: q(r.T), S: q(r.S), E: q(r.E), eta: q(r.eta), F: q(r.flow),
     v: [q(r.valves[0]), q(r.valves[1]), q(r.valves[2]), q(r.valves[3])],
-    pu: [r.pumps[0] ? 1 : 0, r.pumps[1] ? 1 : 0],
+    pu: [r.pumpBroken[0] ? 2 : (r.pumps[0] ? 1 : 0), r.pumpBroken[1] ? 2 : (r.pumps[1] ? 1 : 0)],   // 0 stopped, 1 running, 2 broken
     scram: r.scram ? 1 : 0, auto: r.autoScram ? 1 : 0, leak: r.leak ? 1 : 0,
     warn: r.T >= REACTOR_K.tWarn ? 1 : 0, crit: r.T >= REACTOR_K.tCrit ? 1 : 0
   };
@@ -367,10 +382,20 @@ function boatView(boat) {
 //   scram  : the SCRAM lever under its sealed cover (E3-04), 1 m from the selector. Two presses, one player, no vote: the first lifts
 //            the cover (it falls shut again after LEVER_COVER_TICKS), the second, cover open, pulls the lever. This is the one critical
 //            action that is deliberately NOT under the Rule of Two Players (GDD 3.3). Pulling it again does nothing; restarting is E3-05.
+//   valve0..3 : the four primary-circuit valve handwheels (E3-06), right wall. HOLD the interaction key to turn one open (VALVE_TURN_RATE per
+//            second); drift closes them, only players open them. One player is enough.
+//   pump0..1  : the two primary pumps' switches (E3-06). One press toggles run/stop; a broken pump cannot be started (repair is E5/E9).
 var CONTROLS = [
   { id: "regime", x: -2.5, z: -1.7, reach: 2.0 },
-  { id: "scram", x: -2.5, z: -2.7, reach: 1.5 }
+  { id: "scram", x: -2.5, z: -2.7, reach: 1.5 },
+  { id: "valve0", x: 2.5, z: -3.0, reach: 1.0, valve: 0 },
+  { id: "valve1", x: 2.5, z: -1.5, reach: 1.0, valve: 1 },
+  { id: "valve2", x: 2.5, z: 0.0, reach: 1.0, valve: 2 },
+  { id: "valve3", x: 2.5, z: 1.5, reach: 1.0, valve: 3 },
+  { id: "pump0", x: 2.5, z: 3.5, reach: 1.2, pump: 0 },
+  { id: "pump1", x: 2.5, z: 5.0, reach: 1.2, pump: 1 }
 ];
+var VALVE_TURN_RATE = 0.25;        // valve opening per second while the wheel is held (4 s from closed to open)
 var LEVER_COVER_TICKS = 60;        // 6 s at 10 Hz
 var REGIME_ORDER = ["veille", "croisiere", "pleine"];
 
@@ -384,6 +409,31 @@ function useRegimeSelector(reactor) {
   if (reactor.scram) return false;
   var next = REGIME_ORDER[(REGIME_ORDER.indexOf(reactor.regime) + 1) % REGIME_ORDER.length];
   return reactorSetRegime(reactor, next);
+}
+
+// Hold the interaction key near a valve wheel: it turns open by VALVE_TURN_RATE * DT per applied input (one input per tick).
+function holdValve(reactor, index) {
+  return reactorSetValve(reactor, index, reactor.valves[index] + VALVE_TURN_RATE * DT);
+}
+
+function togglePump(reactor, index) {
+  return reactorSetPump(reactor, index, !reactor.pumps[index]);
+}
+
+// The nearest control within its reach (or null).
+function nearestControl(pl) {
+  var best = null, bestD = Infinity;
+  for (var i = 0; i < CONTROLS.length; i++) {
+    var d = controlDistance(pl, CONTROLS[i]);
+    if (d <= CONTROLS[i].reach && d < bestD) { best = CONTROLS[i]; bestD = d; }
+  }
+  return best;
+}
+
+// The interaction key is HELD (input flag `hold`, sent every tick while the key is down): only valve wheels use it.
+function tryHold(state, pl) {
+  var c = nearestControl(pl);
+  if (c && c.valve !== undefined) holdValve(state.reactor, c.valve);
 }
 
 function newLever() { return { cover: 0 }; }   // cover = ticks left before the cover falls shut (0 = closed)
@@ -420,6 +470,7 @@ function tryAct(state, id, pl, tick) {
   if (bestControl && bestControlD < bestStationD) {
     if (bestControl.id === "regime") useRegimeSelector(state.reactor);
     else if (bestControl.id === "scram") useScramLever(state.lever, state.reactor);
+    else if (bestControl.pump !== undefined) togglePump(state.reactor, bestControl.pump);
     return;
   }
   if (bestStationD < Infinity) tryActivate(state.il, id, pl, tick);
@@ -479,7 +530,7 @@ var matchLoop = function (ctx, logger, nk, dispatcher, tick, state, messages) {
     if (typeof input.seq !== "number" || input.seq <= p.lastQueued) continue;
     p.lastQueued = input.seq;
     p.queue.push({ seq: input.seq, mx: +input.mx || 0, mz: +input.mz || 0, act: input.act === true || input.act === 1,
-                  grab: input.grab === true || input.grab === 1 });
+                  grab: input.grab === true || input.grab === 1, hold: input.hold === true || input.hold === 1 });
     while (p.queue.length > MAX_QUEUED_INPUTS) p.queue.shift();
   }
 
@@ -494,6 +545,7 @@ var matchLoop = function (ctx, logger, nk, dispatcher, tick, state, messages) {
       var next = pl.queue.shift();
       stepPlayer(pl, next.mx, next.mz);
       if (next.act) tryAct(state, state.order[k], pl, tick);
+      if (next.hold) tryHold(state, pl);
       if (next.grab) tryGrab(state.cargo, state.order[k], pl, tick);
       pl.seq = next.seq;
       pl.applied += 1;
@@ -568,6 +620,7 @@ if (typeof module !== "undefined" && module.exports) {
     TICK_RATE: TICK_RATE, DT: DT, STATIONS: STATIONS, STATION_REACH: STATION_REACH, INTERLOCK_WINDOW_TICKS: INTERLOCK_WINDOW_TICKS, MAX_ALLOWANCE: MAX_ALLOWANCE, MOVE_SPEED: MOVE_SPEED, HALF_X: HALF_X, HALF_Z: HALF_Z,
     OP_INPUT: OP_INPUT, OP_STATE: OP_STATE,
     LEVER_COVER_TICKS: LEVER_COVER_TICKS, SINK_RATE_MAX: SINK_RATE_MAX, SINK_RAMP_SECONDS: SINK_RAMP_SECONDS, newBoat: newBoat, boatStep: boatStep,
+    VALVE_TURN_RATE: VALVE_TURN_RATE, reactorBreakPump: reactorBreakPump, reactorRepairPump: reactorRepairPump,
     CONTROLS: CONTROLS, REGIME_ORDER: REGIME_ORDER, tryAct: tryAct,
     reactorNoise: reactorNoise, REACTOR_K: REACTOR_K, newReactor: newReactor, reactorStep: reactorStep, reactorView: reactorView, reactorScram: reactorScram,
     reactorRestart: reactorRestart, reactorSetRegime: reactorSetRegime, reactorSetValve: reactorSetValve, reactorSetPump: reactorSetPump,
