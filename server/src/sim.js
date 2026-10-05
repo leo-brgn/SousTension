@@ -31,6 +31,7 @@ function simStep(state, tick) {
       stepPlayer(pl, next.mx, next.mz, carrySpeedFactor(state, state.order[k]));
       if (next.act) { if (next.use) useTarget(state, state.order[k], pl, tick, next.use); else tryAct(state, state.order[k], pl, tick); }
       if (next.hold) { if (next.use) holdTarget(state, pl, next.use); else tryHold(state, pl); }
+      if (next.dbg) debugCommand(state, state.order[k], pl, next.dbg, tick);
       if (next.flip) manualFlip(state, state.order[k], next.flip);
       if (next.throw) throwItem(state, state.order[k], pl);
       if (next.take) takeItem(state, state.order[k], pl, tick);
@@ -63,6 +64,7 @@ function queueInput(p, input) {
   p.queue.push({ seq: input.seq, mx: +input.mx || 0, mz: +input.mz || 0, act: input.act === true || input.act === 1,
                  grab: input.grab === true || input.grab === 1, hold: input.hold === true || input.hold === 1,
                  ry: typeof input.ry === "number" && isFinite(input.ry) ? input.ry : null,
+                 dbg: typeof input.dbg === "string" && input.dbg.length > 0 && input.dbg.length <= 120 ? input.dbg : "",
                  flip: input.flip === 1 || input.hand === "next" ? 1 : (input.flip === -1 || input.hand === "prev" ? -1 : 0),
                  throw: input.throw === true || input.throw === 1 || input.hand === "throw",
                  use: typeof input.use === "string" && input.use.length <= 40 ? input.use : "",
@@ -75,7 +77,7 @@ function queueInput(p, input) {
 }
 
 // A 64-bit fingerprint (two FNV-1a hashes, hex) of the WHOLE game state: same state, same digest. Object keys are sorted so the digest does not
-// depend on insertion order; the Nakama presence objects (network handles, not game state) are left out.
+// depend on insertion order; the Nakama presence objects (network handles) and the debug console state are not game state: left out.
 function stateDigest(state) {
   var text = stableStringify(state);
   var h1 = 0x811c9dc5, h2 = 0x01000193 ^ 0x9747b28c;
@@ -96,7 +98,7 @@ function stableStringify(v) {
   }
   var keys = Object.keys(v).sort(), o = [];
   for (var k = 0; k < keys.length; k++) {
-    if (keys[k] === "presence") continue;
+    if (keys[k] === "presence" || keys[k] === "debug") continue;
     o.push(JSON.stringify(keys[k]) + ":" + stableStringify(v[keys[k]]));
   }
   return "{" + o.join(",") + "}";

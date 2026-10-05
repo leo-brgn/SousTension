@@ -7,7 +7,7 @@ const path = require("path");
 
 const SRC = path.join(__dirname, "src");
 const OUT = path.join(__dirname, "modules", "index.js");
-const ORDER = ["core.js", "coupled.js", "cargo.js", "hands.js", "manual.js", "water.js", "leaks.js", "bilge.js", "power.js", "propulsion.js", "reactor.js", "boat.js", "controls.js", "restart.js", "sim.js", "match.js"];
+const ORDER = ["core.js", "coupled.js", "cargo.js", "hands.js", "manual.js", "water.js", "leaks.js", "bilge.js", "power.js", "propulsion.js", "reactor.js", "boat.js", "controls.js", "restart.js", "debug.js", "sim.js", "match.js"];
 
 function build() {
   const parts = ORDER.map((f) => fs.readFileSync(path.join(SRC, f), "utf8").replace(/\r\n/g, "\n").replace(/\n+$/, "\n"));

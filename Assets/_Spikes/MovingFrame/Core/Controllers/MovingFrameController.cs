@@ -20,6 +20,7 @@ namespace SousTension.Spikes.MovingFrame
         private readonly IAimSource _aim;
         private readonly IHandsInput _hands;
         private readonly ILookSource _look;
+        private readonly DebugConsoleModel _console;
         private readonly MovingFrameModel _model;
         private readonly PredictionBuffer _prediction = new PredictionBuffer();
         private readonly Dictionary<int, double> _sendTimes = new Dictionary<int, double>();
@@ -31,9 +32,10 @@ namespace SousTension.Spikes.MovingFrame
 
         /// <param name="use">primary action button (mouse); null = keyboard only (position-based interaction)</param>
         /// <param name="aim">what the player looks at; null = nothing aimable</param>
-        public MovingFrameController(INetworkService net, IInputSource input, IClockService clock, MovingFrameModel model, IUseInput use = null, IAimSource aim = null, IHandsInput hands = null, ILookSource look = null)
+        public MovingFrameController(INetworkService net, IInputSource input, IClockService clock, MovingFrameModel model, IUseInput use = null, IAimSource aim = null, IHandsInput hands = null, ILookSource look = null, DebugConsoleModel console = null)
         {
-            _net = net; _input = input; _clock = clock; _model = model; _use = use; _aim = aim; _hands = hands; _look = look;
+            _net = net; _input = input; _clock = clock; _model = model; _use = use; _aim = aim; _hands = hands; _look = look; _console = console;
+            if (_console != null) _net.DebugReceived += _console.AddReply;
             _net.StateReceived += OnState;
         }
 
@@ -76,7 +78,7 @@ namespace SousTension.Spikes.MovingFrame
                 }
                 int seq = _prediction.Predict(mx, mz, _model.LocalCarryFactor());
                 _sendTimes[seq] = _clock.Now;
-                _net.SendInput(seq, mx, mz, act, grab, actHeld, use, hand, _look != null ? _look.Yaw : 0f);   // hold = key still down: valve wheels turn while it is held
+                _net.SendInput(seq, mx, mz, act, grab, actHeld, use, hand, _look != null ? _look.Yaw : 0f, _console?.TakeCommand());   // one debug command per tick   // hold = key still down: valve wheels turn while it is held
             }
             if (ticks == MaxCatchUpTicks) _accumulator = 0; // drop backlog after a long stall
             _model.SetLocal(_prediction.X, _prediction.Z);

@@ -1,7 +1,7 @@
 var matchInit = function (ctx, logger, nk, params) {
   logger.info("moving_frame match init");
   return {
-    state: { tick: 0, players: {}, order: [], cp: newCoupled(), cargo: newCargo(), reactor: newReactor(REACTOR_SEED, "veille"), lever: newLever(), boat: newBoat(), restart: newRestart(), water: newWater(), leaks: newLeaks(), bilge: newBilge(), power: newPower(), prop: newPropulsion(), manual: newManual() },
+    state: { tick: 0, players: {}, order: [], cp: newCoupled(), cargo: newCargo(), reactor: newReactor(REACTOR_SEED, "veille"), lever: newLever(), boat: newBoat(), restart: newRestart(), water: newWater(), leaks: newLeaks(), bilge: newBilge(), power: newPower(), prop: newPropulsion(), manual: newManual(), debug: newDebug(debugEnabled(ctx, params)) },
     tickRate: TICK_RATE,
     label: JSON.stringify({ name: MATCH_NAME })
   };
@@ -50,8 +50,11 @@ var matchLoop = function (ctx, logger, nk, dispatcher, tick, state, messages) {
     queueInput(p, input);
   }
 
-  // 2. Advance the whole simulation by one fixed step (server/src/sim.js: no Nakama, no clock, deterministic).
-  simStep(state, tick);
+  // 2. Advance the whole simulation by one fixed step (server/src/sim.js: no Nakama, no clock, deterministic). `t` is the match tick plus the
+  //    time skipped by the debug command ff (E1-09), so every timer of the game keeps one consistent clock.
+  var t = tick + state.debug.skew;
+  simStep(state, t);
+  while (state.debug.pending > 0) { state.debug.pending--; state.debug.skew++; t++; simStep(state, t); }
 
   // 3. Broadcast authoritative state.
   var out = [];
@@ -59,7 +62,21 @@ var matchLoop = function (ctx, logger, nk, dispatcher, tick, state, messages) {
     var id = state.order[j], q = state.players[id];
     out.push({ id: id, x: q.x, z: q.z, seq: q.seq, hd: handsView(q.hands) });
   }
-  dispatcher.broadcastMessage(OP_STATE, JSON.stringify({ tick: tick, t: tick * DT, players: out, il: coupledView(state.cp, tick)[0], cp: coupledView(state.cp, tick), cargo: cargoView(state.cargo), rx: reactorView(state.reactor), sc: leverView(state.lever, state.reactor), rs: restartView(state), bw: waterView(state.water), lk: leaksView(state.leaks), bp: bilgeView(state.bilge), pw: powerView(state), pr: propulsionView(state.prop), mn: manualView(state.manual), boat: boatView(state.boat) }), null, null, true);
+  dispatcher.broadcastMessage(OP_STATE, JSON.stringify({ tick: t, t: t * DT, players: out, il: coupledView(state.cp, tick)[0], cp: coupledView(state.cp, tick), cargo: cargoView(state.cargo), rx: reactorView(state.reactor), sc: leverView(state.lever, state.reactor), rs: restartView(state), bw: waterView(state.water), lk: leaksView(state.leaks), bp: bilgeView(state.bilge), pw: powerView(state), pr: propulsionView(state.prop), mn: manualView(state.manual), boat: boatView(state.boat) }), null, null, true);
+  // 4. Debug replies (E1-09): each sender gets the lines of their commands as one message, to them only.
+  if (state.debug.out.length > 0) {
+    var byPlayer = {}, order = [];
+    for (var o = 0; o < state.debug.out.length; o++) {
+      var rep = state.debug.out[o];
+      if (!byPlayer[rep.to]) { byPlayer[rep.to] = []; order.push(rep.to); }
+      byPlayer[rep.to].push(rep.text);
+    }
+    for (var d = 0; d < order.length; d++) {
+      var target = state.players[order[d]];
+      if (target) dispatcher.broadcastMessage(OP_DEBUG, JSON.stringify({ lines: byPlayer[order[d]] }), [target.presence], null, true);
+    }
+    state.debug.out = [];
+  }
   return { state: state };
 };
 
@@ -128,6 +145,7 @@ if (typeof module !== "undefined" && module.exports) {
     carrySpeedFactor: carrySpeedFactor, carriedMass: carriedMass, throwItem: throwItem, THROW_SPEED: THROW_SPEED, THROW_UP: THROW_UP, THROW_HEIGHT: THROW_HEIGHT, THROW_BOUNCE: THROW_BOUNCE,
     MANUAL_PAGES: MANUAL_PAGES, MANUAL_MAX_STEPS: MANUAL_MAX_STEPS, manualFlip: manualFlip, manualGoto: manualGoto, manualPageIndex: manualPageIndex,
     ITEM_KINDS: ITEM_KINDS, newHands: newHands, takeItem: takeItem, dropItem: dropItem, stowItem: stowItem, canUseHands: canUseHands, handsView: handsView,
+    OP_DEBUG: OP_DEBUG, DEBUG_PARAMS: DEBUG_PARAMS, DEBUG_FF_MAX_SECONDS: DEBUG_FF_MAX_SECONDS, debugEnabled: debugEnabled,
     AIM_REACH: AIM_REACH, interactableIds: interactableIds,
     CONTROLS: CONTROLS, REGIME_ORDER: REGIME_ORDER, tryAct: tryAct,
     reactorNoise: reactorNoise, REACTOR_K: REACTOR_K, newReactor: newReactor, reactorStep: reactorStep, reactorView: reactorView, reactorScram: reactorScram,
