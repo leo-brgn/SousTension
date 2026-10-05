@@ -42,7 +42,9 @@ namespace SousTension.EditorTools
                 Require(renderer.bones.Length >= minimumBones - 1 && renderer.bones.All(b => b != null), name + ": bones bound");
                 Require(mesh.bindposes.Length == renderer.bones.Length, name + ": bind poses");
                 Require(mesh.HasVertexAttribute(UnityEngine.Rendering.VertexAttribute.Color), name + ": vertex colors");
+                Require(mesh.HasVertexAttribute(UnityEngine.Rendering.VertexAttribute.TexCoord0), name + ": UV0");
                 Require(renderer.sharedMaterial != null && renderer.sharedMaterial.shader != null, name + ": material");
+                Require(renderer.sharedMaterial.shader.name == "SousTension/CrewVertexLit", name + ": crew surface shader");
                 var bounds = renderer.localBounds;
                 Require(bounds.size.y > .2f && bounds.size.y < 3f && bounds.size.x > .2f && bounds.size.x < 3f, name + ": metre dimensions " + bounds.size);
                 Debug.Log("CREW_VALIDATED " + name + ": vertices=" + mesh.vertexCount + ", bones=" + renderer.bones.Length + ", dimensions=" + bounds.size + ", clips=" + string.Join(", ", clips.Select(c => c.name)));

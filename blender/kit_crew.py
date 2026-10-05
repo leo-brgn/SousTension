@@ -1,12 +1,16 @@
-"""P1 crew: articulated sailor and independent first-person hands, Blender 5.2.
-Two-bone sleeve transitions soften elbows while preserving the thick silhouette.
-Animation clips are prototypes for Generic rigs, not production locomotion/IK.
+"""Moodboard sailor and independent first-person hands, Blender 5.2.
+Continuous sleeves and fused trousers with two-bone transitions.
+Generic clips remain prototypes; rest proportions follow reference image 11.
 """
 import os, sys, json, math
 sys.path.insert(0, os.path.dirname(__file__))
 from lib import *
+from crew_shapes import clean_part, loft, tube, panel, crew_material
 
-SKIN = srgb('#D6A780')
+SKIN = srgb('#E8AD83')
+UNIFORM = srgb('#476F35')
+TROUSERS = srgb('#395B2D')
+HAIR = srgb('#25251F')
 
 def crew(fp=False):
     a = Asset('FirstPersonArms' if fp else 'SailorBase')
@@ -15,57 +19,105 @@ def crew(fp=False):
     parts = {}
     def bone(name, head, tail, parent=None):
         bones[prefix+name] = (head, tail, prefix+parent if parent else None)
-        p = a.part(name); parts[name] = p
+        p = clean_part(a.part(name)); parts[name] = p
         return p
-    def sphere(p, c, r, color): p.sphere(c, r, color, u=16, v=10)
+    def sphere(p, c, r, color): p.sphere(c, r, color, u=24, v=16)
     bone('Root', (0,0,0), (0,0,.15))
     if not fp:
-        p=bone('Hips',(0,0,.48),(0,0,.83),'Root')
-        sphere(p,(0,0,.66),(.36,.24,.29),C['bottle_d'])
-        p=bone('Spine',(0,0,.83),(0,0,1.12),'Hips')
-        sphere(p,(0,0,1.02),(.41,.27,.39),C['bottle'])
-        p.box((0,-.255,1.09),(.15,.025,.16),C['bottle_d'],bevel=.018)
-        for z in (.83,.96,1.10,1.23): sphere(p,(0,-.277,z),(.021,.012,.021),C['brass'])
-        for s in (-1,1): p.box((s*.105,-.235,1.31),(.15,.035,.115),C['bottle_d'],rot=(0,s*.30,0),bevel=.015)
-        p=bone('Neck',(0,0,1.12),(0,0,1.35),'Spine')
-        sphere(p,(0,0,1.29),(.14,.13,.12),SKIN)
-        p=bone('Head',(0,0,1.35),(0,0,1.70),'Neck')
-        sphere(p,(0,0,1.52),(.265,.225,.305),SKIN)
-        for s in (-1,1):
-            sphere(p,(s*.26,0,1.49),(.052,.063,.078),SKIN)
-            sphere(p,(s*.082,-.205,1.57),(.027,.015,.035),C['black'])
-            p.box((s*.084,-.212,1.636),(.090,.020,.022),C['bakelite'],rot=(0,s*.12,0),bevel=.008)
-            sphere(p,(s*.085,-.244,1.448),(.101,.038,.045),C['bakelite'])
-        sphere(p,(0,-.240,1.50),(.066,.066,.050),SKIN)
-        p.cyl((0,0,1.76),.275,.095,C['bottle_d'],segs=24,bevel=.018)
-        sphere(p,(0,0,1.825),(.315,.255,.100),C['bottle'])
-        p.box((0,-.24,1.748),(.36,.18,.024),C['bakelite'],bevel=.025)
-        sphere(p,(0,-.25,1.815),(.038,.013,.045),C['brass'])
-        for side,s in (('L',1),('R',-1)):
-            p=bone('UpperLeg_'+side,(s*.18,0,.68),(s*.18,0,.37),'Hips')
-            sphere(p,(s*.18,0,.48),(.15,.165,.25),C['bottle_d'])
-            p=bone('LowerLeg_'+side,(s*.18,0,.37),(s*.18,0,.13),'UpperLeg_'+side)
-            p.cyl((s*.18,0,.25),.115,.28,C['black'],bevel=.018)
-            p=bone('Foot_'+side,(s*.18,0,.13),(s*.18,-.18,.09),'LowerLeg_'+side)
-            p.box((s*.18,-.075,.095),(.25,.37,.18),C['bakelite'],bevel=.065)
-            p.box((s*.18,-.075,.023),(.26,.38,.045),C['black'],bevel=.012)
-    for side,s in (('L',1),('R',-1)):
-        # A-pose with broad sleeves and separate mitten fingers.
-        h=(s*.33,0,1.28); e=(s*.54,0,1.05); w=(s*.65,-.025,.83)
+        p=bone('Hips',(0,0,.30),(0,0,.55),'Root')
+        # One fused pair of trousers, weighted below the crotch to the legs.
+        loft(p,[(.29,.25,.20,0),(.32,.335,.25,0),(.39,.425,.29,0),(.50,.465,.31,0),(.57,.46,.30,0)],TROUSERS)
+        for sign in (-1,1):
+            p.cyl((sign*.225,0,.305),.132,.20,TROUSERS,segs=32,r2=.193)
+        p=bone('Spine',(0,0,.55),(0,0,.98),'Hips')
+        loft(p,[(.515,.461,.31,0),(.54,.48,.32,0),(.66,.49,.335,0),(.82,.46,.32,0),(.98,.405,.28,0),(1.085,.35,.24,0),(1.12,.305,.215,0)],UNIFORM)
+        # Hem and sewn centre line follow the coat surface rather than floating.
+        loft(p,[(.516,.462,.311,0),(.526,.476,.319,0),(.540,.480,.321,0)],shade(UNIFORM,.94))
+        for z,y in ((.585,-.333),(.765,-.338),(.945,-.300)):
+            p.cyl((0,y,z),.028,.019,C['brass'],axis='Y',segs=28,bevel=.005,seg=3)
+            p.cyl((0,y-.011,z),.020,.002,shade(C['brass'],1.08),axis='Y',segs=24)
+        for sign in (-1,1):
+            panel(p,[(sign*.018,-.245,1.086),(sign*.32,-.205,1.125),(sign*.355,-.233,1.065),(sign*.19,-.282,.997)],.047,shade(UNIFORM,1.02),bevel=.014)
+            p.box((sign*.363,.005,1.077),(.145,.22,.029),srgb('#683F26'),rot=(0,sign*.13,0),bevel=.012,seg=3)
+            sphere(p,(sign*.336,-.072,1.095),(.019,.017,.009),C['brass'])
+        p=bone('Neck',(0,0,.98),(0,0,1.12),'Spine')
+        sphere(p,(0,0,1.085),(.265,.198,.12),SKIN)
+        p=bone('Head',(0,0,1.12),(0,0,1.60),'Neck')
+        loft(p,[(1.045,.24,.188,0),(1.073,.33,.23,0),(1.14,.345,.253,0),(1.255,.33,.26,0),(1.385,.30,.248,0),(1.51,.264,.223,0),(1.605,.235,.195,0),(1.65,.17,.14,0)],SKIN,segments=48)
+        for sign in (-1,1):
+            sphere(p,(sign*.314,.018,1.30),(.027,.038,.049),SKIN)
+            sphere(p,(sign*.086,-.235,1.437),(.021,.012,.027),HAIR)
+            sphere(p,(sign*.081,-.246,1.446),(.0045,.0025,.0055),C['white'])
+            tube(p,[(sign*.047,-.219,1.505),(sign*.078,-.224,1.512),(sign*.12,-.211,1.501)],[.010,.014,.008],HAIR,segments=12,smooth=5,depth=.65)
+            # Broad moustache lobes taper into a hooked tip. Longitudinal ridges
+            # are actual geometry, kept subtle so the face reads at game distance.
+            points=[(sign*.010,-.280,1.343),(sign*.050,-.300,1.316),(sign*.105,-.305,1.303),(sign*.161,-.293,1.311),(sign*.208,-.272,1.337),(sign*.225,-.256,1.375)]
+            tube(p,points,[.018,.043,.048,.038,.022,.002],HAIR,segments=16,smooth=5,depth=.68)
+            for j in range(4):
+                zoff=(j-1.5)*.014
+                ridge=[(sign*.022,-.306,1.337+zoff*.45),(sign*.074,-.336,1.317+zoff),(sign*.13,-.333,1.312+zoff),(sign*.177,-.314,1.330+zoff*.65),(sign*.205,-.284,1.352+zoff*.2)]
+                tube(p,ridge,[.001,.0023,.0025,.002,.0007],shade(HAIR,1.16),segments=6,smooth=3,depth=.6)
+        sphere(p,(0,-.277,1.376),(.056,.050,.036),SKIN)
+        tube(p,[(-.040,-.254,1.264),(0,-.263,1.258),(.039,-.254,1.264)],[.002,.004,.002],srgb('#7C4932'),segments=8,smooth=4,depth=.7)
+        # Soft peaked cap, leaning slightly to the wearer's right.
+        existing=set(p.bm.verts)
+        loft(p,[(1.579,.246,.206,0),(1.59,.255,.216,0),(1.65,.262,.225,.006)],srgb('#30352C'),segments=48)
+        loft(p,[(1.642,.255,.221,.005),(1.671,.31,.248,.01),(1.733,.35,.266,.018),(1.787,.313,.240,.026),(1.806,.22,.17,.026),(1.810,.045,.035,.026)],UNIFORM,segments=48)
+        sphere(p,(0,-.179,1.585),(.272,.158,.020),srgb('#38392D'))
+        tube(p,[(-.213,-.148,1.628),(-.14,-.190,1.632),(0,-.225,1.633),(.14,-.19,1.632),(.213,-.148,1.628)],[.009]*5,srgb('#69614B'),segments=8,smooth=4,depth=.65)
+        for sign in (-1,1):
+            p.box((sign*.165,-.183,1.633),(.075,.015,.013),C['brass'],rot=(0,0,sign*.30),bevel=.004,seg=3)
+        sphere(p,(0,-.251,1.717),(.044,.014,.051),C['brass'])
+        star=[]
+        for j in range(10):
+            angle=math.pi/2+j*math.pi/5;radius=.028 if j%2==0 else .0135
+            star.append((radius*math.cos(angle),-.267,1.718+radius*math.sin(angle)))
+        panel(p,star,.008,srgb('#B33124'),bevel=.001)
+        pivot=Vector((0,0,1.60));rot=Euler((-.025,-.10,-.02)).to_matrix()
+        for vertex in p.bm.verts:
+            if vertex not in existing:vertex.co=pivot+rot@(vertex.co-pivot)
+        for side,sign in (('L',1),('R',-1)):
+            bone('UpperLeg_'+side,(sign*.225,0,.40),(sign*.225,0,.235),'Hips')
+            p=bone('LowerLeg_'+side,(sign*.225,0,.235),(sign*.225,0,.10),'UpperLeg_'+side)
+            p.cyl((sign*.225,0,.153),.101,.14,srgb('#20251F'),segs=28,bevel=.014,seg=3)
+            p.cyl((sign*.225,0,.224),.119,.045,srgb('#30362C'),segs=28,bevel=.007,seg=3)
+            p=bone('Foot_'+side,(sign*.225,0,.10),(sign*.225,-.16,.07),'LowerLeg_'+side)
+            sphere(p,(sign*.225,-.052,.083),(.129,.178,.083),srgb('#20251F'))
+            p.box((sign*.225,-.05,.024),(.262,.337,.047),srgb('#1B201A'),bevel=.023,seg=4)
+    for side,sign in (('L',1),('R',-1)):
+        h=(sign*.335,0,1.065);e=(sign*.452,0,.845);w=(sign*.50,-.018,.657)
         p=bone('UpperArm_'+side,h,e,'Root' if fp else 'Spine')
-        sphere(p,(s*.43,0,1.17),(.16,.145,.21),C['bottle'])
+        tube(p,[(sign*.32,0,1.07),(sign*.366,0,1.055),(sign*.412,0,.979),(sign*.45,0,.87),(sign*.474,-.008,.765),(sign*.50,-.018,.672)],[.075,.136,.14,.13,.12,.108],UNIFORM,segments=24,smooth=5)
         p=bone('Forearm_'+side,e,w,'UpperArm_'+side)
-        sphere(p,(s*.595,-.012,.955),(.12,.118,.18),C['bottle'])
-        p.cyl((s*.64,-.025,.86),.117,.065,C['bottle_d'],bevel=.008)
-        p=bone('Hand_'+side,w,(s*.68,-.025,.72),'Forearm_'+side)
-        sphere(p,(s*.67,-.025,.775),(.093,.065,.10),SKIN)
+        tube(p,[(sign*.493,-.016,.704),(sign*.505,-.019,.663)],[.123,.12],shade(UNIFORM,.94),segments=32,smooth=2)
+        p=bone('Hand_'+side,w,(sign*.518,-.02,.535),'Forearm_'+side)
+        sphere(p,(sign*.513,-.025,.591),(.085,.069,.090),SKIN)
         for j in range(4):
-            x=s*(.605+j*.040)
-            p=bone('Finger%d_%s'%(j+1,side),(x,-.04,.745),(x,-.06,.66),'Hand_'+side)
-            sphere(p,(x,-.052,.704),(.024,.029,.062),SKIN)
-        p=bone('Thumb_'+side,(s*.595,-.06,.80),(s*.57,-.10,.735),'Hand_'+side)
-        sphere(p,(s*.585,-.09,.768),(.036,.038,.058),SKIN)
+            x=sign*(.468+j*.030)
+            p=bone('Finger%d_%s'%(j+1,side),(x,-.030,.571),(x,-.044,.510),'Hand_'+side)
+            sphere(p,(x,-.029,.547),(.021,.032,.041-(.005 if j in (0,3) else 0)),SKIN)
+        p=bone('Thumb_'+side,(sign*.45,-.065,.615),(sign*.432,-.087,.562),'Hand_'+side)
+        sphere(p,(sign*.448,-.069,.590),(.032,.030,.046),SKIN)
     a.build()
+    # Fuse the trouser legs into the hips before binding, with no visible
+    # overlapping thigh balls. Sleeves are now continuous ring surfaces.
+    for name,p in parts.items():
+        if name != 'Hips': continue
+        bpy.ops.object.select_all(action='DESELECT')
+        p.ob.select_set(True);bpy.context.view_layer.objects.active=p.ob
+        remesh=p.ob.modifiers.new('ContinuousTrousers','REMESH')
+        remesh.mode='VOXEL';remesh.voxel_size=.018;remesh.use_smooth_shade=True
+        bpy.ops.object.modifier_apply(modifier=remesh.name)
+        relax=p.ob.modifiers.new('TrouserRelax','SMOOTH');relax.factor=.7;relax.iterations=7
+        bpy.ops.object.modifier_apply(modifier=relax.name)
+        me=p.ob.data
+        col=me.color_attributes.get('Col') or me.color_attributes.new(name='Col',type='FLOAT_COLOR',domain='CORNER')
+        linear_uniform=tuple(((v+.055)/1.055)**2.4 if v>.04045 else v/12.92 for v in TROUSERS[:3])+(1,)
+        for datum in col.data:
+            if col.data_type == 'BYTE_COLOR': datum.color_srgb=TROUSERS
+            else: datum.color=linear_uniform
+        for poly in me.polygons:poly.use_smooth=True
+        me.color_attributes.active_color=col;me.color_attributes.render_color_index=me.color_attributes.find('Col')
     rigdata=bpy.data.armatures.new(a.name+'_Skeleton')
     rig=bpy.data.objects.new(a.name+'_Rig',rigdata); bpy.context.collection.objects.link(rig)
     rig.parent=a.root
@@ -89,10 +141,20 @@ def crew(fp=False):
             elbow=Vector(bones[prefix+'Forearm_'+side][0])
             for v in p.ob.data.vertices:
                 distance=(v.co-elbow).length
-                if distance < .18:
-                    blend=.5*(1-distance/.18)
+                if upper:
+                    blend=max(0,min(1,(.91-v.co.z)/.14))
+                else:
+                    blend=0
+                if blend > 0:
                     g.add([v.index],1-blend,'REPLACE')
                     partner.add([v.index],blend,'REPLACE')
+        if name == 'Hips':
+            legs={sign:p.ob.vertex_groups.new(name='UpperLeg_'+side) for side,sign in (('L',1),('R',-1))}
+            for vertex in p.ob.data.vertices:
+                blend=max(0,min(1,(.47-vertex.co.z)/.18))
+                if blend>0:
+                    g.add([vertex.index],1-blend,'REPLACE')
+                    legs[1 if vertex.co.x>=0 else -1].add([vertex.index],blend,'REPLACE')
         mod=p.ob.modifiers.new('Skin','ARMATURE'); mod.object=rig
     # A single skinned renderer per character; disconnected components retain groups.
     bpy.ops.object.select_all(action='DESELECT')
@@ -101,6 +163,34 @@ def crew(fp=False):
     bpy.context.view_layer.objects.active=meshes[0]
     bpy.ops.object.join()
     bpy.context.object.name=a.name+'_Skin'
+    # BMesh byte-colour storage decodes sRGB on conversion to FLOAT_COLOR.
+    # The shared Unity shader expects raw sRGB codes, so explicitly re-encode
+    # this character instead of letting body and remeshed sleeves disagree.
+    colors=bpy.context.object.data.color_attributes['Col']
+    if colors.data_type != 'FLOAT_COLOR':
+        values=[tuple(d.color) for d in colors.data]
+        bpy.context.object.data.color_attributes.remove(colors)
+        colors=bpy.context.object.data.color_attributes.new(name='Col',type='FLOAT_COLOR',domain='CORNER')
+    else: values=[tuple(d.color) for d in colors.data]
+    for datum,c in zip(colors.data,values):
+        datum.color=tuple(1.055*(max(0,v)**(1/2.4))-.055 if v>.0031308 else 12.92*v for v in c[:3])+(c[3],)
+        r,g,b=datum.color[:3]
+        if r>.65 and b>.40: code=.25
+        elif r>.60 and g>.40 and b<.42: code=.5
+        elif g>r*1.08 and g>b*1.20 and r>.16: code=0
+        elif max(r,g,b)<.20: code=.75 if g-r>.008 else 1
+        elif r>.4 and g<.3: code=.75
+        elif g>r*1.03 and r>.16: code=0
+        else: code=1
+        datum.color=(r,g,b,code)
+    bpy.context.object.data.color_attributes.active_color=colors
+    bpy.context.object.data.materials.clear()
+    bpy.context.object.data.materials.append(crew_material())
+    for polygon in bpy.context.object.data.polygons:polygon.material_index=0
+    # Export an editable UV layout as well as the vertex-colour material.
+    bpy.ops.object.mode_set(mode='EDIT');bpy.ops.mesh.select_all(action='SELECT')
+    bpy.ops.uv.smart_project(angle_limit=math.radians(66),island_margin=.008)
+    bpy.ops.object.mode_set(mode='OBJECT')
     rig.animation_data_create()
     clips=['Idle','Walk','ValveTurn','Faint'] if not fp else ['HandsIdle','HandsGrip']
     for clip in clips:
@@ -157,13 +247,29 @@ if __name__=='__main__':
             bake_anim_use_nla_strips=True,bake_anim_simplify_factor=0,mesh_smooth_type='FACE')
         for tr in rig.animation_data.nla_tracks: tr.mute=True
         for pb in rig.pose.bones: pb.rotation_euler=(0,0,0); pb.location=(0,0,0)
-        tris=sum(len(o.data.polygons) for o in meshes)
-        report['assets'].append({'name':a.name,'bones':len(rig.data.bones),'mesh_parts':len(meshes),'clips':clips,'weighted_vertices':sum(len(o.data.vertices) for o in meshes),'blended_vertices':sum(sum(len(v.groups)==2 for v in o.data.vertices) for o in meshes),'weighting':'normalized two-bone elbow transitions; rigid hands/fingers/body components','animation_status':'prototype; Generic rig; game IK and Animator integration pending'})
+        for o in meshes:o.data.calc_loop_triangles()
+        tris=sum(len(o.data.loop_triangles) for o in meshes)
+        report['assets'].append({'name':a.name,'bones':len(rig.data.bones),'mesh_parts':len(meshes),'triangles':tris,'clips':clips,'weighted_vertices':sum(len(o.data.vertices) for o in meshes),'blended_vertices':sum(sum(len(v.groups)==2 for v in o.data.vertices) for o in meshes),'weighting':'normalized two-bone elbows and trouser-leg transitions','material':'CrewSurface: raw sRGB RGB, surface family in alpha','reference':'moodboard/v2_references/11_equipage_personnages.png','animation_status':'prototype; Generic rig; game IK and Animator integration pending'})
         print('EXPORT',a.name,len(rig.data.bones),'bones')
     bpy.context.scene.frame_set(1); bpy.context.view_layer.update()
+    # Open the editable source on the complete sailor, with FP arms available
+    # separately instead of superimposed over the body in the viewport.
+    for ob in [items[1][0].root]+list(items[1][0].root.children_recursive):
+        ob.hide_render=True;ob.hide_set(True)
+    bpy.ops.object.select_all(action='DESELECT')
+    skin=next(o for o in items[0][0].root.children_recursive if o.type=='MESH')
+    skin.select_set(True);bpy.context.view_layer.objects.active=skin
+    for screen in bpy.data.screens:
+        for area in screen.areas:
+            if area.type=='VIEW_3D':
+                area.spaces.active.shading.color_type='VERTEX'
+                area.spaces.active.region_3d.view_location=(0,0,.92)
+                area.spaces.active.region_3d.view_distance=3.2
+                area.spaces.active.region_3d.view_rotation=Vector((.36,-1,.08)).to_track_quat('Z','Y')
     source=os.path.join(os.path.dirname(__file__),'sources','Crew.blend'); bpy.ops.wm.save_as_mainfile(filepath=source)
     with open(os.path.join(out,'crew_manifest.json'),'w') as f: json.dump(report,f,indent=2)
     if preview:
+        for ob in [items[1][0].root]+list(items[1][0].root.children_recursive):ob.hide_set(False)
         os.makedirs(preview,exist_ok=True); render_each([a for a,_,_ in items],preview)
         a,rig,_=items[0]
         for ob in [items[1][0].root]+list(items[1][0].root.children_recursive): ob.hide_render=True
