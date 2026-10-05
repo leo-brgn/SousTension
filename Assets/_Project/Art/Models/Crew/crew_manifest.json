@@ -9,28 +9,34 @@
       "name": "SailorBase",
       "bones": 27,
       "mesh_parts": 1,
+      "triangles": 51068,
       "clips": [
         "Idle",
         "Walk",
         "ValveTurn",
         "Faint"
       ],
-      "weighted_vertices": 6198,
-      "blended_vertices": 284,
-      "weighting": "normalized two-bone elbow transitions; rigid hands/fingers/body components",
+      "weighted_vertices": 25672,
+      "blended_vertices": 4094,
+      "weighting": "normalized two-bone elbows and trouser-leg transitions",
+      "material": "CrewSurface: raw sRGB RGB, surface family in alpha",
+      "reference": "moodboard/v2_references/11_equipage_personnages.png",
       "animation_status": "prototype; Generic rig; game IK and Animator integration pending"
     },
     {
       "name": "FirstPersonArms",
       "bones": 17,
       "mesh_parts": 1,
+      "triangles": 11504,
       "clips": [
         "HandsIdle",
         "HandsGrip"
       ],
-      "weighted_vertices": 2528,
-      "blended_vertices": 284,
-      "weighting": "normalized two-bone elbow transitions; rigid hands/fingers/body components",
+      "weighted_vertices": 5784,
+      "blended_vertices": 598,
+      "weighting": "normalized two-bone elbows and trouser-leg transitions",
+      "material": "CrewSurface: raw sRGB RGB, surface family in alpha",
+      "reference": "moodboard/v2_references/11_equipage_personnages.png",
       "animation_status": "prototype; Generic rig; game IK and Animator integration pending"
     }
   ]

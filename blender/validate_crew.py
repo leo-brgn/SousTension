@@ -16,6 +16,13 @@ for name, expected in [('SailorBase',4),('FirstPersonArms',2)]:
     blended=sum(sum(len(v.groups)==2 for v in o.data.vertices) for o in meshes)
     assert blended>0
     assert all('Col' in o.data.color_attributes for o in meshes)
+    for mesh in meshes:
+        mesh.data.calc_loop_triangles()
+        assert mesh.data.uv_layers, (name,'UV0 missing')
+        assert all(t.area>1e-12 for t in mesh.data.loop_triangles),(name,'degenerate triangles')
+        codes={round(d.color[3]*4)/4 for d in mesh.data.color_attributes['Col'].data}
+        assert {0,.25}.issubset(codes),(name,'cloth/skin surface IDs missing',codes)
+        if name=='SailorBase':assert {.5,.75,1}.issubset(codes),(name,'brass/leather/hair surface IDs missing',codes)
     for action in rig_actions:
         rigs[0].animation_data.action=action
         for frame in (1,9,17,25,33):

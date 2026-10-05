@@ -3,7 +3,7 @@
     "asset": "SailorBase",
     "bones": 27,
     "skinned_meshes": 1,
-    "blended_elbow_vertices": 284,
+    "blended_elbow_vertices": 2554,
     "sampled_frames_per_clip": 5,
     "clips": [
       "SailorBase_Rig|Faint",
@@ -17,7 +17,7 @@
     "asset": "FirstPersonArms",
     "bones": 17,
     "skinned_meshes": 1,
-    "blended_elbow_vertices": 284,
+    "blended_elbow_vertices": 326,
     "sampled_frames_per_clip": 5,
     "clips": [
       "FirstPersonArms_Rig|HandsGrip",
