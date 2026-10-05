@@ -22,13 +22,14 @@ namespace SousTension.Spikes.MovingFrame
         [Serializable] private class PlayerDto { public string id; public float x; public float z; public int seq; }
         [Serializable] private class InterlockDto { public int a; public int b; public string ab; public string bb; public string result; public int rt; public int n; }
         [Serializable] private class CoupledDto { public string id; public int a; public int b; public string ab; public string bb; public string result; public int rt; public int n; }
-        [Serializable] private class CargoDto { public string id; public float x; public float z; public int h; public string[] c; public string p; }
+        [Serializable] private class CargoDto { public string id; public float x; public float z; public int h; public string[] c; public string p; public string k; public int a; }
         [Serializable] private class ReactorDto { public string reg; public float R; public float nz; public float P; public float T; public float S; public float E; public float eta; public float F; public float[] v; public int[] pu; public int scram; public int auto; public int leak; public int warn; public int crit; }
         [Serializable] private class LeverDto { public int cv; public int pl; }
         [Serializable] private class RestartDto { public int[] s; public string last; public int lt; public int n; }
+        [Serializable] private class LeakDto { public int id; public int c; public float x; public float z; public int s; public string t; }
         [Serializable] private class WaterDto { public float[] l; public float m; public float tr; public float li; public int[] dr; }
         [Serializable] private class BoatDto { public float d; public float vz; }
-        [Serializable] private class StateDto { public int tick; public double t; public PlayerDto[] players; public InterlockDto il; public CargoDto[] cargo; public ReactorDto rx; public CoupledDto[] cp; public RestartDto rs; public WaterDto bw; public LeverDto sc; public BoatDto boat; }
+        [Serializable] private class StateDto { public int tick; public double t; public PlayerDto[] players; public InterlockDto il; public CargoDto[] cargo; public ReactorDto rx; public CoupledDto[] cp; public RestartDto rs; public WaterDto bw; public LeakDto[] lk; public LeverDto sc; public BoatDto boat; }
         [Serializable] private class MatchDto { public string matchId; }
 
         private readonly string _scheme, _host, _serverKey, _deviceId;
@@ -96,7 +97,7 @@ namespace SousTension.Spikes.MovingFrame
             for (int i = 0; i < cargo.Length; i++)
             {
                 var c = dto.cargo[i];
-                cargo[i] = new CargoState(c.id, c.x, c.z, c.h == 1, c.c, c.p);
+                cargo[i] = new CargoState(c.id, c.x, c.z, c.h == 1, c.c, c.p, c.k, c.a != 0);
             }
             ReactorState reactor = default;
             if (dto.rx != null && !string.IsNullOrEmpty(dto.rx.reg))
@@ -122,9 +123,15 @@ namespace SousTension.Spikes.MovingFrame
                 for (int i = 0; i < doors.Length; i++) doors[i] = dto.bw.dr[i] == 1;
                 water = new WaterState(dto.bw.l, dto.bw.m, dto.bw.tr, dto.bw.li, doors);
             }
+            LeakState[] leaks = null;
+            if (dto.lk != null)
+            {
+                leaks = new LeakState[dto.lk.Length];
+                for (int i = 0; i < leaks.Length; i++) { var k = dto.lk[i]; leaks[i] = new LeakState(k.id, k.c, k.x, k.z, k.s, k.t); }
+            }
             var lever = dto.sc != null ? new ScramLeverState(dto.sc.cv == 1, dto.sc.pl == 1) : default;
             var boat = dto.boat != null ? new BoatDepthState(dto.boat.d, dto.boat.vz) : default;
-            _queue.Enqueue(new StateSnapshot(dto.tick, dto.t, players, il, cargo, reactor, lever, boat, coupled, restart, water));
+            _queue.Enqueue(new StateSnapshot(dto.tick, dto.t, players, il, cargo, reactor, lever, boat, coupled, restart, water, leaks));
         }
 
         public void Poll()

@@ -45,9 +45,12 @@ namespace SousTension.Spikes.MovingFrame
         public readonly bool Heavy;          // needs two carriers
         public readonly string[] Carriers;   // 0 = loose (slides), 1 = carried, 2 = heavy carried
         public readonly string Pending;      // first carrier of a heavy item, waiting for the second one
+        public readonly string Kind;         // "crate" | "patch" (hull patch, E6-02)
+        public readonly bool Active;         // false for a used patch that has not yet respawned in the toolbox
 
-        public CargoState(string id, float x, float z, bool heavy, string[] carriers, string pending)
+        public CargoState(string id, float x, float z, bool heavy, string[] carriers, string pending, string kind = "crate", bool active = true)
         {
+            Kind = kind ?? "crate"; Active = active;
             Id = id; X = x; Z = z; Heavy = heavy; Carriers = carriers ?? new string[0]; Pending = pending ?? "";
         }
     }
@@ -108,6 +111,17 @@ namespace SousTension.Spikes.MovingFrame
         { Valid = true; Fill = fill ?? new float[0]; MassTonnes = massTonnes; TrimDeg = trimDeg; ListDeg = listDeg; DoorOpen = doorOpen ?? new bool[0]; }
     }
 
+    /// <summary>One open hull leak (E6-02): where it is on the wall, how big, and what kind.</summary>
+    public readonly struct LeakState
+    {
+        public readonly int Id, Compartment;   // compartment 0 = bow
+        public readonly float X, Z;            // boat-local position on the hull wall
+        public readonly int Size;              // 1 small, 2 medium, 3 large
+        public readonly string Type;           // "rivet" | "plate"
+        public LeakState(int id, int compartment, float x, float z, int size, string type)
+        { Id = id; Compartment = compartment; X = x; Z = z; Size = size; Type = type ?? "plate"; }
+    }
+
     /// <summary>Authoritative boat depth below patrol depth (E3-04): grows after a SCRAM. Display only.</summary>
     public readonly struct BoatDepthState
     {
@@ -131,11 +145,13 @@ namespace SousTension.Spikes.MovingFrame
         public readonly CoupledActionState[] Coupled;
         public readonly RestartState Restart;
         public readonly WaterState Water;
+        public readonly LeakState[] Leaks;   // null = the server sent no leak list (older server); empty = no leak
 
         public StateSnapshot(int tick, double serverTime, PlayerState[] players, InterlockState interlock = default, CargoState[] cargo = null, ReactorState reactor = default,
             ScramLeverState lever = default, BoatDepthState boat = default, CoupledActionState[] coupled = null,
-            RestartState restart = default, WaterState water = default)
+            RestartState restart = default, WaterState water = default, LeakState[] leaks = null)
         {
+            Leaks = leaks;
             Water = water;
             Restart = restart;
             Coupled = coupled ?? new CoupledActionState[0];

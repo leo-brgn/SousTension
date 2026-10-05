@@ -120,6 +120,10 @@ namespace SousTension.Spikes.MovingFrame
         public WaterState Water { get; private set; }
         public void SetWater(WaterState state) { if (state.Valid) Water = state; }
 
+        /// <summary>Open hull leaks (E6-02), authoritative; a snapshot without the list keeps the last known one.</summary>
+        public LeakState[] Leaks { get; private set; } = new LeakState[0];
+        public void SetLeaks(LeakState[] leaks) { if (leaks != null) Leaks = leaks; }
+
         public void SetLocal(float x, float z) { LocalX = x; LocalZ = z; }
 
         public void ApplyServerState(StateSnapshot snapshot, double localNow)
