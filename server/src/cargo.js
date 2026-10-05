@@ -8,13 +8,15 @@ var FRICTION = 0.25;        // Coulomb coefficient: loose cargo starts sliding p
 var CARGO_DEFS = [
   { id: "crate1", heavy: false, x: 2.0, z: -3.0 },
   { id: "crate2", heavy: false, x: -2.0, z: 4.0 },
-  { id: "fuel", heavy: true, x: -2.0, z: -5.0 },
+  { id: "fuel", kind: "fuel", heavy: true, x: -2.0, z: -5.0 },
   // Hull patches (E6-02): the toolbox of compartment 2. Light, used up on a leak, back in the toolbox 30 s later.
   { id: "patch1", kind: "patch", heavy: false, x: 0.6, z: 5.5 },
   { id: "patch2", kind: "patch", heavy: false, x: 1.0, z: 5.5 },
   { id: "patch3", kind: "patch", heavy: false, x: 1.4, z: 5.5 },
   // Bucket (E6-03): same toolbox, never used up.
-  { id: "bucket", kind: "bucket", heavy: false, x: 1.8, z: 5.5 }
+  { id: "bucket", kind: "bucket", heavy: false, x: 1.8, z: 5.5 },
+  // Torch (E2-03): the restart "à la lampe torche" (GDD 3.3); one hand, or the chest pocket.
+  { id: "flashlight", kind: "flashlight", heavy: false, x: 0.2, z: 5.5 }
 ];
 // Boat tilt (must match BoatMotion.cs defaults: pitch 15 deg / 7 s, roll 20 deg / 5 s + 1 rad phase).
 var PITCH_AMP = 15 * Math.PI / 180, PITCH_PERIOD = 7;
@@ -37,37 +39,6 @@ function newCargo() {
                active: true, respawnTick: 0, homeX: d.x, homeZ: d.z });
   }
   return out;
-}
-
-function heldBy(cargo, playerId) {
-  for (var i = 0; i < cargo.length; i++) {
-    var c = cargo[i];
-    if (c.carriers.indexOf(playerId) >= 0 || c.pend === playerId) return c;
-  }
-  return null;
-}
-
-// F key: drop what you hold, otherwise grab the nearest free cargo within reach.
-function tryGrab(cargo, playerId, pl, tick) {
-  var held = heldBy(cargo, playerId);
-  if (held) {
-    if (held.pend === playerId) held.pend = "";
-    var idx = held.carriers.indexOf(playerId);
-    if (idx >= 0) { held.carriers = []; held.vx = 0; held.vz = 0; } // dropping breaks a shared carry: both release
-    return;
-  }
-  var best = null, bestD = GRAB_REACH;
-  for (var i = 0; i < cargo.length; i++) {
-    var c = cargo[i];
-    if (!c.active) continue;                                       // a used patch is not in the world until it respawns
-    if (c.carriers.length >= (c.heavy ? 2 : 1)) continue;
-    var dx = pl.x - c.x, dz = pl.z - c.z, d = Math.sqrt(dx * dx + dz * dz);
-    if (d <= bestD) { best = c; bestD = d; }
-  }
-  if (!best) return;
-  if (!best.heavy) { best.carriers = [playerId]; return; }
-  if (best.pend === "") { best.pend = playerId; best.pendTick = tick; }
-  else if (best.pend !== playerId) { best.carriers = [best.pend, playerId]; best.pend = ""; }
 }
 
 function slideStep(c, up) {

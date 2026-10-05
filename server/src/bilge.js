@@ -48,8 +48,8 @@ function bilgeStep(state) {
 // The interaction key pressed by a player carrying the bucket: scoop water out of the compartment they stand in. Returns true when the press
 // was used by the bucket (a scoop, or a scoop refused by the cooldown); false lets the press go to whatever else is in reach.
 function tryScoop(state, id, pl, tick) {
-  var held = heldBy(state.cargo, id);
-  if (!held || held.kind !== "bucket" || held.carriers.indexOf(id) < 0) return false;
+  var held = handItem(state, id, "bucket");
+  if (!held) return false;
   var comp = compartmentAt(pl.z);
   if (state.water.comps[comp].w <= 0) return false;
   var last = state.bilge.scoopTick[id];

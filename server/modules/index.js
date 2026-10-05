@@ -150,13 +150,15 @@ var FRICTION = 0.25;        // Coulomb coefficient: loose cargo starts sliding p
 var CARGO_DEFS = [
   { id: "crate1", heavy: false, x: 2.0, z: -3.0 },
   { id: "crate2", heavy: false, x: -2.0, z: 4.0 },
-  { id: "fuel", heavy: true, x: -2.0, z: -5.0 },
+  { id: "fuel", kind: "fuel", heavy: true, x: -2.0, z: -5.0 },
   // Hull patches (E6-02): the toolbox of compartment 2. Light, used up on a leak, back in the toolbox 30 s later.
   { id: "patch1", kind: "patch", heavy: false, x: 0.6, z: 5.5 },
   { id: "patch2", kind: "patch", heavy: false, x: 1.0, z: 5.5 },
   { id: "patch3", kind: "patch", heavy: false, x: 1.4, z: 5.5 },
   // Bucket (E6-03): same toolbox, never used up.
-  { id: "bucket", kind: "bucket", heavy: false, x: 1.8, z: 5.5 }
+  { id: "bucket", kind: "bucket", heavy: false, x: 1.8, z: 5.5 },
+  // Torch (E2-03): the restart "à la lampe torche" (GDD 3.3); one hand, or the chest pocket.
+  { id: "flashlight", kind: "flashlight", heavy: false, x: 0.2, z: 5.5 }
 ];
 // Boat tilt (must match BoatMotion.cs defaults: pitch 15 deg / 7 s, roll 20 deg / 5 s + 1 rad phase).
 var PITCH_AMP = 15 * Math.PI / 180, PITCH_PERIOD = 7;
@@ -179,37 +181,6 @@ function newCargo() {
                active: true, respawnTick: 0, homeX: d.x, homeZ: d.z });
   }
   return out;
-}
-
-function heldBy(cargo, playerId) {
-  for (var i = 0; i < cargo.length; i++) {
-    var c = cargo[i];
-    if (c.carriers.indexOf(playerId) >= 0 || c.pend === playerId) return c;
-  }
-  return null;
-}
-
-// F key: drop what you hold, otherwise grab the nearest free cargo within reach.
-function tryGrab(cargo, playerId, pl, tick) {
-  var held = heldBy(cargo, playerId);
-  if (held) {
-    if (held.pend === playerId) held.pend = "";
-    var idx = held.carriers.indexOf(playerId);
-    if (idx >= 0) { held.carriers = []; held.vx = 0; held.vz = 0; } // dropping breaks a shared carry: both release
-    return;
-  }
-  var best = null, bestD = GRAB_REACH;
-  for (var i = 0; i < cargo.length; i++) {
-    var c = cargo[i];
-    if (!c.active) continue;                                       // a used patch is not in the world until it respawns
-    if (c.carriers.length >= (c.heavy ? 2 : 1)) continue;
-    var dx = pl.x - c.x, dz = pl.z - c.z, d = Math.sqrt(dx * dx + dz * dz);
-    if (d <= bestD) { best = c; bestD = d; }
-  }
-  if (!best) return;
-  if (!best.heavy) { best.carriers = [playerId]; return; }
-  if (best.pend === "") { best.pend = playerId; best.pendTick = tick; }
-  else if (best.pend !== playerId) { best.carriers = [best.pend, playerId]; best.pend = ""; }
 }
 
 function slideStep(c, up) {
@@ -263,6 +234,151 @@ function cargoView(cargo) {
   }
   return out;
 }
+
+// ---- Hands: one hand = one thing (E2-03) ------------------------------------------------------------------------------------------
+// GDD 5: "une main = une chose". A player has a left hand, a right hand and ONE chest pocket (a single small item: a torch, a stamp, a sandwich),
+// no inventory beyond that. Items are described in data (ITEM_KINDS): how many hands they need and whether they fit the pocket. A two-handed
+// item (a crate, the fuel flask, later the 8 kg Manual) takes both hands and LOCKS every other action: pressing a control, holding a valve
+// wheel or arming a command of the Rule of Two Players all need a free hand (canUseHands). Using the item you hold (a patch on a leak, the
+// bucket in the water) needs no extra hand. The heavy flask is carried by two players, each with both hands.
+//
+// Protocol (input fields): take (pick the nearest item into free hands), drop (true = the last item taken, or "L" / "R" / "P" for a slot), stow
+// (a pocketable one-hand item goes hand -> pocket, or pocket -> hand). The legacy field grab stays: it drops what you hold, else takes (the old F key).
+var ITEM_KINDS = {
+  crate: { hands: 2 },
+  fuel: { hands: 2 },
+  patch: { hands: 1 },
+  bucket: { hands: 1 },
+  flashlight: { hands: 1, pocket: true }
+};
+
+function newHands() { return { l: "", r: "", p: "", order: [] }; }     // slots hold cargo ids; order = items in the order they were taken
+
+function itemKind(item) { return ITEM_KINDS[item.kind] || ITEM_KINDS.crate; }
+function cargoById(cargo, id) {
+  for (var i = 0; i < cargo.length; i++) if (cargo[i].id === id) return cargo[i];
+  return null;
+}
+function freeHandCount(h) { return (h.l === "" ? 1 : 0) + (h.r === "" ? 1 : 0); }
+function holdsTwoHanded(h) { return h.l !== "" && h.l === h.r; }
+function holdsAnything(h) { return h.l !== "" || h.r !== "" || h.p !== ""; }
+// A control may be pressed (or a valve held, or a command armed) only with a free hand and no two-handed item.
+function canUseHands(pl) { return !holdsTwoHanded(pl.hands) && freeHandCount(pl.hands) >= 1; }
+
+// The item of a given kind held in a HAND (not the pocket) by the player, or null (bucket, patch...).
+function handItem(state, playerId, kind) {
+  var h = state.players[playerId].hands;
+  var slots = [h.r, h.l];
+  for (var i = 0; i < slots.length; i++) {
+    if (slots[i] === "") continue;
+    var item = cargoById(state.cargo, slots[i]);
+    if (item && item.kind === kind && item.carriers.indexOf(playerId) >= 0) return item;
+  }
+  return null;
+}
+
+function removeFromHands(h, itemId) {
+  if (h.l === itemId) h.l = "";
+  if (h.r === itemId) h.r = "";
+  if (h.p === itemId) h.p = "";
+  var k = h.order.indexOf(itemId);
+  if (k >= 0) h.order.splice(k, 1);
+}
+
+// Pick the nearest free item within reach into free hands. A heavy item needs a second player taking it within the window (cargo.js: pend).
+function takeItem(state, id, pl, tick) {
+  var h = pl.hands, best = null, bestD = GRAB_REACH;
+  for (var i = 0; i < state.cargo.length; i++) {
+    var c = state.cargo[i];
+    if (!c.active) continue;                                        // a used patch is not in the world until it respawns
+    if (c.carriers.length >= (c.heavy ? 2 : 1)) continue;
+    if (c.carriers.indexOf(id) >= 0 || c.pend === id) continue;
+    var dx = pl.x - c.x, dz = pl.z - c.z, d = Math.sqrt(dx * dx + dz * dz);
+    if (d <= bestD) { best = c; bestD = d; }
+  }
+  if (!best) return false;
+  var need = itemKind(best).hands;
+  if (freeHandCount(h) < need) return false;
+  if (best.heavy) {
+    if (best.pend === "") { best.pend = id; best.pendTick = tick; }
+    else { best.carriers = [best.pend, id]; best.pend = ""; }
+  } else best.carriers = [id];
+  if (need === 2) { h.l = best.id; h.r = best.id; } else if (h.r === "") h.r = best.id; else h.l = best.id;
+  h.order.push(best.id);
+  return true;
+}
+
+// Let go of an item: it stays where the player stands. which: true / "" = the last item taken, "L" / "R" / "P" = a slot. Dropping a shared
+// (heavy) carry makes both carriers let go.
+function dropItem(state, id, pl, which) {
+  var h = pl.hands, itemId = "";
+  if (which === "L") itemId = h.l; else if (which === "R") itemId = h.r; else if (which === "P") itemId = h.p;
+  else if (h.order.length > 0) itemId = h.order[h.order.length - 1];
+  if (itemId === "") return false;
+  releaseItem(state, itemId);
+  return true;
+}
+
+// The item leaves everybody's hands and carriers (a dropped flask drops for both of its carriers).
+function releaseItem(state, itemId) {
+  var item = cargoById(state.cargo, itemId);
+  if (item) { item.carriers = []; item.pend = ""; item.vx = 0; item.vz = 0; }
+  for (var k = 0; k < state.order.length; k++) removeFromHands(state.players[state.order[k]].hands, itemId);
+}
+
+// hand <-> pocket for a pocketable one-hand item: the pocket holds ONE small thing.
+function stowItem(state, id, pl) {
+  var h = pl.hands;
+  if (h.p !== "") {                                                 // pocket -> a free hand
+    if (freeHandCount(h) < 1) return false;
+    var out = h.p;
+    h.p = "";
+    if (h.r === "") h.r = out; else h.l = out;
+    return true;
+  }
+  for (var i = h.order.length - 1; i >= 0; i--) {                   // hand -> pocket: the last pocketable one-hand item taken
+    var item = cargoById(state.cargo, h.order[i]);
+    if (!item || !itemKind(item).pocket || itemKind(item).hands !== 1) continue;
+    if (h.l === item.id) h.l = ""; else if (h.r === item.id) h.r = ""; else continue;
+    h.p = item.id;
+    return true;
+  }
+  return false;
+}
+
+// The legacy F key: let go of what you hold, otherwise pick up the nearest item.
+function grabToggle(state, id, pl, tick) {
+  if (holdsAnything(pl.hands)) dropItem(state, id, pl, true);
+  else takeItem(state, id, pl, tick);
+}
+
+// A player left the match: everything they held is let go.
+function releasePlayerItems(state, id) {
+  var pl = state.players[id];
+  if (!pl) return;
+  var ids = [pl.hands.l, pl.hands.r, pl.hands.p];
+  for (var i = 0; i < ids.length; i++) if (ids[i] !== "") releaseItem(state, ids[i]);
+  for (var c = 0; c < state.cargo.length; c++) if (state.cargo[c].pend === id) state.cargo[c].pend = "";
+}
+
+// Keep the slots truthful: an item that is no longer carried by that player (the second carrier did not come in time, a used patch, a carrier who
+// left) leaves their hands.
+function syncHands(state) {
+  for (var k = 0; k < state.order.length; k++) {
+    var pid = state.order[k], h = state.players[pid].hands;
+    var slots = ["l", "r", "p"];
+    for (var s = 0; s < slots.length; s++) {
+      var itemId = h[slots[s]];
+      if (itemId === "") continue;
+      var item = cargoById(state.cargo, itemId);
+      var valid = item && item.active && (item.carriers.indexOf(pid) >= 0 || item.pend === pid);
+      if (!valid) removeFromHands(h, itemId);
+    }
+  }
+}
+
+// Broadcast (and resync): what a player holds, [left, right, pocket] as cargo ids ("" = empty).
+function handsView(h) { return [h.l, h.r, h.p]; }
 
 // ---- Water by volume per compartment and the boat's trim / list (E6-01) -----------------------------------------------------
 // GDD 8: water is simulated as a VOLUME per compartment plus a centre of mass (no fluid). Six compartments in a line from the bow (+z)
@@ -424,8 +540,8 @@ function nearestLeak(L, pl) {
 // The interaction key was pressed: a player carrying a patch next to a leak applies it. Returns true when the press was a repair.
 // `aimed` (E2-02): the leak the player is looking at; it must exist and be within reach. Without it the nearest leak in reach is used.
 function tryRepair(state, id, pl, tick, aimed) {
-  var held = heldBy(state.cargo, id);
-  if (!held || held.kind !== "patch" || held.carriers.indexOf(id) < 0) return false;
+  var held = handItem(state, id, "patch");
+  if (!held) return false;
   var leak = aimed || nearestLeak(state.leaks, pl);
   if (!leak) return false;
   if (aimed) {
@@ -515,8 +631,8 @@ function bilgeStep(state) {
 // The interaction key pressed by a player carrying the bucket: scoop water out of the compartment they stand in. Returns true when the press
 // was used by the bucket (a scoop, or a scoop refused by the cooldown); false lets the press go to whatever else is in reach.
 function tryScoop(state, id, pl, tick) {
-  var held = heldBy(state.cargo, id);
-  if (!held || held.kind !== "bucket" || held.carriers.indexOf(id) < 0) return false;
+  var held = handItem(state, id, "bucket");
+  if (!held) return false;
   var comp = compartmentAt(pl.z);
   if (state.water.comps[comp].w <= 0) return false;
   var last = state.bilge.scoopTick[id];
@@ -945,6 +1061,7 @@ function nearestControl(pl) {
 
 // The interaction key is HELD (input flag `hold`, sent every tick while the key is down): only valve wheels use it.
 function tryHold(state, pl) {
+  if (!canUseHands(pl)) return;                        // E2-03: a hand must be free
   var c = nearestControl(pl);
   if (c && c.valve !== undefined) holdValve(state.reactor, c.valve);
 }
@@ -990,6 +1107,7 @@ function tryAct(state, id, pl, tick) {
   }
   var cmd = nearestCommand(pl);
   var bestStationD = cmd ? cmd.d : Infinity;
+  if (!canUseHands(pl)) return;                         // E2-03: pressing a control needs a free hand and no two-handed item
   if (bestControl && bestControlD < bestStationD) { activateControl(state, bestControl); return; }
   if (cmd) tryActivate(state.cp, id, pl, tick);
 }
@@ -1022,6 +1140,7 @@ function useTarget(state, id, pl, tick, target) {
     for (var l = 0; l < state.leaks.list.length; l++) if (state.leaks.list[l].id === n) { tryRepair(state, id, pl, tick, state.leaks.list[l]); return; }
     return;
   }
+  if (!canUseHands(pl)) return;                         // E2-03: controls and commands need a free hand; the item uses above do not
   if (target.indexOf("cc:") === 0) {
     var parts = target.split(":");
     var side = +parts[2];
@@ -1041,6 +1160,7 @@ function useTarget(state, id, pl, tick, target) {
 
 // The key is HELD on the object with id `target`: only the valve wheels use it.
 function holdTarget(state, pl, target) {
+  if (!canUseHands(pl)) return;
   var c = controlById(target);
   if (c && c.valve !== undefined && controlDistance(pl, c) <= AIM_REACH) holdValve(state.reactor, c.valve);
 }
@@ -1101,7 +1221,7 @@ function restartView(state) {
 //   3. leaks       the scheduled leak may open; every open leak pours into its compartment
 //   4. bilge       running bilge pumps take water out of their compartment
 //   5. water       flow between compartments through the open openings (trim / list follow)
-//   6. cargo       carried cargo follows its carriers, loose cargo slides on the (water-tilted) floor, used patches respawn
+//   6. cargo       carried cargo follows its carriers, loose cargo slides on the (water-tilted) floor, used patches respawn; hands re-synced
 //   7. reactor     rods, heat, steam, electricity, cooling, drift, automatic protection
 //   8. power       bus voltage from the surplus electricity, emergency battery, breakers that trip
 //   9. propulsion  the boat's speed follows the telegraph set-point x bus voltage
@@ -1119,7 +1239,10 @@ function simStep(state, tick) {
       stepPlayer(pl, next.mx, next.mz);
       if (next.act) { if (next.use) useTarget(state, state.order[k], pl, tick, next.use); else tryAct(state, state.order[k], pl, tick); }
       if (next.hold) { if (next.use) holdTarget(state, pl, next.use); else tryHold(state, pl); }
-      if (next.grab) tryGrab(state.cargo, state.order[k], pl, tick);
+      if (next.take) takeItem(state, state.order[k], pl, tick);
+      if (next.drop) dropItem(state, state.order[k], pl, next.drop);
+      if (next.stow) stowItem(state, state.order[k], pl);
+      if (next.grab) grabToggle(state, state.order[k], pl, tick);
       pl.seq = next.seq;
       pl.applied += 1;
       pl.allowance -= 1;
@@ -1130,6 +1253,7 @@ function simStep(state, tick) {
   bilgeStep(state);
   waterStep(state.water);
   updateCargo(state, tick);
+  syncHands(state);
   reactorStep(state.reactor);
   powerStep(state);
   propulsionStep(state);
@@ -1144,7 +1268,11 @@ function queueInput(p, input) {
   p.lastQueued = input.seq;
   p.queue.push({ seq: input.seq, mx: +input.mx || 0, mz: +input.mz || 0, act: input.act === true || input.act === 1,
                  grab: input.grab === true || input.grab === 1, hold: input.hold === true || input.hold === 1,
-                 use: typeof input.use === "string" && input.use.length <= 40 ? input.use : "" });
+                 use: typeof input.use === "string" && input.use.length <= 40 ? input.use : "",
+                 take: input.take === true || input.take === 1 || input.hand === "take", stow: input.stow === true || input.stow === 1 || input.hand === "stow",
+                 drop: input.drop === "L" || input.drop === "R" || input.drop === "P" ? input.drop
+                   : ((input.drop === true || input.drop === 1 || input.hand === "drop") ? "last"
+                   : (typeof input.hand === "string" && input.hand.length === 6 && input.hand.indexOf("drop:") === 0 && "LRP".indexOf(input.hand.charAt(5)) >= 0 ? input.hand.charAt(5) : "")) });
   while (p.queue.length > MAX_QUEUED_INPUTS) p.queue.shift();
   return true;
 }
@@ -1198,7 +1326,7 @@ var matchJoin = function (ctx, logger, nk, dispatcher, tick, state, presences) {
     var id = presences[i].userId;
     if (!state.players[id]) {
       var slot = state.order.length;
-      state.players[id] = { x: -1.5 + slot, z: 0, seq: 0, lastQueued: 0, allowance: 0, applied: 0, queue: [], presence: presences[i] };
+      state.players[id] = { x: -1.5 + slot, z: 0, seq: 0, lastQueued: 0, allowance: 0, applied: 0, queue: [], hands: newHands(), presence: presences[i] };
       state.order.push(id);
     }
   }
@@ -1210,8 +1338,7 @@ var matchLeave = function (ctx, logger, nk, dispatcher, tick, state, presences) 
     var id = presences[i].userId;
     delete state.players[id];
     releaseCoupled(state.cp, id);
-    var heldCargo = heldBy(state.cargo, id);
-    if (heldCargo) { if (heldCargo.pend === id) heldCargo.pend = ""; heldCargo.carriers = []; heldCargo.vx = 0; heldCargo.vz = 0; }
+    releasePlayerItems(state, id);
     var idx = state.order.indexOf(id);
     if (idx >= 0) state.order.splice(idx, 1);
   }
@@ -1237,7 +1364,7 @@ var matchLoop = function (ctx, logger, nk, dispatcher, tick, state, messages) {
   var out = [];
   for (var j = 0; j < state.order.length; j++) {
     var id = state.order[j], q = state.players[id];
-    out.push({ id: id, x: q.x, z: q.z, seq: q.seq });
+    out.push({ id: id, x: q.x, z: q.z, seq: q.seq, hd: handsView(q.hands) });
   }
   dispatcher.broadcastMessage(OP_STATE, JSON.stringify({ tick: tick, t: tick * DT, players: out, il: coupledView(state.cp, tick)[0], cp: coupledView(state.cp, tick), cargo: cargoView(state.cargo), rx: reactorView(state.reactor), sc: leverView(state.lever, state.reactor), rs: restartView(state), bw: waterView(state.water), lk: leaksView(state.leaks), bp: bilgeView(state.bilge), pw: powerView(state), pr: propulsionView(state.prop), boat: boatView(state.boat) }), null, null, true);
   return { state: state };
@@ -1305,6 +1432,7 @@ if (typeof module !== "undefined" && module.exports) {
     WATER_COMPARTMENTS: WATER_COMPARTMENTS, WATER_FLOW: WATER_FLOW, MAX_TRIM_DEG: MAX_TRIM_DEG, MAX_LIST_DEG: MAX_LIST_DEG, newWater: newWater, waterAdd: waterAdd,
     waterRemove: waterRemove, waterSetDoor: waterSetDoor, waterStep: waterStep, waterTotal: waterTotal, waterTilt: waterTilt, waterView: waterView, waterLevel: waterLevel, compartmentAt: compartmentAt,
     newCoupled: newCoupled, COUPLED_ACTIONS: COUPLED_ACTIONS, COUPLED_EFFECTS: COUPLED_EFFECTS, COUPLED_GRACE_TICKS: COUPLED_GRACE_TICKS,
+    ITEM_KINDS: ITEM_KINDS, newHands: newHands, takeItem: takeItem, dropItem: dropItem, stowItem: stowItem, canUseHands: canUseHands, handsView: handsView,
     AIM_REACH: AIM_REACH, interactableIds: interactableIds,
     CONTROLS: CONTROLS, REGIME_ORDER: REGIME_ORDER, tryAct: tryAct,
     reactorNoise: reactorNoise, REACTOR_K: REACTOR_K, newReactor: newReactor, reactorStep: reactorStep, reactorView: reactorView, reactorScram: reactorScram,

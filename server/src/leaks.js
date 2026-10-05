@@ -45,8 +45,8 @@ function nearestLeak(L, pl) {
 // The interaction key was pressed: a player carrying a patch next to a leak applies it. Returns true when the press was a repair.
 // `aimed` (E2-02): the leak the player is looking at; it must exist and be within reach. Without it the nearest leak in reach is used.
 function tryRepair(state, id, pl, tick, aimed) {
-  var held = heldBy(state.cargo, id);
-  if (!held || held.kind !== "patch" || held.carriers.indexOf(id) < 0) return false;
+  var held = handItem(state, id, "patch");
+  if (!held) return false;
   var leak = aimed || nearestLeak(state.leaks, pl);
   if (!leak) return false;
   if (aimed) {

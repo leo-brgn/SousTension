@@ -14,6 +14,7 @@ namespace SousTension.Spikes.MovingFrame.Tests
 
     internal sealed class FakeUse : IUseInput { public bool UseHeld { get; set; } }
     internal sealed class FakeAim : IAimSource { public string TargetId { get; set; } }
+    internal sealed class FakeHands : IHandsInput { public bool TakeHeld { get; set; } public bool DropHeld { get; set; } public bool StowHeld { get; set; } }
 
     internal sealed class ConstantInput : IInputSource
     {
@@ -28,11 +29,11 @@ namespace SousTension.Spikes.MovingFrame.Tests
         public long BytesSent { get; private set; }
         public long BytesReceived { get; private set; }
         public event Action<StateSnapshot> StateReceived;
-        public readonly List<(int seq, float mx, float mz, bool act, bool grab, bool hold, string use)> Sent = new List<(int, float, float, bool, bool, bool, string)>();
+        public readonly List<(int seq, float mx, float mz, bool act, bool grab, bool hold, string use, string hand)> Sent = new List<(int, float, float, bool, bool, bool, string, string)>();
         private readonly Queue<StateSnapshot> _incoming = new Queue<StateSnapshot>();
 
         public Task ConnectAsync(CancellationToken ct) => Task.CompletedTask;
-        public void SendInput(int seq, float moveX, float moveZ, bool act, bool grab, bool hold = false, string use = null) { Sent.Add((seq, moveX, moveZ, act, grab, hold, use)); BytesSent += 24; }
+        public void SendInput(int seq, float moveX, float moveZ, bool act, bool grab, bool hold = false, string use = null, string hand = null) { Sent.Add((seq, moveX, moveZ, act, grab, hold, use, hand)); BytesSent += 24; }
         public void Enqueue(StateSnapshot s) => _incoming.Enqueue(s);
         public void Poll() { while (_incoming.Count > 0) StateReceived?.Invoke(_incoming.Dequeue()); }
         public void Dispose() { }
@@ -451,6 +452,46 @@ namespace SousTension.Spikes.MovingFrame.Tests
             Assert.GreaterOrEqual(net.Sent.Count, 3);
             foreach (var sent in net.Sent) { Assert.IsNull(sent.use); Assert.IsTrue(sent.hold); }
             Assert.AreEqual(1, net.Sent.FindAll(x => x.act).Count);
+        }
+
+        // ---- Hands (E2-03) ----
+        [Test]
+        public void HandKeys_SendOneCommandOnThePress_DropBeforeStowBeforeTake()
+        {
+            var net = new FakeNetwork(); var clock = new FakeClock(); var model = new MovingFrameModel(); var hands = new FakeHands();
+            var c = new MovingFrameController(net, new ConstantInput(), clock, model, null, null, hands);
+            net.Enqueue(new StateSnapshot(1, 0.1, new[] { new PlayerState("me", 0, 0, 0) }));
+            c.Tick(0); net.Sent.Clear();
+            hands.TakeHeld = true;
+            c.Tick(0.3f);
+            Assert.AreEqual("take", net.Sent[0].hand);
+            for (int i = 1; i < net.Sent.Count; i++) Assert.IsNull(net.Sent[i].hand, "a held key sends the command once");
+            net.Sent.Clear();
+            hands.TakeHeld = false; hands.DropHeld = true; hands.StowHeld = true;
+            c.Tick(0.1f);
+            Assert.AreEqual("drop", net.Sent[0].hand, "drop wins over stow");
+            net.Sent.Clear();
+            hands.DropHeld = false;
+            c.Tick(0.1f);
+            Assert.IsNull(net.Sent[0].hand, "stow was already held");
+            net.Sent.Clear();
+            hands.StowHeld = false; c.Tick(0.1f); net.Sent.Clear();
+            hands.StowHeld = true; c.Tick(0.1f);
+            Assert.AreEqual("stow", net.Sent[0].hand);
+        }
+
+        [Test]
+        public void Snapshot_CarriesWhatEachPlayerHolds_AndUnknownPlayersHoldNothing()
+        {
+            var net = new FakeNetwork(); var clock = new FakeClock(); var model = new MovingFrameModel();
+            var c = new MovingFrameController(net, new ConstantInput(), clock, model);
+            net.Enqueue(new StateSnapshot(1, 0.1, new[] { new PlayerState("me", 0, 0, 0, new[] { "patch1", "", "flashlight" }), new PlayerState("pal", 1, 1, 0, new[] { "crate1", "crate1", "" }) }));
+            c.Tick(0);
+            model.LocalId = "me";
+            CollectionAssert.AreEqual(new[] { "patch1", "", "flashlight" }, model.HandsOf("me"));
+            CollectionAssert.AreEqual(new[] { "crate1", "crate1", "" }, model.HandsOf("pal"));
+            CollectionAssert.AreEqual(new[] { "", "", "" }, model.HandsOf("nobody"));
+            CollectionAssert.AreEqual(new[] { "", "", "" }, new PlayerState("x", 0, 0, 0).Hands);
         }
 
         [Test]

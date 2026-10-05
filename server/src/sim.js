@@ -12,7 +12,7 @@
 //   3. leaks       the scheduled leak may open; every open leak pours into its compartment
 //   4. bilge       running bilge pumps take water out of their compartment
 //   5. water       flow between compartments through the open openings (trim / list follow)
-//   6. cargo       carried cargo follows its carriers, loose cargo slides on the (water-tilted) floor, used patches respawn
+//   6. cargo       carried cargo follows its carriers, loose cargo slides on the (water-tilted) floor, used patches respawn; hands re-synced
 //   7. reactor     rods, heat, steam, electricity, cooling, drift, automatic protection
 //   8. power       bus voltage from the surplus electricity, emergency battery, breakers that trip
 //   9. propulsion  the boat's speed follows the telegraph set-point x bus voltage
@@ -30,7 +30,10 @@ function simStep(state, tick) {
       stepPlayer(pl, next.mx, next.mz);
       if (next.act) { if (next.use) useTarget(state, state.order[k], pl, tick, next.use); else tryAct(state, state.order[k], pl, tick); }
       if (next.hold) { if (next.use) holdTarget(state, pl, next.use); else tryHold(state, pl); }
-      if (next.grab) tryGrab(state.cargo, state.order[k], pl, tick);
+      if (next.take) takeItem(state, state.order[k], pl, tick);
+      if (next.drop) dropItem(state, state.order[k], pl, next.drop);
+      if (next.stow) stowItem(state, state.order[k], pl);
+      if (next.grab) grabToggle(state, state.order[k], pl, tick);
       pl.seq = next.seq;
       pl.applied += 1;
       pl.allowance -= 1;
@@ -41,6 +44,7 @@ function simStep(state, tick) {
   bilgeStep(state);
   waterStep(state.water);
   updateCargo(state, tick);
+  syncHands(state);
   reactorStep(state.reactor);
   powerStep(state);
   propulsionStep(state);
@@ -55,7 +59,11 @@ function queueInput(p, input) {
   p.lastQueued = input.seq;
   p.queue.push({ seq: input.seq, mx: +input.mx || 0, mz: +input.mz || 0, act: input.act === true || input.act === 1,
                  grab: input.grab === true || input.grab === 1, hold: input.hold === true || input.hold === 1,
-                 use: typeof input.use === "string" && input.use.length <= 40 ? input.use : "" });
+                 use: typeof input.use === "string" && input.use.length <= 40 ? input.use : "",
+                 take: input.take === true || input.take === 1 || input.hand === "take", stow: input.stow === true || input.stow === 1 || input.hand === "stow",
+                 drop: input.drop === "L" || input.drop === "R" || input.drop === "P" ? input.drop
+                   : ((input.drop === true || input.drop === 1 || input.hand === "drop") ? "last"
+                   : (typeof input.hand === "string" && input.hand.length === 6 && input.hand.indexOf("drop:") === 0 && "LRP".indexOf(input.hand.charAt(5)) >= 0 ? input.hand.charAt(5) : "")) });
   while (p.queue.length > MAX_QUEUED_INPUTS) p.queue.shift();
   return true;
 }

@@ -6,10 +6,11 @@ namespace SousTension.Spikes.MovingFrame
         public readonly string Id;
         public readonly float X, Z;
         public readonly int Seq; // last input sequence the server has processed for this player
+        public readonly string[] Hands; // what the player holds (E2-03): cargo ids of [left hand, right hand, pocket], "" = empty
 
-        public PlayerState(string id, float x, float z, int seq)
+        public PlayerState(string id, float x, float z, int seq, string[] hands = null)
         {
-            Id = id; X = x; Z = z; Seq = seq;
+            Id = id; X = x; Z = z; Seq = seq; Hands = hands ?? new[] { "", "", "" };
         }
     }
 
