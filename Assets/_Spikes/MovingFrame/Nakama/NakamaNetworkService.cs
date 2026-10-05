@@ -23,7 +23,9 @@ namespace SousTension.Spikes.MovingFrame
         [Serializable] private class InterlockDto { public int a; public int b; public string ab; public string bb; public string result; public int rt; public int n; }
         [Serializable] private class CargoDto { public string id; public float x; public float z; public int h; public string[] c; public string p; }
         [Serializable] private class ReactorDto { public string reg; public float R; public float nz; public float P; public float T; public float S; public float E; public float eta; public float F; public float[] v; public int[] pu; public int scram; public int auto; public int leak; public int warn; public int crit; }
-        [Serializable] private class StateDto { public int tick; public double t; public PlayerDto[] players; public InterlockDto il; public CargoDto[] cargo; public ReactorDto rx; }
+        [Serializable] private class LeverDto { public int cv; public int pl; }
+        [Serializable] private class BoatDto { public float d; public float vz; }
+        [Serializable] private class StateDto { public int tick; public double t; public PlayerDto[] players; public InterlockDto il; public CargoDto[] cargo; public ReactorDto rx; public LeverDto sc; public BoatDto boat; }
         [Serializable] private class MatchDto { public string matchId; }
 
         private readonly string _scheme, _host, _serverKey, _deviceId;
@@ -101,7 +103,9 @@ namespace SousTension.Spikes.MovingFrame
                     new[] { x.pu != null && x.pu.Length > 0 && x.pu[0] == 1, x.pu != null && x.pu.Length > 1 && x.pu[1] == 1 },
                     x.scram == 1, x.auto == 1, x.leak == 1, x.warn == 1, x.crit == 1);
             }
-            _queue.Enqueue(new StateSnapshot(dto.tick, dto.t, players, il, cargo, reactor));
+            var lever = dto.sc != null ? new ScramLeverState(dto.sc.cv == 1, dto.sc.pl == 1) : default;
+            var boat = dto.boat != null ? new BoatDepthState(dto.boat.d, dto.boat.vz) : default;
+            _queue.Enqueue(new StateSnapshot(dto.tick, dto.t, players, il, cargo, reactor, lever, boat));
         }
 
         public void Poll()

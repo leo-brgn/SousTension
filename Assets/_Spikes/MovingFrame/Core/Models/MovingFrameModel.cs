@@ -97,6 +97,12 @@ namespace SousTension.Spikes.MovingFrame
         public ReactorState Reactor { get; private set; }
         public void SetReactor(ReactorState state) { if (state.Valid) Reactor = state; }
 
+        /// <summary>Latest SCRAM lever (cover/pulled) and boat depth, authoritative (E3-04). Missing data keeps the last known values.</summary>
+        public ScramLeverState Lever { get; private set; }
+        public BoatDepthState Boat { get; private set; }
+        public void SetLever(ScramLeverState state) { if (state.Valid) Lever = state; }
+        public void SetBoat(BoatDepthState state) { if (state.Valid) Boat = state; }
+
         public void SetLocal(float x, float z) { LocalX = x; LocalZ = z; }
 
         public void ApplyServerState(StateSnapshot snapshot, double localNow)

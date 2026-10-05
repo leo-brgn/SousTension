@@ -341,3 +341,108 @@ test("interaction key goes to the nearest interactable: the interlock keeps work
   assert.strictEqual(il.ab, "a");
   assert.strictEqual(regimeOf(c), "veille");
 });
+
+// ---- SCRAM lever (E3-04): sealed cover, two presses, one player, and the boat sinks afterwards ----
+const LEVER_POS = { x: -2.5, z: -2.7 };
+function lastView(c) { return c.d.sent[c.d.sent.length - 1].data; }
+
+test("scram lever: the first press only lifts the cover, the second one pulls the lever (single player, no vote)", () => {
+  const c = lockSetup(["a"]);
+  place(c, "a", LEVER_POS.x + 0.5, LEVER_POS.z);
+  tickWith(c, [inputAct(c, "a", true)]);
+  assert.deepStrictEqual(lastView(c).sc, { cv: 1, pl: 0 });
+  assert.strictEqual(lastView(c).rx.scram, 0);
+  tickWith(c, [inputAct(c, "a", true)]);
+  assert.deepStrictEqual(lastView(c).sc, { cv: 1, pl: 1 });
+  assert.strictEqual(lastView(c).rx.scram, 1);
+});
+
+test("scram lever: all the electricity is lost on the very tick of the pull", () => {
+  const c = lockSetup(["a"]);
+  assert.ok(lastViewAfter(c).rx.E > 0, "the plant produces electricity before the SCRAM");
+  place(c, "a", LEVER_POS.x + 0.5, LEVER_POS.z);
+  tickWith(c, [inputAct(c, "a", true)]);
+  tickWith(c, [inputAct(c, "a", true)]);
+  assert.strictEqual(lastView(c).rx.E, 0);
+});
+function lastViewAfter(c) { tickWith(c, []); return lastView(c); }
+
+test("scram lever: the cover falls shut after 6 s, so the next press only lifts it again", () => {
+  const c = lockSetup(["a"]);
+  place(c, "a", LEVER_POS.x + 0.5, LEVER_POS.z);
+  tickWith(c, [inputAct(c, "a", true)]);                                    // cover open
+  for (let i = 0; i < m.LEVER_COVER_TICKS; i++) tickWith(c, []);
+  assert.deepStrictEqual(lastView(c).sc, { cv: 0, pl: 0 });
+  tickWith(c, [inputAct(c, "a", true)]);                                    // lifts the cover again, no SCRAM
+  assert.strictEqual(lastView(c).rx.scram, 0);
+  assert.strictEqual(lastView(c).sc.cv, 1);
+});
+
+test("scram lever: out of reach (1.5 m) nothing happens", () => {
+  const c = lockSetup(["a"]);
+  place(c, "a", LEVER_POS.x + 1.6, LEVER_POS.z);
+  tickWith(c, [inputAct(c, "a", true)]);
+  tickWith(c, [inputAct(c, "a", true)]);
+  assert.deepStrictEqual(lastView(c).sc, { cv: 0, pl: 0 });
+});
+
+test("scram lever: pulling again once SCRAMmed does nothing, and a restart closes the cover again", () => {
+  const c = lockSetup(["a"]);
+  place(c, "a", LEVER_POS.x + 0.5, LEVER_POS.z);
+  tickWith(c, [inputAct(c, "a", true)]);
+  tickWith(c, [inputAct(c, "a", true)]);
+  for (let i = 0; i < 5; i++) tickWith(c, [inputAct(c, "a", true)]);       // presses are ignored
+  assert.deepStrictEqual(lastView(c).sc, { cv: 1, pl: 1 });
+  m.reactorRestart(c.state.reactor);
+  tickWith(c, []);
+  assert.deepStrictEqual(lastView(c).sc, { cv: 0, pl: 0 });
+});
+
+test("scram lever: the nearest control wins, so the selector is not turned from the lever", () => {
+  const c = lockSetup(["a"]);
+  place(c, "a", LEVER_POS.x, LEVER_POS.z + 0.4);                            // 0.4 m from the lever, 0.6 m from the selector
+  tickWith(c, [inputAct(c, "a", true)]);
+  assert.strictEqual(lastView(c).sc.cv, 1);
+  assert.strictEqual(c.state.reactor.regime, "veille");
+});
+
+test("scram lever: the broadcast always carries the lever and boat state (reconnection resync)", () => {
+  const c = lockSetup(["a"]);
+  tickWith(c, []);
+  assert.deepStrictEqual(lastView(c).sc, { cv: 0, pl: 0 });
+  assert.deepStrictEqual(lastView(c).boat, { d: 0, vz: 0 });
+});
+
+test("boat: stays level while the reactor runs, then sinks after a SCRAM with a ramped, bounded descent", () => {
+  const c = lockSetup(["a"]);
+  for (let i = 0; i < 100; i++) tickWith(c, []);
+  assert.strictEqual(c.state.boat.depth, 0);
+  m.reactorScram(c.state.reactor);
+  const rampTicks = m.SINK_RAMP_SECONDS * m.TICK_RATE;
+  for (let i = 0; i < rampTicks; i++) tickWith(c, []);
+  assert.ok(Math.abs(c.state.boat.vz - m.SINK_RATE_MAX) < 1e-9, "full descent speed after the ramp");
+  assert.ok(Math.abs(c.state.boat.depth - 0.5 * m.SINK_RATE_MAX * m.SINK_RAMP_SECONDS) < 0.15, "~2 m after the ramp, got " + c.state.boat.depth);
+  for (let i = 0; i < 100; i++) tickWith(c, []);                            // 10 s more at full speed
+  assert.ok(Math.abs(c.state.boat.depth - (0.5 * m.SINK_RATE_MAX * m.SINK_RAMP_SECONDS + 10 * m.SINK_RATE_MAX)) < 0.15);
+  assert.ok(c.state.boat.vz <= m.SINK_RATE_MAX + 1e-9, "never faster than the cap");
+});
+
+test("boat: the automatic protection SCRAM sinks it too, and a restart eases the descent back to zero (it does not rise)", () => {
+  const c = lockSetup(["a"]);
+  c.state.reactor.autoScram = true; m.reactorScram(c.state.reactor);
+  for (let i = 0; i < 300; i++) tickWith(c, []);
+  const depth = c.state.boat.depth;
+  assert.ok(depth > 2);
+  m.reactorRestart(c.state.reactor);
+  for (let i = 0; i < 300; i++) tickWith(c, []);
+  assert.strictEqual(c.state.boat.vz, 0);
+  assert.ok(c.state.boat.depth > depth, "keeps the depth reached while slowing down, never rises");
+  const settled = c.state.boat.depth;
+  for (let i = 0; i < 50; i++) tickWith(c, []);
+  assert.strictEqual(c.state.boat.depth, settled);
+});
+
+test("boat: the descent is deterministic (same inputs, same depth)", () => {
+  const run = () => { const c = lockSetup(["a"]); m.reactorScram(c.state.reactor); for (let i = 0; i < 250; i++) tickWith(c, []); return c.state.boat.depth; };
+  assert.strictEqual(run(), run());
+});

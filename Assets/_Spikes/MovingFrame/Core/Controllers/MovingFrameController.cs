@@ -63,6 +63,8 @@ namespace SousTension.Spikes.MovingFrame
             _model.SetInterlock(snapshot.Interlock);
             _model.ApplyCargo(snapshot.Cargo, snapshot.ServerTime);
             _model.SetReactor(snapshot.Reactor);
+            _model.SetLever(snapshot.Lever);
+            _model.SetBoat(snapshot.Boat);
 
             foreach (var p in snapshot.Players)
             {

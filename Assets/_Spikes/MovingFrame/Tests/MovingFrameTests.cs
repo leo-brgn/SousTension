@@ -195,6 +195,29 @@ namespace SousTension.Spikes.MovingFrame.Tests
         }
 
         [Test]
+        public void Snapshot_StoresScramLeverAndBoatDepth_AndKeepsLastValuesWhenMissing()
+        {
+            var net = new FakeNetwork(); var clock = new FakeClock(); var model = new MovingFrameModel();
+            var c = new MovingFrameController(net, new ConstantInput(), clock, model);
+            Assert.IsFalse(model.Lever.Valid); Assert.IsFalse(model.Boat.Valid);
+            net.Enqueue(new StateSnapshot(1, 0.1, new[] { new PlayerState("me", 0, 0, 0) }, default, null, default,
+                new ScramLeverState(true, false), new BoatDepthState(0f, 0f)));
+            c.Tick(0);
+            Assert.IsTrue(model.Lever.CoverOpen); Assert.IsFalse(model.Lever.Pulled);
+            net.Enqueue(new StateSnapshot(2, 0.2, new[] { new PlayerState("me", 0, 0, 0) }, default, null, default,
+                new ScramLeverState(true, true), new BoatDepthState(2.5f, 0.2f)));
+            c.Tick(0);
+            Assert.IsTrue(model.Lever.Pulled);
+            Assert.AreEqual(2.5f, model.Boat.Depth, 1e-5f);
+            Assert.AreEqual(0.2f, model.Boat.DescentRate, 1e-5f);
+            // an older server (no lever/boat data) must not wipe what is already known
+            net.Enqueue(new StateSnapshot(3, 0.3, new[] { new PlayerState("me", 0, 0, 0) }));
+            c.Tick(0);
+            Assert.IsTrue(model.Lever.Pulled);
+            Assert.AreEqual(2.5f, model.Boat.Depth, 1e-5f);
+        }
+
+        [Test]
         public void Snapshot_StoresAuthoritativeInterlockState_WithoutPredicting()
         {
             var net = new FakeNetwork(); var clock = new FakeClock(); var model = new MovingFrameModel();

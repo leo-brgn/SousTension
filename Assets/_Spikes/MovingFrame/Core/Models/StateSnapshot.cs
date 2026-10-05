@@ -65,6 +65,24 @@ namespace SousTension.Spikes.MovingFrame
         }
     }
 
+    /// <summary>SCRAM lever under its sealed cover (E3-04), as decided by the server. Pulled = the reactor SCRAM latch.</summary>
+    public readonly struct ScramLeverState
+    {
+        public readonly bool Valid;
+        public readonly bool CoverOpen;      // lifted (stays open while the lever is down)
+        public readonly bool Pulled;
+        public ScramLeverState(bool coverOpen, bool pulled) { Valid = true; CoverOpen = coverOpen; Pulled = pulled; }
+    }
+
+    /// <summary>Authoritative boat depth below patrol depth (E3-04): grows after a SCRAM. Display only.</summary>
+    public readonly struct BoatDepthState
+    {
+        public readonly bool Valid;
+        public readonly float Depth;         // m
+        public readonly float DescentRate;   // m/s
+        public BoatDepthState(float depth, float descentRate) { Valid = true; Depth = depth; DescentRate = descentRate; }
+    }
+
     /// <summary>One authoritative broadcast from the match (10 Hz).</summary>
     public sealed class StateSnapshot
     {
@@ -74,9 +92,13 @@ namespace SousTension.Spikes.MovingFrame
         public readonly InterlockState Interlock;
         public readonly CargoState[] Cargo;
         public readonly ReactorState Reactor;
+        public readonly ScramLeverState Lever;
+        public readonly BoatDepthState Boat;
 
-        public StateSnapshot(int tick, double serverTime, PlayerState[] players, InterlockState interlock = default, CargoState[] cargo = null, ReactorState reactor = default)
+        public StateSnapshot(int tick, double serverTime, PlayerState[] players, InterlockState interlock = default, CargoState[] cargo = null, ReactorState reactor = default,
+            ScramLeverState lever = default, BoatDepthState boat = default)
         {
+            Lever = lever; Boat = boat;
             Tick = tick; ServerTime = serverTime; Players = players; Interlock = interlock; Cargo = cargo ?? new CargoState[0]; Reactor = reactor;
         }
     }
