@@ -1,6 +1,6 @@
 # BACKLOG — SOUS PRESSION / DERNIÈRE PATROUILLE
 
-Source : `GDD_Sous_Pression.md` (v0.3) + `moodboard/`. Dernière mise à jour : 2026-10-04.
+Source : `GDD_Sous_Pression.md` (v0.3) + `moodboard/`. Dernière mise à jour : 2026-10-05 (cases cochées = issues fermées sur GitHub).
 
 ## Légende
 
@@ -27,7 +27,7 @@ Source : `GDD_Sous_Pression.md` (v0.3) + `moodboard/`. Dernière mise à jour : 
 Ces points bloquent ou déforment le backlog. Chaque case = une décision à prendre et à reporter dans le GDD.
 
 - [ ] **D-01 Titre du jeu** : « Sous Pression », « Dernière Patrouille » ou « Sous Tension » (nom du repo) ? Bloque page Steam, logo, typo.
-- [ ] **D-02 Moteur Unity vs Unreal** — conditionné au spike E1-01 (référentiel mobile + netcode). Bloque presque tout le code.
+- [x] **D-02 Moteur Unity vs Unreal** — conditionné au spike E1-01 (référentiel mobile + netcode). Bloque presque tout le code.
 - [ ] **D-03 Équipe** (GDD 1.1 « TODO ») : combien de devs / artistes 3D / sound designers ? Les estimations (~405 j-artiste) en dépendent.
 - [ ] **D-04 Acte IV « Le Jumeau »** (proposition, §2.6) : retenu ou non ? Impacte le périmètre 1.0 (« actes I-III » en §10.2), les assets (sous-marin jumeau, torpille) et la fin.
 - [ ] **D-05 Graffitis multilingues** (§2.2) : oui/non selon budget de localisation.
@@ -49,14 +49,14 @@ Ces points bloquent ou déforment le backlog. Chaque case = une décision à pre
 Objectif : lever le risque n°1 (référentiel mobile + réseau) avant d'investir.
 
 - [ ] **E1-01 🧪 Spike « joueurs dans un référentiel mobile »** — 4 joueurs marchent dans un volume en mouvement/inclinaison, en ligne, sur Unity ET Unreal (ou comparatif ciblé). Sortie : recommandation moteur (D-02). `L` — semaine 1.
-- [ ] **E1-02 🧰 Setup projet** : moteur choisi, structure du repo, `.gitignore`, LFS, conventions de nommage/dossiers, CI de build Windows. `M` · dép. E1-01
+- [x] **E1-02 🧰 Setup projet** : moteur choisi, structure du repo, `.gitignore`, LFS, conventions de nommage/dossiers, CI de build Windows. `M` · dép. E1-01
 - [ ] **E1-03 🧰 Pipeline d'assets** : import, naming, LODs, matériaux de base, prefab/blueprint types « interactif 🔧 » et « transportable 📦 ». `M`
 - [ ] **E1-04 ⚙️ Architecture réseau** : host-client, autorité serveur sur bateau/eau/réacteur, prédiction locale des joueurs, tick fixe. `XL` → découper en E1-04a lobby/session, E1-04b réplication d'état, E1-04c prédiction. · dép. E1-01
 - [ ] **E1-05 ⚙️ Intégration Steam** : Steamworks, invitations par code 6 caractères (registre de bord), lobby, succès, cloud saves. `L` · dép. E1-04
-- [ ] **E1-06 ⚙️ Boucle de simulation à pas fixe 10 Hz, déterministe** (squelette commun réacteur/eau). `M`
+- [x] **E1-06 ⚙️ Boucle de simulation à pas fixe 10 Hz, déterministe** (squelette commun réacteur/eau). `M`
 - [ ] **E1-07 ⚙️ Reconnexion en cours de partie** (obligatoire 1.0) : resynchronisation complète de l'état. `L` · dép. E1-04 · jalon `BETA` (prototyper tôt)
 - [ ] **E1-08 ⚙️ Sauvegarde / persistance** : état du bateau (dégâts persistants), progression matérielle, Notes de Patrouille, succès. `L` · jalon `ALPHA`
-- [ ] **E1-09 🧰 Outils de debug** : console, tweak des paramètres de simulation, téléport, forcer pannes, overlay réseau. `M`
+- [x] **E1-09 🧰 Outils de debug** : console, tweak des paramètres de simulation, téléport, forcer pannes, overlay réseau. `M`
 - [ ] **E1-10 🧰 Télémétrie de playtest** (causes d'échec, temps par procédure, usage du Manuel). `M` · `VS`
 
 ---
@@ -64,9 +64,9 @@ Objectif : lever le risque n°1 (référentiel mobile + réseau) avant d'investi
 # EPIC 2 — Joueur, interaction & contrôles (PROTO → VS)
 
 - [ ] **E2-01 ⚙️ Contrôleur première personne** marchant sur plateformes mobiles/inclinées (dép. E1-01). `L`
-- [ ] **E2-02 ⚙️ Système d'interaction** : clic gauche (tenir pour manivelle ; geste circulaire pour vannes), clic droit examiner/lire. `L`
-- [ ] **E2-03 ⚙️ « Une main = une chose »** : deux mains, poche de poitrine (1 petit objet), objets à deux mains qui verrouillent les autres actions. `L`
-- [ ] **E2-04 ⚙️ Prendre/poser objets physiques 📦** (masse, lancers, collisions réseau). `L`
+- [x] **E2-02 ⚙️ Système d'interaction** : clic gauche (tenir pour manivelle ; geste circulaire pour vannes), clic droit examiner/lire. `L`
+- [x] **E2-03 ⚙️ « Une main = une chose »** : deux mains, poche de poitrine (1 petit objet), objets à deux mains qui verrouillent les autres actions. `L`
+- [x] **E2-04 ⚙️ Prendre/poser objets physiques 📦** (masse, lancers, collisions réseau). `L`
 - [ ] **E2-05 ⚙️ Course (bruit ●●●) et chuchotement (V maintenu)** liés au système de bruit (E8-01). `S`
 - [ ] **E2-06 ⚙️ Support manette** + remap clavier complet. `M` · `ALPHA`
 - [ ] **E2-07 ⚙️ Roue d'émotes sonores et gestuelles** (100 % jouable sans micro). `M` · `VS`
@@ -78,14 +78,14 @@ Objectif : lever le risque n°1 (référentiel mobile + réseau) avant d'investi
 
 # EPIC 3 — Réacteur RK-1 « Petit Soleil » (cœur, PROTO)
 
-- [ ] **E3-01 ✍️ Arbre de décision des dépendances** réacteur → vapeur → électricité → systèmes (livrable demandé §1.4). Chaque lien doit être lisible, jamais arbitraire ; délais (vapeur ~90 s, électricité ~3 min). `M` · PROTO (D-09)
-- [ ] **E3-02 ⚙️ Modèle de simulation** : barres de contrôle → chaleur → vapeur → turbine → électricité + propulsion ; circuit de refroidissement alimenté par l'électricité produite (« boucle diabolique »). Équations simples à tick 10 Hz. `L` · dép. E1-06, E3-01
-- [ ] **E3-03 ⚙️ Trois régimes** Veille / Croisière / Pleine puissance (sélecteur) : production, bruit ○/●●/●●●●, risque (surchauffe ≈ 4 min en pleine puissance sans surveillance). `M`
-- [ ] **E3-04 ⚙️ SCRAM** : levier sous capot plombé, accessible seul, sans vote ; coupe toute l'électricité (noir, silence, pompes arrêtées, bateau qui coule doucement). `M` · PROTO
-- [ ] **E3-05 ⚙️ Redémarrage du réacteur** : procédure à deux joueurs, 90 s, à la lampe torche (utilise E4). `M` · dép. E4-02
-- [ ] **E3-06 ⚙️ Pompes primaire ×2, vannes principales ×4** : états marche/arrêt/cassé. `M` · PROTO
-- [ ] **E3-07 ⚙️ Réseau électrique** : tableau principal (~20 disjoncteurs à réarmer), batteries de secours, consommateurs (pompes, air, lumières, sonar, cafetière, samovar). `L`
-- [ ] **E3-08 ⚙️ Propulsion** liée à la turbine/régime, télégraphe machine (5 positions). `M`
+- [x] **E3-01 ✍️ Arbre de décision des dépendances** réacteur → vapeur → électricité → systèmes (livrable demandé §1.4). Chaque lien doit être lisible, jamais arbitraire ; délais (vapeur ~90 s, électricité ~3 min). `M` · PROTO (D-09)
+- [x] **E3-02 ⚙️ Modèle de simulation** : barres de contrôle → chaleur → vapeur → turbine → électricité + propulsion ; circuit de refroidissement alimenté par l'électricité produite (« boucle diabolique »). Équations simples à tick 10 Hz. `L` · dép. E1-06, E3-01
+- [x] **E3-03 ⚙️ Trois régimes** Veille / Croisière / Pleine puissance (sélecteur) : production, bruit ○/●●/●●●●, risque (surchauffe ≈ 4 min en pleine puissance sans surveillance). `M`
+- [x] **E3-04 ⚙️ SCRAM** : levier sous capot plombé, accessible seul, sans vote ; coupe toute l'électricité (noir, silence, pompes arrêtées, bateau qui coule doucement). `M` · PROTO
+- [x] **E3-05 ⚙️ Redémarrage du réacteur** : procédure à deux joueurs, 90 s, à la lampe torche (utilise E4). `M` · dép. E4-02
+- [x] **E3-06 ⚙️ Pompes primaire ×2, vannes principales ×4** : états marche/arrêt/cassé. `M` · PROTO
+- [x] **E3-07 ⚙️ Réseau électrique** : tableau principal (~20 disjoncteurs à réarmer), batteries de secours, consommateurs (pompes, air, lumières, sonar, cafetière, samovar). `L`
+- [x] **E3-08 ⚙️ Propulsion** liée à la turbine/régime, télégraphe machine (5 positions). `M`
 - [ ] **E3-09 ⚙️ Dérives lentes + système d'alarmes** : ~40 alarmes distinctes, dérives en chaîne, « correction excessive ». Générateur de pannes avec budget d'attention (plus de systèmes que de joueurs). `XL` → découper par système · `VS`
 - [ ] **E3-10 ⚙️ Cohérence d'équilibrage** : outil de simulation headless pour tester sans joueurs (déterminisme). `M`
 - [ ] **E3-11 ✍️ Test « utile en 5 min »** : un nouveau joueur doit pouvoir contribuer sans comprendre la chaîne (risque 🔴 §11). `M` · `VS`
@@ -95,18 +95,18 @@ Objectif : lever le risque n°1 (référentiel mobile + réseau) avant d'investi
 # EPIC 4 — Règle des Deux Joueurs (signature, PROTO)
 
 - [ ] **E4-01 ✍️ Liste exhaustive des actions « deux joueurs »** (TODO §3.4) : démarrage/arrêt réacteur, ballast, leurres, sas extérieur, purge primaire, envoi du Signal, + autres (combustible 📦 à 2, casque de scaphandre, pose sur le fond…). Annexe au GDD. `S` (D-08)
-- [ ] **E4-02 ⚙️ Framework d'actions couplées** : deux commandes physiques éloignées (clés/manivelles/bouton+pédale), fenêtre de 3 s, sans se voir, validation serveur tolérante à la latence. `L` · PROTO
+- [x] **E4-02 ⚙️ Framework d'actions couplées** : deux commandes physiques éloignées (clés/manivelles/bouton+pédale), fenêtre de 3 s, sans se voir, validation serveur tolérante à la latence. `L` · PROTO
 - [ ] **E4-03 ⚙️ Feedback diégétique** de l'attente/échec/succès (voyants, sons), jamais de HUD. `M`
 - [ ] **E4-04 ⚙️ Verrou « pas de partie en solo »** : le jeu ne se lance pas seul ; comportement si un joueur quitte (duo minimum). `S` · D-10
 - [ ] **E4-05 ⚙️ Mode duo** : minuteries élargies, « télécommande bricolée » déblocable (diégétique, « strictement interdite par le règlement »). `M` · `ALPHA` · D-10
-- [ ] **E4-06 🧪 Test de latence** : fenêtre de 3 s à 150–250 ms de ping, interphone grésillant inclus. `M`
+- [x] **E4-06 🧪 Test de latence** : fenêtre de 3 s à 150–250 ms de ping, interphone grésillant inclus. `M`
 
 ---
 
 # EPIC 5 — La Procédure : Manuel OK-114 (PROTO v0 → VS v1)
 
 - [ ] **E5-01 ✍️ Format des procédures** : ≤ 5 étapes, schémas gros, mots-clés en gras, illustrées, numérotées. Gabarit unique. `M`
-- [ ] **E5-02 ⚙️ Objet Manuel 📦🔧** : classeur 8 kg tenu à deux mains (celui qui lit ne peut pas agir), exemplaire unique, pages feuilletables. `L` · PROTO (v0 papier/placeholder)
+- [x] **E5-02 ⚙️ Objet Manuel 📦🔧** : classeur 8 kg tenu à deux mains (celui qui lit ne peut pas agir), exemplaire unique, pages feuilletables. `L` · PROTO (v0 papier/placeholder)
 - [ ] **E5-03 ⚙️ Pages arrachables** : se perdent, brûlent, se mouillent (page volante). `M` · `VS`
 - [ ] **E5-04 ⚙️ Aides de navigation** : ouverture automatique à la bonne page quand une alarme sonne, bouton « GOTO » sur l'alarme (§3.2/3.5 — remplace le mini-jeu d'index). `M` · dép. E3-09
 - [ ] **E5-05 ✍️ Rédaction des procédures** : une procédure par panne/manœuvre (réacteur, ballast, fuite, décon, redémarrage…), ~30 doubles-pages, correctes. `L`, évolutif
@@ -119,9 +119,9 @@ Objectif : lever le risque n°1 (référentiel mobile + réseau) avant d'investi
 
 # EPIC 6 — Eau, dégâts, fuites & flottabilité (PROTO)
 
-- [ ] **E6-01 ⚙️ Simulation d'eau par volumes-par-compartiment** + centre de masse → assiette/gîte du bateau. `L` · PROTO
-- [ ] **E6-02 ⚙️ Fuites** (3 tailles), rivet sauté, tôle déformée ; réparations (patch de coque + cale, marteau, clé). `L` · PROTO (une fuite)
-- [ ] **E6-03 ⚙️ Pompes de cale ×2**, seau, serpillière. `M`
+- [x] **E6-01 ⚙️ Simulation d'eau par volumes-par-compartiment** + centre de masse → assiette/gîte du bateau. `L` · PROTO
+- [x] **E6-02 ⚙️ Fuites** (3 tailles), rivet sauté, tôle déformée ; réparations (patch de coque + cale, marteau, clé). `L` · PROTO (une fuite)
+- [x] **E6-03 ⚙️ Pompes de cale ×2**, seau, serpillière. `M`
 - [ ] **E6-04 ⚙️ Cargo & assiette** : le cargo mal arrimé glisse et modifie l'assiette (sangles, râteliers). `M` · `VS`
 - [ ] **E6-05 ⚙️ Soupe/fluides simples** qui se renversent à l'inclinaison (marmite de la cambuse). `M` · `VS`
 - [ ] **E6-06 ⚙️ Air / CO₂** : cartouches remplaçables, ventilation, déclin lent en Veille. `M` · `VS`
