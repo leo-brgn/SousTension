@@ -30,25 +30,25 @@ namespace SousTension.Spikes.MovingFrame
             Block(root, "Pipe", new Vector3(0.18f, 0.18f, 10.5f), new Vector3(WallX - 0.1f, 1.0f, 0.9f), new Color(0.35f, 0.3f, 0.25f));
             for (int i = 0; i < 4; i++)
             {
-                Block(root, "ValveBody" + i, new Vector3(0.22f, 0.3f, 0.3f), new Vector3(WallX - 0.12f, 1.0f, ValveZ[i]), new Color(0.6f, 0.5f, 0.2f));
+                InteractableTarget.Mark(Block(root, "ValveBody" + i, new Vector3(0.22f, 0.3f, 0.3f), new Vector3(WallX - 0.12f, 1.0f, ValveZ[i]), new Color(0.6f, 0.5f, 0.2f)), InteractableIds.Valve(i));
                 var pivot = new GameObject("Wheel" + i).transform;
                 pivot.SetParent(root, false);
                 pivot.localPosition = new Vector3(WallX - 0.3f, 1.25f, ValveZ[i]);
                 // rim (4 bars forming a square ring) + hub, in the plane facing the room (rotates about the x axis)
-                Block(pivot, "RimA", new Vector3(0.05f, 0.34f, 0.04f), new Vector3(0f, 0f, 0.15f), new Color(0.75f, 0.1f, 0.1f));
-                Block(pivot, "RimB", new Vector3(0.05f, 0.34f, 0.04f), new Vector3(0f, 0f, -0.15f), new Color(0.75f, 0.1f, 0.1f));
-                Block(pivot, "RimC", new Vector3(0.05f, 0.04f, 0.34f), new Vector3(0f, 0.15f, 0f), new Color(0.75f, 0.1f, 0.1f));
-                Block(pivot, "RimD", new Vector3(0.05f, 0.04f, 0.34f), new Vector3(0f, -0.15f, 0f), new Color(0.75f, 0.1f, 0.1f));
-                Block(pivot, "Hub", new Vector3(0.07f, 0.08f, 0.08f), Vector3.zero, new Color(0.15f, 0.15f, 0.15f));
+                InteractableTarget.Mark(Block(pivot, "RimA", new Vector3(0.05f, 0.34f, 0.04f), new Vector3(0f, 0f, 0.15f), new Color(0.75f, 0.1f, 0.1f)), InteractableIds.Valve(i));
+                InteractableTarget.Mark(Block(pivot, "RimB", new Vector3(0.05f, 0.34f, 0.04f), new Vector3(0f, 0f, -0.15f), new Color(0.75f, 0.1f, 0.1f)), InteractableIds.Valve(i));
+                InteractableTarget.Mark(Block(pivot, "RimC", new Vector3(0.05f, 0.04f, 0.34f), new Vector3(0f, 0.15f, 0f), new Color(0.75f, 0.1f, 0.1f)), InteractableIds.Valve(i));
+                InteractableTarget.Mark(Block(pivot, "RimD", new Vector3(0.05f, 0.04f, 0.34f), new Vector3(0f, -0.15f, 0f), new Color(0.75f, 0.1f, 0.1f)), InteractableIds.Valve(i));
+                InteractableTarget.Mark(Block(pivot, "Hub", new Vector3(0.07f, 0.08f, 0.08f), Vector3.zero, new Color(0.15f, 0.15f, 0.15f)), InteractableIds.Valve(i));
                 _wheels[i] = pivot;
             }
             for (int p = 0; p < 2; p++)
             {
-                Block(root, "PumpBody" + p, new Vector3(0.5f, 0.7f, 0.7f), new Vector3(WallX - 0.25f, 0.55f, PumpZ[p]), new Color(0.25f, 0.35f, 0.3f));
+                InteractableTarget.Mark(Block(root, "PumpBody" + p, new Vector3(0.5f, 0.7f, 0.7f), new Vector3(WallX - 0.25f, 0.55f, PumpZ[p]), new Color(0.25f, 0.35f, 0.3f)), InteractableIds.Pump(p));
                 var sw = new GameObject("PumpSwitch" + p).transform;
                 sw.SetParent(root, false);
                 sw.localPosition = new Vector3(WallX - 0.52f, 0.7f, PumpZ[p]);
-                Block(sw, "Lever", new Vector3(0.04f, 0.2f, 0.04f), new Vector3(0f, 0.1f, 0f), new Color(0.9f, 0.88f, 0.75f));
+                InteractableTarget.Mark(Block(sw, "Lever", new Vector3(0.04f, 0.2f, 0.04f), new Vector3(0f, 0.1f, 0f), new Color(0.9f, 0.88f, 0.75f)), InteractableIds.Pump(p));
                 _switches[p] = sw;
                 _lamps[p] = Block(root, "PumpLamp" + p, new Vector3(0.04f, 0.1f, 0.1f), new Vector3(WallX - 0.52f, 0.95f, PumpZ[p]), Color.gray).GetComponent<Renderer>();
             }

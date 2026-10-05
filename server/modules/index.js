@@ -89,10 +89,15 @@ function nearestCommand(pl) {
 function tryActivate(cp, id, pl, tick) {
   var c = nearestCommand(pl);
   if (c === null) return;
-  var act = cp.acts[c.ai];
-  if (act.st[c.side].by !== "") return;
-  if (act.st[1 - c.side].by === id) return;
-  act.st[c.side].by = id; act.st[c.side].tick = tick;
+  armCommand(cp, id, tick, c.ai, c.side);
+}
+
+// Arm command `side` of action `ai` for player `id` (shared by the nearest-command path and the aimed one, E2-02).
+function armCommand(cp, id, tick, ai, side) {
+  var act = cp.acts[ai];
+  if (act.st[side].by !== "") return;
+  if (act.st[1 - side].by === id) return;
+  act.st[side].by = id; act.st[side].tick = tick;
 }
 
 // Success when both commands of an action are armed (by different players, guaranteed by tryActivate): the pair is released and the
@@ -417,11 +422,16 @@ function nearestLeak(L, pl) {
 }
 
 // The interaction key was pressed: a player carrying a patch next to a leak applies it. Returns true when the press was a repair.
-function tryRepair(state, id, pl, tick) {
+// `aimed` (E2-02): the leak the player is looking at; it must exist and be within reach. Without it the nearest leak in reach is used.
+function tryRepair(state, id, pl, tick, aimed) {
   var held = heldBy(state.cargo, id);
   if (!held || held.kind !== "patch" || held.carriers.indexOf(id) < 0) return false;
-  var leak = nearestLeak(state.leaks, pl);
+  var leak = aimed || nearestLeak(state.leaks, pl);
   if (!leak) return false;
+  if (aimed) {
+    var dx = pl.x - aimed.x, dz = pl.z - aimed.z;
+    if (Math.sqrt(dx * dx + dz * dz) > LEAK_REACH) return false;
+  }
   leak.size--;
   held.active = false; held.carriers = []; held.vx = 0; held.vz = 0; held.respawnTick = tick + PATCH_RESPAWN_TICKS;
   if (leak.size <= 0) {
@@ -958,7 +968,18 @@ function leverView(lever, reactor) {
   return { cv: (lever.cover > 0 || reactor.scram) ? 1 : 0, pl: reactor.scram ? 1 : 0 };
 }
 
-// The interaction key was pressed by player `id`: dispatch to the nearest interactable in reach.
+// Press a control (the effect of one press, whoever chose it: the nearest-in-reach path or the aimed one).
+function activateControl(state, c) {
+  if (c.id === "regime") useRegimeSelector(state.reactor);
+  else if (c.id === "scram") useScramLever(state.lever, state.reactor);
+  else if (c.pump !== undefined) togglePump(state.reactor, c.pump);
+  else if (c.bilge !== undefined) bilgeToggle(state.bilge, c.bilge);
+  else if (c.breaker !== undefined) breakerToggle(state.power, c.breaker);
+  else if (c.tele !== undefined) telegraphStep(state.prop, c.tele);
+}
+
+// The interaction key was pressed by player `id`: dispatch to the nearest interactable in reach (the position-based path: bots, tests, the
+// key E). The aimed path is useTarget.
 function tryAct(state, id, pl, tick) {
   if (tryRepair(state, id, pl, tick)) return;           // carrying a hull patch next to a leak: the press applies it (E6-02)
   if (tryScoop(state, id, pl, tick)) return;            // carrying the bucket in a flooded compartment: the press scoops (E6-03)
@@ -969,16 +990,59 @@ function tryAct(state, id, pl, tick) {
   }
   var cmd = nearestCommand(pl);
   var bestStationD = cmd ? cmd.d : Infinity;
-  if (bestControl && bestControlD < bestStationD) {
-    if (bestControl.id === "regime") useRegimeSelector(state.reactor);
-    else if (bestControl.id === "scram") useScramLever(state.lever, state.reactor);
-    else if (bestControl.pump !== undefined) togglePump(state.reactor, bestControl.pump);
-    else if (bestControl.bilge !== undefined) bilgeToggle(state.bilge, bestControl.bilge);
-    else if (bestControl.breaker !== undefined) breakerToggle(state.power, bestControl.breaker);
-    else if (bestControl.tele !== undefined) telegraphStep(state.prop, bestControl.tele);
+  if (bestControl && bestControlD < bestStationD) { activateControl(state, bestControl); return; }
+  if (cmd) tryActivate(state.cp, id, pl, tick);
+}
+
+// ---- Aimed interaction (E2-02) ------------------------------------------------------------------------------------------------
+// The client looks at an object and sends its id in the input field `use`; the server checks that the id exists and that the player is within
+// arm's reach, then does what a press on that object does. Ids: a control id of CONTROLS ("regime", "scram", "valve0".."pump1", "bilge0",
+// "breaker_<id>", "tele_up"...), "cc:<action>:<0|1>" for a command of the Rule of Two Players, "leak:<n>" for a hull leak, and "item" for
+// "use what I hold" (a patch on a leak, the bucket in the water). Anything else, or out of reach, is ignored.
+var AIM_REACH = 2.0;                 // m: arm's reach for every aimed control (the aim removes the ambiguity the small tiles had to solve by position)
+
+function controlById(id) {
+  for (var i = 0; i < CONTROLS.length; i++) if (CONTROLS[i].id === id) return CONTROLS[i];
+  return null;
+}
+
+// Every id the server accepts, except the dynamic "leak:<n>": views and tests use it to stay in step with the server.
+function interactableIds() {
+  var ids = ["item"];
+  for (var i = 0; i < CONTROLS.length; i++) ids.push(CONTROLS[i].id);
+  for (var a = 0; a < COUPLED_ACTIONS.length; a++) { ids.push("cc:" + COUPLED_ACTIONS[a].id + ":0"); ids.push("cc:" + COUPLED_ACTIONS[a].id + ":1"); }
+  return ids;
+}
+
+// A press (input flag act) on the object with id `target`.
+function useTarget(state, id, pl, tick, target) {
+  if (target === "item") { if (!tryRepair(state, id, pl, tick)) tryScoop(state, id, pl, tick); return; }
+  if (target.indexOf("leak:") === 0) {
+    var n = +target.slice(5);
+    for (var l = 0; l < state.leaks.list.length; l++) if (state.leaks.list[l].id === n) { tryRepair(state, id, pl, tick, state.leaks.list[l]); return; }
     return;
   }
-  if (cmd) tryActivate(state.cp, id, pl, tick);
+  if (target.indexOf("cc:") === 0) {
+    var parts = target.split(":");
+    var side = +parts[2];
+    if (parts.length !== 3 || (side !== 0 && side !== 1)) return;
+    for (var a = 0; a < COUPLED_ACTIONS.length; a++) {
+      if (COUPLED_ACTIONS[a].id !== parts[1]) continue;
+      var cmd = side === 0 ? COUPLED_ACTIONS[a].a : COUPLED_ACTIONS[a].b;
+      var dx = pl.x - cmd.x, dz = pl.z - cmd.z;
+      if (Math.sqrt(dx * dx + dz * dz) <= Math.max(cmd.reach, AIM_REACH)) armCommand(state.cp, id, tick, a, side);
+      return;
+    }
+    return;
+  }
+  var c = controlById(target);
+  if (c && controlDistance(pl, c) <= AIM_REACH) activateControl(state, c);
+}
+
+// The key is HELD on the object with id `target`: only the valve wheels use it.
+function holdTarget(state, pl, target) {
+  var c = controlById(target);
+  if (c && c.valve !== undefined && controlDistance(pl, c) <= AIM_REACH) holdValve(state.reactor, c.valve);
 }
 
 // ---- Reactor restart procedure after a SCRAM (E3-05) ----------------------------------------------------------------
@@ -1053,8 +1117,8 @@ function simStep(state, tick) {
     while (pl.allowance >= 1 && pl.queue.length > 0) {
       var next = pl.queue.shift();
       stepPlayer(pl, next.mx, next.mz);
-      if (next.act) tryAct(state, state.order[k], pl, tick);
-      if (next.hold) tryHold(state, pl);
+      if (next.act) { if (next.use) useTarget(state, state.order[k], pl, tick, next.use); else tryAct(state, state.order[k], pl, tick); }
+      if (next.hold) { if (next.use) holdTarget(state, pl, next.use); else tryHold(state, pl); }
       if (next.grab) tryGrab(state.cargo, state.order[k], pl, tick);
       pl.seq = next.seq;
       pl.applied += 1;
@@ -1079,7 +1143,8 @@ function queueInput(p, input) {
   if (typeof input.seq !== "number" || input.seq <= p.lastQueued) return false;
   p.lastQueued = input.seq;
   p.queue.push({ seq: input.seq, mx: +input.mx || 0, mz: +input.mz || 0, act: input.act === true || input.act === 1,
-                 grab: input.grab === true || input.grab === 1, hold: input.hold === true || input.hold === 1 });
+                 grab: input.grab === true || input.grab === 1, hold: input.hold === true || input.hold === 1,
+                 use: typeof input.use === "string" && input.use.length <= 40 ? input.use : "" });
   while (p.queue.length > MAX_QUEUED_INPUTS) p.queue.shift();
   return true;
 }
@@ -1240,6 +1305,7 @@ if (typeof module !== "undefined" && module.exports) {
     WATER_COMPARTMENTS: WATER_COMPARTMENTS, WATER_FLOW: WATER_FLOW, MAX_TRIM_DEG: MAX_TRIM_DEG, MAX_LIST_DEG: MAX_LIST_DEG, newWater: newWater, waterAdd: waterAdd,
     waterRemove: waterRemove, waterSetDoor: waterSetDoor, waterStep: waterStep, waterTotal: waterTotal, waterTilt: waterTilt, waterView: waterView, waterLevel: waterLevel, compartmentAt: compartmentAt,
     newCoupled: newCoupled, COUPLED_ACTIONS: COUPLED_ACTIONS, COUPLED_EFFECTS: COUPLED_EFFECTS, COUPLED_GRACE_TICKS: COUPLED_GRACE_TICKS,
+    AIM_REACH: AIM_REACH, interactableIds: interactableIds,
     CONTROLS: CONTROLS, REGIME_ORDER: REGIME_ORDER, tryAct: tryAct,
     reactorNoise: reactorNoise, REACTOR_K: REACTOR_K, newReactor: newReactor, reactorStep: reactorStep, reactorView: reactorView, reactorScram: reactorScram,
     reactorRestart: reactorRestart, reactorSetRegime: reactorSetRegime, reactorSetValve: reactorSetValve, reactorSetPump: reactorSetPump,

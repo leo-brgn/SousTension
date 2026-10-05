@@ -27,18 +27,18 @@ namespace SousTension.Spikes.MovingFrame
             root.SetParent(boat, false);
             root.localPosition = Centre;
 
-            Block(root, "Plate", new Vector3(0.06f, 0.95f, 0.6f), Vector3.zero, new Color(0.18f, 0.28f, 0.2f));
+            InteractableTarget.Mark(Block(root, "Plate", new Vector3(0.06f, 0.95f, 0.6f), Vector3.zero, new Color(0.18f, 0.28f, 0.2f)), "scram");
             // lever: pivot at the plate centre, arm pointing up at rest, swings down along the wall when pulled
             _lever = new GameObject("LeverPivot").transform;
             _lever.SetParent(root, false);
             _lever.localPosition = new Vector3(0.08f, -0.1f, 0f);
-            Block(_lever, "Arm", new Vector3(0.05f, 0.4f, 0.05f), new Vector3(0f, 0.2f, 0f), new Color(0.75f, 0.1f, 0.1f));
-            Block(_lever, "Grip", new Vector3(0.09f, 0.09f, 0.09f), new Vector3(0f, 0.42f, 0f), new Color(0.75f, 0.1f, 0.1f));
+            InteractableTarget.Mark(Block(_lever, "Arm", new Vector3(0.05f, 0.4f, 0.05f), new Vector3(0f, 0.2f, 0f), new Color(0.75f, 0.1f, 0.1f)), "scram");
+            InteractableTarget.Mark(Block(_lever, "Grip", new Vector3(0.09f, 0.09f, 0.09f), new Vector3(0f, 0.42f, 0f), new Color(0.75f, 0.1f, 0.1f)), "scram");
             // sealed cover hinged at its top edge, swings up and out
             _cover = new GameObject("CoverPivot").transform;
             _cover.SetParent(root, false);
             _cover.localPosition = new Vector3(0.14f, 0.2f, 0f);
-            Block(_cover, "Cover", new Vector3(0.05f, 0.62f, 0.34f), new Vector3(0f, -0.31f, 0f), new Color(0.55f, 0.58f, 0.55f));
+            InteractableTarget.Mark(Block(_cover, "Cover", new Vector3(0.05f, 0.62f, 0.34f), new Vector3(0f, -0.31f, 0f), new Color(0.55f, 0.58f, 0.55f)), "scram");
             Block(_cover, "Seal", new Vector3(0.07f, 0.06f, 0.06f), new Vector3(0.02f, -0.6f, 0f), new Color(0.9f, 0.75f, 0.2f));
             // depth gauge above the lever
             Block(root, "DepthDial", new Vector3(0.05f, 0.24f, 0.24f), new Vector3(0.05f, 0.33f, 0f), new Color(0.9f, 0.88f, 0.75f));

@@ -29,11 +29,11 @@ namespace SousTension.Spikes.MovingFrame
                 root.SetParent(boat, false);
                 root.localPosition = Pumps[i].pos;
                 float f = Pumps[i].face;
-                Block(root, "Body", new Vector3(0.3f, 0.6f, 0.6f), new Vector3(f * 0.15f, 0.35f, 0f), new Color(0.25f, 0.3f, 0.35f));
+                InteractableTarget.Mark(Block(root, "Body", new Vector3(0.3f, 0.6f, 0.6f), new Vector3(f * 0.15f, 0.35f, 0f), new Color(0.25f, 0.3f, 0.35f)), InteractableIds.Bilge(i));
                 var sw = new GameObject("Switch").transform;
                 sw.SetParent(root, false);
                 sw.localPosition = new Vector3(f * 0.34f, 0.55f, 0f);
-                Block(sw, "Lever", new Vector3(0.04f, 0.2f, 0.04f), new Vector3(0f, 0.1f, 0f), new Color(0.9f, 0.88f, 0.75f));
+                InteractableTarget.Mark(Block(sw, "Lever", new Vector3(0.04f, 0.2f, 0.04f), new Vector3(0f, 0.1f, 0f), new Color(0.9f, 0.88f, 0.75f)), InteractableIds.Bilge(i));
                 _levers[i] = sw;
                 _lamps[i] = Block(root, "Lamp", new Vector3(0.04f, 0.1f, 0.1f), new Vector3(f * 0.34f, 0.8f, 0f), Color.gray).GetComponent<Renderer>();
             }

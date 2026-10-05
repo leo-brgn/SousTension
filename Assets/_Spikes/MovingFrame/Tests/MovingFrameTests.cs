@@ -12,6 +12,9 @@ namespace SousTension.Spikes.MovingFrame.Tests
         public double Now { get; set; }
     }
 
+    internal sealed class FakeUse : IUseInput { public bool UseHeld { get; set; } }
+    internal sealed class FakeAim : IAimSource { public string TargetId { get; set; } }
+
     internal sealed class ConstantInput : IInputSource
     {
         public float Mx, Mz; public bool Act, Grab;
@@ -25,11 +28,11 @@ namespace SousTension.Spikes.MovingFrame.Tests
         public long BytesSent { get; private set; }
         public long BytesReceived { get; private set; }
         public event Action<StateSnapshot> StateReceived;
-        public readonly List<(int seq, float mx, float mz, bool act, bool grab, bool hold)> Sent = new List<(int, float, float, bool, bool, bool)>();
+        public readonly List<(int seq, float mx, float mz, bool act, bool grab, bool hold, string use)> Sent = new List<(int, float, float, bool, bool, bool, string)>();
         private readonly Queue<StateSnapshot> _incoming = new Queue<StateSnapshot>();
 
         public Task ConnectAsync(CancellationToken ct) => Task.CompletedTask;
-        public void SendInput(int seq, float moveX, float moveZ, bool act, bool grab, bool hold = false) { Sent.Add((seq, moveX, moveZ, act, grab, hold)); BytesSent += 24; }
+        public void SendInput(int seq, float moveX, float moveZ, bool act, bool grab, bool hold = false, string use = null) { Sent.Add((seq, moveX, moveZ, act, grab, hold, use)); BytesSent += 24; }
         public void Enqueue(StateSnapshot s) => _incoming.Enqueue(s);
         public void Poll() { while (_incoming.Count > 0) StateReceived?.Invoke(_incoming.Dequeue()); }
         public void Dispose() { }
@@ -374,6 +377,80 @@ namespace SousTension.Spikes.MovingFrame.Tests
             net.Enqueue(new StateSnapshot(2, 0.2, new[] { new PlayerState("me", 0, 0, 0) }));                   // older server
             c.Tick(0);
             Assert.AreEqual(3, model.Propulsion.Telegraph);
+        }
+
+        // ---- Aimed interaction (E2-02) ----
+        private static (MovingFrameController c, FakeNetwork net, FakeClock clock, MovingFrameModel model, FakeUse use, FakeAim aim) AimSetup(CargoState[] cargo = null)
+        {
+            var net = new FakeNetwork(); var clock = new FakeClock(); var model = new MovingFrameModel(); var use = new FakeUse(); var aim = new FakeAim();
+            var c = new MovingFrameController(net, new ConstantInput(), clock, model, use, aim);
+            net.Enqueue(new StateSnapshot(1, 0.1, new[] { new PlayerState("me", 0, 0, 0) }, default, cargo));
+            c.Tick(0);
+            net.Sent.Clear();
+            return (c, net, clock, model, use, aim);
+        }
+
+        [Test]
+        public void Click_OnAnAimedObject_SendsActOnThePressThenHoldWhileHeld_WithTheTargetId()
+        {
+            var s = AimSetup();
+            s.aim.TargetId = "valve2"; s.use.UseHeld = true;
+            s.c.Tick(0.3f);
+            Assert.GreaterOrEqual(s.net.Sent.Count, 3);
+            foreach (var sent in s.net.Sent) { Assert.AreEqual("valve2", sent.use); Assert.IsTrue(sent.hold, "held button = hold"); }
+            Assert.AreEqual(1, s.net.Sent.FindAll(x => x.act).Count, "act is the press edge only");
+            Assert.IsTrue(s.net.Sent[0].act);
+        }
+
+        [Test]
+        public void Click_WithNothingAimedAndNothingInHand_SendsNothing_AndNoButtonSendsNoTarget()
+        {
+            var s = AimSetup();
+            s.use.UseHeld = true; s.aim.TargetId = null;
+            s.c.Tick(0.3f);
+            foreach (var sent in s.net.Sent) { Assert.IsNull(sent.use); Assert.IsFalse(sent.act); Assert.IsFalse(sent.hold); }
+            s.net.Sent.Clear();
+            s.use.UseHeld = false; s.aim.TargetId = "regime";
+            s.c.Tick(0.3f);
+            foreach (var sent in s.net.Sent) { Assert.IsNull(sent.use, "looking at an object without clicking does not send it"); Assert.IsFalse(sent.act); }
+        }
+
+        [Test]
+        public void Click_WithAPatchOrTheBucketInHandAndNothingAimed_UsesTheItem()
+        {
+            var cargo = new[] { new CargoState("patch1", 0, 0, false, new[] { "me" }, "", "patch", true) };
+            var s = AimSetup(cargo);
+            s.model.LocalId = "me";
+            Assert.IsTrue(s.model.IsLocalHoldingUsableItem());
+            s.use.UseHeld = true; s.aim.TargetId = null;
+            s.c.Tick(0.3f);
+            Assert.GreaterOrEqual(s.net.Sent.Count, 3);
+            Assert.AreEqual("item", s.net.Sent[0].use); Assert.IsTrue(s.net.Sent[0].act);
+            // aiming at something wins over "item"
+            s.net.Sent.Clear(); s.aim.TargetId = "leak:4";
+            s.c.Tick(0.3f);
+            Assert.AreEqual("leak:4", s.net.Sent[0].use);
+        }
+
+        [Test]
+        public void ACrateInHand_IsNotAUsableItem()
+        {
+            var s = AimSetup(new[] { new CargoState("crate1", 0, 0, false, new[] { "me" }, "") });
+            s.model.LocalId = "me";
+            Assert.IsFalse(s.model.IsLocalHoldingUsableItem());
+        }
+
+        [Test]
+        public void TheInteractionKeyAlone_KeepsTheOldPositionBasedBehaviour_NoTarget()
+        {
+            var net = new FakeNetwork(); var clock = new FakeClock(); var model = new MovingFrameModel();
+            var c = new MovingFrameController(net, new ConstantInput { Act = true }, clock, model, new FakeUse(), new FakeAim { TargetId = "regime" });
+            net.Enqueue(new StateSnapshot(1, 0.1, new[] { new PlayerState("me", 0, 0, 0) }));
+            c.Tick(0); net.Sent.Clear();
+            c.Tick(0.3f);
+            Assert.GreaterOrEqual(net.Sent.Count, 3);
+            foreach (var sent in net.Sent) { Assert.IsNull(sent.use); Assert.IsTrue(sent.hold); }
+            Assert.AreEqual(1, net.Sent.FindAll(x => x.act).Count);
         }
 
         [Test]

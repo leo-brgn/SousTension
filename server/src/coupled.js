@@ -54,10 +54,15 @@ function nearestCommand(pl) {
 function tryActivate(cp, id, pl, tick) {
   var c = nearestCommand(pl);
   if (c === null) return;
-  var act = cp.acts[c.ai];
-  if (act.st[c.side].by !== "") return;
-  if (act.st[1 - c.side].by === id) return;
-  act.st[c.side].by = id; act.st[c.side].tick = tick;
+  armCommand(cp, id, tick, c.ai, c.side);
+}
+
+// Arm command `side` of action `ai` for player `id` (shared by the nearest-command path and the aimed one, E2-02).
+function armCommand(cp, id, tick, ai, side) {
+  var act = cp.acts[ai];
+  if (act.st[side].by !== "") return;
+  if (act.st[1 - side].by === id) return;
+  act.st[side].by = id; act.st[side].tick = tick;
 }
 
 // Success when both commands of an action are armed (by different players, guaranteed by tryActivate): the pair is released and the

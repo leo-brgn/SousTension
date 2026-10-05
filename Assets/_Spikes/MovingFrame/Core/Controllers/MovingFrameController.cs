@@ -16,6 +16,8 @@ namespace SousTension.Spikes.MovingFrame
         private readonly INetworkService _net;
         private readonly IInputSource _input;
         private readonly IClockService _clock;
+        private readonly IUseInput _use;
+        private readonly IAimSource _aim;
         private readonly MovingFrameModel _model;
         private readonly PredictionBuffer _prediction = new PredictionBuffer();
         private readonly Dictionary<int, double> _sendTimes = new Dictionary<int, double>();
@@ -23,11 +25,13 @@ namespace SousTension.Spikes.MovingFrame
         private double _accumulator;
         private bool _initialized;
         private int _lastAcked;
-        private bool _prevAct, _prevGrab;
+        private bool _prevAct, _prevGrab, _prevUse;
 
-        public MovingFrameController(INetworkService net, IInputSource input, IClockService clock, MovingFrameModel model)
+        /// <param name="use">primary action button (mouse); null = keyboard only (position-based interaction)</param>
+        /// <param name="aim">what the player looks at; null = nothing aimable</param>
+        public MovingFrameController(INetworkService net, IInputSource input, IClockService clock, MovingFrameModel model, IUseInput use = null, IAimSource aim = null)
         {
-            _net = net; _input = input; _clock = clock; _model = model;
+            _net = net; _input = input; _clock = clock; _model = model; _use = use; _aim = aim;
             _net.StateReceived += OnState;
         }
 
@@ -48,9 +52,20 @@ namespace SousTension.Spikes.MovingFrame
                 bool act = actHeld && !_prevAct;     // one activation per key press (edge), the server rejects repeats anyway
                 bool grab = grabHeld && !_prevGrab;  // grab/drop toggles on each key press
                 _prevAct = actHeld; _prevGrab = grabHeld;
+                // Aimed interaction (E2-02): the primary button acts on the object looked at (press = act, held = hold); with a patch or the bucket in
+                // hand and nothing aimed it uses the item. The interaction key E keeps the position-based behaviour.
+                string use = null;
+                bool useHeld = _use != null && _use.UseHeld;
+                if (useHeld)
+                {
+                    use = _aim?.TargetId;
+                    if (use == null && _model.IsLocalHoldingUsableItem()) use = "item";
+                    if (use != null) { act |= !_prevUse; actHeld = true; }
+                }
+                _prevUse = useHeld;
                 int seq = _prediction.Predict(mx, mz);
                 _sendTimes[seq] = _clock.Now;
-                _net.SendInput(seq, mx, mz, act, grab, actHeld);   // hold = key still down: valve wheels turn while it is held
+                _net.SendInput(seq, mx, mz, act, grab, actHeld, use);   // hold = key still down: valve wheels turn while it is held
             }
             if (ticks == MaxCatchUpTicks) _accumulator = 0; // drop backlog after a long stall
             _model.SetLocal(_prediction.X, _prediction.Z);
