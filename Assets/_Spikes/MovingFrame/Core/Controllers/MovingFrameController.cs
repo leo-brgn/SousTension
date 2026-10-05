@@ -50,7 +50,7 @@ namespace SousTension.Spikes.MovingFrame
                 _prevAct = actHeld; _prevGrab = grabHeld;
                 int seq = _prediction.Predict(mx, mz);
                 _sendTimes[seq] = _clock.Now;
-                _net.SendInput(seq, mx, mz, act, grab);
+                _net.SendInput(seq, mx, mz, act, grab, actHeld);   // hold = key still down: valve wheels turn while it is held
             }
             if (ticks == MaxCatchUpTicks) _accumulator = 0; // drop backlog after a long stall
             _model.SetLocal(_prediction.X, _prediction.Z);
