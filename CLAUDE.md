@@ -76,7 +76,7 @@ Chaque fonctionnalité est un module organisé en quatre couches, avec une dépe
 
 ## Règles de design à respecter dans tout le code et le contenu
 
-- **Zéro HUD.** Toute information passe par un instrument diégétique (cadran, aiguille, papier, dosimètre). Seuls éléments d'écran : sous-titres et nom du joueur qui parle. Ne crée jamais de barre de vie, minimap ou texte flottant.
+- **HUD léger, sur le personnage et ce qu'il sait** (décision utilisateur, remplace « Zéro HUD ») : contenu des mains et de la poche, action possible sur l'objet visé, rappel des touches. Les informations du bateau (réacteur, eau, électricité, alarmes) restent sur des instruments diégétiques : le HUD ne montre rien que le personnage ne saurait pas. Pas de barre de vie, de minimap ni de texte flottant dans le monde.
 - **Une main = une chose.** Deux mains + une poche de poitrine (un petit objet). Un objet à deux mains verrouille les autres actions.
 - **Pas de monstres, pas de mort violente.** La « mort » est un évanouissement théâtral. La radiation n'est jamais létale.
 - **Trois interdits de ton** : aucune blague écrite (l'humour vient des systèmes et de la panique), aucune horreur, aucun cynisme. Les textes du Commandant sont solennels, déconnectés de la réalité.

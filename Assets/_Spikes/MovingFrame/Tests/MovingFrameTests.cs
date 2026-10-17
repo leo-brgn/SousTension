@@ -754,7 +754,7 @@ namespace SousTension.Spikes.MovingFrame.Tests
         }
 
         [Test]
-        public void EveryAimableObjectHasAHelpText_InBothLanguages()
+        public void EveryAimableObjectHasAHelpText_InBothLanguages_AndEveryItemKindAName()
         {
             var ids = new List<string>(InteractableIds.Breakers); ids.AddRange(InteractableIds.Others); ids.Add("leak:3"); ids.Add("alarm:rx_hot");
             foreach (var id in ids)
@@ -763,6 +763,8 @@ namespace SousTension.Spikes.MovingFrame.Tests
                 Assert.IsNotNull(key, id);
                 foreach (var lang in UiText.Languages) { Assert.IsTrue(UiText.Table(lang).ContainsKey(key + ".name"), id + " name " + lang); Assert.IsTrue(UiText.Table(lang).ContainsKey(key + ".act"), id + " act " + lang); }
             }
+            foreach (var kind in new[] { "crate", "fuel", "patch", "bucket", "flashlight", "manual" })
+                foreach (var lang in UiText.Languages) Assert.IsTrue(UiText.Table(lang).ContainsKey("item." + kind), kind + " " + lang);
             Assert.IsNull(UiText.HintKey(null));
             Assert.IsNull(UiText.HintKey("wall"));
         }
@@ -778,9 +780,9 @@ namespace SousTension.Spikes.MovingFrame.Tests
             s.Fov = 1f; Assert.AreEqual(GameSettings.FovMin, s.Fov, 1e-6f);
             s.Stabilization = 2f; Assert.AreEqual(1f, s.Stabilization, 1e-6f);
             s.Stabilization = 0.04f; Assert.AreEqual(0f, s.Stabilization, 1e-6f);
-            s.InvertY = true; s.Vsync = false; s.HelpVisible = true;
+            s.InvertY = true; s.Vsync = false; s.HelpVisible = false;
             Assert.AreEqual(9, changes);
-            Assert.IsFalse(new GameSettings().HelpVisible, "the help panel is off by default");
+            Assert.IsTrue(new GameSettings().HelpVisible, "the keys panel is on by default");
         }
 
         [Test]

@@ -19,10 +19,10 @@ namespace SousTension.Spikes.MovingFrame
         public float Stabilization { get => _stabilization; set { _stabilization = Clamp(Round(value, StabilizationStep), 0f, 1f); Changed?.Invoke(); } }
         public float Fov { get => _fov; set { _fov = Clamp(Round(value, FovStep), FovMin, FovMax); Changed?.Invoke(); } }
 
-        private bool _invertY, _vsync = true, _help;
+        private bool _invertY, _vsync = true, _help = true;
         public bool InvertY { get => _invertY; set { _invertY = value; Changed?.Invoke(); } }
         public bool Vsync { get => _vsync; set { _vsync = value; Changed?.Invoke(); } }
-        /// <summary>The right-hand help panel (what the aimed object is and what the keys do).</summary>
+        /// <summary>The right-hand panel listing the keys (F1).</summary>
         public bool HelpVisible { get => _help; set { _help = value; Changed?.Invoke(); } }
 
         private string _language = "";

@@ -40,8 +40,11 @@ namespace SousTension.Spikes.MovingFrame
         private GameSettings _settings;
         private Func<string> _aimedTarget;
         private VisualElement _help;
-        private Label _helpName, _helpAct;
-        private string _helpShownTarget = "?";
+        private VisualElement _hud;
+        private Label _hudPrompt, _hudPromptAct;
+        private readonly Label[] _hudSlot = new Label[3];
+        private readonly string[] _hudSlotShown = { null, null, null };
+        private string _hudShownTarget = "?";
         private readonly List<Action> _settingRefresh = new List<Action>();
         private bool _rebuild;
 
@@ -66,7 +69,7 @@ namespace SousTension.Spikes.MovingFrame
         private void BuildAll()
         {
             _settingRefresh.Clear();
-            BuildTitle(); BuildLobby(); BuildBriefing(); BuildDebrief(); BuildPause(); BuildStopped(); BuildHelp();
+            BuildTitle(); BuildLobby(); BuildBriefing(); BuildDebrief(); BuildPause(); BuildStopped(); BuildHelp(); BuildHud();
         }
 
         // ---- building blocks --------------------------------------------------------------------------------------------------------------
@@ -248,23 +251,65 @@ namespace SousTension.Spikes.MovingFrame
             _help.style.borderLeftWidth = 4; _help.style.borderLeftColor = Brass;
             _help.pickingMode = PickingMode.Ignore;
             Text(_help, UiText.Get("ui.help.title"), 26, Brass, false, true);
-            _helpName = Text(_help, "", 24, Cream, false, true);
-            _helpAct = Text(_help, "", 20, Cream);
-            Text(_help, UiText.Get("ui.help.keys"), 18, Brass).style.marginTop = 10;
+            Text(_help, UiText.Get("ui.help.keys"), 20, Cream);
             _root.Add(_help);
-            _helpShownTarget = "?";
         }
 
-        private void RefreshHelp(bool visible)
+        // The player HUD (always on during the run): what the hands and the chest pocket hold, and what a click does on the object aimed at.
+        private static readonly string[] SlotKeys = { "ui.hud.left", "ui.hud.right", "ui.hud.pocket" };
+
+        private void BuildHud()
         {
-            _help.style.display = visible ? DisplayStyle.Flex : DisplayStyle.None;
+            _hud = new VisualElement { name = "Hud" };
+            _hud.style.position = Position.Absolute; _hud.style.left = 0; _hud.style.right = 0; _hud.style.bottom = 28;
+            _hud.style.alignItems = Align.Center; _hud.style.display = DisplayStyle.None; _hud.pickingMode = PickingMode.Ignore;
+            var prompt = new VisualElement();
+            prompt.style.alignItems = Align.Center; prompt.style.marginBottom = 14; prompt.pickingMode = PickingMode.Ignore;
+            _hudPrompt = Text(prompt, "", 30, Cream, true, true); _hudPrompt.style.marginBottom = 2;
+            _hudPromptAct = Text(prompt, "", 22, Brass, true); _hudPromptAct.style.marginBottom = 0;
+            _hud.Add(prompt);
+            var bar = new VisualElement();
+            bar.style.flexDirection = FlexDirection.Row; bar.pickingMode = PickingMode.Ignore;
+            for (int i = 0; i < 3; i++)
+            {
+                var box = new VisualElement();
+                box.style.width = 230; box.style.marginLeft = 8; box.style.marginRight = 8; box.style.paddingLeft = 12; box.style.paddingRight = 12; box.style.paddingTop = 6; box.style.paddingBottom = 6;
+                box.style.backgroundColor = Panel; box.style.borderBottomWidth = 4; box.style.borderBottomColor = Brass; box.pickingMode = PickingMode.Ignore;
+                Text(box, UiText.Get(SlotKeys[i]), 16, Brass).style.marginBottom = 0;
+                _hudSlot[i] = Text(box, "", 24, Cream); _hudSlot[i].style.marginBottom = 0;
+                bar.Add(box);
+                _hudSlotShown[i] = null;
+            }
+            _hud.Add(bar);
+            _root.Add(_hud);
+            _hudShownTarget = "?";
+        }
+
+        private string ItemName(string cargoId)
+        {
+            if (string.IsNullOrEmpty(cargoId)) return UiText.Get("ui.hud.empty");
+            foreach (var c in _model.Cargo) if (c.Id == cargoId) return UiText.Get("item." + c.Kind);
+            return cargoId;
+        }
+
+        private void RefreshHud(bool visible)
+        {
+            _hud.style.display = visible ? DisplayStyle.Flex : DisplayStyle.None;
             if (!visible) return;
+            var hands = _model.HandsOf(_model.LocalId);
+            for (int i = 0; i < 3; i++)
+            {
+                string name = ItemName(hands[i]);
+                if (name == _hudSlotShown[i]) continue;
+                _hudSlotShown[i] = name; _hudSlot[i].text = name;
+                _hudSlot[i].style.color = string.IsNullOrEmpty(hands[i]) ? Brass : Cream;
+            }
             string target = _aimedTarget != null ? _aimedTarget() : null;
-            if (target == _helpShownTarget) return;
-            _helpShownTarget = target;
+            if (target == _hudShownTarget) return;
+            _hudShownTarget = target;
             string key = UiText.HintKey(target);
-            _helpName.text = key != null ? UiText.Get(key + ".name") : UiText.Get("ui.help.nothing");
-            _helpAct.text = key != null ? UiText.Get(key + ".act") : "";
+            _hudPrompt.text = key != null ? UiText.Get(key + ".name") : "";
+            _hudPromptAct.text = key != null ? UiText.Get(key + ".act") : "";
         }
 
         private void BuildStopped()
@@ -320,7 +365,8 @@ namespace SousTension.Spikes.MovingFrame
                 _shownPhase = key;
                 ShowOnly(key == "lobby" ? _lobby : key == "briefing" ? _briefing : key == "debrief" ? _debrief : key == "pause" ? _pause : key == "stopped" ? _stopped : null);
             }
-            RefreshHelp(_settings.HelpVisible && (key == "run" || key == "pause"));
+            _help.style.display = _settings.HelpVisible && (key == "run" || key == "pause") ? DisplayStyle.Flex : DisplayStyle.None;
+            RefreshHud(key == "run");
             if (key == "pause") foreach (var refresh in _settingRefresh) refresh();
             if (key == "lobby") RefreshLobby(mission);
             else if (key == "briefing") RefreshBriefing(mission);
