@@ -31,11 +31,18 @@ namespace SousTension.Spikes.MovingFrame
         private MetricsHudView _hud;
         private readonly CancellationTokenSource _cts = new CancellationTokenSource();
 
+        private static void ApplySettings(GameSettings s, Camera cam)
+        {
+            // --novsync switches the sync off for measures; else the player's choice
+            QualitySettings.vSyncCount = s.Vsync && Array.IndexOf(Environment.GetCommandLineArgs(), "--novsync") < 0 ? 1 : 0;
+            cam.fieldOfView = s.Fov;
+            CharactersView.CameraStabilization = s.Stabilization;
+        }
+
         private async void Start()
         {
             // Smooth image: synchronised with the screen (an uncapped 400 fps tears and makes the camera look jerky). --novsync switches it off for measures.
-            QualitySettings.vSyncCount = Array.IndexOf(Environment.GetCommandLineArgs(), "--novsync") >= 0 ? 0 : 1;
-            Application.targetFrameRate = -1;
+                        Application.targetFrameRate = -1;
             ParseArgs(out string device, out float latency, out float jitter, out float loss, out string h, out int p);
             if (latency >= 0) simulatedLatencyMs = latency;
             if (jitter >= 0) simulatedJitterMs = jitter;
@@ -50,7 +57,10 @@ namespace SousTension.Spikes.MovingFrame
             INetworkService network = new NakamaNetworkService(device, host, port);
             if (simulatedLatencyMs > 0 || simulatedLossPercent > 0)
                 network = new SimulatedLatencyNetworkService(network, clock, simulatedLatencyMs / 1000.0, simulatedJitterMs / 1000.0, simulatedLossPercent / 100.0);
-            var input = new KeyboardInputSource();
+            var settings = new GameSettings();
+            SettingsStore.Load(settings);
+            if (!string.IsNullOrEmpty(settings.Language)) UiText.Language = settings.Language;
+            var input = new KeyboardInputSource(settings);
             _network = network;
 
             // Model + Controller (aim and mouse button: AimView, bound to the camera below)
@@ -90,7 +100,9 @@ namespace SousTension.Spikes.MovingFrame
             _hud = new GameObject("MetricsHud").AddComponent<MetricsHudView>();
             _hud.Bind(model, network, _controller, clock);
             var screens = new GameObject("Screens").AddComponent<ScreensView>();
-            screens.Bind(model, () => _hud.Status);
+            screens.Bind(model, () => _hud.Status, settings, () => aim.TargetId);
+            settings.Changed += () => ApplySettings(settings, cam);
+            ApplySettings(settings, cam);
             screens.ReadyChanged += _controller.RequestReady;
             screens.QuitRequested += () => Application.Quit();
 

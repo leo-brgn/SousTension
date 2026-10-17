@@ -754,6 +754,38 @@ namespace SousTension.Spikes.MovingFrame.Tests
         }
 
         [Test]
+        public void EveryAimableObjectHasAHelpText_InBothLanguages_AndEveryItemKindAName()
+        {
+            var ids = new List<string>(InteractableIds.Breakers); ids.AddRange(InteractableIds.Others); ids.Add("leak:3"); ids.Add("alarm:rx_hot");
+            foreach (var id in ids)
+            {
+                string key = UiText.HintKey(id);
+                Assert.IsNotNull(key, id);
+                foreach (var lang in UiText.Languages) { Assert.IsTrue(UiText.Table(lang).ContainsKey(key + ".name"), id + " name " + lang); Assert.IsTrue(UiText.Table(lang).ContainsKey(key + ".act"), id + " act " + lang); }
+            }
+            foreach (var kind in new[] { "crate", "fuel", "patch", "bucket", "flashlight", "manual" })
+                foreach (var lang in UiText.Languages) Assert.IsTrue(UiText.Table(lang).ContainsKey("item." + kind), kind + " " + lang);
+            Assert.IsNull(UiText.HintKey(null));
+            Assert.IsNull(UiText.HintKey("wall"));
+        }
+
+        [Test]
+        public void TheSettingsAreClampedAndNotifyTheirChanges()
+        {
+            var s = new GameSettings();
+            int changes = 0; s.Changed += () => changes++;
+            s.Sensitivity = 1f; Assert.AreEqual(GameSettings.SensitivityMax, s.Sensitivity, 1e-6f);
+            s.Sensitivity = 0f; Assert.AreEqual(GameSettings.SensitivityMin, s.Sensitivity, 1e-6f);
+            s.Fov = 500f; Assert.AreEqual(GameSettings.FovMax, s.Fov, 1e-6f);
+            s.Fov = 1f; Assert.AreEqual(GameSettings.FovMin, s.Fov, 1e-6f);
+            s.Stabilization = 2f; Assert.AreEqual(1f, s.Stabilization, 1e-6f);
+            s.Stabilization = 0.04f; Assert.AreEqual(0f, s.Stabilization, 1e-6f);
+            s.InvertY = true; s.Vsync = false; s.HelpVisible = false;
+            Assert.AreEqual(9, changes);
+            Assert.IsTrue(new GameSettings().HelpVisible, "the keys panel is on by default");
+        }
+
+        [Test]
         public void TheModelKeepsTheMissionFlow_AndKnowsWhoIsReady()
         {
             var model = new MovingFrameModel { LocalId = "me" };
