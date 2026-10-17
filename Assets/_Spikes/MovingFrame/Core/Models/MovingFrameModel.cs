@@ -218,6 +218,12 @@ namespace SousTension.Spikes.MovingFrame
             HasServerTime = true;
             LastServerTime = snapshot.ServerTime;
             LastReceiveLocalTime = localNow;
+            // The server clock is followed, not copied: a snapshot that arrives 30 ms early or late (the network, the tick loop) must not make everything that
+            // depends on the clock (the swell of the boat, remote players, cargo) jump. The offset (server time minus local time) is slewed slowly; only a
+            // large gap (first snapshot, a long stall, ff) resets it.
+            double sample = snapshot.ServerTime - localNow;
+            if (!_clockInitialised || Math.Abs(sample - _clockOffset) > ClockSnapSeconds) { _clockOffset = sample; _clockInitialised = true; }
+            else _clockOffset += (sample - _clockOffset) * ClockSlew;
             var present = new HashSet<string>();
             foreach (var p in snapshot.Players)
             {
@@ -235,7 +241,12 @@ namespace SousTension.Spikes.MovingFrame
 
         /// <summary>Server clock extrapolated from the last snapshot.</summary>
         public double EstimateServerTime(double localNow)
-            => HasServerTime ? LastServerTime + (localNow - LastReceiveLocalTime) : 0.0;
+            => HasServerTime ? localNow + _clockOffset : 0.0;
+
+        private double _clockOffset;
+        private bool _clockInitialised;
+        private const double ClockSnapSeconds = 0.5;      // a gap larger than this is not jitter: resynchronise at once
+        private const double ClockSlew = 0.03;            // share of the error corrected per snapshot (10 Hz): a time constant of about 3 s
 
         /// <summary>Interpolated position of a remote player at <paramref name="serverTime"/> (clamped to the known samples).</summary>
         public bool TrySampleRemote(string id, double serverTime, out float x, out float z)
