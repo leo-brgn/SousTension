@@ -66,8 +66,17 @@ test("module registers match + rpc", () => {
     registerRpc: (n) => reg.rpcs.push(n)
   });
   assert.deepStrictEqual(reg.matches, ["moving_frame"]);
-  assert.deepStrictEqual(reg.rpcs, ["get_moving_frame_match"]);
+  assert.deepStrictEqual(reg.rpcs, ["get_moving_frame_match", "create_test_match"]);
   assert.strictEqual(published.length, 1); // match id published to storage at startup
+});
+
+test("rpc create_test_match makes a bare match, in debug mode only", () => {
+  const rpcs = {};
+  const nkFull = { binaryToString: nk.binaryToString, matchCreate: (name, params) => "match-" + JSON.stringify(params || {}), storageWrite() {} };
+  m.InitModule({}, logger, nkFull, { registerMatch() {}, registerRpc: (n, fn) => { rpcs[n] = fn; } });
+  assert.throws(() => rpcs.create_test_match({ env: {} }, logger, nkFull, "{}"), /debug/);
+  const out = JSON.parse(rpcs.create_test_match({ env: { SOUSTENSION_DEBUG: "1" } }, logger, nkFull, "{}"));
+  assert.strictEqual(out.matchId, "match-{}", "bare: no lobby, no faults");
 });
 
 test("backlog after a network stall drains in a few ticks (no permanent lag)", () => {
