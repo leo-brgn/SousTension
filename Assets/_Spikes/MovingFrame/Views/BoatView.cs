@@ -4,6 +4,7 @@ using UnityEngine;
 namespace SousTension.Spikes.MovingFrame
 {
     /// <summary>Passive view: moves the boat root to the deterministic pose at the estimated server time.</summary>
+    [DefaultExecutionOrder(-100)]                  // poses the boat before the views that depend on it (the steadied camera) run their LateUpdate
     public sealed class BoatView : MonoBehaviour
     {
         private MovingFrameModel _model;

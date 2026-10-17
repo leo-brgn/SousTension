@@ -17,6 +17,14 @@ namespace SousTension.Spikes.MovingFrame
         private KeyboardInputSource _look;
         private Transform _boat;
         private Transform _cameraRig;
+        public static float CameraStabilization = ReadStabilization();
+
+        private static float ReadStabilization()
+        {
+            foreach (var a in System.Environment.GetCommandLineArgs())
+                if (a.StartsWith("--stab=") && float.TryParse(a.Substring(7), System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out float v)) return Mathf.Clamp01(v);
+            return 0.7f;
+        }
         private readonly Dictionary<string, Transform> _characters = new Dictionary<string, Transform>();
         private readonly HashSet<string> _artCharacters = new HashSet<string>();               // remotes drawn with the 3D sailor (origin at the feet)
         private readonly Dictionary<string, Vector3> _lastPosition = new Dictionary<string, Vector3>();
@@ -25,6 +33,17 @@ namespace SousTension.Spikes.MovingFrame
         {
             _model = model; _clock = clock; _look = look; _boat = boat;
             _cameraRig = camera.transform;
+        }
+
+        // After BoatView has posed the boat this frame (it runs first: DefaultExecutionOrder), so the compensation uses the rotation that is drawn.
+        private void LateUpdate()
+        {
+            if (_cameraRig == null || _cameraRig.parent == null || _model == null || string.IsNullOrEmpty(_model.LocalId)) return;
+            // Comfort (E2-01): the camera sits in a hull that rolls and pitches; the eyes see the horizon of the room tilt while the inner ear feels nothing,
+            // which is what makes people sick. The head compensates a share of the boat's tilt (a steadied head, as on a ship): the room still sways around
+            // the player, the view does not. 0 = rigidly fixed to the boat (as before), 1 = a fully level camera. Option: --stab=0..1.
+            var boatRotation = _cameraRig.parent.rotation;                       // the boat's rotation: the player has no rotation of their own
+            _cameraRig.rotation = Quaternion.Slerp(Quaternion.identity, Quaternion.Inverse(boatRotation), CameraStabilization) * _cameraRig.rotation;
         }
 
         private void Update()
