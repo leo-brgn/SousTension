@@ -1,6 +1,6 @@
 # Direction audio (E12-01, #133) — proposition à valider
 
-> **Statut : décisions prises (17 oct. 2026).** Middleware : **Wwise**. Sources des sons : un mélange de bibliothèque libre et de synthèse. Réseau noir : le silence **et** un son d'alarme dédié. Voix : **Dissonance** (paquet payant, à acquérir par l'utilisateur ; transport des paquets audio par Nakama via un comms network personnalisé). Wwise n'est pas installé : le Wwise Launcher demande un compte Audiokinetic (action de l'utilisateur). Ce document fixe **ce que chaque système doit dire**, indépendamment de l'outil. Principe du GDD : *« compréhensible les yeux fermés »*, sons **diégétiques** ; le Commandant seul est sous-titré.
+> **Statut : décisions prises (17 oct. 2026).** Audio : **Unity natif** (AudioSource + AudioMixer), sans middleware ; `IAudioService` permet d'en brancher un plus tard. Sources des sons : synthèse d'abord (livrée : `ProceduralAudioService`), puis bibliothèque libre. Réseau noir : le silence du fond **et** un son d'alarme dédié. Voix : **UniVoice** (MIT, Opus/Concentus, transport par Nakama), à installer au démarrage de #83. Ce document fixe **ce que chaque système doit dire**, indépendamment de l'outil. Principe du GDD : *« compréhensible les yeux fermés »*, sons **diégétiques** ; le Commandant seul est sous-titré.
 
 ## 1. Règles
 1. **Une voix par système**, reconnaissable seule : le joueur doit pouvoir dire quel système a un problème sans regarder.
@@ -52,8 +52,6 @@ Une alarme acquittée (clic sur la lampe) se tait ; la lampe reste fixe tant que
 4. Événements : vannes, écoutilles, pas, télégraphe, disjoncteurs.
 5. Voix : interphone, proximité (E8-07), Commandant (E13).
 
-## 6. Décisions et reste à faire
-1. Wwise retenu. Installation : Wwise Launcher + intégration Unity, avec un compte Audiokinetic (à faire par l'utilisateur ; non automatisable).
-2. Sources : bibliothèque libre + synthèse, selon le son.
-3. Réseau noir : silence du fond suivi d'un son d'alarme dédié.
-4. Prochaine étape de code, une fois l'intégration installée : `IAudioService` (interface dans `Gameplay`), implémentation Wwise isolée dans son assembly, pilotée par l'état du serveur (fonds, alarmes par famille).
+## 6. État
+1. **Livré** (E12-01) : `AudioMix` (calcul pur, testé), `AudioController`, `ProceduralAudioService` : fonds du réacteur, de la turbine, de l'électricité, de l'eau et de la coque ; six alarmes par famille ; acquittement = silence ; silence du bateau hors mission.
+2. **Reste** : spatialisation par compartiment et atténuation par les écoutilles, sons d'événements (vannes, écoutilles, pas, télégraphe, disjoncteurs), enregistrements libres à la place de la synthèse, mixage (bus), voix (#83).

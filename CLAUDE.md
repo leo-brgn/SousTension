@@ -29,7 +29,7 @@ Co-op 2–4 joueurs, première personne, parodie de sous-marin nucléaire (Steam
 
 - **Moteur : Unity** (D-02 tranché). Langage C#.
 - **Unity 6000.3.25f1** (URP). **Backend et réseau de gameplay : Nakama** (décision utilisateur : « Nakama pour tout ») — comptes, salons, persistance, **et** matches autoritatifs en temps réel (serveur dans `server/`, JavaScript, 10 Hz ; SDK `nakama-unity` v3.10.1). NGO et Fish-Net sont écartés. Le spike E1-01 (#16) valide ce choix pour le référentiel mobile ; sa conclusion peut le remettre en cause.
-- **Audio : Wwise** (décision utilisateur, 17 oct. 2026) ; pas encore installé (intégration à faire dans E12-01, #133). **Voix : Dissonance** (décision utilisateur, 17 oct. 2026) ; paquet payant de l'Asset Store, à acheter et installer par l'utilisateur ; il faudra un « comms network » personnalisé qui relaie les paquets par Nakama (E8-07, #83). **Encore à décider** (ne choisis pas à la place de l'utilisateur) : rien d'autre côté audio/voix.
+- **Audio : audio natif d'Unity** (AudioSource + AudioMixer), sans middleware (décision utilisateur, 17 oct. 2026, remplace Wwise : pas de compte à créer). Interface `IAudioService` ; les sons sont d'abord synthétisés, puis remplaçables par des enregistrements libres. **Voix : UniVoice** (open source, MIT, github.com/adrenak/univoice ; Opus via Concentus ; transport branchable) à la place de Dissonance, avec les paquets relayés par Nakama (E8-07, #83) ; pas encore installé : à installer sur accord explicite au démarrage de #83.
 - **Pressenti, à confirmer avant d'installer :** URP, Input System, package Localization, Steamworks.NET.
 
 ## Règles d'architecture (issues du GDD §8 — non négociables)

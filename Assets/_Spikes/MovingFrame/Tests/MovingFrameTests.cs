@@ -786,6 +786,42 @@ namespace SousTension.Spikes.MovingFrame.Tests
         }
 
         [Test]
+        public void TheAudioMix_FollowsTheReactorTheGridAndTheAlarms()
+        {
+            var model = new MovingFrameModel { LocalId = "me" };
+            var quiet = AudioMix.Compute(model);
+            Assert.AreEqual(AlarmTone.None, quiet.Alarm);
+            Assert.AreEqual(0f, quiet.ReactorVolume, 1e-6f, "no reactor data: no hum");
+
+            var valves = new[] { 1f, 1f, 1f, 1f }; var pumps = new[] { true, true };
+            model.SetReactor(new ReactorState("croisiere", 0.5f, 1f, 100f, 250f, 30f, 5f, 1f, 1f, valves, pumps, false, false, false, false, false));
+            float cool = AudioMix.Compute(model).ReactorPitch;
+            model.SetReactor(new ReactorState("pleine", 0.9f, 2f, 300f, 380f, 50f, 8f, 1f, 1f, valves, pumps, false, false, false, false, false));
+            var hot = AudioMix.Compute(model);
+            Assert.Greater(hot.ReactorPitch, cool, "the hum rises with the temperature");
+            Assert.Greater(hot.ReactorVolume, 0.25f);
+
+            model.SetAlarms(new[] { "wt_leak_2" });
+            Assert.AreEqual(AlarmTone.Water, AudioMix.Compute(model).Alarm);
+            model.SetAlarms(new[] { "wt_leak_2", "pw_v_low" });
+            Assert.AreEqual(AlarmTone.Power, AudioMix.Compute(model).Alarm, "the most urgent family wins");
+            model.SetAlarms(new[] { "wt_leak_2", "pw_v_low", "wt_flood_3" });
+            Assert.AreEqual(AlarmTone.Flood, AudioMix.Compute(model).Alarm);
+            model.SetAlarms(new[] { "!wt_flood_3", "!wt_leak_2", "!pw_v_low" });
+            Assert.AreEqual(AlarmTone.None, AudioMix.Compute(model).Alarm, "acknowledged alarms are silent");
+            model.SetAlarms(new[] { "rx_temp_crit", "wt_flood_3" });
+            Assert.AreEqual(AlarmTone.ReactorCritical, AudioMix.Compute(model).Alarm);
+
+            model.SetAlarms(new[] { "pw_v_dark" });
+            var dark = AudioMix.Compute(model);
+            Assert.AreEqual(AlarmTone.DarkGrid, dark.Alarm, "the dark grid has its own sound after the silence");
+            Assert.AreEqual(0f, dark.GridVolume, 1e-6f, "and the machine hum is gone");
+
+            model.SetReactor(new ReactorState("pleine", 0.9f, 2f, 300f, 380f, 50f, 8f, 1f, 1f, valves, pumps, true, false, false, false, false));
+            Assert.AreEqual(0f, AudioMix.Compute(model).ReactorVolume, 1e-6f, "a SCRAMmed reactor falls silent");
+        }
+
+        [Test]
         public void TheModelKeepsTheMissionFlow_AndKnowsWhoIsReady()
         {
             var model = new MovingFrameModel { LocalId = "me" };

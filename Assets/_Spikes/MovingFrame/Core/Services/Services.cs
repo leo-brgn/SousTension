@@ -65,6 +65,12 @@ namespace SousTension.Spikes.MovingFrame
         string TargetId { get; }
     }
 
+    /// <summary>Plays the sound of the boat: the machine loops and the current alarm (docs/design/audio-direction.md). The implementation smooths the changes.</summary>
+    public interface IAudioService
+    {
+        void Apply(AudioMix mix);
+    }
+
     /// <summary>Anything advanced once per frame by the composition root.</summary>
     public interface ITickable
     {
