@@ -178,7 +178,7 @@ Objectif : lever le risque n°1 (référentiel mobile + réseau) avant d'investi
 # EPIC 10 — Monde, niveaux & hub (VS → ALPHA)
 
 ## Bateau (blockout dès PROTO)
-- [ ] **E10-01 🧪 Blockout du bateau** : 3 compartiments (PROTO) → 6 compartiments en enfilade, 28 m, sas manuels, aucun poste visible depuis un autre. `L` → `M`
+- [x] **E10-01 🧪 Blockout du bateau** : 3 compartiments (PROTO) → 6 compartiments en enfilade, 28 m, sas manuels, aucun poste visible depuis un autre. `L` → `M`
 - [ ] **E10-02 🎨 Compartiments détaillés** dans l'ordre d'attaque : 4 Réacteur → 2 Poste central → 5 Machines → 6 Sas & vie → 3 Radio/sonar → 1 Torpilles. `XL` (voir Epic 12)
 
 ## Zones
@@ -201,7 +201,7 @@ Références visuelles : `moodboard/01..05`, `moodboard/v2_references/01..16`, e
 ## Fondations
 - [ ] **E11-01 🎨 Bible artistique** (à partir du moodboard v2) : palette, proportions, langage de formes, règle du rouge unique, références hors-limites. `M` · PROTO
 - [ ] **E11-02 🎨 Typographie « administration kravique »** + tampons + gabarit **K-90/B** (formulaire de fin de mission, 3 exemplaires — TODO §2.1). `M` · `VS`
-- [ ] **E11-03 🎨 Système de lumière/tension** : blanc → orange → rouge → noir ; plafonnier par compartiment, éclairage de secours rouge, lampes torches. `L` · PROTO
+- [x] **E11-03 🎨 Système de lumière/tension** : blanc → orange → rouge → noir ; plafonnier par compartiment, éclairage de secours rouge, lampes torches. `L` · PROTO
 - [x] **E11-04 🎨 Matelot de base** (corps pataud, rig complet + mains 1re personne) — réf. `v2_references/11_equipage_personnages.png` : silhouettes en œuf, moustaches, casquettes vertes à étoile rouge. `L` · PROTO
 - [ ] **E11-05 🎨 Concepts manquants** : plans d'ensemble du bateau (coupe 6 compartiments), carte des zones, Entente (frégate/avion), sous-marin jumeau. `L`
 
