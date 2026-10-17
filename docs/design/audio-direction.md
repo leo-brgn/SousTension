@@ -1,6 +1,6 @@
 # Direction audio (E12-01, #133) — proposition à valider
 
-> **Statut : proposition.** Décisions ouvertes : **moteur audio (FMOD ou Wwise)** et voix (Vivox / Dissonance) : rien n'est installé. Ce document fixe **ce que chaque système doit dire**, indépendamment de l'outil. Principe du GDD : *« compréhensible les yeux fermés »*, rien d'autre que des sons **diégétiques** (pas de bips d'interface), le Commandant seul est sous-titré.
+> **Statut : décisions prises (17 oct. 2026).** Middleware : **Wwise**. Sources des sons : un mélange de bibliothèque libre et de synthèse. Réseau noir : le silence **et** un son d'alarme dédié. La voix (Vivox / Dissonance) reste ouverte. Wwise n'est pas installé : le Wwise Launcher demande un compte Audiokinetic (action de l'utilisateur). Ce document fixe **ce que chaque système doit dire**, indépendamment de l'outil. Principe du GDD : *« compréhensible les yeux fermés »*, sons **diégétiques** ; le Commandant seul est sous-titré.
 
 ## 1. Règles
 1. **Une voix par système**, reconnaissable seule : le joueur doit pouvoir dire quel système a un problème sans regarder.
@@ -35,7 +35,7 @@ Les 38 alarmes (`server/src/alarms.js`) ne peuvent pas avoir 38 sons. Elles sonn
 | Eau | cloche étouffée | roulement montant | `wt_leak`, `wt_level` |
 | Noyade (rouge) | sirène à deux tons | continue | `wt_flood_*` |
 | Critique réacteur (rouge) | klaxon à deux tons | continu | `rx_temp_crit`, `rx_scram_auto` |
-| Réseau noir | rien : le silence **est** l'alarme, puis les lampes de secours | | `pw_v_dark` |
+| Réseau noir | le fond disparaît d'un coup, puis **un son d'alarme dédié** (décision utilisateur) et les lampes de secours | un coup grave, long, répété | `pw_v_dark` |
 
 Une alarme acquittée (clic sur la lampe) se tait ; la lampe reste fixe tant que la cause dure.
 
@@ -52,7 +52,8 @@ Une alarme acquittée (clic sur la lampe) se tait ; la lampe reste fixe tant que
 4. Événements : vannes, écoutilles, pas, télégraphe, disjoncteurs.
 5. Voix : interphone, proximité (E8-07), Commandant (E13).
 
-## 6. Questions ouvertes
-1. FMOD ou Wwise (les deux sont gratuits sous un seuil de revenus) ?
-2. Source des sons : bibliothèque libre, enregistrement ou synthèse (budget) ?
-3. Le **silence** du réseau noir est-il bien l'alarme voulue ?
+## 6. Décisions et reste à faire
+1. Wwise retenu. Installation : Wwise Launcher + intégration Unity, avec un compte Audiokinetic (à faire par l'utilisateur ; non automatisable).
+2. Sources : bibliothèque libre + synthèse, selon le son.
+3. Réseau noir : silence du fond suivi d'un son d'alarme dédié.
+4. Prochaine étape de code, une fois l'intégration installée : `IAudioService` (interface dans `Gameplay`), implémentation Wwise isolée dans son assembly, pilotée par l'état du serveur (fonds, alarmes par famille).
