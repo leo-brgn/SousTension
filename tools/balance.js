@@ -61,7 +61,7 @@ function run(name, seed) {
   const sc = SCENARIOS[name];
   const state = createMatch(["a", "b"]);
   sc.setup(state, seed);
-  const r = { scenario: name, seed, minutes: MINUTES, maxT: 0, minV: 1, minE: Infinity, maxWaterM3: 0, maxTrimDeg: 0, maxDepth: 0, firstWarnS: null, firstScramS: null, firstFloodS: null, violations: [] };
+  const r = { scenario: name, seed, minutes: MINUTES, maxT: 0, minV: 1, minE: Infinity, maxWaterM3: 0, maxTrimDeg: 0, maxDepth: 0, firstWarnS: null, firstScramS: null, firstFloodS: null, alarms: {}, violations: [] };
   const script = {
     events: sc.events || {},
     onTick: (s, t) => {
@@ -76,6 +76,7 @@ function run(name, seed) {
       if (r.firstWarnS === null && s.reactor.T >= m.REACTOR_WARN) r.firstWarnS = sec;
       if (r.firstScramS === null && s.reactor.scram) r.firstScramS = sec;
       if (r.firstFloodS === null && s.water.comps.some((c, i) => c.w >= m.WATER_COMPARTMENTS[i].volume - 1e-9)) r.firstFloodS = sec;
+      for (let i = 0; i < m.ALARMS.length; i++) if (s.alarms.list[i].on && r.alarms[m.ALARMS[i].id] === undefined) r.alarms[m.ALARMS[i].id] = sec;     // first time each alarm rang
       for (let i = 0; i < s.water.comps.length; i++) if (s.water.comps[i].w > m.WATER_COMPARTMENTS[i].volume + 1e-6) r.violations.push("water above capacity in compartment " + (i + 1) + " at " + sec + " s");
       for (const id of s.order) { const p = s.players[id]; if (Math.abs(p.x) > m.HALF_X + 1e-9 || Math.abs(p.z) > m.HALF_Z + 1e-9) r.violations.push("player " + id + " out of the boat at " + sec + " s"); }
     },
@@ -112,6 +113,10 @@ else {
     for (const r of rows)
       console.log([r.seed, f(r.maxT, 0), f(r.minV, 2), f(r.minE, 1), f(r.maxWaterM3, 1), f(r.maxTrimDeg, 1), f(r.maxDepth, 1), f(r.firstWarnS, 0), f(r.firstScramS, 0), f(r.firstFloodS, 0), r.scram ? "SCRAM" : "running"].map((x, i) => String(x).padStart(i === 0 ? 4 : i === 10 ? 8 : 7)).join(" "));
     const scrams = rows.filter((r) => r.firstScramS !== null).length;
+    const first = {};
+    for (const r of rows) for (const [id, sec] of Object.entries(r.alarms)) (first[id] = first[id] || []).push(sec);
+    const rang = Object.keys(first).sort((a, b) => Math.min(...first[a]) - Math.min(...first[b]));
+    console.log("alarms: " + (rang.length ? rang.map((id) => id + " " + first[id].length + "/" + rows.length + " from " + f(Math.min(...first[id]), 0) + " s").join(" | ") : "none"));
     console.log("-> " + scrams + "/" + rows.length + " runs went to SCRAM; max temperature " + f(Math.max(...rows.map((r) => r.maxT)), 0) + " C; max water " + f(Math.max(...rows.map((r) => r.maxWaterM3)), 1) + " m3");
   }
   const bad = report.flatMap((r) => r.violations.map((v) => r.scenario + " seed " + r.seed + ": " + v));

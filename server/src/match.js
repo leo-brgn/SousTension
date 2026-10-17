@@ -1,7 +1,7 @@
 var matchInit = function (ctx, logger, nk, params) {
   logger.info("moving_frame match init");
   return {
-    state: { tick: 0, players: {}, order: [], cp: newCoupled(), cargo: newCargo(), reactor: newReactor(REACTOR_SEED, "veille"), lever: newLever(), boat: newBoat(), restart: newRestart(), water: newWater(), leaks: newLeaks(), bilge: newBilge(), power: newPower(), prop: newPropulsion(), manual: newManual(), debug: newDebug(debugEnabled(ctx, params)) },
+    state: { tick: 0, players: {}, order: [], cp: newCoupled(), cargo: newCargo(), reactor: newReactor(REACTOR_SEED, "veille"), lever: newLever(), boat: newBoat(), restart: newRestart(), water: newWater(), leaks: newLeaks(), bilge: newBilge(), power: newPower(), prop: newPropulsion(), manual: newManual(), alarms: newAlarms(), debug: newDebug(debugEnabled(ctx, params)) },
     tickRate: TICK_RATE,
     label: JSON.stringify({ name: MATCH_NAME })
   };
@@ -62,7 +62,7 @@ var matchLoop = function (ctx, logger, nk, dispatcher, tick, state, messages) {
     var id = state.order[j], q = state.players[id];
     out.push({ id: id, x: q.x, z: q.z, seq: q.seq, hd: handsView(q.hands) });
   }
-  dispatcher.broadcastMessage(OP_STATE, JSON.stringify({ tick: t, t: t * DT, players: out, il: coupledView(state.cp, tick)[0], cp: coupledView(state.cp, tick), cargo: cargoView(state.cargo), rx: reactorView(state.reactor), sc: leverView(state.lever, state.reactor), rs: restartView(state), bw: waterView(state.water), lk: leaksView(state.leaks), bp: bilgeView(state.bilge), pw: powerView(state), pr: propulsionView(state.prop), mn: manualView(state.manual), boat: boatView(state.boat) }), null, null, true);
+  dispatcher.broadcastMessage(OP_STATE, JSON.stringify({ tick: t, t: t * DT, players: out, il: coupledView(state.cp, tick)[0], cp: coupledView(state.cp, tick), cargo: cargoView(state.cargo), rx: reactorView(state.reactor), sc: leverView(state.lever, state.reactor), rs: restartView(state), bw: waterView(state.water), lk: leaksView(state.leaks), bp: bilgeView(state.bilge), pw: powerView(state), pr: propulsionView(state.prop), mn: manualView(state.manual), al: alarmsView(state.alarms), boat: boatView(state.boat) }), null, null, true);
   // 4. Debug replies (E1-09): each sender gets the lines of their commands as one message, to them only.
   if (state.debug.out.length > 0) {
     var byPlayer = {}, order = [];
@@ -128,7 +128,7 @@ if (typeof module !== "undefined" && module.exports) {
   module.exports = {
     InitModule: InitModule, stepPlayer: stepPlayer, simStep: simStep, queueInput: queueInput, stateDigest: stateDigest,
     TICK_RATE: TICK_RATE, DT: DT, STATIONS: STATIONS, STATION_REACH: STATION_REACH, INTERLOCK_WINDOW_TICKS: INTERLOCK_WINDOW_TICKS, MAX_ALLOWANCE: MAX_ALLOWANCE, MOVE_SPEED: MOVE_SPEED, HALF_X: HALF_X, HALF_Z: HALF_Z,
-    OP_INPUT: OP_INPUT, OP_STATE: OP_STATE,
+    OP_INPUT: OP_INPUT, OP_STATE: OP_STATE, ALARMS: ALARMS, newAlarms: newAlarms, alarmsStep: alarmsStep, alarmAck: alarmAck, alarmsView: alarmsView,
     PLAYER_RADIUS: PLAYER_RADIUS, BULKHEAD_Z: BULKHEAD_Z, HATCH_X: HATCH_X, HATCH_HALF: HATCH_HALF, WALL_HALF: WALL_HALF, BAFFLE_HALF_X: BAFFLE_HALF_X, BAFFLE_HALF_Z: BAFFLE_HALF_Z, BAFFLE_OFFSET: BAFFLE_OFFSET,
     LAYOUT_OBSTACLES: LAYOUT_OBSTACLES, cargoBlocked: cargoBlocked, CARGO_RADIUS: CARGO_RADIUS, layoutBlocked: layoutBlocked, hatchToggle: hatchToggle, hatchOccupied: hatchOccupied, CONTROLS: CONTROLS,
     LEVER_COVER_TICKS: LEVER_COVER_TICKS, SINK_RATE_MAX: SINK_RATE_MAX, SINK_RAMP_SECONDS: SINK_RAMP_SECONDS, newBoat: newBoat, boatStep: boatStep,
