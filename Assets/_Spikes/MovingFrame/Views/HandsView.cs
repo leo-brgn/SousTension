@@ -97,9 +97,11 @@ namespace SousTension.Spikes.MovingFrame
             if (_model == null || string.IsNullOrEmpty(_model.LocalId)) return;
             var held = _model.HandsOf(_model.LocalId);
             UpdateArms(held);
+            bool twoHanded = held.Length > 1 && !string.IsNullOrEmpty(held[0]) && held[0] == held[1];       // one item in both hands: drawn once, between them
             for (int i = 0; i < 3; i++)
             {
-                bool any = held.Length > i && !string.IsNullOrEmpty(held[i]);
+                bool any = held.Length > i && !string.IsNullOrEmpty(held[i]) && !(i == 1 && twoHanded);
+                if (i == 0) _slots[0].localPosition = twoHanded ? new Vector3(0f, -0.3f, 0.55f) : Positions[0];
                 if (_slots[i].gameObject.activeSelf != any) _slots[i].gameObject.SetActive(any);
                 if (!any) continue;
                 string kind = KindOf(held[i]);
