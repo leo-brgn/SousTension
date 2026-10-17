@@ -69,6 +69,8 @@ namespace SousTension.Spikes.MovingFrame
     public interface IAudioService
     {
         void Apply(AudioMix mix);
+        /// <summary>A short sound (a hatch, a click, a footstep...).</summary>
+        void Play(AudioCue cue);
     }
 
     /// <summary>Anything advanced once per frame by the composition root.</summary>
