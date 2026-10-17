@@ -66,6 +66,7 @@ namespace SousTension.Spikes.MovingFrame
             aim.Bind(cam);
             new GameObject("Hands").AddComponent<HandsView>().Bind(model, cam, aim, input);
             new GameObject("Manual").AddComponent<ManualView>().Bind(model, cam);
+            new GameObject("Flashlight").AddComponent<FlashlightView>().Bind(model, cam);
             var characters = new GameObject("Characters").AddComponent<CharactersView>();
             characters.Bind(model, clock, input, boat.transform, cam);
             new GameObject("Stations").AddComponent<StationsView>().Bind(model, boat.transform);
