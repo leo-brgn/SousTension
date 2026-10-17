@@ -82,6 +82,7 @@ namespace SousTension.Spikes.MovingFrame
             new GameObject("Manual").AddComponent<ManualView>().Bind(model, cam);
             new GameObject("Flashlight").AddComponent<FlashlightView>().Bind(model, cam);
             _audio = new AudioController(model, new GameObject("Audio").AddComponent<ProceduralAudioService>());
+            if (VoiceLoopbackView.Requested) new GameObject("VoiceLoopback").AddComponent<VoiceLoopbackView>();       // voice chain test (E8-07b): --voice-loopback
             var characters = new GameObject("Characters").AddComponent<CharactersView>();
             characters.Bind(model, clock, input, boat.transform, cam);
             new GameObject("Stations").AddComponent<StationsView>().Bind(model, boat.transform);

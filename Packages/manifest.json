@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "com.adrenak.univoice": "4.12.0",
     "com.heroiclabs.nakama-unity": "https://github.com/heroiclabs/nakama-unity.git?path=/Packages/Nakama#v3.10.1",
     "com.unity.ai.navigation": "2.0.14",
     "com.unity.collab-proxy": "2.13.6",
@@ -46,5 +47,17 @@
     "com.unity.timeline": "1.8.13",
     "com.unity.ugui": "2.0.0",
     "com.unity.visualscripting": "1.9.12"
-  }
+  },
+  "scopedRegistries": [
+    {
+      "name": "npmjs",
+      "url": "https://registry.npmjs.org",
+      "scopes": [
+        "com.adrenak.univoice",
+        "com.adrenak.brw",
+        "com.adrenak.unimic",
+        "com.adrenak.concentus-unity"
+      ]
+    }
+  ]
 }
