@@ -18,7 +18,9 @@ namespace SousTension.Spikes.MovingFrame
         public float Yaw { get; private set; }   // radians, about the boat's up axis
         public float Pitch { get; private set; } // radians
 
-        private const float Sensitivity = 0.0025f;
+        private readonly GameSettings _settings;
+
+        public KeyboardInputSource(GameSettings settings = null) { _settings = settings ?? new GameSettings(); }
 
         public bool UseHeld => !ScreensView.IsOpen && Mouse.current != null && Mouse.current.leftButton.isPressed;   // a click on a screen is not a use of the world
         public bool TakeHeld => Keyboard.current != null && Keyboard.current.fKey.isPressed;
@@ -56,8 +58,8 @@ namespace SousTension.Spikes.MovingFrame
             var mouse = Mouse.current;
             if (mouse == null || ScreensView.IsOpen) return;                  // a screen is open: the cursor is free, the camera does not turn
             var d = mouse.delta.ReadValue();
-            Yaw += d.x * Sensitivity;
-            Pitch = Mathf.Clamp(Pitch - d.y * Sensitivity, -1.2f, 1.2f);
+            Yaw += d.x * _settings.Sensitivity;
+            Pitch = Mathf.Clamp(Pitch - (_settings.InvertY ? -d.y : d.y) * _settings.Sensitivity, -1.2f, 1.2f);
         }
     }
 }

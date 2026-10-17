@@ -37,22 +37,36 @@ namespace SousTension.Spikes.MovingFrame
         private bool _pauseOpen;
         private string _shownPhase = "";
         private bool _wantReady;
+        private GameSettings _settings;
+        private Func<string> _aimedTarget;
+        private VisualElement _help;
+        private Label _helpName, _helpAct;
+        private string _helpShownTarget = "?";
+        private readonly List<Action> _settingRefresh = new List<Action>();
+        private bool _rebuild;
 
-        public void Bind(MovingFrameModel model, Func<string> connectionStatus)
+        public void Bind(MovingFrameModel model, Func<string> connectionStatus, GameSettings settings = null, Func<string> aimedTarget = null)
         {
             Instance = this;
             _model = model; _connectionStatus = connectionStatus;
-            var settings = ScriptableObject.CreateInstance<PanelSettings>();
-            settings.scaleMode = PanelScaleMode.ScaleWithScreenSize;
-            settings.referenceResolution = new Vector2Int(1920, 1080);
-            settings.themeStyleSheet = ScriptableObject.CreateInstance<ThemeStyleSheet>();       // empty: every style is set here
+            _settings = settings ?? new GameSettings(); _aimedTarget = aimedTarget;
+            var panelSettings = ScriptableObject.CreateInstance<PanelSettings>();
+            panelSettings.scaleMode = PanelScaleMode.ScaleWithScreenSize;
+            panelSettings.referenceResolution = new Vector2Int(1920, 1080);
+            panelSettings.themeStyleSheet = ScriptableObject.CreateInstance<ThemeStyleSheet>();       // empty: every style is set here
             var doc = gameObject.AddComponent<UIDocument>();
-            doc.panelSettings = settings;
+            doc.panelSettings = panelSettings;
             _root = doc.rootVisualElement;
             _root.style.flexGrow = 1;
             _root.style.unityFontDefinition = FontDefinition.FromFont(Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf"));      // the empty theme brings no font: the texts are inherited from here
-            BuildTitle(); BuildLobby(); BuildBriefing(); BuildDebrief(); BuildPause(); BuildStopped();
+            BuildAll();
             ShowOnly(_title);
+        }
+
+        private void BuildAll()
+        {
+            _settingRefresh.Clear();
+            BuildTitle(); BuildLobby(); BuildBriefing(); BuildDebrief(); BuildPause(); BuildStopped(); BuildHelp();
         }
 
         // ---- building blocks --------------------------------------------------------------------------------------------------------------
@@ -158,11 +172,99 @@ namespace SousTension.Spikes.MovingFrame
         private void BuildPause()
         {
             _pause = Screen("Pause");
-            var card = Card(_pause, 640);
+            var card = Card(_pause, 820);
             Text(card, UiText.Get("ui.pause.title"), 52, Cream, true, true);
             Text(card, UiText.Get("ui.pause.note"), 22, Brass, true);
+            Text(card, UiText.Get("ui.settings.title"), 28, Brass, false, true).style.marginTop = 12;
+            var g = _settings;
+            StepRow(card, "ui.settings.sensitivity", () => (g.Sensitivity / 0.0025f * 100f).ToString("0") + " %", () => g.Sensitivity -= GameSettings.SensitivityStep, () => g.Sensitivity += GameSettings.SensitivityStep);
+            ToggleRow(card, "ui.settings.invert", () => g.InvertY, () => g.InvertY = !g.InvertY);
+            StepRow(card, "ui.settings.stab", () => Mathf.RoundToInt(g.Stabilization * 100f) + " %", () => g.Stabilization -= GameSettings.StabilizationStep, () => g.Stabilization += GameSettings.StabilizationStep);
+            StepRow(card, "ui.settings.fov", () => g.Fov.ToString("0") + "°", () => g.Fov -= GameSettings.FovStep, () => g.Fov += GameSettings.FovStep);
+            ToggleRow(card, "ui.settings.vsync", () => g.Vsync, () => g.Vsync = !g.Vsync);
+            ToggleRow(card, "ui.settings.help", () => g.HelpVisible, () => g.HelpVisible = !g.HelpVisible);
+            ChoiceRow(card, "ui.settings.language", () => UiText.Get("ui.settings.lang." + UiText.Language), () =>
+            {
+                g.Language = UiText.Language == "fr" ? "en" : "fr";
+                UiText.Language = g.Language;
+                _rebuild = true;                                       // every text is built once: build them again in the new language
+            });
             MakeButton(card, UiText.Get("ui.pause.resume"), () => _pauseOpen = false);
             MakeButton(card, UiText.Get("ui.quit"), () => QuitRequested?.Invoke(), Rust);
+        }
+
+        private VisualElement SettingRow(VisualElement card, string labelKey)
+        {
+            var row = new VisualElement();
+            row.style.flexDirection = FlexDirection.Row; row.style.alignItems = Align.Center; row.style.justifyContent = Justify.SpaceBetween; row.style.marginTop = 6;
+            var label = Text(row, UiText.Get(labelKey), 24, Cream);
+            label.style.flexGrow = 1; label.style.marginBottom = 0;
+            card.Add(row);
+            return row;
+        }
+
+        private static Button SmallButton(VisualElement parent, string text, Action onClick)
+        {
+            var b = MakeButton(parent, text, onClick);
+            b.style.fontSize = 24; b.style.marginTop = 0; b.style.paddingTop = 4; b.style.paddingBottom = 4; b.style.minWidth = 52;
+            return b;
+        }
+
+        private void Persist() { SettingsStore.Save(_settings); }
+
+        // a value changed with - and + (the cursor is free in the pause: plain buttons need no slider theme)
+        private void StepRow(VisualElement card, string labelKey, Func<string> value, Action dec, Action inc)
+        {
+            var row = SettingRow(card, labelKey);
+            SmallButton(row, "-", () => { dec(); Persist(); });
+            var v = Text(row, "", 24, Brass, true); v.style.minWidth = 110; v.style.marginBottom = 0;
+            SmallButton(row, "+", () => { inc(); Persist(); });
+            _settingRefresh.Add(() => v.text = value());
+        }
+
+        private void ToggleRow(VisualElement card, string labelKey, Func<bool> value, Action toggle)
+        {
+            var row = SettingRow(card, labelKey);
+            var b = SmallButton(row, "", () => { toggle(); Persist(); });
+            b.style.minWidth = 110;
+            _settingRefresh.Add(() => b.text = UiText.Get(value() ? "ui.settings.on" : "ui.settings.off"));
+        }
+
+        private void ChoiceRow(VisualElement card, string labelKey, Func<string> value, Action next)
+        {
+            var row = SettingRow(card, labelKey);
+            var b = SmallButton(row, "", () => { next(); Persist(); });
+            b.style.minWidth = 160;
+            _settingRefresh.Add(() => b.text = value());
+        }
+
+        // The help panel (right side, F1): what the aimed object is and what a click does, plus the keys. Off by default; the game itself has no HUD.
+        private void BuildHelp()
+        {
+            _help = new VisualElement { name = "Help" };
+            _help.style.position = Position.Absolute; _help.style.right = 24; _help.style.top = 120; _help.style.width = 440;
+            _help.style.paddingLeft = 20; _help.style.paddingRight = 20; _help.style.paddingTop = 14; _help.style.paddingBottom = 14;
+            _help.style.backgroundColor = Panel; _help.style.display = DisplayStyle.None;
+            _help.style.borderLeftWidth = 4; _help.style.borderLeftColor = Brass;
+            _help.pickingMode = PickingMode.Ignore;
+            Text(_help, UiText.Get("ui.help.title"), 26, Brass, false, true);
+            _helpName = Text(_help, "", 24, Cream, false, true);
+            _helpAct = Text(_help, "", 20, Cream);
+            Text(_help, UiText.Get("ui.help.keys"), 18, Brass).style.marginTop = 10;
+            _root.Add(_help);
+            _helpShownTarget = "?";
+        }
+
+        private void RefreshHelp(bool visible)
+        {
+            _help.style.display = visible ? DisplayStyle.Flex : DisplayStyle.None;
+            if (!visible) return;
+            string target = _aimedTarget != null ? _aimedTarget() : null;
+            if (target == _helpShownTarget) return;
+            _helpShownTarget = target;
+            string key = UiText.HintKey(target);
+            _helpName.text = key != null ? UiText.Get(key + ".name") : UiText.Get("ui.help.nothing");
+            _helpAct.text = key != null ? UiText.Get(key + ".act") : "";
         }
 
         private void BuildStopped()
@@ -207,6 +309,8 @@ namespace SousTension.Spikes.MovingFrame
             }
 
             // a server without a lobby (older, or a bare match) has no mission flow: the game is just running
+            if (_rebuild) { _rebuild = false; _root.Clear(); BuildAll(); _shownPhase = ""; }
+            if (keyboard != null && keyboard.f1Key.wasPressedThisFrame) { _settings.HelpVisible = !_settings.HelpVisible; Persist(); }
             string phase = !mission.Valid ? "run" : mission.Phase;
             if (phase == "run" && keyboard != null && keyboard.escapeKey.wasPressedThisFrame) _pauseOpen = !_pauseOpen;
             if (phase != "run") _pauseOpen = false;
@@ -216,6 +320,8 @@ namespace SousTension.Spikes.MovingFrame
                 _shownPhase = key;
                 ShowOnly(key == "lobby" ? _lobby : key == "briefing" ? _briefing : key == "debrief" ? _debrief : key == "pause" ? _pause : key == "stopped" ? _stopped : null);
             }
+            RefreshHelp(_settings.HelpVisible && (key == "run" || key == "pause"));
+            if (key == "pause") foreach (var refresh in _settingRefresh) refresh();
             if (key == "lobby") RefreshLobby(mission);
             else if (key == "briefing") RefreshBriefing(mission);
             else if (key == "debrief") RefreshDebrief(mission);

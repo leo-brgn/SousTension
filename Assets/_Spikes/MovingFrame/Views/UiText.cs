@@ -32,6 +32,23 @@ namespace SousTension.Spikes.MovingFrame
         /// <summary>The text of <paramref name="key"/> in the current language; the key itself when it is missing (visible in play, caught by a test).</summary>
         public static string Get(string key) => Table(Language).TryGetValue(key, out var text) ? text : key;
 
+        /// <summary>The help key of an aimable object id ("hint.valve"...); its texts are <c>.name</c> and <c>.act</c>. Null for an unknown id.</summary>
+        public static string HintKey(string id)
+        {
+            if (string.IsNullOrEmpty(id)) return null;
+            if (id.StartsWith("leak:")) return "hint.leak";
+            if (id.StartsWith("alarm:")) return "hint.alarm";
+            if (id.StartsWith("cc:")) return "hint.cc";
+            if (id.StartsWith("breaker_")) return "hint.breaker";
+            if (id.StartsWith("tele_")) return "hint.tele";
+            if (id.StartsWith("valve")) return "hint.valve";
+            if (id.StartsWith("pump")) return "hint.pump";
+            if (id.StartsWith("bilge")) return "hint.bilge";
+            if (id.StartsWith("hatch")) return "hint.hatch";
+            if (id == "item" || id == "regime" || id == "scram") return "hint." + id;
+            return null;
+        }
+
         public static string Format(string key, params object[] args) => string.Format(Get(key), args);
 
         private static readonly Dictionary<string, string> Fr = new Dictionary<string, string>
@@ -84,6 +101,45 @@ namespace SousTension.Spikes.MovingFrame
             ["ui.paused.body"] = "Un équipier est parti. Le sous-marin ne navigue pas avec un seul marin : en attente d'un équipier.",
             ["ui.unit.m"] = "m",
             ["ui.unit.s"] = "s",
+            ["ui.help.title"] = "Aide",
+            ["ui.help.nothing"] = "Visez un objet pour savoir quoi faire.",
+            ["ui.help.keys"] = "Z Q S D : marcher\nSouris : regarder\nClic gauche : manier\nF prendre — G poser — H poche\nClic droit : jeter\nFlèches : pages du Manuel\nF1 : cette aide\nÉchap : pause et réglages",
+            ["ui.settings.title"] = "Réglages",
+            ["ui.settings.sensitivity"] = "Sensibilité de la souris",
+            ["ui.settings.invert"] = "Inverser l'axe vertical",
+            ["ui.settings.stab"] = "Stabilisation de la caméra",
+            ["ui.settings.fov"] = "Champ de vision",
+            ["ui.settings.vsync"] = "Synchronisation verticale",
+            ["ui.settings.help"] = "Aide à l'écran (F1)",
+            ["ui.settings.language"] = "Langue",
+            ["ui.settings.on"] = "oui",
+            ["ui.settings.off"] = "non",
+            ["ui.settings.lang.fr"] = "Français",
+            ["ui.settings.lang.en"] = "Anglais",
+            ["hint.item.name"] = "Objet",
+            ["hint.item.act"] = "Clic gauche : l'utiliser — F : prendre — G : poser",
+            ["hint.regime.name"] = "Sélecteur de régime du réacteur",
+            ["hint.regime.act"] = "Clic gauche : changer de régime",
+            ["hint.scram.name"] = "Levier d'arrêt d'urgence (SCRAM)",
+            ["hint.scram.act"] = "Clic gauche : actionner (après un SCRAM, le remettre en place)",
+            ["hint.valve.name"] = "Vanne du circuit primaire",
+            ["hint.valve.act"] = "Clic gauche maintenu : ouvrir la vanne",
+            ["hint.pump.name"] = "Pompe de refroidissement",
+            ["hint.pump.act"] = "Clic gauche : marche / arrêt",
+            ["hint.bilge.name"] = "Pompe de cale",
+            ["hint.bilge.act"] = "Clic gauche : marche / arrêt (il faut du courant)",
+            ["hint.breaker.name"] = "Disjoncteur",
+            ["hint.breaker.act"] = "Clic gauche : réarmer ou couper",
+            ["hint.tele.name"] = "Télégraphe de machine",
+            ["hint.tele.act"] = "Clic gauche : plus ou moins de vitesse",
+            ["hint.hatch.name"] = "Écoutille de cloison",
+            ["hint.hatch.act"] = "Clic gauche : ouvrir ou fermer",
+            ["hint.leak.name"] = "Voie d'eau",
+            ["hint.leak.act"] = "Clic gauche avec une rustine en main : la boucher",
+            ["hint.alarm.name"] = "Voyant d'alarme",
+            ["hint.alarm.act"] = "Clic gauche : acquitter l'alarme",
+            ["hint.cc.name"] = "Commande à deux",
+            ["hint.cc.act"] = "Clic gauche, et qu'un équipier appuie sur l'autre poste en moins de 3 s",
         };
 
         private static readonly Dictionary<string, string> En = new Dictionary<string, string>
@@ -136,6 +192,45 @@ namespace SousTension.Spikes.MovingFrame
             ["ui.paused.body"] = "A crew member left. The submarine does not sail with one sailor: waiting for a crew member.",
             ["ui.unit.m"] = "m",
             ["ui.unit.s"] = "s",
+            ["ui.help.title"] = "Help",
+            ["ui.help.nothing"] = "Aim at an object to see what it does.",
+            ["ui.help.keys"] = "W A S D: walk\nMouse: look\nLeft click: use\nF take — G put down — H pocket\nRight click: throw\nArrows: Manual pages\nF1: this help\nEsc: pause and settings",
+            ["ui.settings.title"] = "Settings",
+            ["ui.settings.sensitivity"] = "Mouse sensitivity",
+            ["ui.settings.invert"] = "Invert vertical axis",
+            ["ui.settings.stab"] = "Camera steadiness",
+            ["ui.settings.fov"] = "Field of view",
+            ["ui.settings.vsync"] = "Vertical sync",
+            ["ui.settings.help"] = "On-screen help (F1)",
+            ["ui.settings.language"] = "Language",
+            ["ui.settings.on"] = "on",
+            ["ui.settings.off"] = "off",
+            ["ui.settings.lang.fr"] = "French",
+            ["ui.settings.lang.en"] = "English",
+            ["hint.item.name"] = "Item",
+            ["hint.item.act"] = "Left click: use it — F: take — G: put down",
+            ["hint.regime.name"] = "Reactor regime selector",
+            ["hint.regime.act"] = "Left click: change regime",
+            ["hint.scram.name"] = "Emergency shutdown lever (SCRAM)",
+            ["hint.scram.act"] = "Left click: pull (after a SCRAM, set it back)",
+            ["hint.valve.name"] = "Primary circuit valve",
+            ["hint.valve.act"] = "Hold left click: open the valve",
+            ["hint.pump.name"] = "Cooling pump",
+            ["hint.pump.act"] = "Left click: on / off",
+            ["hint.bilge.name"] = "Bilge pump",
+            ["hint.bilge.act"] = "Left click: on / off (needs power)",
+            ["hint.breaker.name"] = "Circuit breaker",
+            ["hint.breaker.act"] = "Left click: reset or cut",
+            ["hint.tele.name"] = "Engine telegraph",
+            ["hint.tele.act"] = "Left click: more or less speed",
+            ["hint.hatch.name"] = "Bulkhead hatch",
+            ["hint.hatch.act"] = "Left click: open or close",
+            ["hint.leak.name"] = "Leak",
+            ["hint.leak.act"] = "Left click with a patch in hand: plug it",
+            ["hint.alarm.name"] = "Alarm lamp",
+            ["hint.alarm.act"] = "Left click: acknowledge the alarm",
+            ["hint.cc.name"] = "Two-person command",
+            ["hint.cc.act"] = "Left click, while a crewmate presses the other station within 3 s",
         };
     }
 }

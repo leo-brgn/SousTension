@@ -37,7 +37,8 @@ Objectif : appuyer sur Play et jouer, seul (avec un partenaire fantôme) ou à d
 | Feuilleter le Manuel (quand on le tient) | flèches gauche / droite |
 | Console de debug | touche à gauche du `1` |
 | Overlay réseau (développeur) | F2 |
-| Pause | Échap |
+| Pause et réglages (sensibilité, axe inversé, stabilisation de la caméra, champ de vision, synchro verticale, langue) | Échap |
+| Aide à l'écran, à droite : nom de l'objet visé et ce que fait un clic (désactivée par défaut) | F1 |
 
 Confort : la caméra compense 70 % du roulis / tangage du bateau (option du client `--stab=0..1` : 0 = caméra rigide, 1 = caméra toujours à l'horizontale). Si le mal de mer persiste, essayer `--stab=1`.
 
