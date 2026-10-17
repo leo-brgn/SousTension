@@ -15,9 +15,19 @@ namespace SousTension.Spikes.MovingFrame
         private AudioMix _target = AudioMix.Silent;
         private AlarmTone _alarmTone = AlarmTone.None;
         private AudioClip[] _alarmClips;
+        private AudioClip[] _cues;
+        private AudioSource _oneShot;
         private float _alarmVolume;
 
         public void Apply(AudioMix mix) { _target = mix; }
+
+        public void Play(AudioCue cue)
+        {
+            var clip = _cues[(int)cue.Kind];
+            if (clip == null || cue.Gain < 0.02f) return;
+            _oneShot.pitch = cue.Kind == CueKind.Footstep ? Random.Range(0.85f, 1.15f) : 1f;      // cosmetic variation, not simulation
+            _oneShot.PlayOneShot(clip, cue.Gain * MasterVolume * (cue.Kind == CueKind.Footstep ? 0.5f : 1f));
+        }
 
         private void Awake()
         {
@@ -28,6 +38,15 @@ namespace SousTension.Spikes.MovingFrame
             _water = Loop("Water", Water(4f, rng));
             _hull = Loop("Hull", Creaks(6f, rng));
             _alarm = Loop("Alarm", null);
+            _oneShot = Loop("OneShots", null);
+            _oneShot.loop = false;
+            _cues = new AudioClip[6];
+            _cues[(int)CueKind.Hatch] = Thump(0.45f, 90f, 0.9f, 0.35f, rng);                          // a heavy wheel and a bolt: low thump with a rattle
+            _cues[(int)CueKind.Breaker] = Thump(0.12f, 400f, 0.5f, 0.6f, rng);                        // a relay click
+            _cues[(int)CueKind.Pump] = Thump(0.35f, 140f, 0.8f, 0.15f, rng);                          // a motor catching or stopping
+            _cues[(int)CueKind.Telegraph] = Bell(1.4f, 660f);                                         // the engine room bell
+            _cues[(int)CueKind.Footstep] = Thump(0.14f, 180f, 0.45f, 0.7f, rng);                      // a boot on a metal grating
+            _cues[(int)CueKind.Scram] = Thump(1.2f, 38f, 1f, 0.1f, rng);                              // the rods falling
             _alarmClips = new AudioClip[7];
             _alarmClips[(int)AlarmTone.Reactor] = Pattern(3f, new[] { (0f, 110f, 1.2f, 0.9f) });                                                   // gong: one low note, a pause
             _alarmClips[(int)AlarmTone.Power] = Pattern(2f, new[] { (0f, 220f, 0.12f, 0.8f), (0.25f, 220f, 0.12f, 0.8f), (0.5f, 220f, 0.12f, 0.8f) }); // three short buzzes
@@ -152,6 +171,33 @@ namespace SousTension.Spikes.MovingFrame
                 }
             }
             return Make("alarm", data);
+        }
+
+        // A falling tone with a burst of noise: thumps, clicks, steps. noise = share of noise in the attack.
+        private static AudioClip Thump(float seconds, float freq, float gain, float noise, System.Random rng)
+        {
+            int n = (int)(seconds * Rate);
+            var data = new float[n];
+            for (int i = 0; i < n; i++)
+            {
+                float t = i / (float)Rate, env = Mathf.Min(1f, i / (0.004f * Rate)) * Mathf.Exp(-6f * i / n);
+                float tone = Mathf.Sin(2f * Mathf.PI * freq * (1f - 0.4f * i / n) * t);
+                float hiss = (float)(rng.NextDouble() * 2 - 1) * Mathf.Exp(-30f * i / n);
+                data[i] = (tone * (1f - noise) + hiss * noise) * env * gain;
+            }
+            return Make("cue", data);
+        }
+
+        private static AudioClip Bell(float seconds, float freq)
+        {
+            int n = (int)(seconds * Rate);
+            var data = new float[n];
+            for (int i = 0; i < n; i++)
+            {
+                float t = i / (float)Rate, env = Mathf.Exp(-4f * i / n);
+                data[i] = (Mathf.Sin(2f * Mathf.PI * freq * t) + 0.5f * Mathf.Sin(2f * Mathf.PI * freq * 2.76f * t) + 0.25f * Mathf.Sin(2f * Mathf.PI * freq * 5.4f * t)) * env * 0.4f;
+            }
+            return Make("bell", data);
         }
 
         private static void Fade(float[] data)

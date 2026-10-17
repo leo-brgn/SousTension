@@ -848,6 +848,45 @@ namespace SousTension.Spikes.MovingFrame.Tests
         }
 
         [Test]
+        public void TheCueDetector_HearsHatchesBreakersPumpsTheTelegraphTheScramAndFootsteps()
+        {
+            var model = new MovingFrameModel { LocalId = "me" };
+            var detector = new AudioCueDetector();
+            var cues = new List<AudioCue>();
+            var valves = new[] { 1f, 1f, 1f, 1f };
+            ReactorState Reactor(bool pump, bool scram) => new ReactorState("pleine", 0.9f, 2f, 300f, 380f, 50f, 8f, 1f, 1f, valves, new[] { pump, true }, scram, false, false, false, false);
+            WaterState Water(bool door) => new WaterState(new float[6], 0f, 0f, 0f, new[] { door, true, true, true, true });
+            GridState Grid(int breaker) => new GridState(1f, 1f, false, new[] { breaker, 1 }, new int[6], 1f, 1f);
+
+            model.SetLocal(0f, -2f); model.SetReactor(Reactor(true, false)); model.SetWater(Water(true)); model.SetGrid(Grid(1));
+            model.SetPropulsion(new PropulsionState(1, 0f, 0f, 0f));
+            detector.Detect(model, cues);
+            Assert.AreEqual(0, cues.Count, "the first call only learns the state");
+
+            detector.Detect(model, cues);
+            Assert.AreEqual(0, cues.Count, "nothing changed, nothing to hear");
+
+            model.SetWater(Water(false)); detector.Detect(model, cues);
+            Assert.AreEqual(CueKind.Hatch, cues[cues.Count - 1].Kind);
+            model.SetGrid(Grid(2)); detector.Detect(model, cues);
+            Assert.AreEqual(CueKind.Breaker, cues[cues.Count - 1].Kind);
+            model.SetReactor(Reactor(false, false)); detector.Detect(model, cues);
+            Assert.AreEqual(CueKind.Pump, cues[cues.Count - 1].Kind);
+            model.SetPropulsion(new PropulsionState(3, 0f, 0f, 0f)); detector.Detect(model, cues);
+            Assert.AreEqual(CueKind.Telegraph, cues[cues.Count - 1].Kind);
+            model.SetReactor(Reactor(false, true)); detector.Detect(model, cues);
+            Assert.AreEqual(CueKind.Scram, cues[cues.Count - 1].Kind);
+
+            cues.Clear();
+            for (int i = 1; i <= 10; i++) { model.SetLocal(0f, -2f + i * 0.31f); detector.Detect(model, cues); }
+            Assert.AreEqual(4, cues.Count, "3.1 m walked = 4 footsteps of 0.75 m");
+            foreach (var cue in cues) Assert.AreEqual(CueKind.Footstep, cue.Kind);
+            cues.Clear();
+            model.SetLocal(0f, 9f); detector.Detect(model, cues);
+            Assert.AreEqual(0, cues.Count, "a jump (correction, teleport) is not a walk");
+        }
+
+        [Test]
         public void TheModelKeepsTheMissionFlow_AndKnowsWhoIsReady()
         {
             var model = new MovingFrameModel { LocalId = "me" };

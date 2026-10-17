@@ -54,4 +54,4 @@ Une alarme acquittée (clic sur la lampe) se tait ; la lampe reste fixe tant que
 
 ## 6. État
 1. **Livré** (E12-01) : `AudioMix` (calcul pur, testé), `AudioController`, `ProceduralAudioService` : fonds du réacteur, de la turbine, de l'électricité, de l'eau et de la coque ; six alarmes par famille ; acquittement = silence ; silence du bateau hors mission.
-2. **Livré aussi** : l'atténuation par les cloisons (une écoutille fermée étouffe beaucoup plus qu'une ouverte ; les alarmes s'entendent partout, atténuées). **Reste** : sons d'événements (vannes, écoutilles, pas, télégraphe, disjoncteurs), enregistrements libres à la place de la synthèse, mixage (bus), voix (#83).
+2. **Livré aussi** : l'atténuation par les cloisons (une écoutille fermée étouffe beaucoup plus qu'une ouverte ; les alarmes s'entendent partout, atténuées). **Livré aussi** : sons d'événements (écoutilles, disjoncteurs, pompes, télégraphe, SCRAM, pas). **Reste** : sons des vannes et des fuites, enregistrements libres à la place de la synthèse, mixage (bus), voix (#83).
