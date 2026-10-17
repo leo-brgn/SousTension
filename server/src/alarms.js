@@ -7,7 +7,7 @@
 //   severity : "warn" (amber) | "crit" (red: reserved for real emergencies, GDD design rules)
 //   page     : the OK-114 manual page that handles it (E5-04 will open the manual there; ids of manual.js, placeholders until E5-05 writes the procedures)
 // Acknowledging (silencing) an alarm is alarmAck(); it never changes the simulation.
-function reactorMeanValve(r) { return (r.valves[0] + r.valves[1] + r.valves[2] + r.valves[3]) / 4; }
+function reactorMinValve(r) { return Math.min(r.valves[0], r.valves[1], r.valves[2], r.valves[3]); }
 
 var ALARMS = [
   { id: "rx_temp_warn", system: "reactor", severity: "warn", page: "scram",
@@ -16,8 +16,8 @@ var ALARMS = [
     when: function (s) { return s.reactor.T >= REACTOR_K.tCrit; }, clear: function (s) { return s.reactor.T < REACTOR_K.tCrit - 3; } },
   { id: "rx_temp_low", system: "reactor", severity: "warn", page: "index",                     // the core runs colder than its inlet allows: the primary is over-cooled
     when: function (s) { return !s.reactor.scram && s.reactor.T < REACTOR_K.tIn + 8; }, clear: function (s) { return s.reactor.scram || s.reactor.T >= REACTOR_K.tIn + 12; } },
-  { id: "rx_valve_low", system: "reactor", severity: "warn", page: "restart",                  // the valves have drifted shut: less cooling
-    when: function (s) { return !s.reactor.scram && reactorMeanValve(s.reactor) < 0.5; }, clear: function (s) { return s.reactor.scram || reactorMeanValve(s.reactor) >= 0.6; } },
+  { id: "rx_valve_low", system: "reactor", severity: "warn", page: "restart",                  // a valve has drifted shut (any one): less cooling
+    when: function (s) { return !s.reactor.scram && reactorMinValve(s.reactor) < 0.4; }, clear: function (s) { return s.reactor.scram || reactorMinValve(s.reactor) >= 0.5; } },
   { id: "rx_flow_low", system: "reactor", severity: "warn", page: "restart",
     when: function (s) { return !s.reactor.scram && s.reactor.flow < 0.6; }, clear: function (s) { return s.reactor.scram || s.reactor.flow >= 0.7; } },
   { id: "rx_pump0_broken", system: "reactor", severity: "warn", page: "restart", when: function (s) { return s.reactor.pumpBroken[0]; } },
