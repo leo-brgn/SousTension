@@ -113,6 +113,8 @@ Le projet Unity n'existe pas encore dans le repo. À remplir à sa création (ch
 Unity -batchmode -projectPath <chemin> -runTests -testPlatform EditMode -testResults results.xml
 ```
 
+CI : les jobs Unity (`test-editmode`, `build-windows`) sont désactivés tant que la variable de dépôt `UNITY_RUNNER` n'est pas `true` (il n'y a pas de runner auto-hébergé) : **lance les tests EditMode en local avant chaque fusion** (`"C:/Program Files/Unity/Hub/Editor/6000.3.25f1/Editor/Unity.exe" -batchmode -nographics -projectPath . -runTests -testPlatform EditMode -testResults res.xml`, éditeur fermé).
+
 Ne suppose pas d'autres commandes qui n'existent pas encore.
 
 ## Git et GitHub

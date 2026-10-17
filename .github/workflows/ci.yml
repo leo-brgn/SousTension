@@ -56,8 +56,9 @@ jobs:
           fi
 
   test-editmode:
-    # Jamais pour une PR de fork (le runner auto-hébergé exécuterait du code non fiable)
-    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
+    # Désactivé tant qu'aucun runner auto-hébergé « unity » n'existe (sinon le job reste en file) : définir la variable de dépôt UNITY_RUNNER=true pour l'activer.
+    # Jamais pour une PR de fork (le runner auto-hébergé exécuterait du code non fiable).
+    if: vars.UNITY_RUNNER == 'true' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository)
     runs-on: [self-hosted, unity]
     timeout-minutes: 60
     steps:
@@ -78,7 +79,7 @@ jobs:
 
   test-playmode:
     # Manuel : à valider sur ton runner avant de le rendre bloquant (le PlayMode peut demander du rendu)
-    if: github.event_name == 'workflow_dispatch'
+    if: vars.UNITY_RUNNER == 'true' && github.event_name == 'workflow_dispatch'
     runs-on: [self-hosted, unity]
     timeout-minutes: 60
     continue-on-error: true
@@ -100,7 +101,7 @@ jobs:
 
   build-windows:
     # Sur main ou à la demande ; après les contrôles et les tests
-    if: github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && inputs.build)
+    if: vars.UNITY_RUNNER == 'true' && (github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && inputs.build))
     needs: [secrets-scan, deps-lock-check, server-tests, test-editmode]
     runs-on: [self-hosted, unity]
     timeout-minutes: 90
