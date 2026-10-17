@@ -1,0 +1,18 @@
+{
+    "name": "SousTension.Spikes.MovingFrame.Editor",
+    "rootNamespace": "SousTension.Spikes.MovingFrame.EditorTools",
+    "references": [
+        "SousTension.Spikes.MovingFrame.Views"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": false,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

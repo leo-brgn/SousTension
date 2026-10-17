@@ -145,7 +145,7 @@ if (typeof module !== "undefined" && module.exports) {
     carrySpeedFactor: carrySpeedFactor, carriedMass: carriedMass, throwItem: throwItem, THROW_SPEED: THROW_SPEED, THROW_UP: THROW_UP, THROW_HEIGHT: THROW_HEIGHT, THROW_BOUNCE: THROW_BOUNCE,
     MANUAL_PAGES: MANUAL_PAGES, MANUAL_MAX_STEPS: MANUAL_MAX_STEPS, manualFlip: manualFlip, manualGoto: manualGoto, manualPageIndex: manualPageIndex,
     ITEM_KINDS: ITEM_KINDS, newHands: newHands, takeItem: takeItem, dropItem: dropItem, stowItem: stowItem, canUseHands: canUseHands, handsView: handsView,
-    OP_DEBUG: OP_DEBUG, DEBUG_PARAMS: DEBUG_PARAMS, DEBUG_FF_MAX_SECONDS: DEBUG_FF_MAX_SECONDS, debugEnabled: debugEnabled,
+    GHOST_ID: GHOST_ID, GHOST_DELAY_TICKS: GHOST_DELAY_TICKS, OP_DEBUG: OP_DEBUG, DEBUG_PARAMS: DEBUG_PARAMS, DEBUG_FF_MAX_SECONDS: DEBUG_FF_MAX_SECONDS, debugEnabled: debugEnabled,
     AIM_REACH: AIM_REACH, interactableIds: interactableIds,
     CONTROLS: CONTROLS, REGIME_ORDER: REGIME_ORDER, tryAct: tryAct,
     reactorNoise: reactorNoise, REACTOR_K: REACTOR_K, newReactor: newReactor, reactorStep: reactorStep, reactorView: reactorView, reactorScram: reactorScram,

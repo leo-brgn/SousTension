@@ -1322,7 +1322,7 @@ function restartView(state) {
 //
 // Commands:  help | state | tp <x> <z> | regime <veille|croisiere|pleine> | scram | restart | leak <1-6> <1-3> [g|d] | unleak
 //            break <pump|bilge> <1-2> | repair <pump|bilge> <1-2> | trip <breaker id> | water <1-6> <m3> | bring <item id>
-//            get <param> | set <param> <value|default> | ff <seconds>
+//            get <param> | set <param> <value|default> | ff <seconds> | partner <on|off|status>
 var DEBUG_FF_MAX_SECONDS = 300;
 
 function debugEnabled(ctx, params) {
@@ -1360,6 +1360,44 @@ var DEBUG_PARAMS = (function () {
 // A parameter of the whitelist, by its own name only: never something inherited from Object ("constructor", "__proto__"...).
 function dbgParam(name) { return Object.prototype.hasOwnProperty.call(DEBUG_PARAMS, name) ? DEBUG_PARAMS[name] : null; }
 
+// ---- Ghost partner (E1-12): lets ONE player test the Rule of Two Players. A virtual player who answers a coupled action a second after a real
+// player armed the first command, by arming the complementary one (and standing there). It never arms first and does nothing else.
+var GHOST_ID = "ghost";
+var GHOST_DELAY_TICKS = 10;                                          // 1 s
+
+function ghostAdd(state) {
+  if (state.players[GHOST_ID]) return false;
+  state.players[GHOST_ID] = { x: 0, z: 0, seq: 0, lastQueued: 0, allowance: 0, applied: 0, queue: [], hands: newHands(), yaw: 0, presence: null };
+  state.order.push(GHOST_ID);
+  return true;
+}
+
+function ghostRemove(state) {
+  if (!state.players[GHOST_ID]) return false;
+  releasePlayerItems(state, GHOST_ID);
+  releaseCoupled(state.cp, GHOST_ID);
+  delete state.players[GHOST_ID];
+  state.order.splice(state.order.indexOf(GHOST_ID), 1);
+  return true;
+}
+
+// Called by simStep every tick (does nothing unless the ghost is in the match).
+function ghostStep(state, tick) {
+  var g = state.players[GHOST_ID];
+  if (!g) return;
+  for (var i = 0; i < COUPLED_ACTIONS.length; i++) {
+    var act = state.cp.acts[i];
+    for (var s = 0; s < 2; s++) {
+      var st = act.st[s], other = act.st[1 - s];
+      if (st.by !== "" && st.by !== GHOST_ID && other.by === "" && tick - st.tick >= GHOST_DELAY_TICKS) {
+        armCommand(state.cp, GHOST_ID, tick, i, 1 - s);
+        var cmd = (1 - s) === 0 ? COUPLED_ACTIONS[i].a : COUPLED_ACTIONS[i].b;
+        g.x = cmd.x; g.z = cmd.z;
+      }
+    }
+  }
+}
+
 function dbgReply(state, id, text) { state.debug.out.push({ to: id, text: text }); }
 function dbgNum(tok) { var v = Number(tok); return tok !== undefined && tok !== "" && isFinite(v) ? v : NaN; }
 function dbgCompartment(tok) { var c = dbgNum(tok); return c >= 1 && c <= WATER_COMPARTMENTS.length && Math.floor(c) === c ? c - 1 : -1; }
@@ -1389,7 +1427,7 @@ function debugCommand(state, id, pl, line, tick) {
   var i, n, v;
   if (cmd === "help") {
     reply("help | state | tp x z | regime veille|croisiere|pleine | scram | restart | leak 1-6 1-3 [g|d] | unleak | break pump|bilge 1-2 | repair pump|bilge 1-2");
-    reply("trip <breaker> | water 1-6 m3 | bring <item> | get <param> | set <param> <value|default> | ff <seconds>");
+    reply("trip <breaker> | water 1-6 m3 | bring <item> | get <param> | set <param> <value|default> | ff <seconds> | partner on|off|status");
   } else if (cmd === "state") {
     var lines = debugState(state);
     for (i = 0; i < lines.length; i++) reply(lines[i]);
@@ -1446,6 +1484,11 @@ function debugCommand(state, id, pl, line, tick) {
     if (v < sp.min || v > sp.max) { reply(tok[1] + " must be between " + sp.min + " and " + sp.max); return; }
     sp.set(v);
     reply(tok[1] + " = " + sp.get());
+  } else if (cmd === "partner") {
+    if (tok[1] === "on") reply(ghostAdd(state) ? "ghost partner joined: it arms the other command a second after you arm one" : "the ghost partner is already here");
+    else if (tok[1] === "off") reply(ghostRemove(state) ? "ghost partner left" : "no ghost partner");
+    else if (tok[1] === "status") reply(state.players[GHOST_ID] ? "ghost partner present" : "no ghost partner");
+    else reply("usage: partner on|off|status");
   } else if (cmd === "ff") {
     v = dbgNum(tok[1]);
     if (!(v > 0) || v > DEBUG_FF_MAX_SECONDS) { reply("usage: ff <seconds, 0-" + DEBUG_FF_MAX_SECONDS + ">"); return; }
@@ -1501,6 +1544,7 @@ function simStep(state, tick) {
       pl.allowance -= 1;
     }
   }
+  if (state.players[GHOST_ID]) ghostStep(state, tick);       // debug-only ghost partner (E1-12): answers a pressed coupled command
   evaluateCoupled(state, tick);
   leakStep(state, tick);
   bilgeStep(state);
@@ -1709,7 +1753,7 @@ if (typeof module !== "undefined" && module.exports) {
     carrySpeedFactor: carrySpeedFactor, carriedMass: carriedMass, throwItem: throwItem, THROW_SPEED: THROW_SPEED, THROW_UP: THROW_UP, THROW_HEIGHT: THROW_HEIGHT, THROW_BOUNCE: THROW_BOUNCE,
     MANUAL_PAGES: MANUAL_PAGES, MANUAL_MAX_STEPS: MANUAL_MAX_STEPS, manualFlip: manualFlip, manualGoto: manualGoto, manualPageIndex: manualPageIndex,
     ITEM_KINDS: ITEM_KINDS, newHands: newHands, takeItem: takeItem, dropItem: dropItem, stowItem: stowItem, canUseHands: canUseHands, handsView: handsView,
-    OP_DEBUG: OP_DEBUG, DEBUG_PARAMS: DEBUG_PARAMS, DEBUG_FF_MAX_SECONDS: DEBUG_FF_MAX_SECONDS, debugEnabled: debugEnabled,
+    GHOST_ID: GHOST_ID, GHOST_DELAY_TICKS: GHOST_DELAY_TICKS, OP_DEBUG: OP_DEBUG, DEBUG_PARAMS: DEBUG_PARAMS, DEBUG_FF_MAX_SECONDS: DEBUG_FF_MAX_SECONDS, debugEnabled: debugEnabled,
     AIM_REACH: AIM_REACH, interactableIds: interactableIds,
     CONTROLS: CONTROLS, REGIME_ORDER: REGIME_ORDER, tryAct: tryAct,
     reactorNoise: reactorNoise, REACTOR_K: REACTOR_K, newReactor: newReactor, reactorStep: reactorStep, reactorView: reactorView, reactorScram: reactorScram,
