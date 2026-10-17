@@ -55,6 +55,15 @@ var matchLeave = function (ctx, logger, nk, dispatcher, tick, state, presences) 
     var idx = state.order.indexOf(id);
     if (idx >= 0) state.order.splice(idx, 1);
   }
+  // Nobody real is left (only the debug ghost, or nobody): the next crew must find a fresh match, not the wreck of the last game
+  // (a run in progress, a debrief, the ghost partner still in a seat).
+  var humans = 0;
+  for (var h = 0; h < state.order.length; h++) if (state.order[h] !== GHOST_ID) humans++;
+  if (humans === 0) {
+    if (state.players[GHOST_ID]) ghostRemove(state);
+    state.mission = newMission(state.mission.mode);
+    worldReset(state);
+  }
   return { state: state };
 };
 
