@@ -4,7 +4,7 @@
 // Light crates need one carrier; the heavy fuel flask needs two players who both grab within the 3 s window.
 var GRAB_REACH = 1.5;       // m
 var GRAVITY = 9.81;         // m/s^2
-var FRICTION = 0.25;        // Coulomb coefficient: loose cargo starts sliding past ~14 deg of tilt
+var FRICTION = 0.12;        // Coulomb coefficient: loose cargo starts sliding past ~7 deg of tilt: the calm swell alone (<= 5 deg) does not move it, the water does
 var CARGO_DEFS = [
   { id: "crate1", heavy: false, x: 1.2, z: -2.0 },
   { id: "crate2", heavy: false, x: -2.0, z: 5.0 },
@@ -21,8 +21,10 @@ var CARGO_DEFS = [
   { id: "manual", kind: "manual", heavy: false, x: 1.8, z: 6.1 }
 ];
 // Boat tilt (must match BoatMotion.cs defaults: pitch 15 deg / 7 s, roll 20 deg / 5 s + 1 rad phase).
-var PITCH_AMP = 15 * Math.PI / 180, PITCH_PERIOD = 7;
-var ROLL_AMP = 20 * Math.PI / 180, ROLL_PERIOD = 5;
+// A calm swell (comfort: the spike's +-15 / +-20 deg made people sick): +-3 deg of pitch every 9 s, +-4 deg of roll every 11 s. Loose cargo no longer slides by
+// the swell alone (the friction angle is ~14 deg): the weight of the water and the damage do that.
+var PITCH_AMP = 3 * Math.PI / 180, PITCH_PERIOD = 9;
+var ROLL_AMP = 4 * Math.PI / 180, ROLL_PERIOD = 11;
 
 // Horizontal part of the world "up" vector expressed in boat-local axes: up_local = (cos p sin r, cos p cos r, -sin p).
 // trimDeg / listDeg (E6-01) are the offsets the water's weight adds to the scripted swell (same as BoatMotion.Evaluate with offsets).

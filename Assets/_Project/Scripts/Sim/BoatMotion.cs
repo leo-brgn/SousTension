@@ -42,10 +42,10 @@ namespace SousTension.Sim
         public float SurgePeriod { get; }
 
         public BoatMotion(
-            float pitchAmplitudeDeg = 15f, float rollAmplitudeDeg = 20f,
-            float heaveAmplitude = 1.0f, float surgeAmplitude = 2.0f,
-            float pitchPeriod = 7f, float rollPeriod = 5f,
-            float heavePeriod = 6f, float surgePeriod = 9f)
+            float pitchAmplitudeDeg = 3f, float rollAmplitudeDeg = 4f,                   // a calm swell (comfort): server/src/cargo.js PITCH_AMP / ROLL_AMP
+            float heaveAmplitude = 0.15f, float surgeAmplitude = 0.3f,
+            float pitchPeriod = 9f, float rollPeriod = 11f,
+            float heavePeriod = 8f, float surgePeriod = 12f)
         {
             PitchAmplitudeDeg = pitchAmplitudeDeg;
             RollAmplitudeDeg = rollAmplitudeDeg;

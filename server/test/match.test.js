@@ -211,6 +211,7 @@ test("cargo: out of reach cannot be grabbed (reach 1.5 m)", () => {
 
 test("cargo: loose cargo slides when the boat tilts past the friction angle, and stays inside the boat", () => {
   const c = lockSetup(["a"]);
+  m.waterAdd(c.state.water, 1, 40, 1);                       // the water's weight tilts the boat; with the calm swell on top the crate goes past the friction angle
   let moved = 0, start = null;
   for (let i = 0; i < 700; i++) {                           // 70 s covers several roll/pitch cycles
     tickWith(c, []);
@@ -284,10 +285,10 @@ test("cargo: a carrier leaving the match releases the cargo", () => {
 
 test("cargo: tilt projection golden values (same numbers asserted in C#: BoatMotionTests)", () => {
   const golden = [
-    [0, 0.289523314, 0.0],
-    [1.5, 0.0856205745, -0.252473316],
-    [3.7, -0.204979999, 0.0467290627],
-    [10.25, 0.330693301, -0.0582228990]
+    [0, 0.058711974, 0.0],
+    [1.5, 0.066858467, -0.045329446],
+    [3.7, 0.001964753, -0.027742948],
+    [10.25, 0.037728129, -0.040099239]
   ];
   for (const [t, ux, uz] of golden) {
     const u = m.boatUpHorizontal(t);

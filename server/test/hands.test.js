@@ -172,6 +172,7 @@ test("the heavy fuel flask needs two players with both hands free each; one drop
   take(c, "a", "patch1");
   take(c, "a", "fuel");
   assert.strictEqual(cargo(c, "fuel").pend, "", "a hand is busy: refused");
+  at(c, "a", 0, 3); tick(c);                                                     // walk away with the patch, then drop it there: a calm swell does not slide it clear of the flask
   tick(c, [send(c, "a", { drop: true })]);
   take(c, "a", "fuel");
   assert.strictEqual(cargo(c, "fuel").pend, "a");

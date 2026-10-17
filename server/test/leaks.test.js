@@ -145,7 +145,10 @@ test("a used patch is back in the toolbox 30 s later, and cannot be grabbed whil
   ticks(c, m.PATCH_RESPAWN_TICKS);
   assert.strictEqual(p.active, true);
   close(p.x, p.homeX, 0.5); close(p.z, p.homeZ, 0.5);                     // back at the toolbox (it may start sliding on a tilted floor like any loose cargo)
-  p.x = p.homeX; p.z = p.homeZ; place(c, "a", p.homeX - 0.3, p.homeZ);          // standing next to the toolbox, patch1 the nearest one
+  const other = cargoOf(c, "patch2"); other.x = 0.5; other.z = 3;                     // the dropped neighbour stays where it was dropped (the swell no longer slides it away): put it elsewhere
+  p.x = p.homeX; p.z = p.homeZ; place(c, "a", p.homeX + 0.3, p.homeZ);          // standing next to the toolbox (on the side away from the crate), patch1 the nearest one
+  tick(c, [send(c, "a", { drop: true })]);                                       // hands free (the grab key takes only when nothing is held)
+  other.x = 0.5; other.z = 3;
   tick(c, [send(c, "a", { grab: true })]);
   assert.deepStrictEqual(p.carriers, ["a"]);
 });

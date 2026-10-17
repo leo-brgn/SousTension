@@ -52,10 +52,10 @@ namespace SousTension.Tests
             // server/test/match.test.js against boatUpHorizontal() (the server uses it to slide loose cargo).
             var golden = new[]
             {
-                (t: 0.0,   x: 0.289523314f,  z: 0.0f),
-                (t: 1.5,   x: 0.0856205745f, z: -0.252473316f),
-                (t: 3.7,   x: -0.204979999f, z: 0.0467290627f),
-                (t: 10.25, x: 0.330693301f,  z: -0.0582228990f),
+                (t: 0.0,   x: 0.058711974f,  z: 0.0f),
+                (t: 1.5,   x: 0.066858467f,  z: -0.045329446f),
+                (t: 3.7,   x: 0.001964753f,  z: -0.027742948f),
+                (t: 10.25, x: 0.037728129f,  z: -0.040099239f),
             };
             var motion = new BoatMotion();
             foreach (var g in golden)
@@ -85,8 +85,8 @@ namespace SousTension.Tests
             // same formula as server/src/cargo.js boatUpHorizontal(t, trim, list): up_local = (cos p sin r, cos p cos r, -sin p)
             const double tau = 2.0 * System.Math.PI;
             double t = 7.7, trim = 5.0, list = -3.0;
-            double p = 15.0 * System.Math.PI / 180.0 * System.Math.Sin(tau * t / 7.0) + trim * System.Math.PI / 180.0;
-            double r = 20.0 * System.Math.PI / 180.0 * System.Math.Sin(tau * t / 5.0 + 1.0) + list * System.Math.PI / 180.0;
+            double p = 3.0 * System.Math.PI / 180.0 * System.Math.Sin(tau * t / 9.0) + trim * System.Math.PI / 180.0;
+            double r = 4.0 * System.Math.PI / 180.0 * System.Math.Sin(tau * t / 11.0 + 1.0) + list * System.Math.PI / 180.0;
             var up = Vector3.Transform(Vector3.UnitY, Quaternion.Inverse(motion.Evaluate(t, (float)trim, (float)list).Rotation));
             Assert.AreEqual((float)(System.Math.Cos(p) * System.Math.Sin(r)), up.X, 1e-4f);
             Assert.AreEqual((float)(-System.Math.Sin(p)), up.Z, 1e-4f);
