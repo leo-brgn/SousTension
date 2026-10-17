@@ -26,6 +26,8 @@ namespace SousTension.Spikes.MovingFrame
             return 0.7f;
         }
         private readonly Dictionary<string, Transform> _characters = new Dictionary<string, Transform>();
+        private readonly HashSet<string> _seen = new HashSet<string>();
+        private readonly List<string> _stale = new List<string>();
         private readonly HashSet<string> _artCharacters = new HashSet<string>();               // remotes drawn with the 3D sailor (origin at the feet)
         private readonly Dictionary<string, Vector3> _lastPosition = new Dictionary<string, Vector3>();
 
@@ -60,7 +62,7 @@ namespace SousTension.Spikes.MovingFrame
 
             // Remotes
             double renderTime = _model.EstimateServerTime(_clock.Now) - InterpolationDelay;
-            var seen = new HashSet<string>();
+            var seen = _seen; seen.Clear();                                        // no allocation per frame
             foreach (var id in _model.RemoteIds)
             {
                 seen.Add(id);
@@ -76,7 +78,7 @@ namespace SousTension.Spikes.MovingFrame
                 }
                 else remote.localPosition = new Vector3(x, 0.9f, z);
             }
-            var stale = new List<string>();
+            var stale = _stale; stale.Clear();
             foreach (var kv in _characters) if (kv.Key != _model.LocalId && !seen.Contains(kv.Key)) stale.Add(kv.Key);
             foreach (var id in stale) { Destroy(_characters[id].gameObject); _characters.Remove(id); }
         }

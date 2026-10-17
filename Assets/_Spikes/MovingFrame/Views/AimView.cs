@@ -18,6 +18,7 @@ namespace SousTension.Spikes.MovingFrame
         private Camera _camera;
         private string _target;
         private readonly List<Renderer> _lit = new List<Renderer>();
+        private readonly RaycastHit[] _hits = new RaycastHit[16];                                  // no allocation per frame
 
         public string TargetId => _target;
         public bool UseHeld => !ScreensView.IsOpen && Mouse.current != null && Mouse.current.leftButton.isPressed;
@@ -29,10 +30,11 @@ namespace SousTension.Spikes.MovingFrame
             string target = null;
             if (_camera != null)
             {
-                var hits = Physics.RaycastAll(_camera.transform.position, _camera.transform.forward, AimRange, ~0, QueryTriggerInteraction.Ignore);
+                int count = Physics.RaycastNonAlloc(_camera.transform.position, _camera.transform.forward, _hits, AimRange, ~0, QueryTriggerInteraction.Ignore);
                 float best = float.MaxValue;
-                foreach (var hit in hits)
+                for (int i = 0; i < count; i++)
                 {
+                    var hit = _hits[i];
                     if (hit.distance >= best) continue;       // the nearest solid object decides: a wall in front blocks the aim
                     best = hit.distance;
                     var marker = hit.collider.GetComponent<InteractableTarget>();

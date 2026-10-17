@@ -33,6 +33,9 @@ namespace SousTension.Spikes.MovingFrame
 
         private async void Start()
         {
+            // Smooth image: synchronised with the screen (an uncapped 400 fps tears and makes the camera look jerky). --novsync switches it off for measures.
+            QualitySettings.vSyncCount = Array.IndexOf(Environment.GetCommandLineArgs(), "--novsync") >= 0 ? 0 : 1;
+            Application.targetFrameRate = -1;
             ParseArgs(out string device, out float latency, out float jitter, out float loss, out string h, out int p);
             if (latency >= 0) simulatedLatencyMs = latency;
             if (jitter >= 0) simulatedJitterMs = jitter;
