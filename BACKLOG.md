@@ -87,7 +87,7 @@ Objectif : lever le risque n°1 (référentiel mobile + réseau) avant d'investi
 - [x] **E3-07 ⚙️ Réseau électrique** : tableau principal (~20 disjoncteurs à réarmer), batteries de secours, consommateurs (pompes, air, lumières, sonar, cafetière, samovar). `L`
 - [x] **E3-08 ⚙️ Propulsion** liée à la turbine/régime, télégraphe machine (5 positions). `M`
 - [ ] **E3-09 ⚙️ Dérives lentes + système d'alarmes** : ~40 alarmes distinctes, dérives en chaîne, « correction excessive ». Générateur de pannes avec budget d'attention (plus de systèmes que de joueurs). `XL` → découper par système · `VS`
-- [ ] **E3-10 ⚙️ Cohérence d'équilibrage** : outil de simulation headless pour tester sans joueurs (déterminisme). `M`
+- [x] **E3-10 ⚙️ Cohérence d'équilibrage** : outil de simulation headless pour tester sans joueurs (déterminisme). `M`
 - [ ] **E3-11 ✍️ Test « utile en 5 min »** : un nouveau joueur doit pouvoir contribuer sans comprendre la chaîne (risque 🔴 §11). `M` · `VS`
 
 ---
