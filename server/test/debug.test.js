@@ -211,3 +211,94 @@ test("the debug console is not game state: the digest ignores it, and with debug
   for (let i = 0; i < 200; i++) { tick(normal); tick(flagged); }
   assert.strictEqual(m.stateDigest(normal.state), m.stateDigest(flagged.state), "enabling the channel alone changes nothing");
 });
+
+// ---- Ghost partner (E1-12) ----
+const DEMO2 = m.COUPLED_ACTIONS.find((x) => x.id === "demo2"), DEMO2_IDX = m.COUPLED_ACTIONS.indexOf(DEMO2);
+function standAtCommand(c, side, pid) { const cmd = side === 0 ? DEMO2.a : DEMO2.b; c.state.players[pid || "a"].x = cmd.x; c.state.players[pid || "a"].z = cmd.z; }
+function lastPlayers(c) { return c.sent[c.sent.length - 1].players; }
+const demo2 = (c) => c.state.cp.acts[DEMO2_IDX];
+
+test("partner on / off / status adds and removes a virtual player, visible to everyone, only in debug mode", () => {
+  const off = setup();
+  assert.match(cmd(off, "partner on"), /debug disabled/);
+  assert.ok(!off.state.players.ghost);
+  const c = on();
+  assert.match(cmd(c, "partner status"), /no ghost/);
+  assert.match(cmd(c, "partner on"), /ghost partner joined/);
+  tick(c);
+  assert.ok(lastPlayers(c).some((p) => p.id === m.GHOST_ID), "the ghost is a player of the match (drawn like the others)");
+  assert.match(cmd(c, "partner on"), /already here/);
+  assert.match(cmd(c, "partner status"), /present/);
+  assert.match(cmd(c, "partner off"), /left/);
+  tick(c);
+  assert.ok(!lastPlayers(c).some((p) => p.id === m.GHOST_ID));
+  assert.match(cmd(c, "partner off"), /no ghost/);
+  assert.match(cmd(c, "partner maybe"), /usage/);
+});
+
+test("the ghost answers a pressed command one second later by arming the complementary one: a single player completes the action", () => {
+  const c = on();
+  cmd(c, "partner on");
+  standAtCommand(c, 0);
+  tick(c, [send(c, "a", { act: true, use: "cc:demo2:0" })]);
+  assert.strictEqual(demo2(c).st[0].by, "a");
+  for (let i = 0; i < m.GHOST_DELAY_TICKS - 2; i++) tick(c);
+  assert.strictEqual(demo2(c).count, 0, "not before its delay");
+  for (let i = 0; i < 4; i++) tick(c);
+  assert.strictEqual(demo2(c).count, 1, "the action succeeded with one real player");
+  assert.strictEqual(demo2(c).result, "success");
+  assert.deepStrictEqual([c.state.players.ghost.x, c.state.players.ghost.z], [DEMO2.b.x, DEMO2.b.z], "it walked to the command it armed");
+});
+
+test("it works whichever command the real player arms first, on every action", () => {
+  for (const act of m.COUPLED_ACTIONS) for (const side of [0, 1]) {
+    const c = on(); const idx = m.COUPLED_ACTIONS.indexOf(act);
+    c.state.reactor.scram = false;
+    cmd(c, "partner on");
+    const from = side === 0 ? act.a : act.b;
+    c.state.players.a.x = from.x; c.state.players.a.z = from.z;
+    tick(c, [send(c, "a", { act: true, use: "cc:" + act.id + ":" + side })]);
+    for (let i = 0; i < m.GHOST_DELAY_TICKS + 3; i++) tick(c);
+    assert.strictEqual(c.state.cp.acts[idx].result, "success", act.id + " from side " + side);
+  }
+});
+
+test("the ghost never arms first: with nobody pressing, nothing is ever armed", () => {
+  const c = on();
+  cmd(c, "partner on");
+  for (let i = 0; i < 300; i++) tick(c);
+  for (const a of c.state.cp.acts) { assert.strictEqual(a.st[0].by, ""); assert.strictEqual(a.st[1].by, ""); assert.strictEqual(a.count, 0); }
+});
+
+test("the ghost restarts the reactor with a real player once the preparation steps are done", () => {
+  const c = on();
+  m.reactorScram(c.state.reactor);
+  c.state.lever.reset = true; c.state.reactor.valves = [1, 1, 1, 1]; c.state.reactor.pumps = [true, true];
+  cmd(c, "partner on");
+  const restart = m.COUPLED_ACTIONS.find((x) => x.id === "reactor_restart");
+  c.state.players.a.x = restart.a.x; c.state.players.a.z = restart.a.z;
+  tick(c, [send(c, "a", { act: true, use: "cc:reactor_restart:0" })]);
+  for (let i = 0; i < m.GHOST_DELAY_TICKS + 3; i++) tick(c);
+  assert.strictEqual(c.state.reactor.scram, false, "the reactor is back");
+  assert.strictEqual(c.state.restart.count, 1);
+});
+
+test("removing the ghost frees the commands it had armed, and it takes nothing else with it", () => {
+  const c = on();
+  cmd(c, "partner on");
+  demo2(c).st[0].by = m.GHOST_ID; demo2(c).st[0].tick = c.state.tick;
+  cmd(c, "partner off");
+  assert.strictEqual(demo2(c).st[0].by, "");
+  assert.ok(!c.state.players.ghost);
+  assert.deepStrictEqual(c.state.order, ["a"]);
+});
+
+test("the real player cannot hold both commands even with the ghost around, and a lone press that expires is not completed later", () => {
+  const c = on();
+  cmd(c, "partner on");
+  standAtCommand(c, 0);
+  tick(c, [send(c, "a", { act: true, use: "cc:demo2:0" })]);
+  standAtCommand(c, 1);
+  tick(c, [send(c, "a", { act: true, use: "cc:demo2:1" })]);                       // the same player on the other command: refused
+  assert.notStrictEqual(demo2(c).st[1].by, "a");
+});

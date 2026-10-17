@@ -1,0 +1,61 @@
+# Jouer en local : tester le prototype dans Unity (E1-11 / E1-12)
+
+Objectif : appuyer sur Play et jouer, seul (avec un partenaire fantôme) ou à deux, sur ta machine.
+
+## Prérequis
+- **Docker** démarré (le serveur Nakama tourne dans un conteneur : `server/docker-compose.yml`, déjà en **mode debug**).
+- Unity 6000.3.25f1 avec ce projet ouvert.
+
+## Jouer seul (le plus simple)
+1. Menu **SousTension > Spike > 3. Play locally (server + scene)** : il démarre le serveur (premier lancement : une minute ou deux), ouvre la scène `MovingFrame` et lance Play.
+2. Ouvre la console de debug avec la touche à gauche du `1` (`²` sur un clavier AZERTY) et tape `partner on` : un **joueur fantôme** apparaît. Il arme la commande complémentaire une seconde après que tu as armé la première, ce qui permet de tester toute action à deux **tout seul**.
+
+## Jouer à deux (deux fenêtres)
+1. Une seule fois : menu **SousTension > Spike > 4. Build the Windows development client (player 2)** (le build arrive dans `Builds/Dev/`, ignoré par git).
+2. Lance l'éditeur en Play (étape ci-dessus) puis, dans un terminal à la racine du dépôt :
+   ```
+   powershell -ExecutionPolicy Bypass -File tools/play-local.ps1 -Clients 1
+   ```
+   Le script démarre le serveur s'il ne tourne pas, puis ouvre un client du build. `-Clients 2` en ouvre deux (jeu à quatre avec l'éditeur et le fantôme). `-ServerOnly` ne lance que le serveur.
+3. Options d'un client pour simuler un mauvais réseau : `--latency=MS --jitter=MS --loss=PERCENT` (voir `MovingFrameBootstrap`).
+
+## Commandes du jeu
+| Action | Commande |
+|---|---|
+| Marcher / regarder | ZQSD (ou WASD) / souris |
+| Utiliser ce qu'on vise (tenir pour un volant) | clic gauche |
+| Lancer l'objet en main | clic droit |
+| Prendre / poser (le dernier pris) / ranger la torche en poche | F / G / H |
+| Feuilleter le Manuel (quand on le tient) | flèches gauche / droite |
+| Console de debug | touche à gauche du `1` |
+| Overlay réseau | F2 |
+
+La touche **E** garde l'ancien comportement par position (la commande la plus proche), utile pour dépanner.
+
+## Provoquer des pannes (console de debug)
+`help` liste tout. Les plus utiles :
+
+| Commande | Effet |
+|---|---|
+| `leak 3 2 g` | fuite de taille 2 dans le compartiment 3, paroi gauche |
+| `water 4 3` | 3 m³ d'eau dans le compartiment 4 |
+| `scram` / `restart` | SCRAM / redémarrage forcé (sans procédure) |
+| `regime pleine` | passe à la pleine puissance |
+| `break pump 1`, `break bilge 2`, `trip galley` | pompe cassée, pompe de cale cassée, disjoncteur qui saute |
+| `tp 0 -9` | se téléporter |
+| `ff 60` | avance la simulation de 60 s d'un coup |
+| `state` | résumé de l'état du jeu |
+| `partner on` / `partner off` | joueur fantôme (E1-12) |
+
+## Ce qu'il faut tester d'abord (5 minutes)
+1. Marcher dans le bateau qui tangue : pas de glissement bizarre, la caméra suit.
+2. Viser le **sélecteur de régime** (RK-1, mur gauche du compartiment 4) : il s'éclaire, un clic tourne le sélecteur.
+3. `partner on`, puis armer la clé `demo` à un bout du bateau : le fantôme arme l'autre bout, les deux clés passent au vert.
+4. `leak 3 2 d`, prendre un patch dans la caisse à outils (compartiment 2, `F`), cliquer sur la fuite : un cran de moins.
+5. `scram` : le noir se fait, le bateau coule doucement ; redémarrer par la procédure (levier, vannes, pompes, puis les deux clés).
+6. Prendre le **Manuel** sur la table du poste central, tourner les pages avec les flèches : tant qu'on le tient, aucune commande ne répond.
+
+## En cas de problème
+- « the server did not answer » : Docker n'est pas démarré ou le port 7350 est pris.
+- Écran vide : la scène n'a pas de caméra principale ; relancer **1. Create the MovingFrame scene**.
+- Les tests : `node --test server/test/*.test.js` pour le serveur, Test Runner > EditMode pour Unity.

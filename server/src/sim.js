@@ -43,6 +43,7 @@ function simStep(state, tick) {
       pl.allowance -= 1;
     }
   }
+  if (state.players[GHOST_ID]) ghostStep(state, tick);       // debug-only ghost partner (E1-12): answers a pressed coupled command
   evaluateCoupled(state, tick);
   leakStep(state, tick);
   bilgeStep(state);

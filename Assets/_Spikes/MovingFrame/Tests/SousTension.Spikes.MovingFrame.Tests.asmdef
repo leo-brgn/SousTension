@@ -6,7 +6,8 @@
         "UnityEditor.TestRunner",
         "SousTension.Sim",
         "SousTension.Spikes.MovingFrame.Core",
-        "SousTension.Spikes.MovingFrame.Views"
+        "SousTension.Spikes.MovingFrame.Views",
+        "SousTension.Spikes.MovingFrame.Editor"
     ],
     "includePlatforms": [
         "Editor"
