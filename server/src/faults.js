@@ -59,8 +59,10 @@ function faultBudget(state, tick) {
   return Math.min(players + 1, 1 + Math.floor(tick / TICK_RATE / FAULT_RAMP_SECONDS));
 }
 
+// The generator keeps its own clock: the ticks of the RUN (state.mission.runTicks), so the lobby and the briefing do not use up the grace period.
 function faultsStep(state, tick) {
   var f = state.faults;
+  tick = state.mission.runTicks;
   if (!f.enabled || tick < f.nextTick || state.order.length === 0) return;
   if (faultUnresolved(state) >= faultBudget(state, tick)) return;                         // the crew is busy enough: try again next tick
   var usable = [], other = [];
