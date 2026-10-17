@@ -16,9 +16,69 @@ namespace SousTension.Spikes.MovingFrame
         private static readonly Vector3[] Positions = { new Vector3(-0.28f, -0.24f, 0.5f), new Vector3(0.28f, -0.24f, 0.5f), new Vector3(0f, -0.34f, 0.42f) };
         private static readonly Vector3[] Scales = { new Vector3(0.2f, 0.2f, 0.2f), new Vector3(0.2f, 0.2f, 0.2f), new Vector3(0.1f, 0.1f, 0.1f) };
 
-        public void Bind(MovingFrameModel model, Camera camera)
+        // ---- the 3D arms (Models/Crew/FirstPersonArms.fbx) -------------------------------------------------------------------------------
+        private const float ShoulderHeight = 1.07f;                  // the rig stands on the floor: its shoulders are 1.07 m up
+        // The rig is a standing body: hands rest by the hips (out of view) and come up to 0.33 m in front of the shoulders when carrying or reaching.
+        // The arms hang from a pivot at the shoulders, a little below and behind the eyes and pitched up 30 degrees, so that the raised hands show at the
+        // bottom corners of the screen and the resting hands stay out of sight.
+        private static readonly Vector3 ShoulderPivot = new Vector3(0f, -0.24f, -0.12f);
+        private const float ArmsPitch = -30f;
+        /// <summary>Developer tool: a pose forced on the arms (the screenshot tour shows the hands raised); null = follow the game.</summary>
+        public static string ForcedPose;
+        private Animator _arms;
+        private IAimSource _aim;
+        private IUseInput _use;
+        private string _armState = "";
+        private float _armStateUntil;
+        private int _lastHeldCount;
+        private bool _lastUse;
+
+        private void BindArms(Transform camera)
         {
-            _model = model;
+            var arms = SpikeArt.Spawn("FirstPersonArms", camera);
+            if (arms == null) return;
+            var pivot = new GameObject("ArmsPivot").transform;
+            pivot.SetParent(camera, false);
+            pivot.localPosition = ShoulderPivot;
+            pivot.localRotation = Quaternion.Euler(ArmsPitch, 0f, 0f);
+            arms.transform.SetParent(pivot, false);
+            arms.transform.localPosition = new Vector3(0f, -ShoulderHeight, 0f);
+            arms.transform.localRotation = Quaternion.identity;
+            foreach (var r in arms.GetComponentsInChildren<Renderer>(true)) { r.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off; if (r is SkinnedMeshRenderer s) s.updateWhenOffscreen = true; }
+            _arms = arms.GetComponentInChildren<Animator>(true);
+        }
+
+        private void PlayArms(string state, float holdSeconds = 0f)
+        {
+            if (_arms == null || state == _armState) return;
+            _armState = state;
+            _armStateUntil = holdSeconds > 0f ? Time.time + holdSeconds : 0f;
+            _arms.CrossFadeInFixedTime("Base Layer." + state, 0.12f, 0, 0f);
+        }
+
+        /// <summary>Which pose the arms take: carrying, gripping (just took something), releasing (just dropped), turning a valve, reaching for what is aimed.</summary>
+        private void UpdateArms(string[] held)
+        {
+            if (_arms == null) return;
+            if (!string.IsNullOrEmpty(ForcedPose)) { PlayArms(ForcedPose); return; }
+            int count = 0;
+            foreach (var h in held) if (!string.IsNullOrEmpty(h)) count++;
+            bool useHeld = _use != null && _use.UseHeld;
+            string target = _aim != null ? _aim.TargetId : null;
+            string rest = count > 0 ? "HandsCarry" : "HandsIdle";
+            if (count > _lastHeldCount) PlayArms("HandsGrip", 0.5f);
+            else if (count < _lastHeldCount) PlayArms("HandsRelease", 0.5f);
+            else if (useHeld && target != null && target.StartsWith("valve")) PlayArms("HandsValve");
+            else if (useHeld && !_lastUse && target != null) PlayArms("HandsReach", 0.6f);
+            else if (_armStateUntil > 0f && Time.time < _armStateUntil) { }
+            else if (_armState != rest && !(useHeld && target != null && target.StartsWith("valve"))) { _armStateUntil = 0f; _armState = ""; PlayArms(rest); }
+            _lastHeldCount = count; _lastUse = useHeld;
+        }
+
+        public void Bind(MovingFrameModel model, Camera camera, IAimSource aim = null, IUseInput use = null)
+        {
+            _model = model; _aim = aim; _use = use;
+            BindArms(camera.transform);
             for (int i = 0; i < 3; i++)
             {
                 var go = SpikePrimitives.Create(PrimitiveType.Cube);
@@ -36,6 +96,7 @@ namespace SousTension.Spikes.MovingFrame
         {
             if (_model == null || string.IsNullOrEmpty(_model.LocalId)) return;
             var held = _model.HandsOf(_model.LocalId);
+            UpdateArms(held);
             for (int i = 0; i < 3; i++)
             {
                 bool any = held.Length > i && !string.IsNullOrEmpty(held[i]);

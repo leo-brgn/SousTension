@@ -63,6 +63,7 @@ namespace SousTension.Spikes.MovingFrame
             yield return new WaitForEndOfFrame();
             ScreenCapture.CaptureScreenshot(Path.Combine(_dir, "00_start_dark_emergency.png"));
             yield return new WaitForSecondsRealtime(0.4f);
+            HandsView.ForcedPose = "HandsCarry";                                    // hands raised, so that the arms are in the pictures
             _console.Submit("regime croisiere");
             _console.Submit("ff 300");
             yield return new WaitForSecondsRealtime(6f);

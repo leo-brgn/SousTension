@@ -31,6 +31,8 @@ MonoBehaviour:
     Prefab: {fileID: 4360823596214899628, guid: 24e2043a61d31044fb0c2e1e4a41dea7, type: 3}
   - Key: ManualOK114OpenBinder
     Prefab: {fileID: 879346876293390632, guid: 786772be505dee84ca98f72f2cb42e8b, type: 3}
+  - Key: FirstPersonArms
+    Prefab: {fileID: 8225550683378472529, guid: 152f307a325e4f54c8936d4bd0833b41, type: 3}
   - Key: SailorBase
     Prefab: {fileID: 7013770853082856630, guid: 09df2e066de90f94d82d8985ce7d8ffa, type: 3}
   - Key: SailorFemale
