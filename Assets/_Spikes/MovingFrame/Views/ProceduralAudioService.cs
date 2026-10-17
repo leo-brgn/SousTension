@@ -40,13 +40,16 @@ namespace SousTension.Spikes.MovingFrame
             _alarm = Loop("Alarm", null);
             _oneShot = Loop("OneShots", null);
             _oneShot.loop = false;
-            _cues = new AudioClip[6];
+            _cues = new AudioClip[9];
             _cues[(int)CueKind.Hatch] = Thump(0.45f, 90f, 0.9f, 0.35f, rng);                          // a heavy wheel and a bolt: low thump with a rattle
             _cues[(int)CueKind.Breaker] = Thump(0.12f, 400f, 0.5f, 0.6f, rng);                        // a relay click
             _cues[(int)CueKind.Pump] = Thump(0.35f, 140f, 0.8f, 0.15f, rng);                          // a motor catching or stopping
             _cues[(int)CueKind.Telegraph] = Bell(1.4f, 660f);                                         // the engine room bell
             _cues[(int)CueKind.Footstep] = Thump(0.14f, 180f, 0.45f, 0.7f, rng);                      // a boot on a metal grating
             _cues[(int)CueKind.Scram] = Thump(1.2f, 38f, 1f, 0.1f, rng);                              // the rods falling
+            _cues[(int)CueKind.Valve] = Thump(0.18f, 320f, 0.5f, 0.45f, rng);                         // a wheel squeaking round
+            _cues[(int)CueKind.LeakStart] = Thump(0.7f, 500f, 0.7f, 0.95f, rng);                      // a spurt of water
+            _cues[(int)CueKind.LeakPlug] = Thump(0.35f, 110f, 0.9f, 0.25f, rng);                      // a patch pressed home
             _alarmClips = new AudioClip[7];
             _alarmClips[(int)AlarmTone.Reactor] = Pattern(3f, new[] { (0f, 110f, 1.2f, 0.9f) });                                                   // gong: one low note, a pause
             _alarmClips[(int)AlarmTone.Power] = Pattern(2f, new[] { (0f, 220f, 0.12f, 0.8f), (0.25f, 220f, 0.12f, 0.8f), (0.5f, 220f, 0.12f, 0.8f) }); // three short buzzes

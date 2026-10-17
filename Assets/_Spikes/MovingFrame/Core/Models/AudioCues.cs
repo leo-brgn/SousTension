@@ -3,7 +3,7 @@ using SousTension.Sim;
 
 namespace SousTension.Spikes.MovingFrame
 {
-    public enum CueKind { Hatch, Breaker, Pump, Telegraph, Footstep, Scram }
+    public enum CueKind { Hatch, Breaker, Pump, Telegraph, Footstep, Scram, Valve, LeakStart, LeakPlug }
 
     /// <summary>One short sound to play now, with its loudness (already muffled by the bulkheads between the source and the listener).</summary>
     public readonly struct AudioCue
@@ -30,6 +30,11 @@ namespace SousTension.Spikes.MovingFrame
         private int _telegraph;
         private bool _scram;
         private float _lastX, _lastZ, _walked;
+        private int[] _valveSteps = new int[0];
+        private readonly Dictionary<int, int> _leakCompartments = new Dictionary<int, int>();
+        private readonly HashSet<int> _leaks = new HashSet<int>();
+        private readonly HashSet<int> _seenLeaks = new HashSet<int>();
+        public const int ValveSteps = 8;                       // a valve wheel squeaks every eighth of a turn
 
         public void Detect(MovingFrameModel m, List<AudioCue> cues)
         {
@@ -41,6 +46,11 @@ namespace SousTension.Spikes.MovingFrame
             var bilge = m.Bilge.Valid ? m.Bilge.State : new int[0];
             int telegraph = m.Propulsion.Valid ? m.Propulsion.Telegraph : _telegraph;
             bool scram = m.Reactor.Valid && m.Reactor.Scram;
+            var valves = m.Reactor.Valid ? m.Reactor.Valves : new float[0];
+            var valveSteps = new int[valves.Length];
+            for (int i = 0; i < valves.Length; i++) valveSteps[i] = (int)(valves[i] * ValveSteps + 0.0001f);
+            _seenLeaks.Clear();
+            if (m.Leaks != null) foreach (var leak in m.Leaks) _seenLeaks.Add(leak.Id);
 
             if (_known)
             {
@@ -55,6 +65,15 @@ namespace SousTension.Spikes.MovingFrame
                 for (int i = 0; i < bilge.Length && i < _bilge.Length; i++)
                     if (bilge[i] != _bilge[i]) cues.Add(new AudioCue(CueKind.Pump, grid));
                 if (telegraph != _telegraph) cues.Add(new AudioCue(CueKind.Telegraph, AudioMix.Reach(water, BoatLayout.CompartmentAt(TelegraphZ), here)));
+                for (int i = 0; i < valveSteps.Length && i < _valveSteps.Length; i++)
+                    if (valveSteps[i] != _valveSteps[i]) cues.Add(new AudioCue(CueKind.Valve, reactor));
+                if (m.Leaks != null)
+                {
+                    foreach (var leak in m.Leaks)
+                        if (!_leaks.Contains(leak.Id)) cues.Add(new AudioCue(CueKind.LeakStart, AudioMix.Reach(water, leak.Compartment, here)));
+                    foreach (int id in _leaks)
+                        if (!_seenLeaks.Contains(id)) cues.Add(new AudioCue(CueKind.LeakPlug, _leakCompartments.TryGetValue(id, out int c) ? AudioMix.Reach(water, c, here) : 1f));
+                }
                 if (scram && !_scram) cues.Add(new AudioCue(CueKind.Scram, 1f));
                 float dx = m.LocalX - _lastX, dz = m.LocalZ - _lastZ;
                 float step = (float)System.Math.Sqrt(dx * dx + dz * dz);
@@ -62,6 +81,9 @@ namespace SousTension.Spikes.MovingFrame
                 while (_walked >= StepLength) { _walked -= StepLength; cues.Add(new AudioCue(CueKind.Footstep, 1f)); }
             }
             _known = true;
+            _valveSteps = valveSteps;
+            _leaks.Clear(); _leakCompartments.Clear();
+            if (m.Leaks != null) foreach (var leak in m.Leaks) { _leaks.Add(leak.Id); _leakCompartments[leak.Id] = leak.Compartment; }
             _doors = (bool[])doors.Clone(); _breakers = (int[])breakers.Clone(); _pumps = (bool[])pumps.Clone(); _bilge = (int[])bilge.Clone();
             _telegraph = telegraph; _scram = scram; _lastX = m.LocalX; _lastZ = m.LocalZ;
         }
