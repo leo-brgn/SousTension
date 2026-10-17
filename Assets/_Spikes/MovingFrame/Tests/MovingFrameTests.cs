@@ -710,6 +710,26 @@ namespace SousTension.Spikes.MovingFrame.Tests
             Assert.AreEqual(30, StationFeedback.WindowTicks);
         }
 
+        // ---- Alarms (E3-09c) ----
+        [Test]
+        public void TheModelKeepsTheActiveAlarms_AndWhichOnesAreAcknowledged()
+        {
+            var model = new MovingFrameModel();
+            Assert.AreEqual(0, model.Alarms.Count);
+            model.SetAlarms(new[] { "rx_temp_warn", "!pw_v_low" });
+            Assert.AreEqual(2, model.Alarms.Count);
+            Assert.IsFalse(model.Alarms["rx_temp_warn"]);
+            Assert.IsTrue(model.Alarms["pw_v_low"]);
+            model.SetAlarms(new string[0]);                                  // all quiet: the panel goes dark
+            Assert.AreEqual(0, model.Alarms.Count);
+            model.SetAlarms(null);                                           // an older server sends none: nothing changes
+            Assert.AreEqual(0, model.Alarms.Count);
+            Assert.AreEqual("alarm:rx_temp_warn", InteractableIds.Alarm("rx_temp_warn"));
+            Assert.AreEqual("R1", AlarmCatalog.Plate(0));
+            Assert.AreEqual("E1", AlarmCatalog.Plate(8));
+            Assert.AreEqual("W1", AlarmCatalog.Plate(16));
+        }
+
         [Test]
         public void CargoState_CarriesItsHeight()
         {

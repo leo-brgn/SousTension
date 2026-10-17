@@ -257,5 +257,23 @@ namespace SousTension.Spikes.MovingFrame.Tests
             }
             Assert.Less(worst, 0.02f, "worst error " + worst + " at step " + worstStep);
         }
+
+        [Test]
+        public void TheAlarmCatalogEqualsTheServers_AndTheAnnunciatorStandsWhereTheServerExpects()
+        {
+            var lines = File.ReadAllLines(Path.Combine(RepoRoot, "Assets", "_Spikes", "MovingFrame", "Tests", "alarm_catalog.txt"));     // tools/gen-alarm-catalog.js
+            var expected = new List<string[]>();
+            foreach (var line in lines) if (line.Trim().Length > 0) expected.Add(line.Trim().Split(' '));
+            Assert.AreEqual(expected.Count, AlarmCatalog.All.Count, "the client lists as many alarms as the server");
+            for (int i = 0; i < expected.Count; i++)
+            {
+                Assert.AreEqual(expected[i][0], AlarmCatalog.All[i].Id, "alarm " + i);
+                Assert.AreEqual(expected[i][1], AlarmCatalog.All[i].System, expected[i][0] + " system");
+                Assert.AreEqual(expected[i][2] == "crit", AlarmCatalog.All[i].Critical, expected[i][0] + " severity");
+            }
+            var m1 = Regex.Match(Server("alarms.js"), @"var ANNUNCIATOR = \{ x: (-?[\d.]+), z: (-?[\d.]+),");
+            Assert.AreEqual(ControlLayout.AnnunciatorX, F(m1.Groups[1].Value), 1e-6f);
+            Assert.AreEqual(ControlLayout.AnnunciatorZ, F(m1.Groups[2].Value), 1e-6f);
+        }
     }
 }

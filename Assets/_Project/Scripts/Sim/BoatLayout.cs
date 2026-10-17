@@ -92,6 +92,8 @@ namespace SousTension.Sim
         public static readonly float[] BilgeX = { 0.0f, 0.0f };
         public static readonly float[] BilgeZ = { -3.45f, -7.35f };
         public const float TeleX = -2.3f, TeleUpZ = 6.15f, TeleDownZ = 5.35f;
+        /// <summary>The annunciator (alarm lamps): on the right wall of the central post. Server ANNUNCIATOR in alarms.js.</summary>
+        public const float AnnunciatorX = 2.7f, AnnunciatorZ = 6.6f;
 
         /// <summary>The 20 breakers sit on the electrical panel of the machines compartment: 5 columns x 4 rows (row 0 = lowest, 0.54 m).</summary>
         public const int BreakerCount = 20, BreakerColumns = 5;
