@@ -50,6 +50,9 @@ const SCENARIOS = {
     about: "croisiere with the fault generator (attention budget) and a crew that never reacts: how fast the faults pile up and what the alarms say",
     setup: (s, seed) => { s.reactor = m.newReactor(seed, "croisiere"); s.leaks.nextTick = 1e9; s.faults.enabled = true; s.faults.rng = seed; },
   },
+  "transit-lent": { about: "the mission: croisiere, telegraph at lent from the start, nobody does anything else: when is the goal reached?", setup: (s, seed) => { s.reactor = m.newReactor(seed, "croisiere"); s.leaks.nextTick = 1e9; s.prop.pos = 2; } },
+  "transit-demi": { about: "the mission: croisiere, telegraph at demi", setup: (s, seed) => { s.reactor = m.newReactor(seed, "croisiere"); s.leaks.nextTick = 1e9; s.prop.pos = 3; } },
+  "transit-toute": { about: "the mission: croisiere, telegraph at toute", setup: (s, seed) => { s.reactor = m.newReactor(seed, "croisiere"); s.leaks.nextTick = 1e9; s.prop.pos = 4; } },
   "scheduled-leaks": {
     about: "croisiere with the game's own leak schedule and nobody repairing: how long before the boat is in trouble",
     setup: (s, seed) => { s.reactor = m.newReactor(seed, "croisiere"); },
@@ -65,7 +68,7 @@ function run(name, seed) {
   const sc = SCENARIOS[name];
   const state = createMatch(["a", "b"]);
   sc.setup(state, seed);
-  const r = { scenario: name, seed, minutes: MINUTES, maxT: 0, minV: 1, minE: Infinity, maxWaterM3: 0, maxTrimDeg: 0, maxDepth: 0, firstWarnS: null, firstScramS: null, firstFloodS: null, alarms: {}, violations: [] };
+  const r = { scenario: name, seed, minutes: MINUTES, maxT: 0, minV: 1, minE: Infinity, maxWaterM3: 0, maxTrimDeg: 0, maxDepth: 0, firstWarnS: null, firstScramS: null, firstFloodS: null, goalS: null, alarms: {}, violations: [] };
   const script = {
     events: sc.events || {},
     onTick: (s, t) => {
@@ -77,6 +80,7 @@ function run(name, seed) {
       r.maxWaterM3 = Math.max(r.maxWaterM3, water);
       r.maxTrimDeg = Math.max(r.maxTrimDeg, Math.abs(m.waterTilt(s.water).trim));
       r.maxDepth = Math.max(r.maxDepth, s.boat.depth);
+      if (r.goalS === null && s.prop.dist >= m.MISSION_GOAL_M) r.goalS = sec;
       if (r.firstWarnS === null && s.reactor.T >= m.REACTOR_WARN) r.firstWarnS = sec;
       if (r.firstScramS === null && s.reactor.scram) r.firstScramS = sec;
       if (r.firstFloodS === null && s.water.comps.some((c, i) => c.w >= m.WATER_COMPARTMENTS[i].volume - 1e-9)) r.firstFloodS = sec;
@@ -123,6 +127,7 @@ else {
     const rang = Object.keys(first).sort((a, b) => Math.min(...first[a]) - Math.min(...first[b]));
     console.log("alarms: " + (rang.length ? rang.map((id) => id + " " + first[id].length + "/" + rows.length + " from " + f(Math.min(...first[id]), 0) + " s").join(" | ") : "none"));
     if (rows.some((r) => r.faultsStarted > 0)) console.log("faults started: " + rows.map((r) => r.faultsStarted).join(", ") + " | unresolved at the end: " + rows.map((r) => r.unresolvedAtEnd).join(", "));
+    if (rows.some((r) => r.goalS !== null)) console.log("goal (" + m.MISSION_GOAL_M + " m) reached at: " + rows.map((r) => f(r.goalS, 0)).join(", ") + " s");
     console.log("-> " + scrams + "/" + rows.length + " runs went to SCRAM; max temperature " + f(Math.max(...rows.map((r) => r.maxT)), 0) + " C; max water " + f(Math.max(...rows.map((r) => r.maxWaterM3)), 1) + " m3");
   }
   const bad = report.flatMap((r) => r.violations.map((v) => r.scenario + " seed " + r.seed + ": " + v));
