@@ -116,6 +116,7 @@ namespace SousTension.Spikes.MovingFrame
             _model.SetGrid(snapshot.Grid);
             _model.SetPropulsion(snapshot.Propulsion);
             _model.SetManual(snapshot.Manual);
+            _model.SetAlarms(snapshot.Alarms);
 
             foreach (var p in snapshot.Players)
             {

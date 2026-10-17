@@ -35,7 +35,7 @@ namespace SousTension.Spikes.MovingFrame
         [Serializable] private class LeakDto { public int id; public int c; public float x; public float z; public int s; public string t; }
         [Serializable] private class WaterDto { public float[] l; public float m; public float tr; public float li; public int[] dr; }
         [Serializable] private class BoatDto { public float d; public float vz; }
-        [Serializable] private class StateDto { public int tick; public double t; public PlayerDto[] players; public InterlockDto il; public CargoDto[] cargo; public ReactorDto rx; public CoupledDto[] cp; public RestartDto rs; public WaterDto bw; public LeakDto[] lk; public BilgeDto[] bp; public GridDto pw; public PropulsionDto pr; public ManualDto mn; public LeverDto sc; public BoatDto boat; }
+        [Serializable] private class StateDto { public int tick; public double t; public PlayerDto[] players; public InterlockDto il; public CargoDto[] cargo; public ReactorDto rx; public CoupledDto[] cp; public RestartDto rs; public WaterDto bw; public LeakDto[] lk; public BilgeDto[] bp; public GridDto pw; public PropulsionDto pr; public ManualDto mn; public LeverDto sc; public BoatDto boat; public string[] al; }
         [Serializable] private class MatchDto { public string matchId; }
 
         private readonly string _scheme, _host, _serverKey, _deviceId;
@@ -155,7 +155,7 @@ namespace SousTension.Spikes.MovingFrame
             var manual = dto.mn != null && dto.mn.n > 0 ? new ManualState(dto.mn.p, dto.mn.n) : default;
             var lever = dto.sc != null ? new ScramLeverState(dto.sc.cv == 1, dto.sc.pl == 1) : default;
             var boat = dto.boat != null ? new BoatDepthState(dto.boat.d, dto.boat.vz) : default;
-            _queue.Enqueue(new StateSnapshot(dto.tick, dto.t, players, il, cargo, reactor, lever, boat, coupled, restart, water, leaks, bilge, grid, propulsion, manual));
+            _queue.Enqueue(new StateSnapshot(dto.tick, dto.t, players, il, cargo, reactor, lever, boat, coupled, restart, water, leaks, bilge, grid, propulsion, manual, dto.al));
         }
 
         public void Poll()

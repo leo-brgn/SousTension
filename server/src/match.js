@@ -128,7 +128,7 @@ if (typeof module !== "undefined" && module.exports) {
   module.exports = {
     InitModule: InitModule, stepPlayer: stepPlayer, simStep: simStep, queueInput: queueInput, stateDigest: stateDigest,
     TICK_RATE: TICK_RATE, DT: DT, STATIONS: STATIONS, STATION_REACH: STATION_REACH, INTERLOCK_WINDOW_TICKS: INTERLOCK_WINDOW_TICKS, MAX_ALLOWANCE: MAX_ALLOWANCE, MOVE_SPEED: MOVE_SPEED, HALF_X: HALF_X, HALF_Z: HALF_Z,
-    OP_INPUT: OP_INPUT, OP_STATE: OP_STATE, ALARMS: ALARMS, newAlarms: newAlarms, alarmsStep: alarmsStep, alarmAck: alarmAck, alarmsView: alarmsView,
+    OP_INPUT: OP_INPUT, OP_STATE: OP_STATE, ALARMS: ALARMS, ANNUNCIATOR: ANNUNCIATOR, newAlarms: newAlarms, alarmsStep: alarmsStep, alarmAck: alarmAck, alarmsView: alarmsView,
     PLAYER_RADIUS: PLAYER_RADIUS, BULKHEAD_Z: BULKHEAD_Z, HATCH_X: HATCH_X, HATCH_HALF: HATCH_HALF, WALL_HALF: WALL_HALF, BAFFLE_HALF_X: BAFFLE_HALF_X, BAFFLE_HALF_Z: BAFFLE_HALF_Z, BAFFLE_OFFSET: BAFFLE_OFFSET,
     LAYOUT_OBSTACLES: LAYOUT_OBSTACLES, cargoBlocked: cargoBlocked, CARGO_RADIUS: CARGO_RADIUS, layoutBlocked: layoutBlocked, hatchToggle: hatchToggle, hatchOccupied: hatchOccupied, CONTROLS: CONTROLS,
     LEVER_COVER_TICKS: LEVER_COVER_TICKS, SINK_RATE_MAX: SINK_RATE_MAX, SINK_RAMP_SECONDS: SINK_RAMP_SECONDS, newBoat: newBoat, boatStep: boatStep,

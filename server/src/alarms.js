@@ -70,6 +70,9 @@ ALARMS.push(
   );
 })();
 
+// The annunciator: the lamp panel on the right wall of the central post (E3-09c). Pressing a lamp acknowledges that alarm; the player must be at the panel.
+var ANNUNCIATOR = { x: 2.7, z: 6.6, reach: 2.0 };
+
 function newAlarms() {
   var list = [];
   for (var i = 0; i < ALARMS.length; i++) list.push({ on: false, since: 0, ack: false, count: 0 });

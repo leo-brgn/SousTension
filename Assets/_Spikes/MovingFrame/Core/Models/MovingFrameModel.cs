@@ -172,6 +172,20 @@ namespace SousTension.Spikes.MovingFrame
         public void SetPropulsion(PropulsionState state) { if (state.Valid) Propulsion = state; }
 
         /// <summary>The Operating Manual's page (E5-02), authoritative; a snapshot without it keeps the last known one.</summary>
+        /// <summary>Active alarms (E3-09): id -> acknowledged. Empty when all is quiet.</summary>
+        public IReadOnlyDictionary<string, bool> Alarms => _alarms;
+        private readonly Dictionary<string, bool> _alarms = new Dictionary<string, bool>();
+        public void SetAlarms(string[] ids)
+        {
+            if (ids == null) return;
+            _alarms.Clear();
+            foreach (var raw in ids)
+            {
+                bool ack = raw.StartsWith("!");
+                _alarms[ack ? raw.Substring(1) : raw] = ack;
+            }
+        }
+
         public ManualState Manual { get; private set; }
         public void SetManual(ManualState state) { if (state.Valid) Manual = state; }
 

@@ -58,6 +58,7 @@ namespace SousTension.Spikes.MovingFrame
         public static string Bilge(int i) => "bilge" + i;
         public static string Hatch(int d) => "hatch" + d;
         public static string Leak(int id) => "leak:" + id;
+        public static string Alarm(string id) => "alarm:" + id;
         public static string Command(string action, int side) => "cc:" + action + ":" + side;
     }
 }

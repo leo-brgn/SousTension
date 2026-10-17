@@ -122,7 +122,7 @@ function tryAct(state, id, pl, tick) {
 // ---- Aimed interaction (E2-02) ------------------------------------------------------------------------------------------------
 // The client looks at an object and sends its id in the input field `use`; the server checks that the id exists and that the player is within
 // arm's reach, then does what a press on that object does. Ids: a control id of CONTROLS ("regime", "scram", "valve0".."pump1", "bilge0",
-// "breaker_<id>", "tele_up"...), "cc:<action>:<0|1>" for a command of the Rule of Two Players, "leak:<n>" for a hull leak, and "item" for
+// "breaker_<id>", "tele_up"...), "cc:<action>:<0|1>" for a command of the Rule of Two Players, "leak:<n>" for a hull leak, "alarm:<id>" for a lamp of the annunciator (acknowledges that alarm, alarms.js), and "item" for
 // "use what I hold" (a patch on a leak, the bucket in the water). Anything else, or out of reach, is ignored.
 var AIM_REACH = 2.0;                 // m: arm's reach for every aimed control (the aim removes the ambiguity the small tiles had to solve by position)
 
@@ -148,6 +148,11 @@ function useTarget(state, id, pl, tick, target) {
     return;
   }
   if (!canUseHands(pl)) return;                         // E2-03: controls and commands need a free hand; the item uses above do not
+  if (target.indexOf("alarm:") === 0) {                 // E3-09c: acknowledge one alarm at the annunciator
+    var ax = pl.x - ANNUNCIATOR.x, az = pl.z - ANNUNCIATOR.z;
+    if (Math.sqrt(ax * ax + az * az) <= ANNUNCIATOR.reach) alarmAck(state, target.slice(6));
+    return;
+  }
   if (target.indexOf("cc:") === 0) {
     var parts = target.split(":");
     var side = +parts[2];

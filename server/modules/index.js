@@ -1264,6 +1264,9 @@ ALARMS.push(
   );
 })();
 
+// The annunciator: the lamp panel on the right wall of the central post (E3-09c). Pressing a lamp acknowledges that alarm; the player must be at the panel.
+var ANNUNCIATOR = { x: 2.7, z: 6.6, reach: 2.0 };
+
 function newAlarms() {
   var list = [];
   for (var i = 0; i < ALARMS.length; i++) list.push({ on: false, since: 0, ack: false, count: 0 });
@@ -1422,7 +1425,7 @@ function tryAct(state, id, pl, tick) {
 // ---- Aimed interaction (E2-02) ------------------------------------------------------------------------------------------------
 // The client looks at an object and sends its id in the input field `use`; the server checks that the id exists and that the player is within
 // arm's reach, then does what a press on that object does. Ids: a control id of CONTROLS ("regime", "scram", "valve0".."pump1", "bilge0",
-// "breaker_<id>", "tele_up"...), "cc:<action>:<0|1>" for a command of the Rule of Two Players, "leak:<n>" for a hull leak, and "item" for
+// "breaker_<id>", "tele_up"...), "cc:<action>:<0|1>" for a command of the Rule of Two Players, "leak:<n>" for a hull leak, "alarm:<id>" for a lamp of the annunciator (acknowledges that alarm, alarms.js), and "item" for
 // "use what I hold" (a patch on a leak, the bucket in the water). Anything else, or out of reach, is ignored.
 var AIM_REACH = 2.0;                 // m: arm's reach for every aimed control (the aim removes the ambiguity the small tiles had to solve by position)
 
@@ -1448,6 +1451,11 @@ function useTarget(state, id, pl, tick, target) {
     return;
   }
   if (!canUseHands(pl)) return;                         // E2-03: controls and commands need a free hand; the item uses above do not
+  if (target.indexOf("alarm:") === 0) {                 // E3-09c: acknowledge one alarm at the annunciator
+    var ax = pl.x - ANNUNCIATOR.x, az = pl.z - ANNUNCIATOR.z;
+    if (Math.sqrt(ax * ax + az * az) <= ANNUNCIATOR.reach) alarmAck(state, target.slice(6));
+    return;
+  }
   if (target.indexOf("cc:") === 0) {
     var parts = target.split(":");
     var side = +parts[2];
@@ -1951,7 +1959,7 @@ if (typeof module !== "undefined" && module.exports) {
   module.exports = {
     InitModule: InitModule, stepPlayer: stepPlayer, simStep: simStep, queueInput: queueInput, stateDigest: stateDigest,
     TICK_RATE: TICK_RATE, DT: DT, STATIONS: STATIONS, STATION_REACH: STATION_REACH, INTERLOCK_WINDOW_TICKS: INTERLOCK_WINDOW_TICKS, MAX_ALLOWANCE: MAX_ALLOWANCE, MOVE_SPEED: MOVE_SPEED, HALF_X: HALF_X, HALF_Z: HALF_Z,
-    OP_INPUT: OP_INPUT, OP_STATE: OP_STATE, ALARMS: ALARMS, newAlarms: newAlarms, alarmsStep: alarmsStep, alarmAck: alarmAck, alarmsView: alarmsView,
+    OP_INPUT: OP_INPUT, OP_STATE: OP_STATE, ALARMS: ALARMS, ANNUNCIATOR: ANNUNCIATOR, newAlarms: newAlarms, alarmsStep: alarmsStep, alarmAck: alarmAck, alarmsView: alarmsView,
     PLAYER_RADIUS: PLAYER_RADIUS, BULKHEAD_Z: BULKHEAD_Z, HATCH_X: HATCH_X, HATCH_HALF: HATCH_HALF, WALL_HALF: WALL_HALF, BAFFLE_HALF_X: BAFFLE_HALF_X, BAFFLE_HALF_Z: BAFFLE_HALF_Z, BAFFLE_OFFSET: BAFFLE_OFFSET,
     LAYOUT_OBSTACLES: LAYOUT_OBSTACLES, cargoBlocked: cargoBlocked, CARGO_RADIUS: CARGO_RADIUS, layoutBlocked: layoutBlocked, hatchToggle: hatchToggle, hatchOccupied: hatchOccupied, CONTROLS: CONTROLS,
     LEVER_COVER_TICKS: LEVER_COVER_TICKS, SINK_RATE_MAX: SINK_RATE_MAX, SINK_RAMP_SECONDS: SINK_RAMP_SECONDS, newBoat: newBoat, boatStep: boatStep,

@@ -79,6 +79,7 @@ namespace SousTension.Spikes.MovingFrame
             new GameObject("BilgePumps").AddComponent<BilgePumpsView>().Bind(model, boat.transform);
             new GameObject("BreakerPanel").AddComponent<BreakerPanelView>().Bind(model, boat.transform);
             new GameObject("Telegraph").AddComponent<TelegraphView>().Bind(model, boat.transform);
+            new GameObject("AlarmPanel").AddComponent<AlarmPanelView>().Bind(model, boat.transform);
             new GameObject("GridLighting").AddComponent<GridLightingView>().Bind(model);
             string tourDir = CommandLineValue("--tour=");
             if (!string.IsNullOrEmpty(tourDir)) new GameObject("ShotTour").AddComponent<ShotTourView>().Bind(model, console, input, tourDir);

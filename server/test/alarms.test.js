@@ -159,3 +159,29 @@ test("a leak left alone rings, then the level, then the flood, in that order, an
   }
   assert.deepStrictEqual(order, ["wt_leak_2", "wt_level_2", "wt_flood_2"]);
 });
+
+test("a lamp of the annunciator is pressed with the aimed interaction: it acknowledges that alarm, from the panel only, with a free hand", () => {
+  const h = m.handlers, nk = { binaryToString: (d) => d }, logger = { info() {} };
+  let { state } = h.matchInit({}, logger, nk, {});
+  state = h.matchJoin({}, logger, nk, null, 0, state, [{ userId: "a", sessionId: "sa" }]).state;
+  state.leaks.nextTick = 1e9;
+  const d = { broadcastMessage() {} };
+  let tick = 0, seq = 0;
+  const press = (use) => { state = h.matchLoop({}, logger, nk, d, ++tick, state, [{ opCode: m.OP_INPUT, sender: { userId: "a", sessionId: "sa" }, data: JSON.stringify({ seq: ++seq, mx: 0, mz: 0, act: true, use }) }]).state; };
+  state.reactor.T = m.REACTOR_K.tWarn + 5;
+  press("none");                                                                    // the alarm rings
+  assert.deepStrictEqual(m.alarmsView(state.alarms).filter((x) => /temp_warn/.test(x)), ["rx_temp_warn"]);
+  state.players.a.x = -2; state.players.a.z = -9;                                   // far from the panel
+  press("alarm:rx_temp_warn");
+  assert.ok(m.alarmsView(state.alarms).includes("rx_temp_warn"), "out of reach: still ringing");
+  state.players.a.x = m.ANNUNCIATOR.x - 1; state.players.a.z = m.ANNUNCIATOR.z;
+  press("alarm:rx_temp_warn");
+  assert.ok(m.alarmsView(state.alarms).includes("!rx_temp_warn"), "acknowledged at the panel");
+  press("alarm:does_not_exist");                                                    // an unknown id is ignored
+});
+
+test("the alarm catalogue fixture used by the Unity client test is up to date (node tools/gen-alarm-catalog.js)", () => {
+  const { spawnSync } = require("node:child_process");
+  const r = spawnSync(process.execPath, [require("node:path").join(__dirname, "..", "..", "tools", "gen-alarm-catalog.js"), "--check"]);
+  assert.strictEqual(r.status, 0, "Assets/_Spikes/MovingFrame/Tests/alarm_catalog.txt is out of date: run node tools/gen-alarm-catalog.js");
+});

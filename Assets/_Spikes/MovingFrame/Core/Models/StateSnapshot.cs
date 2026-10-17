@@ -195,11 +195,13 @@ namespace SousTension.Spikes.MovingFrame
         public readonly PropulsionState Propulsion;
         public readonly ManualState Manual;
         public readonly LeakState[] Leaks;   // null = the server sent no leak list (older server); empty = no leak
+        public readonly string[] Alarms;     // active alarm ids in catalogue order, "!" prefix = acknowledged (E3-09); null = the server sent none (older server)
 
         public StateSnapshot(int tick, double serverTime, PlayerState[] players, InterlockState interlock = default, CargoState[] cargo = null, ReactorState reactor = default,
             ScramLeverState lever = default, BoatDepthState boat = default, CoupledActionState[] coupled = null,
-            RestartState restart = default, WaterState water = default, LeakState[] leaks = null, BilgeState bilge = default, GridState grid = default, PropulsionState propulsion = default, ManualState manual = default)
+            RestartState restart = default, WaterState water = default, LeakState[] leaks = null, BilgeState bilge = default, GridState grid = default, PropulsionState propulsion = default, ManualState manual = default, string[] alarms = null)
         {
+            Alarms = alarms;
             Manual = manual;
             Propulsion = propulsion;
             Grid = grid;
