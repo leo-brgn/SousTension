@@ -57,7 +57,7 @@ namespace SousTension.Spikes.MovingFrame
 
         private static GameObject Block(Transform parent, string name, Vector3 scale, Vector3 localPos, Color color)
         {
-            var go = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            var go = SpikePrimitives.Create(PrimitiveType.Cube);
             go.name = name;
             Destroy(go.GetComponent<Collider>());
             go.transform.SetParent(parent, false);

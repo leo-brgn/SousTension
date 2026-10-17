@@ -20,7 +20,7 @@ namespace SousTension.Spikes.MovingFrame
             _model = model;
             for (int i = 0; i < 3; i++)
             {
-                var go = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                var go = SpikePrimitives.Create(PrimitiveType.Cube);
                 go.name = "Hand" + (i == 0 ? "Left" : i == 1 ? "Right" : "Pocket");
                 Destroy(go.GetComponent<Collider>());
                 go.transform.SetParent(camera.transform, false);

@@ -113,7 +113,7 @@ namespace SousTension.Spikes.MovingFrame
             // Fixed reference cubes inside the boat: they must not slide relative to the floor.
             for (int i = -2; i <= 2; i++) Piece(root.transform, "Marker" + i, new Vector3(i * 1.2f, 0.3f, i * 4f), Vector3.one * 0.6f, Color.HSVToRGB((i + 2) / 5f, 0.7f, 0.9f));
             // A static "world" reference outside the boat to feel the motion.
-            var world = GameObject.CreatePrimitive(PrimitiveType.Plane);
+            var world = SpikePrimitives.Create(PrimitiveType.Plane);
             world.name = "WorldGround"; world.transform.position = new Vector3(0, -6f, 0); world.transform.localScale = Vector3.one * 10f;
             world.GetComponent<Renderer>().material.color = new Color(0.15f, 0.25f, 0.5f);
             return root.AddComponent<BoatView>();
@@ -121,7 +121,7 @@ namespace SousTension.Spikes.MovingFrame
 
         private static void Piece(Transform parent, string name, Vector3 localPos, Vector3 scale, Color color)
         {
-            var go = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            var go = SpikePrimitives.Create(PrimitiveType.Cube);
             go.name = name; go.transform.SetParent(parent, false);
             go.transform.localPosition = localPos; go.transform.localScale = scale;
             go.GetComponent<Renderer>().material.color = color;

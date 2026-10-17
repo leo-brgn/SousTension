@@ -41,14 +41,14 @@ namespace SousTension.Spikes.MovingFrame
                 var pair = new Pair();
                 for (int i = 0; i < 2; i++)
                 {
-                    var go = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
+                    var go = SpikePrimitives.Create(PrimitiveType.Cylinder);
                     go.name = "Key_" + action.id + (i == 0 ? "A" : "B");
                     InteractableTarget.Mark(go, InteractableIds.Command(action.id, i));
                     go.transform.SetParent(boat, false);
                     go.transform.localPosition = (i == 0 ? action.a : action.b) + new Vector3(0f, 0.6f, 0f);
                     go.transform.localScale = new Vector3(0.5f, 0.6f, 0.5f);
                     pair.Keys[i] = go.GetComponent<Renderer>();
-                    var timer = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
+                    var timer = SpikePrimitives.Create(PrimitiveType.Cylinder);
                     timer.name = "Timer_" + action.id + (i == 0 ? "A" : "B");
                     Destroy(timer.GetComponent<Collider>());
                     timer.transform.SetParent(boat, false);

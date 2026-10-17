@@ -37,6 +37,35 @@ namespace SousTension.Spikes.MovingFrame.Tests
         }
 
         [Test]
+        public void SpikePrimitives_UseUrpMaterials_NotTheBuiltInStandardOneThatTurnsEverythingPink()
+        {
+            PlayLocal.EnsureMaterials();
+            var go = SpikePrimitives.Create(UnityEngine.PrimitiveType.Cube);
+            try
+            {
+                var shader = go.GetComponent<UnityEngine.Renderer>().sharedMaterial.shader;
+                Assert.AreEqual("Universal Render Pipeline/Lit", shader.name, "a Standard material is drawn pink by URP");
+                Assert.IsTrue(shader.isSupported);
+            }
+            finally { UnityEngine.Object.DestroyImmediate(go); }
+            var water = SpikePrimitives.Water();
+            Assert.IsNotNull(water);
+            Assert.AreEqual("Universal Render Pipeline/Unlit", water.shader.name);
+            Assert.AreEqual((int)UnityEngine.Rendering.RenderQueue.Transparent, water.renderQueue, "the water is transparent");
+        }
+
+        [Test]
+        public void NoViewCreatesAPrimitiveWithTheDefaultMaterial()
+        {
+            var views = System.IO.Directory.GetFiles("Assets/_Spikes/MovingFrame/Views", "*.cs");
+            foreach (var path in views)
+            {
+                if (path.EndsWith("SpikePrimitives.cs")) continue;
+                StringAssert.DoesNotContain("GameObject.CreatePrimitive(", System.IO.File.ReadAllText(path), path + " must use SpikePrimitives.Create (URP material)");
+            }
+        }
+
+        [Test]
         public void TheLocalServer_HealthUrl_IsTheNakamaOneOfTheCompose()
         {
             StringAssert.Contains(":7350/", PlayLocal.HealthUrl);
