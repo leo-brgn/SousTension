@@ -6,9 +6,17 @@ Objectif : appuyer sur Play et jouer, seul (avec un partenaire fantôme) ou à d
 - **Docker** démarré (le serveur Nakama tourne dans un conteneur : `server/docker-compose.yml`, déjà en **mode debug**).
 - Unity 6000.3.25f1 avec ce projet ouvert.
 
+## Une partie (le serveur démarre en salle d'attente)
+1. **Écran titre** : attends « Connecté », puis **Jouer**.
+2. **Salle d'attente** : il faut **au moins 2 équipiers**, tous « prêts » (pas de partie en solo). Le monde est figé, on peut marcher.
+3. **Ordre de mission** (10 s) : transit de **1500 m**.
+4. **La patrouille** : aucun HUD, tout est sur les instruments du bateau. Les pannes montent toutes seules (fuites, disjoncteurs, vannes) ; le panneau d'alarmes est au poste central (mur de droite), le Manuel s'ouvre à la page de l'alarme. **Échap** = pause (le jeu continue pour les autres).
+5. **Bilan** : réussite (1500 m atteints) ou échec (un compartiment noyé 60 s, ou 40 m de profondeur), étoiles, statistiques ; **Nouvelle patrouille** quand tout le monde est prêt.
+
 ## Jouer seul (le plus simple)
 1. Menu **SousTension > Spike > 3. Play locally (server + scene)** : il démarre le serveur (premier lancement : une minute ou deux), ouvre la scène `MovingFrame` et lance Play.
-2. Ouvre la console de debug avec la touche à gauche du `1` (`²` sur un clavier AZERTY) et tape `partner on` : un **joueur fantôme** apparaît. Il arme la commande complémentaire une seconde après que tu as armé la première, ce qui permet de tester toute action à deux **tout seul**.
+2. Ouvre la console de debug avec la touche à gauche du `1` (`²` sur un clavier AZERTY) et tape `partner on` : un **joueur fantôme**, **toujours prêt**, rejoint la partie. Clique **Jouer**, puis **Je suis prêt** : la partie démarre. Il arme la commande complémentaire une seconde après que tu as armé la première, ce qui permet de tester toute action à deux **tout seul**.
+3. Raccourcis de test : `mission start` (tout le monde prêt), `mission win` (arriver), `mission fail`, `mission goal 300` (objectif court), `faults now` (une panne tout de suite), `regime croisiere` puis `ff 120` (le réseau électrique monte et les lampes s'allument), `tp 4` (aller au compartiment 4).
 
 ## Jouer à deux (deux fenêtres)
 1. Une seule fois : menu **SousTension > Spike > 4. Build the Windows development client (player 2)** (le build arrive dans `Builds/Dev/`, ignoré par git).
@@ -28,7 +36,8 @@ Objectif : appuyer sur Play et jouer, seul (avec un partenaire fantôme) ou à d
 | Prendre / poser (le dernier pris) / ranger la torche en poche | F / G / H |
 | Feuilleter le Manuel (quand on le tient) | flèches gauche / droite |
 | Console de debug | touche à gauche du `1` |
-| Overlay réseau | F2 |
+| Overlay réseau (développeur) | F2 |
+| Pause | Échap |
 
 La touche **E** garde l'ancien comportement par position (la commande la plus proche), utile pour dépanner.
 

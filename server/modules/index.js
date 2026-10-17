@@ -1451,6 +1451,7 @@ function missionBeginBriefing(state, tick) {
 function missionStep(state, tick) {
   var ms = state.mission;
   if (ms.phase === "lobby" || ms.phase === "debrief") {
+    if (state.players[GHOST_ID]) ms.ready[GHOST_ID] = true;               // the debug ghost partner (E1-12) is always ready: one tester can start a game alone
     if (missionAllReady(state)) {
       if (ms.phase === "debrief") worldReset(state);
       missionBeginBriefing(state, tick);
