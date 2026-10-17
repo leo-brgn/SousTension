@@ -71,7 +71,7 @@ namespace SousTension.Spikes.MovingFrame
         public void Bind(MovingFrameModel model, Camera camera)
         {
             _model = model;
-            var go = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            var go = SpikePrimitives.Create(PrimitiveType.Cube);
             go.name = "ManualInHands";
             Destroy(go.GetComponent<Collider>());
             go.transform.SetParent(camera.transform, false);

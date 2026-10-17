@@ -42,7 +42,7 @@ namespace SousTension.Spikes.MovingFrame
         private Transform Get(CargoState c)
         {
             if (_items.TryGetValue(c.Id, out var t)) return t;
-            var go = GameObject.CreatePrimitive(c.Heavy ? PrimitiveType.Cylinder : PrimitiveType.Cube);
+            var go = SpikePrimitives.Create(c.Heavy ? PrimitiveType.Cylinder : PrimitiveType.Cube);
             go.name = "Cargo_" + c.Id;
             Destroy(go.GetComponent<Collider>());
             go.transform.SetParent(_boat, false);

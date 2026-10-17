@@ -54,7 +54,7 @@ namespace SousTension.Spikes.MovingFrame
         private Transform Get(string id, bool isLocal)
         {
             if (_characters.TryGetValue(id, out var t)) return t;
-            var go = GameObject.CreatePrimitive(PrimitiveType.Capsule);
+            var go = SpikePrimitives.Create(PrimitiveType.Capsule);
             go.name = (isLocal ? "Local_" : "Remote_") + id.Substring(0, Mathf.Min(6, id.Length));
             Destroy(go.GetComponent<Collider>());
             go.transform.SetParent(_boat, false);

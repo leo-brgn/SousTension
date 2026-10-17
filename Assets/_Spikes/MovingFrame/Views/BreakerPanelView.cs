@@ -18,7 +18,7 @@ namespace SousTension.Spikes.MovingFrame
             _model = model;
             for (int i = 0; i < Count; i++)
             {
-                var go = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                var go = SpikePrimitives.Create(PrimitiveType.Cube);
                 go.name = "Breaker" + i;
                 InteractableTarget.Mark(go, InteractableIds.Breakers[i]);
                 go.transform.SetParent(boat, false);

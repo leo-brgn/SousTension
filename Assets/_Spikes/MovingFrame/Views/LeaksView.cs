@@ -40,7 +40,7 @@ namespace SousTension.Spikes.MovingFrame
 
         private Transform Create(LeakState leak)
         {
-            var go = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            var go = SpikePrimitives.Create(PrimitiveType.Cube);
             go.name = "Leak" + leak.Id;
             InteractableTarget.Mark(go, InteractableIds.Leak(leak.Id));
             go.transform.SetParent(_boat, false);

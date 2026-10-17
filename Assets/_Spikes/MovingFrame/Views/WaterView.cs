@@ -21,10 +21,10 @@ namespace SousTension.Spikes.MovingFrame
         public void Bind(MovingFrameModel model, Transform boat)
         {
             _model = model;
-            var shader = Shader.Find("Universal Render Pipeline/Unlit") ?? Shader.Find("Sprites/Default");
+            var water = SpikePrimitives.Water();
             for (int i = 0; i < Compartments; i++)
             {
-                var go = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                var go = SpikePrimitives.Create(PrimitiveType.Cube);
                 go.name = "Water" + (i + 1);
                 Destroy(go.GetComponent<Collider>());
                 go.transform.SetParent(boat, false);
@@ -32,7 +32,7 @@ namespace SousTension.Spikes.MovingFrame
                 go.transform.localPosition = new Vector3(0f, 0f, zCentre);
                 go.transform.localScale = new Vector3(2f * HalfBeam, 0.001f, Length);
                 var renderer = go.GetComponent<Renderer>();
-                renderer.material = new Material(shader) { color = new Color(0.1f, 0.35f, 0.55f, 0.6f) };
+                renderer.material = new Material(water) { color = new Color(0.1f, 0.35f, 0.55f, 0.6f) };
                 _slabs[i] = go.transform;
                 go.SetActive(false);
             }

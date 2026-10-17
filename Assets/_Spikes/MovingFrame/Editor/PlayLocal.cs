@@ -25,10 +25,42 @@ namespace SousTension.Spikes.MovingFrame.EditorTools
 
         // ---- the scene -------------------------------------------------------------------------------------------------------------
 
+        public const string LitMaterialPath = "Assets/_Spikes/MovingFrame/Resources/SpikeLit.mat";
+        public const string WaterMaterialPath = "Assets/_Spikes/MovingFrame/Resources/SpikeWater.mat";
+
+        /// <summary>
+        /// URP materials of the spike's primitives (they would be PINK with the built-in Standard material that CreatePrimitive assigns: see
+        /// SpikePrimitives). Created in Resources so they are included in player builds too.
+        /// </summary>
+        public static void EnsureMaterials()
+        {
+            Directory.CreateDirectory(Path.Combine(ProjectRoot, Path.GetDirectoryName(LitMaterialPath)));
+            if (AssetDatabase.LoadAssetAtPath<Material>(LitMaterialPath) == null)
+            {
+                var lit = new Material(Shader.Find("Universal Render Pipeline/Lit")) { name = "SpikeLit" };
+                AssetDatabase.CreateAsset(lit, LitMaterialPath);
+            }
+            if (AssetDatabase.LoadAssetAtPath<Material>(WaterMaterialPath) == null)
+            {
+                var water = new Material(Shader.Find("Universal Render Pipeline/Unlit")) { name = "SpikeWater" };
+                water.SetOverrideTag("RenderType", "Transparent");
+                water.SetFloat("_Surface", 1f);                       // transparent
+                water.SetFloat("_Blend", 0f);                         // alpha blend
+                water.SetFloat("_SrcBlend", (float)UnityEngine.Rendering.BlendMode.SrcAlpha);
+                water.SetFloat("_DstBlend", (float)UnityEngine.Rendering.BlendMode.OneMinusSrcAlpha);
+                water.SetFloat("_ZWrite", 0f);
+                water.EnableKeyword("_SURFACE_TYPE_TRANSPARENT");
+                water.renderQueue = (int)UnityEngine.Rendering.RenderQueue.Transparent;
+                AssetDatabase.CreateAsset(water, WaterMaterialPath);
+            }
+            AssetDatabase.SaveAssets();
+        }
+
         [MenuItem("SousTension/Spike/1. Create the MovingFrame scene")]
         public static void CreateScene()
         {
             if (EditorApplication.isPlaying) { Debug.LogWarning("[PlayLocal] stop Play mode first"); return; }
+            EnsureMaterials();
             Directory.CreateDirectory(Path.Combine(ProjectRoot, Path.GetDirectoryName(ScenePath)));
             var scene = EditorSceneManager.NewScene(NewSceneSetup.DefaultGameObjects, NewSceneMode.Single);
             var root = new GameObject("MovingFrameBootstrap");
