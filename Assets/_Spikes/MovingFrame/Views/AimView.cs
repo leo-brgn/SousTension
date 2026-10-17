@@ -20,7 +20,7 @@ namespace SousTension.Spikes.MovingFrame
         private readonly List<Renderer> _lit = new List<Renderer>();
 
         public string TargetId => _target;
-        public bool UseHeld => Mouse.current != null && Mouse.current.leftButton.isPressed;
+        public bool UseHeld => !ScreensView.IsOpen && Mouse.current != null && Mouse.current.leftButton.isPressed;
 
         public void Bind(Camera camera) { _camera = camera; }
 

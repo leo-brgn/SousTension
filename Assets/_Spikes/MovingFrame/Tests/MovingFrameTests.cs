@@ -36,7 +36,8 @@ namespace SousTension.Spikes.MovingFrame.Tests
         private readonly Queue<StateSnapshot> _incoming = new Queue<StateSnapshot>();
 
         public Task ConnectAsync(CancellationToken ct) => Task.CompletedTask;
-        public void SendInput(int seq, float moveX, float moveZ, bool act, bool grab, bool hold = false, string use = null, string hand = null, float yaw = 0f, string dbg = null) { Sent.Add((seq, moveX, moveZ, act, grab, hold, use, hand, yaw, dbg)); BytesSent += 24; }
+        public void SendInput(int seq, float moveX, float moveZ, bool act, bool grab, bool hold = false, string use = null, string hand = null, float yaw = 0f, string dbg = null, int ready = -1) { Sent.Add((seq, moveX, moveZ, act, grab, hold, use, hand, yaw, dbg)); if (ready >= 0) ReadySent.Add(ready); BytesSent += 24; }
+        public readonly List<int> ReadySent = new List<int>();
         public void Enqueue(StateSnapshot s) => _incoming.Enqueue(s);
         public void Poll() { while (_incoming.Count > 0) StateReceived?.Invoke(_incoming.Dequeue()); }
         public void Dispose() { }
@@ -708,6 +709,57 @@ namespace SousTension.Spikes.MovingFrame.Tests
         public void StationFeedback_TheOfficialWindowIsThreeSeconds()
         {
             Assert.AreEqual(30, StationFeedback.WindowTicks);
+        }
+
+        // ---- Mission flow and screens (MVP) ----
+        [Test]
+        public void TheScreensTextsExistInEveryLanguageWithTheSameKeys()
+        {
+            var fr = UiText.Table("fr"); var en = UiText.Table("en");
+            CollectionAssert.AreEquivalent(new List<string>(fr.Keys), new List<string>(en.Keys), "French and English have the same keys");
+            foreach (var kv in fr) { Assert.IsNotEmpty(kv.Value, kv.Key); Assert.IsNotEmpty(en[kv.Key], kv.Key); }
+            foreach (var why in new[] { "arrived", "flooded", "depth" }) Assert.IsTrue(fr.ContainsKey("ui.debrief.why." + why), why);
+            UiText.Language = "en";
+            Assert.AreEqual("Play", UiText.Get("ui.play"));
+            Assert.AreEqual("Casting off in 7 s", UiText.Format("ui.briefing.countdown", 7));
+            Assert.AreEqual("ui.no.such.key", UiText.Get("ui.no.such.key"), "a missing key shows itself");
+            UiText.Language = "fr";
+            Assert.AreEqual("Jouer", UiText.Get("ui.play"));
+            UiText.Language = null;
+        }
+
+        [Test]
+        public void TheModelKeepsTheMissionFlow_AndKnowsWhoIsReady()
+        {
+            var model = new MovingFrameModel { LocalId = "me" };
+            Assert.IsFalse(model.Mission.Valid);
+            Assert.IsFalse(model.LocalIsReady());
+            model.SetMission(new MissionState("lobby", 1500, 0, 0, 0, new[] { "other" }, 2, 2, false, "", "", 0, 0, 0, 0, 0, 0f, 0));
+            Assert.AreEqual("lobby", model.Mission.Phase);
+            Assert.IsFalse(model.LocalIsReady());
+            model.SetMission(new MissionState("lobby", 1500, 0, 0, 0, new[] { "other", "me" }, 2, 2, false, "", "", 0, 0, 0, 0, 0, 0f, 0));
+            Assert.IsTrue(model.LocalIsReady());
+            model.SetMission(new MissionState("debrief", 1500, 1500, 400, 0, new string[0], 2, 2, false, "success", "arrived", 3, 400, 1500, 3, 12, 0.2f, 0));
+            Assert.AreEqual(3, model.Mission.Stars);
+            Assert.AreEqual("arrived", model.Mission.Why);
+            Assert.AreEqual("me", new List<string>(model.AllPlayerIds())[0], "the local player comes first");
+        }
+
+        [Test]
+        public void ReadyIsSentOnceWithTheNextInput_AndNotRepeated()
+        {
+            var net = new FakeNetwork(); var clock = new FakeClock(); var model = new MovingFrameModel();
+            var c = new MovingFrameController(net, new ConstantInput(), clock, model);
+            net.Enqueue(Snapshot(1, new PlayerState("me", 0, 0, 0)));
+            c.Tick(0f);
+            c.Tick(0.1f);
+            Assert.AreEqual(0, net.ReadySent.Count, "nothing asked: nothing sent");
+            c.RequestReady(true);
+            c.Tick(0.1f); c.Tick(0.1f);
+            Assert.AreEqual(new[] { 1 }, net.ReadySent.ToArray(), "ready goes out once, not on every input");
+            c.RequestReady(false);
+            c.Tick(0.1f);
+            Assert.AreEqual(new[] { 1, 0 }, net.ReadySent.ToArray());
         }
 
         // ---- Alarms (E3-09c) ----

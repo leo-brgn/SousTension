@@ -18,7 +18,7 @@ namespace SousTension.Spikes.MovingFrame
         event Action<string[]> DebugReceived;
 
         Task ConnectAsync(CancellationToken cancellationToken);
-        void SendInput(int seq, float moveX, float moveZ, bool act, bool grab, bool hold = false, string use = null, string hand = null, float yaw = 0f, string dbg = null);
+        void SendInput(int seq, float moveX, float moveZ, bool act, bool grab, bool hold = false, string use = null, string hand = null, float yaw = 0f, string dbg = null, int ready = -1);
 
         /// <summary>Deliver queued network events on the calling thread.</summary>
         void Poll();

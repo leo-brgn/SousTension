@@ -22,7 +22,7 @@ namespace SousTension.Spikes.MovingFrame
         private readonly double _loss;
         private readonly double _retransmitDelay;
         private readonly Random _rng;
-        private readonly List<Delayed<(int seq, float mx, float mz, bool act, bool grab, bool hold, string use, string hand, float yaw, string dbg)>> _outgoing = new List<Delayed<(int, float, float, bool, bool, bool, string, string, float, string)>>();
+        private readonly List<Delayed<(int seq, float mx, float mz, bool act, bool grab, bool hold, string use, string hand, float yaw, string dbg, int ready)>> _outgoing = new List<Delayed<(int seq, float mx, float mz, bool act, bool grab, bool hold, string use, string hand, float yaw, string dbg, int ready)>>();
         private readonly List<Delayed<StateSnapshot>> _incoming = new List<Delayed<StateSnapshot>>();
         private double _lastOutDue, _lastInDue;
 
@@ -46,10 +46,10 @@ namespace SousTension.Spikes.MovingFrame
 
         public Task ConnectAsync(CancellationToken ct) => _inner.ConnectAsync(ct);
 
-        public void SendInput(int seq, float moveX, float moveZ, bool act, bool grab, bool hold = false, string use = null, string hand = null, float yaw = 0f, string dbg = null)
+        public void SendInput(int seq, float moveX, float moveZ, bool act, bool grab, bool hold = false, string use = null, string hand = null, float yaw = 0f, string dbg = null, int ready = -1)
         {
             _lastOutDue = Math.Max(_lastOutDue, _clock.Now + NextDelay());
-            _outgoing.Add(new Delayed<(int, float, float, bool, bool, bool, string, string, float, string)> { Due = _lastOutDue, Item = (seq, moveX, moveZ, act, grab, hold, use, hand, yaw, dbg) });
+            _outgoing.Add(new Delayed<(int seq, float mx, float mz, bool act, bool grab, bool hold, string use, string hand, float yaw, string dbg, int ready)> { Due = _lastOutDue, Item = (seq, moveX, moveZ, act, grab, hold, use, hand, yaw, dbg, ready) });
         }
 
         private void OnInnerState(StateSnapshot s)
@@ -65,7 +65,7 @@ namespace SousTension.Spikes.MovingFrame
             while (_outgoing.Count > 0 && _outgoing[0].Due <= now)
             {
                 var o = _outgoing[0].Item; _outgoing.RemoveAt(0);
-                _inner.SendInput(o.seq, o.mx, o.mz, o.act, o.grab, o.hold, o.use, o.hand, o.yaw, o.dbg);
+                _inner.SendInput(o.seq, o.mx, o.mz, o.act, o.grab, o.hold, o.use, o.hand, o.yaw, o.dbg, o.ready);
             }
             while (_incoming.Count > 0 && _incoming[0].Due <= now)
             {
