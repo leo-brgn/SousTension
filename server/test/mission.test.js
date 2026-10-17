@@ -168,3 +168,16 @@ test("the debug console drives the mission: start, goal, win", () => {
   say("mission win"); ticks(c, 2);
   assert.strictEqual(c.state.mission.result, "success");
 });
+
+test("the debug ghost partner is always ready: one tester can start a game (lobby and debrief)", () => {
+  const c = lobby(["a"]);
+  tick(c, [input(c, "a", { dbg: "partner on" })]);
+  assert.strictEqual(c.state.mission.phase, "lobby", "alone with a ghost: waits for the real player");
+  ready(c, ["a"]);
+  assert.strictEqual(c.state.mission.phase, "briefing");
+  ticks(c, secs(m.MISSION_BRIEFING_SECONDS) + 2);
+  c.state.prop.dist = m.MISSION_GOAL_M + 1; tick(c);
+  assert.strictEqual(c.state.mission.phase, "debrief");
+  ready(c, ["a"]);
+  assert.strictEqual(c.state.mission.phase, "briefing", "the ghost is ready for the next game too");
+});
