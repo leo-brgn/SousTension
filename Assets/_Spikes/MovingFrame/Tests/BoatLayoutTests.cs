@@ -229,5 +229,33 @@ namespace SousTension.Spikes.MovingFrame.Tests
             }
             finally { UnityEngine.Object.DestroyImmediate(boat); }
         }
+
+        [Test]
+        public void TheClientWalksLikeTheServer()
+        {
+            // motion_parity.txt: 3 x 3000 steps of a pseudo-random walk through the boat, computed by the server (tools/gen-motion-parity.js).
+            var lines = File.ReadAllLines(Path.Combine(RepoRoot, "Assets", "_Spikes", "MovingFrame", "Tests", "motion_parity.txt"));
+            float x = 0, z = 0; bool[] doors = null; int step = 0, run = -1; float worst = 0f; int worstStep = 0;
+            foreach (var line in lines)
+            {
+                var t = line.Split(' ');
+                if (t[0] == "run")
+                {
+                    run++; step = 0; x = F(t[1]); z = F(t[2]);
+                    doors = new bool[t[3].Length];
+                    for (int i = 0; i < doors.Length; i++) doors[i] = t[3][i] == '1';
+                    continue;
+                }
+                CharacterMotion.Step(ref x, ref z, F(t[0]), F(t[1]), F(t[2]), doors);
+                float dx = x - F(t[3]), dz = z - F(t[4]);
+                float err = Mathf.Sqrt(dx * dx + dz * dz);
+                if (err > worst) { worst = err; worstStep = step; }
+                // the client follows the server step by step: its own drift stays tiny (it never has to be snapped back)
+                Assert.Less(err, 0.02f, "run " + run + " step " + step + ": client (" + x + ", " + z + ") vs server (" + t[3] + ", " + t[4] + ")");
+                x = F(t[3]); z = F(t[4]);                                                       // re-sync each step: tests one step at a time, as the reconciliation does
+                step++;
+            }
+            Assert.Less(worst, 0.02f, "worst error " + worst + " at step " + worstStep);
+        }
     }
 }

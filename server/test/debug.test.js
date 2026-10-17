@@ -73,8 +73,23 @@ test("tp puts you where you ask, inside the boat; bad arguments get a usage mess
   assert.deepStrictEqual([c.state.players.a.x, c.state.players.a.z], [1.5, -4]);
   cmd(c, "tp 99 -99");
   assert.deepStrictEqual([c.state.players.a.x, c.state.players.a.z], [m.HALF_X, -m.HALF_Z]);
-  assert.match(cmd(c, "tp 1"), /usage/);
+  assert.match(cmd(c, "tp 7"), /usage/);
   assert.match(cmd(c, "tp a b"), /usage/);
+  assert.match(cmd(c, "tp nowhere"), /usage/);
+});
+
+test("tp <compartment> puts you in the middle of that compartment, by number or by name (the boat is 28 m long)", () => {
+  const c = on();
+  m.WATER_COMPARTMENTS.forEach((room, i) => {
+    const mid = (room.z0 + room.z1) / 2;
+    cmd(c, "tp " + (i + 1));
+    assert.deepStrictEqual([c.state.players.a.x, c.state.players.a.z], [0, mid], "by number " + (i + 1));
+    assert.ok(!m.layoutBlocked(0, mid, c.state.water.doors), "not inside a wall");
+    cmd(c, "tp 3");
+    cmd(c, "tp " + room.id);
+    assert.deepStrictEqual([c.state.players.a.x, c.state.players.a.z], [0, mid], "by name " + room.id);
+  });
+  assert.match(cmd(c, "tp reacteur"), /compartment 4/);
 });
 
 test("regime, scram and restart act on the reactor, restart without the procedure", () => {

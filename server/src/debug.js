@@ -5,7 +5,7 @@
 // the command is ignored and the sender is told so. The debug state is NOT game state: it is left out of the state digest, and with debug off
 // nothing here touches the simulation. Replies go back to the sender only, as the server message OP_DEBUG: {lines: [...]}.
 //
-// Commands:  help | state | tp <x> <z> | regime <veille|croisiere|pleine> | scram | restart | leak <1-6> <1-3> [g|d] | unleak
+// Commands:  help | state | tp <x> <z> | tp <1-6|torpilles|central|radio|reacteur|machines|vie> | regime <veille|croisiere|pleine> | scram | restart | leak <1-6> <1-3> [g|d] | unleak
 //            break <pump|bilge> <1-2> | repair <pump|bilge> <1-2> | trip <breaker id> | water <1-6> <m3> | bring <item id>
 //            get <param> | set <param> <value|default> | ff <seconds> | partner <on|off|status>
 var DEBUG_FF_MAX_SECONDS = 300;
@@ -85,6 +85,12 @@ function ghostStep(state, tick) {
 
 function dbgReply(state, id, text) { state.debug.out.push({ to: id, text: text }); }
 function dbgNum(tok) { var v = Number(tok); return tok !== undefined && tok !== "" && isFinite(v) ? v : NaN; }
+// A compartment named by its number (1-6) or its id; -1 when it is neither.
+function dbgRoom(tok) {
+  for (var i = 0; i < WATER_COMPARTMENTS.length; i++) if (WATER_COMPARTMENTS[i].id === tok) return i;
+  var c = dbgNum(tok);
+  return c >= 1 && c <= WATER_COMPARTMENTS.length && Math.floor(c) === c ? c - 1 : -1;
+}
 function dbgCompartment(tok) { var c = dbgNum(tok); return c >= 1 && c <= WATER_COMPARTMENTS.length && Math.floor(c) === c ? c - 1 : -1; }
 
 function debugState(state) {
@@ -117,8 +123,14 @@ function debugCommand(state, id, pl, line, tick) {
     var lines = debugState(state);
     for (i = 0; i < lines.length; i++) reply(lines[i]);
   } else if (cmd === "tp") {
+    var room = tok.length === 2 ? dbgRoom(tok[1]) : -1;                       // tp <compartment>: the middle of that compartment (the boat is 28 m long)
+    if (room >= 0) {
+      pl.x = 0; pl.z = (WATER_COMPARTMENTS[room].z0 + WATER_COMPARTMENTS[room].z1) / 2;
+      reply("teleported to compartment " + (room + 1) + " (" + WATER_COMPARTMENTS[room].id + ")");
+      return;
+    }
     var x = dbgNum(tok[1]), z = dbgNum(tok[2]);
-    if (isNaN(x) || isNaN(z)) { reply("usage: tp <x> <z>"); return; }
+    if (isNaN(x) || isNaN(z)) { reply("usage: tp <x> <z> | tp <1-6|" + WATER_COMPARTMENTS.map(function (c) { return c.id; }).join("|") + ">"); return; }
     pl.x = clamp(x, -HALF_X, HALF_X); pl.z = clamp(z, -HALF_Z, HALF_Z);
     reply("teleported to " + pl.x + " " + pl.z);
   } else if (cmd === "regime") {
