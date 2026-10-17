@@ -67,7 +67,7 @@ namespace SousTension.Spikes.MovingFrame
                     if (_alarm.clip != null) _alarm.Play();
                 }
             }
-            else _alarmVolume = Mathf.Lerp(_alarmVolume, _alarmTone == AlarmTone.None ? 0f : 0.7f, 1f - Mathf.Exp(-8f * dt));
+            else _alarmVolume = Mathf.Lerp(_alarmVolume, _alarmTone == AlarmTone.None ? 0f : 0.7f * _target.AlarmGain, 1f - Mathf.Exp(-8f * dt));
             _alarm.volume = _alarmVolume * MasterVolume;
         }
 

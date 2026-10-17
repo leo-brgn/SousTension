@@ -822,6 +822,32 @@ namespace SousTension.Spikes.MovingFrame.Tests
         }
 
         [Test]
+        public void TheAudioMix_IsMuffledByBulkheads_ClosedMoreThanOpen()
+        {
+            var open = new WaterState(new float[6], 0f, 0f, 0f, new[] { true, true, true, true, true });
+            var shut = new WaterState(new float[6], 0f, 0f, 0f, new[] { false, false, false, false, false });
+            Assert.AreEqual(1f, AudioMix.Reach(shut, 3, 3), 1e-6f, "same compartment: full level");
+            Assert.Less(AudioMix.Reach(open, 3, 2), 1f);
+            Assert.Less(AudioMix.Reach(shut, 3, 2), AudioMix.Reach(open, 3, 2), "a closed hatch muffles more");
+            Assert.Less(AudioMix.Reach(shut, 3, 0), AudioMix.Reach(shut, 3, 2), "each bulkhead adds to it");
+            Assert.AreEqual(AudioMix.Reach(shut, 5, 1), AudioMix.Reach(shut, 1, 5), 1e-6f, "symmetric");
+            Assert.AreEqual(AudioMix.Reach(open, 3, 2), AudioMix.Reach(default(WaterState), 3, 2), 1e-6f, "unknown doors count as open");
+
+            var model = new MovingFrameModel { LocalId = "me" };
+            var valves = new[] { 1f, 1f, 1f, 1f }; var pumps = new[] { true, true };
+            model.SetReactor(new ReactorState("pleine", 0.9f, 2f, 300f, 380f, 50f, 8f, 1f, 1f, valves, pumps, false, false, false, false, false));
+            model.SetWater(shut);
+            model.SetAlarms(new[] { "pw_v_low" });
+            model.SetLocal(0f, -2f);                                                           // next to the reactor panel
+            var near = AudioMix.Compute(model);
+            model.SetLocal(0f, 12f);                                                           // in the bow, behind closed hatches
+            var far = AudioMix.Compute(model);
+            Assert.Less(far.ReactorVolume, near.ReactorVolume * 0.5f);
+            Assert.Less(far.GridVolume, near.GridVolume);
+            Assert.Greater(far.AlarmGain, 0.3f, "an alarm is still heard from afar");
+        }
+
+        [Test]
         public void TheModelKeepsTheMissionFlow_AndKnowsWhoIsReady()
         {
             var model = new MovingFrameModel { LocalId = "me" };
