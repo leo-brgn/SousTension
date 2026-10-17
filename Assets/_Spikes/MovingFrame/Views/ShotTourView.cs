@@ -27,6 +27,7 @@ namespace SousTension.Spikes.MovingFrame
             ("11_torpedo_room", 0f, 10.8f, 0f, 5f),
             ("12_reactor_hatch_from_radio", -1.45f, 2.2f, 180f, 8f),
             ("13_annunciator", 1.5f, 6.6f, 90f, 6f),
+            ("14_odometer", -1.2f, 4.75f, -90f, 3f),
         };
 
         private MovingFrameModel _model;
