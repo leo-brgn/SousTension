@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Collections.Concurrent;
 using System.Text;
 using System.Threading;
@@ -13,11 +14,12 @@ namespace SousTension.Spikes.MovingFrame
     /// Protocol: opcode 1 = input {seq, mx, mz} (client -> server), opcode 2 = state {tick, t, players[]} (server -> clients).
     /// Socket callbacks may run off the main thread, so snapshots are queued and delivered from <see cref="Poll"/>.
     /// </summary>
-    public sealed class NakamaNetworkService : INetworkService
+    public sealed class NakamaNetworkService : INetworkService, IVoiceTransport
     {
         private const long OpInput = 1;
         private const long OpState = 2;
         private const long OpDebug = 3;
+        private const long OpVoice = 4;
 
         [Serializable] private class InputDto { public int seq; public float mx; public float mz; public bool act; public bool grab; public bool hold; public string use; public string hand; public float ry; public string dbg; public int rdy; }
         [Serializable] private class DebugDto { public string[] lines; }
@@ -52,6 +54,8 @@ namespace SousTension.Spikes.MovingFrame
 
         public event Action<StateSnapshot> StateReceived;
         public event Action<string[]> DebugReceived;
+        public event Action<string, byte[]> VoiceReceived;
+        private readonly ConcurrentQueue<KeyValuePair<string, byte[]>> _voiceQueue = new ConcurrentQueue<KeyValuePair<string, byte[]>>();
         private readonly System.Collections.Concurrent.ConcurrentQueue<string[]> _debugQueue = new System.Collections.Concurrent.ConcurrentQueue<string[]>();
         public string LocalUserId => _session?.UserId;
         public long BytesSent => Interlocked.Read(ref _bytesSent);
@@ -91,8 +95,27 @@ namespace SousTension.Spikes.MovingFrame
             catch (Exception e) { Debug.LogWarning("[Nakama] send failed: " + e.Message); }
         }
 
+        public void SendVoice(byte[] packet)
+        {
+            if (_socket == null || _matchId == null || packet == null) return;
+            Interlocked.Add(ref _bytesSent, packet.Length);
+            _ = SendVoiceAsync(packet);
+        }
+
+        private async Task SendVoiceAsync(byte[] packet)
+        {
+            try { await _socket.SendMatchStateAsync(_matchId, OpVoice, packet); }
+            catch (Exception e) { Debug.LogWarning("[Nakama] voice send failed: " + e.Message); }
+        }
+
         private void OnMatchState(IMatchState state)
         {
+            if (state.OpCode == OpVoice)
+            {
+                var sender = state.UserPresence?.UserId;
+                if (sender != null && sender != LocalUserId) _voiceQueue.Enqueue(new KeyValuePair<string, byte[]>(sender, state.State));      // the relay also echoes our own packets
+                return;
+            }
             if (state.OpCode == OpDebug)
             {
                 var reply = JsonUtility.FromJson<DebugDto>(Encoding.UTF8.GetString(state.State));
@@ -171,6 +194,7 @@ namespace SousTension.Spikes.MovingFrame
         {
             while (_queue.TryDequeue(out var snapshot)) StateReceived?.Invoke(snapshot);
             while (_debugQueue.TryDequeue(out var lines)) DebugReceived?.Invoke(lines);
+            while (_voiceQueue.TryDequeue(out var voice)) VoiceReceived?.Invoke(voice.Key, voice.Value);
         }
 
         public void Dispose()
