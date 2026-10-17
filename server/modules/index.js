@@ -12,6 +12,8 @@ var TICK_RATE = 10;
 var DT = 1 / TICK_RATE;
 var OP_INPUT = 1;      // client -> server : {seq, mx, mz}
 var OP_DEBUG = 3;      // server -> one client: the reply to a debug command, {lines: [...]} (E1-09, debug mode only)
+var OP_VOICE = 4;      // client -> server -> the other clients: one voice packet (opaque bytes, E8-07). Relayed as is, never stored, outside simStep.
+var VOICE_MAX_PER_TICK = 10;   // per sender and per tick (a 20 ms Opus frame is 5 per tick): a flooding client cannot saturate the others
 var OP_STATE = 2;      // server -> clients: {tick, t, players:[{id, x, z, seq}]}
 var MOVE_SPEED = 3.0;  // m/s
 var HALF_X = 3.0;      // boat interior half width (m)
@@ -2116,9 +2118,18 @@ var matchLeave = function (ctx, logger, nk, dispatcher, tick, state, presences) 
 };
 
 var matchLoop = function (ctx, logger, nk, dispatcher, tick, state, messages) {
-  // 1. Collect inputs (ordered by arrival). Drop the oldest if a client floods the queue.
+  // 1. Collect inputs (ordered by arrival). Drop the oldest if a client floods the queue. Voice packets are relayed untouched (the game does not read them).
+  var voiceCount = {};
   for (var i = 0; i < messages.length; i++) {
     var m = messages[i];
+    if (m.opCode === OP_VOICE) {
+      var from = m.sender.userId;
+      if (state.players[from] && (voiceCount[from] || 0) < VOICE_MAX_PER_TICK) {
+        voiceCount[from] = (voiceCount[from] || 0) + 1;
+        dispatcher.broadcastMessage(OP_VOICE, m.data, null, m.sender, false);
+      }
+      continue;
+    }
     if (m.opCode !== OP_INPUT) continue;
     var p = state.players[m.sender.userId];
     if (!p) continue;
@@ -2185,6 +2196,12 @@ var rpcGetMatch = function (ctx, logger, nk, payload) {
   return JSON.stringify({ matchId: matchId });
 };
 
+// RPC (debug mode only): a fresh bare match, apart from the real one, for tests and measures (the voice spike) that must not disturb a game.
+var rpcCreateTestMatch = function (ctx, logger, nk, payload) {
+  if (!debugEnabled(ctx, null)) throw Error("debug mode only");
+  return JSON.stringify({ matchId: nk.matchCreate(MATCH_NAME, {}) });
+};
+
 function InitModule(ctx, logger, nk, initializer) {
   initializer.registerMatch(MATCH_NAME, {
     matchInit: matchInit,
@@ -2196,6 +2213,7 @@ function InitModule(ctx, logger, nk, initializer) {
     matchSignal: matchSignal
   });
   initializer.registerRpc("get_moving_frame_match", rpcGetMatch);
+  initializer.registerRpc("create_test_match", rpcCreateTestMatch);
   publishMatch(nk); // fresh match (and fresh id) at every server start
   logger.info("moving_frame module loaded (tick rate %d Hz)", TICK_RATE);
 }
@@ -2205,7 +2223,7 @@ if (typeof module !== "undefined" && module.exports) {
   module.exports = {
     InitModule: InitModule, stepPlayer: stepPlayer, simStep: simStep, queueInput: queueInput, stateDigest: stateDigest,
     TICK_RATE: TICK_RATE, DT: DT, STATIONS: STATIONS, STATION_REACH: STATION_REACH, INTERLOCK_WINDOW_TICKS: INTERLOCK_WINDOW_TICKS, MAX_ALLOWANCE: MAX_ALLOWANCE, MOVE_SPEED: MOVE_SPEED, HALF_X: HALF_X, HALF_Z: HALF_Z,
-    OP_INPUT: OP_INPUT, OP_STATE: OP_STATE, MIN_PLAYERS: MIN_PLAYERS, MISSION_GOAL_M: MISSION_GOAL_M, MISSION_BRIEFING_SECONDS: MISSION_BRIEFING_SECONDS, MISSION_FLOOD_FAIL_SECONDS: MISSION_FLOOD_FAIL_SECONDS,
+    OP_INPUT: OP_INPUT, OP_VOICE: OP_VOICE, VOICE_MAX_PER_TICK: VOICE_MAX_PER_TICK, OP_STATE: OP_STATE, MIN_PLAYERS: MIN_PLAYERS, MISSION_GOAL_M: MISSION_GOAL_M, MISSION_BRIEFING_SECONDS: MISSION_BRIEFING_SECONDS, MISSION_FLOOD_FAIL_SECONDS: MISSION_FLOOD_FAIL_SECONDS,
     MISSION_CRUSH_DEPTH_M: MISSION_CRUSH_DEPTH_M, MISSION_FAST_SECONDS: MISSION_FAST_SECONDS, newMission: newMission, missionStep: missionStep, missionView: missionView,
     missionSetReady: missionSetReady, missionFinish: missionFinish, missionRunning: missionRunning, worldReset: worldReset, newWorld: newWorld,
     FAULTS: FAULTS, newFaults: newFaults, faultsStep: faultsStep, faultBudget: faultBudget, faultUnresolved: faultUnresolved, ALARMS: ALARMS, ANNUNCIATOR: ANNUNCIATOR, newAlarms: newAlarms, alarmsStep: alarmsStep, alarmAck: alarmAck, alarmsView: alarmsView,
