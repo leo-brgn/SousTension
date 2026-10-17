@@ -4,7 +4,8 @@
 # Usage (repo root):  powershell -ExecutionPolicy Bypass -File tools/shot-tour.ps1 [-Build Builds\Dev\SousTension.exe] [-Out Builds\Shots]
 param(
     [string]$Build = "Builds\Dev\SousTension.exe",
-    [string]$Out = "Builds\Shots"
+    [string]$Out = "Builds\Shots",
+    [switch]$ScreensOnly
 )
 $ErrorActionPreference = "Stop"
 $root = Split-Path -Parent $PSScriptRoot
