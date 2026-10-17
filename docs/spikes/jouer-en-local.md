@@ -42,7 +42,8 @@ La touche **E** garde l'ancien comportement par position (la commande la plus pr
 | `scram` / `restart` | SCRAM / redémarrage forcé (sans procédure) |
 | `regime pleine` | passe à la pleine puissance |
 | `break pump 1`, `break bilge 2`, `trip galley` | pompe cassée, pompe de cale cassée, disjoncteur qui saute |
-| `tp 0 -9` | se téléporter (le bateau fait 28 m : z de -14 à +14) |
+| `tp 4` ou `tp reacteur` | se téléporter au milieu d'un compartiment (1 à 6, ou torpilles, central, radio, reacteur, machines, vie) |
+| `tp 0 -9` | se téléporter à une position (le bateau fait 28 m : z de -14 à +14) |
 | `ff 60` | avance la simulation de 60 s d'un coup |
 | `state` | résumé de l'état du jeu |
 | `partner on` / `partner off` | joueur fantôme (E1-12) |
