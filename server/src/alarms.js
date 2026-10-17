@@ -25,6 +25,51 @@ var ALARMS = [
   { id: "rx_scram_auto", system: "reactor", severity: "crit", page: "restart", when: function (s) { return s.reactor.autoScram; } }
 ];
 
+// ---- Electricity (E3-09b): "low" alarms and their symmetric "high" ones (an over-correction rings too, GDD 3.2) ----------------------------------
+function anyTripped(s) { for (var i = 0; i < s.power.br.length; i++) if (s.power.br[i].tripped) return true; return false; }
+ALARMS.push(
+  { id: "pw_v_low", system: "power", severity: "warn", page: "power",
+    when: function (s) { return s.power.V < 0.5; }, clear: function (s) { return s.power.V >= 0.6; } },
+  { id: "pw_v_dark", system: "power", severity: "crit", page: "power",                             // the grid is dark: the lights are out
+    when: function (s) { return s.power.V < DARK_V; }, clear: function (s) { return s.power.V >= DARK_V + 0.1; } },
+  { id: "pw_emergency_bus", system: "power", severity: "warn", page: "power",                     // dark grid, the battery feeds the red lamps
+    when: function (s) { return s.power.V < DARK_V && s.power.B > 0; }, clear: function (s) { return s.power.V >= DARK_V + 0.1 || s.power.B <= 0; } },
+  { id: "pw_battery_low", system: "power", severity: "warn", page: "power",
+    when: function (s) { return s.power.B < 0.2; }, clear: function (s) { return s.power.B >= 0.3; } },
+  { id: "pw_breaker_tripped", system: "power", severity: "warn", page: "power", when: anyTripped },
+  { id: "pw_overload", system: "power", severity: "warn", page: "power",                           // the closed breakers ask for more than the turbine leaves
+    when: function (s) { return !s.reactor.scram && s.power.V < 0.95 && gridDemand(s.power) > gridSurplus(s.reactor) + 0.05; },
+    clear: function (s) { return s.reactor.scram || s.power.V >= 0.97 || gridDemand(s.power) <= gridSurplus(s.reactor); } },
+  { id: "pw_essential_short", system: "power", severity: "warn", page: "power",                    // the primary pumps do not get their electricity: the cooling suffers
+    when: function (s) { return !s.reactor.scram && s.reactor.eta < 0.9; }, clear: function (s) { return s.reactor.scram || s.reactor.eta >= 0.95; } },
+  { id: "pw_surplus_high", system: "power", severity: "warn", page: "power",                        // far more electricity than the boat uses: the plant runs too hot for the load
+    when: function (s) { return s.power.V > 0.99 && gridSurplus(s.reactor) > gridDemand(s.power) * 1.5; },
+    clear: function (s) { return s.power.V <= 0.99 || gridSurplus(s.reactor) <= gridDemand(s.power) * 1.3; } }
+);
+
+// ---- Water and hull (E3-09b): one alarm per compartment for a leak, a rising level and a flooded compartment; then trim, list and the bilge pumps ----
+(function waterAlarms() {
+  function fill(s, i) { return s.water.comps[i].w / WATER_COMPARTMENTS[i].volume; }
+  function leakIn(s, i) { for (var k = 0; k < s.leaks.list.length; k++) if (s.leaks.list[k].comp === i) return true; return false; }
+  for (var c = 0; c < WATER_COMPARTMENTS.length; c++) {
+    (function (i) {
+      ALARMS.push({ id: "wt_leak_" + (i + 1), system: "water", severity: "warn", page: "leak", compartment: i, when: function (s) { return leakIn(s, i); } });
+      ALARMS.push({ id: "wt_level_" + (i + 1), system: "water", severity: "warn", page: "leak", compartment: i,
+        when: function (s) { return fill(s, i) >= 0.25; }, clear: function (s) { return fill(s, i) < 0.2; } });
+      ALARMS.push({ id: "wt_flood_" + (i + 1), system: "water", severity: "crit", page: "leak", compartment: i,
+        when: function (s) { return fill(s, i) >= 0.9; }, clear: function (s) { return fill(s, i) < 0.8; } });
+    })(c);
+  }
+  ALARMS.push(
+    { id: "wt_trim_high", system: "water", severity: "warn", page: "leak",
+      when: function (s) { return Math.abs(waterTilt(s.water).trim) >= 2; }, clear: function (s) { return Math.abs(waterTilt(s.water).trim) < 1.5; } },
+    { id: "wt_list_high", system: "water", severity: "warn", page: "leak",
+      when: function (s) { return Math.abs(waterTilt(s.water).list) >= 2.5; }, clear: function (s) { return Math.abs(waterTilt(s.water).list) < 2; } },
+    { id: "wt_bilge0_broken", system: "water", severity: "warn", page: "leak", when: function (s) { return s.bilge.pumps[0].broken; } },
+    { id: "wt_bilge1_broken", system: "water", severity: "warn", page: "leak", when: function (s) { return s.bilge.pumps[1].broken; } }
+  );
+})();
+
 function newAlarms() {
   var list = [];
   for (var i = 0; i < ALARMS.length; i++) list.push({ on: false, since: 0, ack: false, count: 0 });
