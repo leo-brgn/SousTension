@@ -887,6 +887,29 @@ namespace SousTension.Spikes.MovingFrame.Tests
         }
 
         [Test]
+        public void TheCueDetector_HearsValvesAndLeaks()
+        {
+            var model = new MovingFrameModel { LocalId = "me" };
+            var detector = new AudioCueDetector();
+            var cues = new List<AudioCue>();
+            ReactorState Reactor(float v) => new ReactorState("pleine", 0.9f, 2f, 300f, 380f, 50f, 8f, 1f, 1f, new[] { v, 1f, 1f, 1f }, new[] { true, true }, false, false, false, false, false);
+            model.SetLocal(0f, -2f); model.SetReactor(Reactor(0.5f)); model.SetLeaks(new LeakState[0]);
+            detector.Detect(model, cues);
+            model.SetReactor(Reactor(0.52f)); detector.Detect(model, cues);
+            Assert.AreEqual(0, cues.Count, "a hair of movement is not a squeak");
+            model.SetReactor(Reactor(0.64f)); detector.Detect(model, cues);
+            Assert.AreEqual(CueKind.Valve, cues[cues.Count - 1].Kind);
+
+            cues.Clear();
+            model.SetLeaks(new[] { new LeakState(4, 3, 2.9f, -2f, 2, "plate") }); detector.Detect(model, cues);
+            Assert.AreEqual(1, cues.Count); Assert.AreEqual(CueKind.LeakStart, cues[0].Kind);
+            detector.Detect(model, cues);
+            Assert.AreEqual(1, cues.Count, "a leak that goes on is heard once");
+            model.SetLeaks(new LeakState[0]); detector.Detect(model, cues);
+            Assert.AreEqual(CueKind.LeakPlug, cues[cues.Count - 1].Kind);
+        }
+
+        [Test]
         public void TheModelKeepsTheMissionFlow_AndKnowsWhoIsReady()
         {
             var model = new MovingFrameModel { LocalId = "me" };
