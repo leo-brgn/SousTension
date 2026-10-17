@@ -185,3 +185,22 @@ test("the alarm catalogue fixture used by the Unity client test is up to date (n
   const r = spawnSync(process.execPath, [require("node:path").join(__dirname, "..", "..", "tools", "gen-alarm-catalog.js"), "--check"]);
   assert.strictEqual(r.status, 0, "Assets/_Spikes/MovingFrame/Tests/alarm_catalog.txt is out of date: run node tools/gen-alarm-catalog.js");
 });
+
+test("the Manual opens by itself on the page of the alarm that rings (E5-04); a red alarm beats an amber one; clearing changes nothing", () => {
+  const s = quiet("croisiere");
+  const page = () => m.MANUAL_PAGES[s.manual.page].id;
+  assert.strictEqual(page(), "index");
+  s.power.br[3].tripped = true; m.alarmsStep(s, 1);
+  assert.strictEqual(page(), "power", "a tripped breaker opens the power page");
+  s.reactor.T = m.REACTOR_K.tWarn + 1; m.alarmsStep(s, 2);
+  assert.strictEqual(page(), "scram", "the new alarm takes the Manual");
+  s.power.br[3].tripped = false; s.reactor.T = 300; m.alarmsStep(s, 3);
+  assert.strictEqual(page(), "scram", "alarms clearing do not turn the page back");
+  s.reactor.T = m.REACTOR_K.tWarn + 1; s.power.V = 0.4; m.alarmsStep(s, 4);                // amber alarms rise: the first in the catalogue wins
+  assert.strictEqual(page(), "scram");
+  s.reactor.T = 300; s.power.V = 1; m.alarmsStep(s, 5);
+  s.power.V = 0.05; s.power.B = 0.5; m.alarmsStep(s, 6);                                   // dark grid (red) and low voltage (amber) together: the red one's page
+  assert.strictEqual(page(), "power");
+  const quietTick = s.manual.page; m.alarmsStep(s, 7);
+  assert.strictEqual(s.manual.page, quietTick, "nothing new: the page stays");
+});

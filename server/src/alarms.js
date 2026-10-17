@@ -81,15 +81,19 @@ function newAlarms() {
 
 // One tick: raise and clear alarms. `tick` is the simulation tick (stored in `since` so views can show how long an alarm has been ringing).
 function alarmsStep(state, tick) {
-  var al = state.alarms.list;
+  var al = state.alarms.list, show = -1;
   for (var i = 0; i < ALARMS.length; i++) {
     var a = al[i], def = ALARMS[i];
     if (!a.on) {
-      if (def.when(state)) { a.on = true; a.since = tick; a.ack = false; a.count += 1; }
+      if (def.when(state)) {
+        a.on = true; a.since = tick; a.ack = false; a.count += 1;
+        if (show < 0 || (def.severity === "crit" && ALARMS[show].severity !== "crit")) show = i;      // a red alarm beats an amber one raised in the same tick
+      }
     } else if (def.clear ? def.clear(state) : !def.when(state)) {
       a.on = false; a.ack = false;
     }
   }
+  if (show >= 0) manualGoto(state, ALARMS[show].page);              // E5-04: the Manual opens by itself on the page of the alarm that just rang (GDD 3.5)
 }
 
 // A player silences an alarm (one click, no game effect). Returns true when something was acknowledged.
