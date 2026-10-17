@@ -27,6 +27,7 @@ namespace SousTension.Spikes.MovingFrame
         [SerializeField] private float simulatedLossPercent = 0f;
 
         private MovingFrameController _controller;
+        private AudioController _audio;
         private INetworkService _network;
         private MetricsHudView _hud;
         private readonly CancellationTokenSource _cts = new CancellationTokenSource();
@@ -80,6 +81,7 @@ namespace SousTension.Spikes.MovingFrame
             new GameObject("Hands").AddComponent<HandsView>().Bind(model, cam, aim, input);
             new GameObject("Manual").AddComponent<ManualView>().Bind(model, cam);
             new GameObject("Flashlight").AddComponent<FlashlightView>().Bind(model, cam);
+            _audio = new AudioController(model, new GameObject("Audio").AddComponent<ProceduralAudioService>());
             var characters = new GameObject("Characters").AddComponent<CharactersView>();
             characters.Bind(model, clock, input, boat.transform, cam);
             new GameObject("Stations").AddComponent<StationsView>().Bind(model, boat.transform);
@@ -118,7 +120,7 @@ namespace SousTension.Spikes.MovingFrame
             }
         }
 
-        private void Update() => _controller?.Tick(Time.deltaTime);
+        private void Update() { _controller?.Tick(Time.deltaTime); _audio?.Tick(Time.deltaTime); }
 
         private void OnDestroy()
         {
