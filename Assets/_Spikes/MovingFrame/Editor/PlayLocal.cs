@@ -67,7 +67,7 @@ namespace SousTension.Spikes.MovingFrame.EditorTools
             ("FuelDrum", "Cargo/FuelDrum.prefab"),
             ("HullPatch", "Tools/HullPatch.prefab"), ("Bucket", "Tools/Bucket.prefab"), ("Flashlight", "Tools/Flashlight.prefab"),
             ("ManualOK114OpenBinder", "Central/ManualOK114OpenBinder.prefab"),
-            ("SailorBase", "Crew/SailorBase.prefab"), ("SailorFemale", "Crew/SailorFemale.prefab"),
+            ("FirstPersonArms", "Crew/FirstPersonArms.prefab"), ("SailorBase", "Crew/SailorBase.prefab"), ("SailorFemale", "Crew/SailorFemale.prefab"),
             ("LampDome", "Instruments/LampDome.prefab"), ("MachineBreaker", "Machines/MachineBreaker.prefab"), ("GaugeRound_S", "Instruments/GaugeRound_S.prefab"), ("GaugeRound_M", "Instruments/GaugeRound_M.prefab"),
         };
 

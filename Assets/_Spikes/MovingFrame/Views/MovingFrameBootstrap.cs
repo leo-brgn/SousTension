@@ -64,7 +64,7 @@ namespace SousTension.Spikes.MovingFrame
             if (environment == null) BuildBlockout(boat.transform);
             var cam = BuildCamera();
             aim.Bind(cam);
-            new GameObject("Hands").AddComponent<HandsView>().Bind(model, cam);
+            new GameObject("Hands").AddComponent<HandsView>().Bind(model, cam, aim, input);
             new GameObject("Manual").AddComponent<ManualView>().Bind(model, cam);
             var characters = new GameObject("Characters").AddComponent<CharactersView>();
             characters.Bind(model, clock, input, boat.transform, cam);
@@ -145,7 +145,7 @@ namespace SousTension.Spikes.MovingFrame
         {
             var existing = Camera.main;
             var cam = existing != null ? existing : new GameObject("Main Camera", typeof(Camera), typeof(AudioListener)).GetComponent<Camera>();
-            cam.tag = "MainCamera"; cam.nearClipPlane = 0.05f;
+            cam.tag = "MainCamera"; cam.nearClipPlane = 0.05f; cam.fieldOfView = 70f;     // first person: wide enough to see the hands
             return cam;
         }
 
