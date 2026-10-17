@@ -138,6 +138,7 @@ namespace SousTension.Spikes.MovingFrame
             Text(card, UiText.Get("ui.briefing.tip1"), 24, Cream);
             Text(card, UiText.Get("ui.briefing.tip2"), 24, Cream);
             Text(card, UiText.Get("ui.briefing.tip3"), 24, Cream);
+            Text(card, UiText.Get("ui.briefing.tip4"), 24, Cream);
             _briefingCount = Text(card, "", 30, Brass, true, true);
         }
 
