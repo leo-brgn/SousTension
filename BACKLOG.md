@@ -97,7 +97,7 @@ Objectif : lever le risque n°1 (référentiel mobile + réseau) avant d'investi
 - [ ] **E4-01 ✍️ Liste exhaustive des actions « deux joueurs »** (TODO §3.4) : démarrage/arrêt réacteur, ballast, leurres, sas extérieur, purge primaire, envoi du Signal, + autres (combustible 📦 à 2, casque de scaphandre, pose sur le fond…). Annexe au GDD. `S` (D-08)
 - [x] **E4-02 ⚙️ Framework d'actions couplées** : deux commandes physiques éloignées (clés/manivelles/bouton+pédale), fenêtre de 3 s, sans se voir, validation serveur tolérante à la latence. `L` · PROTO
 - [ ] **E4-03 ⚙️ Feedback diégétique** de l'attente/échec/succès (voyants, sons), jamais de HUD. `M`
-- [ ] **E4-04 ⚙️ Verrou « pas de partie en solo »** : le jeu ne se lance pas seul ; comportement si un joueur quitte (duo minimum). `S` · D-10
+- [x] **E4-04 ⚙️ Verrou « pas de partie en solo »** : le jeu ne se lance pas seul ; comportement si un joueur quitte (duo minimum). `S` · D-10
 - [ ] **E4-05 ⚙️ Mode duo** : minuteries élargies, « télécommande bricolée » déblocable (diégétique, « strictement interdite par le règlement »). `M` · `ALPHA` · D-10
 - [x] **E4-06 🧪 Test de latence** : fenêtre de 3 s à 150–250 ms de ping, interphone grésillant inclus. `M`
 

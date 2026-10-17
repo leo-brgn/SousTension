@@ -20,10 +20,12 @@
 //  11. boat        buoyancy: descent speed and depth follow the SCRAM latch
 //  12. faults      the fault generator (faults.js) may start a new fault if the crew is under its attention budget
 //  13. alarms      the catalogue of alarms (alarms.js) is evaluated on the state the previous steps produced
+//  14. mission     win / lose conditions, run clock (mission.js). Outside a running mission only the inputs (walking, ready, debug) and missionStep run.
 function simStep(state, tick) {
   // 1. inputs: +1 per tick per player (the nominal input rate), capped at MAX_ALLOWANCE. In steady state this is exactly one input per tick;
   //    after a network stall (TCP retransmission) the backlog drains in a few ticks instead of lagging forever. The long-term rate can never
   //    exceed TICK_RATE inputs/s, so flooding the server with inputs does not speed a player up.
+  var running = missionRunning(state);                       // lobby, briefing, debrief, or a run with fewer than two players: nothing but walking is simulated
   for (var k = 0; k < state.order.length; k++) {
     var pl = state.players[state.order[k]];
     pl.allowance = Math.min(MAX_ALLOWANCE, pl.allowance + 1);
@@ -31,9 +33,11 @@ function simStep(state, tick) {
       var next = pl.queue.shift();
       if (next.ry !== null) pl.yaw = next.ry;
       stepPlayer(pl, next.mx, next.mz, carrySpeedFactor(state, state.order[k]), state.water.doors);
+      if (next.rdy >= 0) missionSetReady(state, state.order[k], next.rdy === 1);
+      if (next.dbg) debugCommand(state, state.order[k], pl, next.dbg, tick);
+      if (!running) { pl.seq = next.seq; pl.applied += 1; pl.allowance -= 1; continue; }
       if (next.act) { if (next.use) useTarget(state, state.order[k], pl, tick, next.use); else tryAct(state, state.order[k], pl, tick); }
       if (next.hold) { if (next.use) holdTarget(state, pl, next.use); else tryHold(state, pl); }
-      if (next.dbg) debugCommand(state, state.order[k], pl, next.dbg, tick);
       if (next.flip) manualFlip(state, state.order[k], next.flip);
       if (next.throw) throwItem(state, state.order[k], pl);
       if (next.take) takeItem(state, state.order[k], pl, tick);
@@ -45,6 +49,7 @@ function simStep(state, tick) {
       pl.allowance -= 1;
     }
   }
+  if (!running) { missionStep(state, tick); state.tick = tick; return; }
   if (state.players[GHOST_ID]) ghostStep(state, tick);       // debug-only ghost partner (E1-12): answers a pressed coupled command
   evaluateCoupled(state, tick);
   leakStep(state, tick);
@@ -59,6 +64,7 @@ function simStep(state, tick) {
   boatStep(state.boat, state.reactor);
   faultsStep(state, tick);
   alarmsStep(state, tick);
+  missionStep(state, tick);
   state.tick = tick;
 }
 
@@ -73,6 +79,7 @@ function queueInput(p, input) {
                  flip: input.flip === 1 || input.hand === "next" ? 1 : (input.flip === -1 || input.hand === "prev" ? -1 : 0),
                  throw: input.throw === true || input.throw === 1 || input.hand === "throw",
                  use: typeof input.use === "string" && input.use.length <= 40 ? input.use : "",
+                 rdy: input.rdy === true || input.rdy === 1 ? 1 : (input.rdy === false || input.rdy === 0 ? 0 : -1),      // E4-04: ready / not ready (lobby, debrief)
                  take: input.take === true || input.take === 1 || input.hand === "take", stow: input.stow === true || input.stow === 1 || input.hand === "stow",
                  drop: input.drop === "L" || input.drop === "R" || input.drop === "P" ? input.drop
                    : ((input.drop === true || input.drop === 1 || input.hand === "drop") ? "last"

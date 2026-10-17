@@ -1,7 +1,27 @@
+// Everything that belongs to the boat and its systems (a new game rebuilds it, the players stay): see worldReset.
+function newWorld(faultsEnabled) {
+  return { cp: newCoupled(), cargo: newCargo(), reactor: newReactor(REACTOR_SEED, "veille"), lever: newLever(), boat: newBoat(), restart: newRestart(), water: newWater(),
+           leaks: newLeaks(), bilge: newBilge(), power: newPower(), prop: newPropulsion(), manual: newManual(), alarms: newAlarms(), faults: newFaults(faultsEnabled) };
+}
+
+// A new game (mission.js): a fresh boat for the same crew, back at the spawn point with empty hands.
+function worldReset(state) {
+  var world = newWorld(state.faults.enabled);
+  for (var k in world) if (Object.prototype.hasOwnProperty.call(world, k)) state[k] = world[k];
+  for (var i = 0; i < state.order.length; i++) {
+    var p = state.players[state.order[i]];
+    if (!p) continue;
+    p.x = -1.5 + i; p.z = 2; p.hands = newHands(); p.queue = []; p.yaw = 0;
+  }
+}
+
 var matchInit = function (ctx, logger, nk, params) {
   logger.info("moving_frame match init");
+  var state = { tick: 0, players: {}, order: [], mission: newMission(!!(params && params.lobby === true)), debug: newDebug(debugEnabled(ctx, params)) };
+  var world = newWorld(!!(params && params.faults === true));
+  for (var key in world) if (Object.prototype.hasOwnProperty.call(world, key)) state[key] = world[key];
   return {
-    state: { tick: 0, players: {}, order: [], cp: newCoupled(), cargo: newCargo(), reactor: newReactor(REACTOR_SEED, "veille"), lever: newLever(), boat: newBoat(), restart: newRestart(), water: newWater(), leaks: newLeaks(), bilge: newBilge(), power: newPower(), prop: newPropulsion(), manual: newManual(), alarms: newAlarms(), faults: newFaults(params && params.faults === true), debug: newDebug(debugEnabled(ctx, params)) },
+    state: state,
     tickRate: TICK_RATE,
     label: JSON.stringify({ name: MATCH_NAME })
   };
@@ -62,7 +82,7 @@ var matchLoop = function (ctx, logger, nk, dispatcher, tick, state, messages) {
     var id = state.order[j], q = state.players[id];
     out.push({ id: id, x: q.x, z: q.z, seq: q.seq, hd: handsView(q.hands) });
   }
-  dispatcher.broadcastMessage(OP_STATE, JSON.stringify({ tick: t, t: t * DT, players: out, il: coupledView(state.cp, tick)[0], cp: coupledView(state.cp, tick), cargo: cargoView(state.cargo), rx: reactorView(state.reactor), sc: leverView(state.lever, state.reactor), rs: restartView(state), bw: waterView(state.water), lk: leaksView(state.leaks), bp: bilgeView(state.bilge), pw: powerView(state), pr: propulsionView(state.prop), mn: manualView(state.manual), al: alarmsView(state.alarms), boat: boatView(state.boat) }), null, null, true);
+  dispatcher.broadcastMessage(OP_STATE, JSON.stringify({ tick: t, t: t * DT, players: out, il: coupledView(state.cp, tick)[0], cp: coupledView(state.cp, tick), cargo: cargoView(state.cargo), rx: reactorView(state.reactor), sc: leverView(state.lever, state.reactor), rs: restartView(state), bw: waterView(state.water), lk: leaksView(state.leaks), bp: bilgeView(state.bilge), pw: powerView(state), pr: propulsionView(state.prop), mn: manualView(state.manual), al: alarmsView(state.alarms), ms: missionView(state, t), boat: boatView(state.boat) }), null, null, true);
   // 4. Debug replies (E1-09): each sender gets the lines of their commands as one message, to them only.
   if (state.debug.out.length > 0) {
     var byPlayer = {}, order = [];
@@ -95,7 +115,7 @@ var SYSTEM_USER = "00000000-0000-0000-0000-000000000000";
 var STORAGE = { collection: "system", key: "moving_frame_match" };
 
 function publishMatch(nk) {
-  var matchId = nk.matchCreate(MATCH_NAME, { faults: true });                  // the real server runs the fault generator (E3-09d)
+  var matchId = nk.matchCreate(MATCH_NAME, { faults: true, lobby: true });   // the real server runs the fault generator (E3-09d) and the lobby / briefing / debrief flow
   nk.storageWrite([{ collection: STORAGE.collection, key: STORAGE.key, userId: SYSTEM_USER,
                      value: { matchId: matchId }, permissionRead: 2, permissionWrite: 0 }]);
   return matchId;
@@ -128,7 +148,10 @@ if (typeof module !== "undefined" && module.exports) {
   module.exports = {
     InitModule: InitModule, stepPlayer: stepPlayer, simStep: simStep, queueInput: queueInput, stateDigest: stateDigest,
     TICK_RATE: TICK_RATE, DT: DT, STATIONS: STATIONS, STATION_REACH: STATION_REACH, INTERLOCK_WINDOW_TICKS: INTERLOCK_WINDOW_TICKS, MAX_ALLOWANCE: MAX_ALLOWANCE, MOVE_SPEED: MOVE_SPEED, HALF_X: HALF_X, HALF_Z: HALF_Z,
-    OP_INPUT: OP_INPUT, OP_STATE: OP_STATE, FAULTS: FAULTS, newFaults: newFaults, faultsStep: faultsStep, faultBudget: faultBudget, faultUnresolved: faultUnresolved, ALARMS: ALARMS, ANNUNCIATOR: ANNUNCIATOR, newAlarms: newAlarms, alarmsStep: alarmsStep, alarmAck: alarmAck, alarmsView: alarmsView,
+    OP_INPUT: OP_INPUT, OP_STATE: OP_STATE, MIN_PLAYERS: MIN_PLAYERS, MISSION_GOAL_M: MISSION_GOAL_M, MISSION_BRIEFING_SECONDS: MISSION_BRIEFING_SECONDS, MISSION_FLOOD_FAIL_SECONDS: MISSION_FLOOD_FAIL_SECONDS,
+    MISSION_CRUSH_DEPTH_M: MISSION_CRUSH_DEPTH_M, MISSION_FAST_SECONDS: MISSION_FAST_SECONDS, newMission: newMission, missionStep: missionStep, missionView: missionView,
+    missionSetReady: missionSetReady, missionFinish: missionFinish, missionRunning: missionRunning, worldReset: worldReset, newWorld: newWorld,
+    FAULTS: FAULTS, newFaults: newFaults, faultsStep: faultsStep, faultBudget: faultBudget, faultUnresolved: faultUnresolved, ALARMS: ALARMS, ANNUNCIATOR: ANNUNCIATOR, newAlarms: newAlarms, alarmsStep: alarmsStep, alarmAck: alarmAck, alarmsView: alarmsView,
     PLAYER_RADIUS: PLAYER_RADIUS, BULKHEAD_Z: BULKHEAD_Z, HATCH_X: HATCH_X, HATCH_HALF: HATCH_HALF, WALL_HALF: WALL_HALF, BAFFLE_HALF_X: BAFFLE_HALF_X, BAFFLE_HALF_Z: BAFFLE_HALF_Z, BAFFLE_OFFSET: BAFFLE_OFFSET,
     LAYOUT_OBSTACLES: LAYOUT_OBSTACLES, cargoBlocked: cargoBlocked, CARGO_RADIUS: CARGO_RADIUS, layoutBlocked: layoutBlocked, hatchToggle: hatchToggle, hatchOccupied: hatchOccupied, CONTROLS: CONTROLS,
     LEVER_COVER_TICKS: LEVER_COVER_TICKS, SINK_RATE_MAX: SINK_RATE_MAX, SINK_RAMP_SECONDS: SINK_RAMP_SECONDS, newBoat: newBoat, boatStep: boatStep,

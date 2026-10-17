@@ -118,7 +118,7 @@ function debugCommand(state, id, pl, line, tick) {
   var i, n, v;
   if (cmd === "help") {
     reply("help | state | tp x z | regime veille|croisiere|pleine | scram | restart | leak 1-6 1-3 [g|d] | unleak | break pump|bilge 1-2 | repair pump|bilge 1-2");
-    reply("trip <breaker> | water 1-6 m3 | bring <item> | get <param> | set <param> <value|default> | ff <seconds> | partner on|off|status | faults on|off|now|status");
+    reply("trip <breaker> | water 1-6 m3 | bring <item> | get <param> | set <param> <value|default> | ff <seconds> | partner on|off|status | faults on|off|now|status | mission status|start|win|fail|goal");
   } else if (cmd === "state") {
     var lines = debugState(state);
     for (i = 0; i < lines.length; i++) reply(lines[i]);
@@ -190,9 +190,17 @@ function debugCommand(state, id, pl, line, tick) {
     var fg = state.faults;
     if (tok[1] === "on") { fg.enabled = true; reply("fault generator on (budget " + faultBudget(state, tick) + ")"); }
     else if (tok[1] === "off") { fg.enabled = false; reply("fault generator off"); }
-    else if (tok[1] === "now") { fg.enabled = true; fg.nextTick = tick; reply("a fault starts as soon as the budget allows (budget " + faultBudget(state, tick) + ", unresolved " + faultUnresolved(state) + ")"); }
+    else if (tok[1] === "now") { fg.enabled = true; fg.nextTick = state.mission.runTicks; reply("a fault starts as soon as the budget allows (budget " + faultBudget(state, tick) + ", unresolved " + faultUnresolved(state) + ")"); }
     else if (tok[1] === "status") reply((fg.enabled ? "on" : "off") + " | budget " + faultBudget(state, tick) + " | unresolved " + faultUnresolved(state) + " | started " + fg.started + " | next at tick " + fg.nextTick);
     else reply("usage: faults on|off|now|status");
+  } else if (cmd === "mission") {                                                     // the mission flow (mission.js)
+    var ms = state.mission;
+    if (tok[1] === "status") reply("phase " + ms.phase + " | goal " + ms.goal + " m | distance " + Math.round(state.prop.dist) + " m | run " + Math.round(ms.runTicks / TICK_RATE) + " s | ready " + Object.keys(ms.ready).length + "/" + state.order.length);
+    else if (tok[1] === "start") { ms.ready = {}; for (var ri = 0; ri < state.order.length; ri++) ms.ready[state.order[ri]] = true; reply("everybody ready"); }
+    else if (tok[1] === "win") { if (ms.phase === "run") { state.prop.dist = ms.goal; reply("goal reached"); } else reply("no run in progress"); }
+    else if (tok[1] === "fail") { if (ms.phase === "run") { missionFinish(state, "failure", "flooded"); reply("run failed"); } else reply("no run in progress"); }
+    else if (tok[1] === "goal") { v = dbgNum(tok[2]); if (v > 0) { ms.goal = v; reply("goal " + v + " m"); } else reply("usage: mission goal <metres>"); }
+    else reply("usage: mission status|start|win|fail|goal <m>");
   } else if (cmd === "ff") {
     v = dbgNum(tok[1]);
     if (!(v > 0) || v > DEBUG_FF_MAX_SECONDS) { reply("usage: ff <seconds, 0-" + DEBUG_FF_MAX_SECONDS + ">"); return; }

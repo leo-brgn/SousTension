@@ -1366,8 +1366,10 @@ function faultBudget(state, tick) {
   return Math.min(players + 1, 1 + Math.floor(tick / TICK_RATE / FAULT_RAMP_SECONDS));
 }
 
+// The generator keeps its own clock: the ticks of the RUN (state.mission.runTicks), so the lobby and the briefing do not use up the grace period.
 function faultsStep(state, tick) {
   var f = state.faults;
+  tick = state.mission.runTicks;
   if (!f.enabled || tick < f.nextTick || state.order.length === 0) return;
   if (faultUnresolved(state) >= faultBudget(state, tick)) return;                         // the crew is busy enough: try again next tick
   var usable = [], other = [];
@@ -1378,6 +1380,112 @@ function faultsStep(state, tick) {
   fault.start(state, f);
   f.last = fault.system; f.started += 1;
   f.nextTick = tick + Math.round((FAULT_GAP_MIN + faultRand(f) * (FAULT_GAP_MAX - FAULT_GAP_MIN)) * TICK_RATE);
+}
+
+// ---- The mission flow of a game: lobby -> briefing -> run -> debrief (MVP loop; GDD 3.1 simplified, issues E4-04, E9-02, E9-09) -----------------------
+// One mission for the MVP, the TRANSIT: bring the boat MISSION_GOAL_M metres on while the faults pile up (faults.js).
+//   lobby    the crew waits; players walk around; nothing is simulated. The game starts when at least MIN_PLAYERS (2: no solo game, GDD rule 5) are
+//            there and EVERYONE has said "ready" (input field rdy).
+//   briefing MISSION_BRIEFING_SECONDS: the objective is shown to everybody (the client draws it), then the run starts.
+//   run      the simulation runs. The run ends on
+//              success   dist >= MISSION_GOAL_M
+//              failure   a compartment stays flooded (>= 90 %) for MISSION_FLOOD_FAIL_SECONDS, or the boat sinks below MISSION_CRUSH_DEPTH_M
+//            If fewer than MIN_PLAYERS remain the run is PAUSED (the world is frozen, `pz`), it never continues with a lone player.
+//   debrief  result, stats and a grade (stars: 3 clean, 2 hurt or slow, 1 saved from a flooded compartment, 0 failure); a new game starts when
+//            everybody is ready again (the world is rebuilt: the damage of a run does not carry over yet, E6-09 / E1-08).
+// Matches created by the tests and the tools start directly in "run", with no minimum of players and no objective (no lobby, the run never ends); the real server asks for the lobby (match parameter lobby:true), which brings the two-player minimum.
+var MIN_PLAYERS = 2;
+var MISSION_GOAL_M = 1500;
+var MISSION_BRIEFING_SECONDS = 10;
+var MISSION_FLOOD_FAIL_SECONDS = 60;
+var MISSION_CRUSH_DEPTH_M = 40;
+var MISSION_FAST_SECONDS = 600;          // a run slower than this loses a star
+
+function newMission(lobby) {
+  return { phase: lobby ? "lobby" : "run", mode: !!lobby, minPlayers: lobby ? MIN_PLAYERS : 0, phaseTick: 0, ready: {}, goal: MISSION_GOAL_M, runTicks: 0, floodTicks: 0, flooded: false, maxFill: 0,
+           scrams: 0, wasScram: false, result: "", stars: 0, why: "", stats: { t: 0, d: 0, f: 0, a: 0, mf: 0, sc: 0 }, games: 0 };
+}
+
+function missionRunning(state) {
+  return state.mission.phase === "run" && state.order.length >= state.mission.minPlayers;
+}
+
+function missionSetReady(state, id, ready) {
+  var ms = state.mission;
+  if (ms.phase !== "lobby" && ms.phase !== "debrief") return false;
+  if (ready) ms.ready[id] = true; else delete ms.ready[id];
+  return true;
+}
+
+function missionAllReady(state) {
+  if (state.order.length < state.mission.minPlayers) return false;
+  for (var i = 0; i < state.order.length; i++) if (!state.mission.ready[state.order[i]]) return false;
+  return true;
+}
+
+function missionFinish(state, result, why) {
+  var ms = state.mission, fill = 0;
+  for (var i = 0; i < state.water.comps.length; i++) fill = Math.max(fill, state.water.comps[i].w / WATER_COMPARTMENTS[i].volume);
+  var rung = 0;
+  for (var a = 0; a < state.alarms.list.length; a++) rung += state.alarms.list[a].count;
+  ms.result = result; ms.why = why; ms.phase = "debrief"; ms.ready = {};
+  ms.stats = { t: Math.round(ms.runTicks / TICK_RATE), d: Math.round(state.prop.dist), f: state.faults.started, a: rung, mf: Math.round(ms.maxFill * 100) / 100, sc: ms.scrams };
+  var stars = 0;
+  if (result === "success") {
+    stars = 3;
+    if (ms.maxFill >= 0.5) stars--;
+    if (ms.runTicks > MISSION_FAST_SECONDS * TICK_RATE) stars--;
+    if (ms.flooded) stars = Math.min(stars, 1);
+    stars = Math.max(1, stars);
+  }
+  ms.stars = stars; ms.games += 1;
+}
+
+// A new world for a new game: the same players, a fresh boat (reset by match.js).
+function missionBeginBriefing(state, tick) {
+  var ms = state.mission;
+  ms.phase = "briefing"; ms.phaseTick = tick; ms.ready = {};
+  ms.runTicks = 0; ms.floodTicks = 0; ms.flooded = false; ms.maxFill = 0; ms.scrams = 0; ms.wasScram = false; ms.result = ""; ms.why = ""; ms.stars = 0;
+}
+
+function missionStep(state, tick) {
+  var ms = state.mission;
+  if (ms.phase === "lobby" || ms.phase === "debrief") {
+    if (missionAllReady(state)) {
+      if (ms.phase === "debrief") worldReset(state);
+      missionBeginBriefing(state, tick);
+    }
+    return;
+  }
+  if (ms.phase === "briefing") {
+    if (state.order.length < ms.minPlayers) { ms.phase = "lobby"; ms.ready = {}; return; }       // somebody left during the briefing
+    if (tick - ms.phaseTick >= MISSION_BRIEFING_SECONDS * TICK_RATE) ms.phase = "run";
+    return;
+  }
+  if (!missionRunning(state)) return;                                                            // run paused: fewer than two players
+  ms.runTicks += 1;
+  var fill = 0;
+  for (var i = 0; i < state.water.comps.length; i++) fill = Math.max(fill, state.water.comps[i].w / WATER_COMPARTMENTS[i].volume);
+  ms.maxFill = Math.max(ms.maxFill, fill);
+  if (fill >= 0.9) { ms.floodTicks += 1; ms.flooded = true; } else ms.floodTicks = 0;
+  if (state.reactor.scram && !ms.wasScram) ms.scrams += 1;
+  ms.wasScram = !!state.reactor.scram;
+  if (!ms.mode) return;                                           // a bare match (tests, tools) has no objective: it never ends
+  if (state.prop.dist >= ms.goal) missionFinish(state, "success", "arrived");
+  else if (ms.floodTicks >= MISSION_FLOOD_FAIL_SECONDS * TICK_RATE) missionFinish(state, "failure", "flooded");
+  else if (state.boat.depth >= MISSION_CRUSH_DEPTH_M) missionFinish(state, "failure", "depth");
+}
+
+// Broadcast (and resync): ph = phase, g = goal (m), d = distance (m), t = seconds of run, r = ids that are ready, n = players, pz = 1 when paused,
+// res / why / stars / st = the outcome once the run is over, bt = seconds left of the briefing.
+function missionView(state, tick) {
+  var ms = state.mission, ready = [];
+  for (var i = 0; i < state.order.length; i++) if (ms.ready[state.order[i]]) ready.push(state.order[i]);
+  var v = { ph: ms.phase, g: ms.goal, d: Math.round(state.prop.dist), t: Math.round(ms.runTicks / TICK_RATE), r: ready, n: state.order.length, mp: ms.minPlayers,
+            pz: ms.phase === "run" && state.order.length < ms.minPlayers ? 1 : 0 };
+  if (ms.phase === "briefing") v.bt = Math.max(0, Math.ceil(MISSION_BRIEFING_SECONDS - (tick - ms.phaseTick) / TICK_RATE));
+  if (ms.phase === "debrief") { v.res = ms.result; v.why = ms.why; v.stars = ms.stars; v.st = ms.stats; }
+  return v;
 }
 
 // ---- Interactive controls (boat-local) ---------------------------------------------------------------------
@@ -1721,7 +1829,7 @@ function debugCommand(state, id, pl, line, tick) {
   var i, n, v;
   if (cmd === "help") {
     reply("help | state | tp x z | regime veille|croisiere|pleine | scram | restart | leak 1-6 1-3 [g|d] | unleak | break pump|bilge 1-2 | repair pump|bilge 1-2");
-    reply("trip <breaker> | water 1-6 m3 | bring <item> | get <param> | set <param> <value|default> | ff <seconds> | partner on|off|status | faults on|off|now|status");
+    reply("trip <breaker> | water 1-6 m3 | bring <item> | get <param> | set <param> <value|default> | ff <seconds> | partner on|off|status | faults on|off|now|status | mission status|start|win|fail|goal");
   } else if (cmd === "state") {
     var lines = debugState(state);
     for (i = 0; i < lines.length; i++) reply(lines[i]);
@@ -1793,9 +1901,17 @@ function debugCommand(state, id, pl, line, tick) {
     var fg = state.faults;
     if (tok[1] === "on") { fg.enabled = true; reply("fault generator on (budget " + faultBudget(state, tick) + ")"); }
     else if (tok[1] === "off") { fg.enabled = false; reply("fault generator off"); }
-    else if (tok[1] === "now") { fg.enabled = true; fg.nextTick = tick; reply("a fault starts as soon as the budget allows (budget " + faultBudget(state, tick) + ", unresolved " + faultUnresolved(state) + ")"); }
+    else if (tok[1] === "now") { fg.enabled = true; fg.nextTick = state.mission.runTicks; reply("a fault starts as soon as the budget allows (budget " + faultBudget(state, tick) + ", unresolved " + faultUnresolved(state) + ")"); }
     else if (tok[1] === "status") reply((fg.enabled ? "on" : "off") + " | budget " + faultBudget(state, tick) + " | unresolved " + faultUnresolved(state) + " | started " + fg.started + " | next at tick " + fg.nextTick);
     else reply("usage: faults on|off|now|status");
+  } else if (cmd === "mission") {                                                     // the mission flow (mission.js)
+    var ms = state.mission;
+    if (tok[1] === "status") reply("phase " + ms.phase + " | goal " + ms.goal + " m | distance " + Math.round(state.prop.dist) + " m | run " + Math.round(ms.runTicks / TICK_RATE) + " s | ready " + Object.keys(ms.ready).length + "/" + state.order.length);
+    else if (tok[1] === "start") { ms.ready = {}; for (var ri = 0; ri < state.order.length; ri++) ms.ready[state.order[ri]] = true; reply("everybody ready"); }
+    else if (tok[1] === "win") { if (ms.phase === "run") { state.prop.dist = ms.goal; reply("goal reached"); } else reply("no run in progress"); }
+    else if (tok[1] === "fail") { if (ms.phase === "run") { missionFinish(state, "failure", "flooded"); reply("run failed"); } else reply("no run in progress"); }
+    else if (tok[1] === "goal") { v = dbgNum(tok[2]); if (v > 0) { ms.goal = v; reply("goal " + v + " m"); } else reply("usage: mission goal <metres>"); }
+    else reply("usage: mission status|start|win|fail|goal <m>");
   } else if (cmd === "ff") {
     v = dbgNum(tok[1]);
     if (!(v > 0) || v > DEBUG_FF_MAX_SECONDS) { reply("usage: ff <seconds, 0-" + DEBUG_FF_MAX_SECONDS + ">"); return; }
@@ -1828,10 +1944,12 @@ function debugCommand(state, id, pl, line, tick) {
 //  11. boat        buoyancy: descent speed and depth follow the SCRAM latch
 //  12. faults      the fault generator (faults.js) may start a new fault if the crew is under its attention budget
 //  13. alarms      the catalogue of alarms (alarms.js) is evaluated on the state the previous steps produced
+//  14. mission     win / lose conditions, run clock (mission.js). Outside a running mission only the inputs (walking, ready, debug) and missionStep run.
 function simStep(state, tick) {
   // 1. inputs: +1 per tick per player (the nominal input rate), capped at MAX_ALLOWANCE. In steady state this is exactly one input per tick;
   //    after a network stall (TCP retransmission) the backlog drains in a few ticks instead of lagging forever. The long-term rate can never
   //    exceed TICK_RATE inputs/s, so flooding the server with inputs does not speed a player up.
+  var running = missionRunning(state);                       // lobby, briefing, debrief, or a run with fewer than two players: nothing but walking is simulated
   for (var k = 0; k < state.order.length; k++) {
     var pl = state.players[state.order[k]];
     pl.allowance = Math.min(MAX_ALLOWANCE, pl.allowance + 1);
@@ -1839,9 +1957,11 @@ function simStep(state, tick) {
       var next = pl.queue.shift();
       if (next.ry !== null) pl.yaw = next.ry;
       stepPlayer(pl, next.mx, next.mz, carrySpeedFactor(state, state.order[k]), state.water.doors);
+      if (next.rdy >= 0) missionSetReady(state, state.order[k], next.rdy === 1);
+      if (next.dbg) debugCommand(state, state.order[k], pl, next.dbg, tick);
+      if (!running) { pl.seq = next.seq; pl.applied += 1; pl.allowance -= 1; continue; }
       if (next.act) { if (next.use) useTarget(state, state.order[k], pl, tick, next.use); else tryAct(state, state.order[k], pl, tick); }
       if (next.hold) { if (next.use) holdTarget(state, pl, next.use); else tryHold(state, pl); }
-      if (next.dbg) debugCommand(state, state.order[k], pl, next.dbg, tick);
       if (next.flip) manualFlip(state, state.order[k], next.flip);
       if (next.throw) throwItem(state, state.order[k], pl);
       if (next.take) takeItem(state, state.order[k], pl, tick);
@@ -1853,6 +1973,7 @@ function simStep(state, tick) {
       pl.allowance -= 1;
     }
   }
+  if (!running) { missionStep(state, tick); state.tick = tick; return; }
   if (state.players[GHOST_ID]) ghostStep(state, tick);       // debug-only ghost partner (E1-12): answers a pressed coupled command
   evaluateCoupled(state, tick);
   leakStep(state, tick);
@@ -1867,6 +1988,7 @@ function simStep(state, tick) {
   boatStep(state.boat, state.reactor);
   faultsStep(state, tick);
   alarmsStep(state, tick);
+  missionStep(state, tick);
   state.tick = tick;
 }
 
@@ -1881,6 +2003,7 @@ function queueInput(p, input) {
                  flip: input.flip === 1 || input.hand === "next" ? 1 : (input.flip === -1 || input.hand === "prev" ? -1 : 0),
                  throw: input.throw === true || input.throw === 1 || input.hand === "throw",
                  use: typeof input.use === "string" && input.use.length <= 40 ? input.use : "",
+                 rdy: input.rdy === true || input.rdy === 1 ? 1 : (input.rdy === false || input.rdy === 0 ? 0 : -1),      // E4-04: ready / not ready (lobby, debrief)
                  take: input.take === true || input.take === 1 || input.hand === "take", stow: input.stow === true || input.stow === 1 || input.hand === "stow",
                  drop: input.drop === "L" || input.drop === "R" || input.drop === "P" ? input.drop
                    : ((input.drop === true || input.drop === 1 || input.hand === "drop") ? "last"
@@ -1917,10 +2040,30 @@ function stableStringify(v) {
   return "{" + o.join(",") + "}";
 }
 
+// Everything that belongs to the boat and its systems (a new game rebuilds it, the players stay): see worldReset.
+function newWorld(faultsEnabled) {
+  return { cp: newCoupled(), cargo: newCargo(), reactor: newReactor(REACTOR_SEED, "veille"), lever: newLever(), boat: newBoat(), restart: newRestart(), water: newWater(),
+           leaks: newLeaks(), bilge: newBilge(), power: newPower(), prop: newPropulsion(), manual: newManual(), alarms: newAlarms(), faults: newFaults(faultsEnabled) };
+}
+
+// A new game (mission.js): a fresh boat for the same crew, back at the spawn point with empty hands.
+function worldReset(state) {
+  var world = newWorld(state.faults.enabled);
+  for (var k in world) if (Object.prototype.hasOwnProperty.call(world, k)) state[k] = world[k];
+  for (var i = 0; i < state.order.length; i++) {
+    var p = state.players[state.order[i]];
+    if (!p) continue;
+    p.x = -1.5 + i; p.z = 2; p.hands = newHands(); p.queue = []; p.yaw = 0;
+  }
+}
+
 var matchInit = function (ctx, logger, nk, params) {
   logger.info("moving_frame match init");
+  var state = { tick: 0, players: {}, order: [], mission: newMission(!!(params && params.lobby === true)), debug: newDebug(debugEnabled(ctx, params)) };
+  var world = newWorld(!!(params && params.faults === true));
+  for (var key in world) if (Object.prototype.hasOwnProperty.call(world, key)) state[key] = world[key];
   return {
-    state: { tick: 0, players: {}, order: [], cp: newCoupled(), cargo: newCargo(), reactor: newReactor(REACTOR_SEED, "veille"), lever: newLever(), boat: newBoat(), restart: newRestart(), water: newWater(), leaks: newLeaks(), bilge: newBilge(), power: newPower(), prop: newPropulsion(), manual: newManual(), alarms: newAlarms(), faults: newFaults(params && params.faults === true), debug: newDebug(debugEnabled(ctx, params)) },
+    state: state,
     tickRate: TICK_RATE,
     label: JSON.stringify({ name: MATCH_NAME })
   };
@@ -1981,7 +2124,7 @@ var matchLoop = function (ctx, logger, nk, dispatcher, tick, state, messages) {
     var id = state.order[j], q = state.players[id];
     out.push({ id: id, x: q.x, z: q.z, seq: q.seq, hd: handsView(q.hands) });
   }
-  dispatcher.broadcastMessage(OP_STATE, JSON.stringify({ tick: t, t: t * DT, players: out, il: coupledView(state.cp, tick)[0], cp: coupledView(state.cp, tick), cargo: cargoView(state.cargo), rx: reactorView(state.reactor), sc: leverView(state.lever, state.reactor), rs: restartView(state), bw: waterView(state.water), lk: leaksView(state.leaks), bp: bilgeView(state.bilge), pw: powerView(state), pr: propulsionView(state.prop), mn: manualView(state.manual), al: alarmsView(state.alarms), boat: boatView(state.boat) }), null, null, true);
+  dispatcher.broadcastMessage(OP_STATE, JSON.stringify({ tick: t, t: t * DT, players: out, il: coupledView(state.cp, tick)[0], cp: coupledView(state.cp, tick), cargo: cargoView(state.cargo), rx: reactorView(state.reactor), sc: leverView(state.lever, state.reactor), rs: restartView(state), bw: waterView(state.water), lk: leaksView(state.leaks), bp: bilgeView(state.bilge), pw: powerView(state), pr: propulsionView(state.prop), mn: manualView(state.manual), al: alarmsView(state.alarms), ms: missionView(state, t), boat: boatView(state.boat) }), null, null, true);
   // 4. Debug replies (E1-09): each sender gets the lines of their commands as one message, to them only.
   if (state.debug.out.length > 0) {
     var byPlayer = {}, order = [];
@@ -2014,7 +2157,7 @@ var SYSTEM_USER = "00000000-0000-0000-0000-000000000000";
 var STORAGE = { collection: "system", key: "moving_frame_match" };
 
 function publishMatch(nk) {
-  var matchId = nk.matchCreate(MATCH_NAME, { faults: true });                  // the real server runs the fault generator (E3-09d)
+  var matchId = nk.matchCreate(MATCH_NAME, { faults: true, lobby: true });   // the real server runs the fault generator (E3-09d) and the lobby / briefing / debrief flow
   nk.storageWrite([{ collection: STORAGE.collection, key: STORAGE.key, userId: SYSTEM_USER,
                      value: { matchId: matchId }, permissionRead: 2, permissionWrite: 0 }]);
   return matchId;
@@ -2047,7 +2190,10 @@ if (typeof module !== "undefined" && module.exports) {
   module.exports = {
     InitModule: InitModule, stepPlayer: stepPlayer, simStep: simStep, queueInput: queueInput, stateDigest: stateDigest,
     TICK_RATE: TICK_RATE, DT: DT, STATIONS: STATIONS, STATION_REACH: STATION_REACH, INTERLOCK_WINDOW_TICKS: INTERLOCK_WINDOW_TICKS, MAX_ALLOWANCE: MAX_ALLOWANCE, MOVE_SPEED: MOVE_SPEED, HALF_X: HALF_X, HALF_Z: HALF_Z,
-    OP_INPUT: OP_INPUT, OP_STATE: OP_STATE, FAULTS: FAULTS, newFaults: newFaults, faultsStep: faultsStep, faultBudget: faultBudget, faultUnresolved: faultUnresolved, ALARMS: ALARMS, ANNUNCIATOR: ANNUNCIATOR, newAlarms: newAlarms, alarmsStep: alarmsStep, alarmAck: alarmAck, alarmsView: alarmsView,
+    OP_INPUT: OP_INPUT, OP_STATE: OP_STATE, MIN_PLAYERS: MIN_PLAYERS, MISSION_GOAL_M: MISSION_GOAL_M, MISSION_BRIEFING_SECONDS: MISSION_BRIEFING_SECONDS, MISSION_FLOOD_FAIL_SECONDS: MISSION_FLOOD_FAIL_SECONDS,
+    MISSION_CRUSH_DEPTH_M: MISSION_CRUSH_DEPTH_M, MISSION_FAST_SECONDS: MISSION_FAST_SECONDS, newMission: newMission, missionStep: missionStep, missionView: missionView,
+    missionSetReady: missionSetReady, missionFinish: missionFinish, missionRunning: missionRunning, worldReset: worldReset, newWorld: newWorld,
+    FAULTS: FAULTS, newFaults: newFaults, faultsStep: faultsStep, faultBudget: faultBudget, faultUnresolved: faultUnresolved, ALARMS: ALARMS, ANNUNCIATOR: ANNUNCIATOR, newAlarms: newAlarms, alarmsStep: alarmsStep, alarmAck: alarmAck, alarmsView: alarmsView,
     PLAYER_RADIUS: PLAYER_RADIUS, BULKHEAD_Z: BULKHEAD_Z, HATCH_X: HATCH_X, HATCH_HALF: HATCH_HALF, WALL_HALF: WALL_HALF, BAFFLE_HALF_X: BAFFLE_HALF_X, BAFFLE_HALF_Z: BAFFLE_HALF_Z, BAFFLE_OFFSET: BAFFLE_OFFSET,
     LAYOUT_OBSTACLES: LAYOUT_OBSTACLES, cargoBlocked: cargoBlocked, CARGO_RADIUS: CARGO_RADIUS, layoutBlocked: layoutBlocked, hatchToggle: hatchToggle, hatchOccupied: hatchOccupied, CONTROLS: CONTROLS,
     LEVER_COVER_TICKS: LEVER_COVER_TICKS, SINK_RATE_MAX: SINK_RATE_MAX, SINK_RAMP_SECONDS: SINK_RAMP_SECONDS, newBoat: newBoat, boatStep: boatStep,
