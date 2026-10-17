@@ -24,3 +24,14 @@ Constats du premier passage (10 min) : en *veille* le bateau reste dans le noir 
 **Transit (1500 m, croisière, personne ne fait autre chose)** : *lent* (1,8 m/s) en 14 min 10 s ; *demi* (3,6 m/s) en 7 min 55 s ; *toute* (6 m/s) en 5 min 50 s. En pleine puissance sans surveillance le réacteur part en SCRAM avant d arriver. La limite des 3 étoiles (10 min) est donc atteignable avec *demi* ou mieux, sans panne ; les pannes et les alarmes font le reste de la difficulté. Les joueurs doivent penser au télégraphe : l ordre de mission devrait le dire.
 
 Test : `server/test/balance.test.js` (l'outil tourne, rapport lisible par machine, identique d'une exécution à l'autre). À brancher plus tard : des joueurs scriptés (`server/test/route.js`) pour mesurer les temps de procédure (E3-11).
+
+## Équipage scripté (tools/playtest-bot.js)
+`node tools/playtest-bot.js [--seeds N] [--reaction S] [--idle a|b|both] [--minutes M]` fait **jouer la mission par deux marins scriptés** à travers les vraies entrées (marche par les écoutilles, pressions visées, volants tenus, patchs) : salle d'attente, briefing, pannes du générateur, but, bilan. Les marins lisent l'état pour savoir ce qui est en panne ; tout ce qu'ils FONT passe par les entrées d'un client. `--reaction` = secondes avant qu'un marin se mette sur un problème apparu (un humain doit remarquer, comprendre, se déplacer).
+
+Réglage du générateur de pannes (10 graines) : budget = joueurs + 3 (+1 par minute), pause de 10 à 30 s entre deux pannes, fuites de taille 3 possibles.
+| Réaction | Résultat | Médiane | Étoiles |
+|---|---|---|---|
+| 20 s | 10/10 réussies | 8 min 26 s | 9 × 3, 1 × 2 |
+| 45 s | 10/10 | 9 min 16 s | 9 × 3, 1 × 2 |
+| 90 s | 10/10 | 10 min 14 s | 3 × 3, 5 × 2, 2 × 1 |
+Avant ce réglage (budget joueurs + 1, pause 20 à 60 s) un équipage à 90 s de réaction faisait 2 étoiles à chaque fois : aucune pression. La mission n'est donc **jamais perdue** par un équipage qui travaille ; l'échec ne vient que de l'abandon (pas de télégraphe, pas de régime) ou d'une noyade non traitée. À rejouer avec de vrais joueurs avant de durcir encore. Test : `server/test/crewbot.test.js`.

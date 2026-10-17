@@ -4,12 +4,14 @@
 // patch, re-arming a breaker, opening a valve); faults that need a repair mechanic (a broken pump) join when that mechanic exists (E5 / E9).
 // The generator is deterministic: a seeded generator stored in the state, never Math.random. It only runs when the match asks for it (state.faults.enabled:
 // match parameter faults:true, which the real server sets, or the debug command `faults on`), so tests and tools that script their own faults are unaffected.
-//   budget(tick) = min(players + 1, 1 + floor(seconds / FAULT_RAMP_SECONDS)): one fault at a time at first, then as many as there are players plus one.
+//   budget(tick) = min(players + 3, 1 + floor(seconds / FAULT_RAMP_SECONDS)): one fault at a time at first, one more every minute, up to the number of
+//   players plus three ("plus de systèmes que de joueurs"). Tuned with the scripted crew (tools/playtest-bot.js): a crew that needs 90 s to react to each
+//   problem still finishes the 1500 m, but only with 1 to 3 stars.
 //   A new fault starts when the unresolved ones are under the budget and the pause since the last start is over; it comes from a system different
 //   from the last one whenever another is possible.
 var FAULT_FIRST_SECONDS = 60;      // grace period at the start of a patrol
-var FAULT_RAMP_SECONDS = 150;      // one more simultaneous fault every 2 min 30 s
-var FAULT_GAP_MIN = 20, FAULT_GAP_MAX = 60;   // seconds between two starts (when under the budget)
+var FAULT_RAMP_SECONDS = 60;       // one more simultaneous fault every minute
+var FAULT_GAP_MIN = 10, FAULT_GAP_MAX = 30;   // seconds between two starts (when under the budget)
 
 function faultRand(f) {
   f.rng = (f.rng + 0x6D2B79F5) | 0;
@@ -25,7 +27,8 @@ var FAULTS = [
     start: function (s, f) {
       var c = Math.min(WATER_COMPARTMENTS.length - 1, Math.floor(faultRand(f) * WATER_COMPARTMENTS.length)), comp = WATER_COMPARTMENTS[c];
       var z = comp.z0 + 0.5 + faultRand(f) * (comp.z1 - comp.z0 - 1);
-      leakCreate(s.leaks, z, faultRand(f) < 0.5 ? -1 : 1, faultRand(f) < 0.7 ? 1 : 2);
+      var sizeRoll = faultRand(f);
+      leakCreate(s.leaks, z, faultRand(f) < 0.5 ? -1 : 1, sizeRoll < 0.4 ? 1 : (sizeRoll < 0.85 ? 2 : 3));
     } },
   { id: "breaker", system: "power",
     count: function (s) { var n = 0; for (var i = 0; i < s.power.br.length; i++) if (s.power.br[i].tripped) n++; return n; },
@@ -56,7 +59,7 @@ function faultUnresolved(state) {
 
 function faultBudget(state, tick) {
   var players = Math.max(1, state.order.length);
-  return Math.min(players + 1, 1 + Math.floor(tick / TICK_RATE / FAULT_RAMP_SECONDS));
+  return Math.min(players + 3, 1 + Math.floor(tick / TICK_RATE / FAULT_RAMP_SECONDS));
 }
 
 // The generator keeps its own clock: the ticks of the RUN (state.mission.runTicks), so the lobby and the briefing do not use up the grace period.

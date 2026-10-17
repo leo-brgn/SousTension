@@ -21,11 +21,11 @@ test("the generator is off unless the match asks for it: tests and tools that sc
   assert.strictEqual(m.handlers.matchInit({}, { info() {} }, { binaryToString: (d) => d }, { faults: true }).state.faults.enabled, true);
 });
 
-test("the budget starts at one fault, grows every 2 min 30 s and never exceeds the number of players plus one", () => {
+test("the budget starts at one fault, grows every minute and never exceeds the number of players plus three", () => {
   const two = game(["a", "b"], true), four = game(["a", "b", "c", "d"], true);
   const at = (s, sec) => m.faultBudget(s, sec * m.TICK_RATE);
-  assert.deepStrictEqual([0, 100, 150, 299, 300, 450, 3000].map((t) => at(two, t)), [1, 1, 2, 2, 3, 3, 3]);
-  assert.deepStrictEqual([0, 150, 300, 450, 3000].map((t) => at(four, t)), [1, 2, 3, 4, 5]);
+  assert.deepStrictEqual([0, 59, 60, 119, 120, 180, 240, 3000].map((t) => at(two, t)), [1, 1, 2, 2, 3, 4, 5, 5]);
+  assert.deepStrictEqual([0, 60, 180, 360, 3000].map((t) => at(four, t)), [1, 2, 4, 7, 7]);
 });
 
 test("nothing happens during the grace period, then faults come, never started above the budget, from alternating systems", () => {
