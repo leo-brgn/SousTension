@@ -226,10 +226,14 @@ namespace SousTension.Spikes.MovingFrame
         private void RefreshLobby(MissionState m)
         {
             var lines = new List<string>();
-            foreach (var id in _model.AllPlayerIds())
+            var ids = new List<string>(_model.AllPlayerIds());
+            var sorted = new List<string>(ids);
+            sorted.Sort(StringComparer.Ordinal);                         // the same numbering on every screen: a sailor is "Sailor n" by the order of the sorted ids
+            foreach (var id in ids)
             {
                 bool ready = Array.IndexOf(m.ReadyIds, id) >= 0;
-                lines.Add((ready ? "■ " : "□ ") + ShortId(id) + (id == _model.LocalId ? " (" + UiText.Get("ui.lobby.you") + ")" : "") + " — " + UiText.Get(ready ? "ui.lobby.ready" : "ui.lobby.notReady"));
+                string who = id == "ghost" ? UiText.Get("ui.lobby.ghost") : UiText.Format("ui.lobby.sailor", sorted.IndexOf(id) + 1);
+                lines.Add((ready ? "■ " : "□ ") + who + (id == _model.LocalId ? " (" + UiText.Get("ui.lobby.you") + ")" : "") + " — " + UiText.Get(ready ? "ui.lobby.ready" : "ui.lobby.notReady"));
             }
             _lobbyList.text = string.Join("\n", lines);
             _lobbyNeed.text = m.Players < m.MinPlayers ? UiText.Format("ui.lobby.needMore", m.MinPlayers) : UiText.Get("ui.lobby.waiting");
