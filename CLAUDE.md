@@ -29,7 +29,7 @@ Co-op 2–4 joueurs, première personne, parodie de sous-marin nucléaire (Steam
 
 - **Moteur : Unity** (D-02 tranché). Langage C#.
 - **Unity 6000.3.25f1** (URP). **Backend et réseau de gameplay : Nakama** (décision utilisateur : « Nakama pour tout ») — comptes, salons, persistance, **et** matches autoritatifs en temps réel (serveur dans `server/`, JavaScript, 10 Hz ; SDK `nakama-unity` v3.10.1). NGO et Fish-Net sont écartés. Le spike E1-01 (#16) valide ce choix pour le référentiel mobile ; sa conclusion peut le remettre en cause.
-- **Encore à décider** (ne choisis pas à la place de l'utilisateur) : audio (FMOD ou Wwise), voix (Vivox ou Dissonance, à confronter à Nakama).
+- **Audio : Wwise** (décision utilisateur, 17 oct. 2026) ; pas encore installé (intégration à faire dans E12-01, #133). **Encore à décider** (ne choisis pas à la place de l'utilisateur) : voix (Vivox ou Dissonance, à confronter à Nakama).
 - **Pressenti, à confirmer avant d'installer :** URP, Input System, package Localization, Steamworks.NET.
 
 ## Règles d'architecture (issues du GDD §8 — non négociables)
