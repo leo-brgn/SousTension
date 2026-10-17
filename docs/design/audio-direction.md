@@ -1,6 +1,6 @@
 # Direction audio (E12-01, #133) — proposition à valider
 
-> **Statut : décisions prises (17 oct. 2026).** Middleware : **Wwise**. Sources des sons : un mélange de bibliothèque libre et de synthèse. Réseau noir : le silence **et** un son d'alarme dédié. La voix (Vivox / Dissonance) reste ouverte. Wwise n'est pas installé : le Wwise Launcher demande un compte Audiokinetic (action de l'utilisateur). Ce document fixe **ce que chaque système doit dire**, indépendamment de l'outil. Principe du GDD : *« compréhensible les yeux fermés »*, sons **diégétiques** ; le Commandant seul est sous-titré.
+> **Statut : décisions prises (17 oct. 2026).** Middleware : **Wwise**. Sources des sons : un mélange de bibliothèque libre et de synthèse. Réseau noir : le silence **et** un son d'alarme dédié. Voix : **Dissonance** (paquet payant, à acquérir par l'utilisateur ; transport des paquets audio par Nakama via un comms network personnalisé). Wwise n'est pas installé : le Wwise Launcher demande un compte Audiokinetic (action de l'utilisateur). Ce document fixe **ce que chaque système doit dire**, indépendamment de l'outil. Principe du GDD : *« compréhensible les yeux fermés »*, sons **diégétiques** ; le Commandant seul est sous-titré.
 
 ## 1. Règles
 1. **Une voix par système**, reconnaissable seule : le joueur doit pouvoir dire quel système a un problème sans regarder.
