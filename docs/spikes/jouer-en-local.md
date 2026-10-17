@@ -39,6 +39,8 @@ Objectif : appuyer sur Play et jouer, seul (avec un partenaire fantôme) ou à d
 | Overlay réseau (développeur) | F2 |
 | Pause | Échap |
 
+Confort : la caméra compense 70 % du roulis / tangage du bateau (option du client `--stab=0..1` : 0 = caméra rigide, 1 = caméra toujours à l'horizontale). Si le mal de mer persiste, essayer `--stab=1`.
+
 La touche **E** garde l'ancien comportement par position (la commande la plus proche), utile pour dépanner.
 
 ## Provoquer des pannes (console de debug)
