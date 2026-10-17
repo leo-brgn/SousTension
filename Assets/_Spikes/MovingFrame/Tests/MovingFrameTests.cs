@@ -665,6 +665,34 @@ namespace SousTension.Spikes.MovingFrame.Tests
             Assert.AreEqual("line " + (DebugConsoleModel.MaxLog + 49), console.Log[console.Log.Count - 1]);
         }
 
+        // ---- Station feedback (E4-03) ----
+        [Test]
+        public void StationFeedback_IdleThenArmedWithADecreasingTimerThenFlashes()
+        {
+            var idle = StationFeedback.Compute(0, "", "none", 999f);
+            Assert.AreEqual(KeyLook.Idle, idle.Look);
+
+            var fresh = StationFeedback.Compute(30, "pal", "none", 999f);
+            Assert.AreEqual(KeyLook.Armed, fresh.Look); Assert.AreEqual(1f, fresh.Fraction, 1e-6f);
+            Assert.AreEqual(0.5f, StationFeedback.Compute(15, "pal", "none", 999f).Fraction, 1e-6f);
+            Assert.AreEqual(0f, StationFeedback.Compute(0, "pal", "timeout", 5f).Fraction, 1e-6f, "held but out of the official window (the server's latency grace): armed, timer at zero");
+            Assert.AreEqual(KeyLook.Armed, StationFeedback.Compute(0, "pal", "none", 999f).Look);
+            Assert.AreEqual(KeyLook.Armed, StationFeedback.Compute(12, "", "none", 999f).Look, "remaining time alone also counts as armed");
+            Assert.AreEqual(1f, StationFeedback.Compute(99, "pal", "none", 999f).Fraction, 1e-6f, "never above 1");
+
+            var ok = StationFeedback.Compute(0, "", "success", 0.25f);
+            Assert.AreEqual(KeyLook.Success, ok.Look); Assert.AreEqual(0.75f, ok.Fraction, 1e-6f);
+            Assert.AreEqual(KeyLook.Failure, StationFeedback.Compute(0, "", "timeout", 0.1f).Look);
+            Assert.AreEqual(KeyLook.Idle, StationFeedback.Compute(0, "", "success", StationFeedback.FlashSeconds + 0.01f).Look, "the flash ends");
+            Assert.AreEqual(KeyLook.Idle, StationFeedback.Compute(0, "", "none", 0f).Look, "no outcome yet: no flash");
+        }
+
+        [Test]
+        public void StationFeedback_TheOfficialWindowIsThreeSeconds()
+        {
+            Assert.AreEqual(30, StationFeedback.WindowTicks);
+        }
+
         [Test]
         public void CargoState_CarriesItsHeight()
         {
