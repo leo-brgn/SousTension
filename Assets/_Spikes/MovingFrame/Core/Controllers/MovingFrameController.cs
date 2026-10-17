@@ -44,6 +44,10 @@ namespace SousTension.Spikes.MovingFrame
 
         public int PendingInputs => _prediction.PendingCount;
 
+        private int _pendingReady = -1;
+        /// <summary>Tell the server this player is ready (or not) for the next game: sent once, with the next input (lobby, debrief).</summary>
+        public void RequestReady(bool ready) { _pendingReady = ready ? 1 : 0; }
+
         public void Tick(float deltaTime)
         {
             _net.Poll();
@@ -81,7 +85,8 @@ namespace SousTension.Spikes.MovingFrame
                 }
                 int seq = _prediction.Predict(mx, mz, _model.LocalCarryFactor());
                 _sendTimes[seq] = _clock.Now;
-                _net.SendInput(seq, mx, mz, act, grab, actHeld, use, hand, _look != null ? _look.Yaw : 0f, _console?.TakeCommand());   // one debug command per tick   // hold = key still down: valve wheels turn while it is held
+                _net.SendInput(seq, mx, mz, act, grab, actHeld, use, hand, _look != null ? _look.Yaw : 0f, _console?.TakeCommand(), _pendingReady);
+                _pendingReady = -1;   // one debug command per tick   // hold = key still down: valve wheels turn while it is held
             }
             if (ticks == MaxCatchUpTicks) _accumulator = 0; // drop backlog after a long stall
             // What is drawn: the predicted position of the last tick plus the part of the next step that has already elapsed (the input is sampled every
@@ -117,6 +122,7 @@ namespace SousTension.Spikes.MovingFrame
             _model.SetPropulsion(snapshot.Propulsion);
             _model.SetManual(snapshot.Manual);
             _model.SetAlarms(snapshot.Alarms);
+            _model.SetMission(snapshot.Mission);
 
             foreach (var p in snapshot.Players)
             {

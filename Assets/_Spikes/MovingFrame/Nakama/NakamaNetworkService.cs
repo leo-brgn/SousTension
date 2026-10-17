@@ -19,7 +19,7 @@ namespace SousTension.Spikes.MovingFrame
         private const long OpState = 2;
         private const long OpDebug = 3;
 
-        [Serializable] private class InputDto { public int seq; public float mx; public float mz; public bool act; public bool grab; public bool hold; public string use; public string hand; public float ry; public string dbg; }
+        [Serializable] private class InputDto { public int seq; public float mx; public float mz; public bool act; public bool grab; public bool hold; public string use; public string hand; public float ry; public string dbg; public int rdy; }
         [Serializable] private class DebugDto { public string[] lines; }
         [Serializable] private class PlayerDto { public string id; public float x; public float z; public int seq; public string[] hd; }
         [Serializable] private class InterlockDto { public int a; public int b; public string ab; public string bb; public string result; public int rt; public int n; }
@@ -35,7 +35,9 @@ namespace SousTension.Spikes.MovingFrame
         [Serializable] private class LeakDto { public int id; public int c; public float x; public float z; public int s; public string t; }
         [Serializable] private class WaterDto { public float[] l; public float m; public float tr; public float li; public int[] dr; }
         [Serializable] private class BoatDto { public float d; public float vz; }
-        [Serializable] private class StateDto { public int tick; public double t; public PlayerDto[] players; public InterlockDto il; public CargoDto[] cargo; public ReactorDto rx; public CoupledDto[] cp; public RestartDto rs; public WaterDto bw; public LeakDto[] lk; public BilgeDto[] bp; public GridDto pw; public PropulsionDto pr; public ManualDto mn; public LeverDto sc; public BoatDto boat; public string[] al; }
+        [Serializable] private class StateDto { public int tick; public double t; public PlayerDto[] players; public InterlockDto il; public CargoDto[] cargo; public ReactorDto rx; public CoupledDto[] cp; public RestartDto rs; public WaterDto bw; public LeakDto[] lk; public BilgeDto[] bp; public GridDto pw; public PropulsionDto pr; public ManualDto mn; public LeverDto sc; public BoatDto boat; public string[] al; public MissionDto ms; }
+        [Serializable] private class MissionStatsDto { public int t; public int d; public int f; public int a; public float mf; public int sc; }
+        [Serializable] private class MissionDto { public string ph; public int g; public int d; public int t; public int bt; public string[] r; public int n; public int mp; public int pz; public string res; public string why; public int stars; public MissionStatsDto st; }
         [Serializable] private class MatchDto { public string matchId; }
 
         private readonly string _scheme, _host, _serverKey, _deviceId;
@@ -74,10 +76,10 @@ namespace SousTension.Spikes.MovingFrame
             await _socket.JoinMatchAsync(_matchId);
         }
 
-        public void SendInput(int seq, float moveX, float moveZ, bool act, bool grab, bool hold = false, string use = null, string hand = null, float yaw = 0f, string dbg = null)
+        public void SendInput(int seq, float moveX, float moveZ, bool act, bool grab, bool hold = false, string use = null, string hand = null, float yaw = 0f, string dbg = null, int ready = -1)
         {
             if (_socket == null || !_socket.IsConnected) return;
-            var json = JsonUtility.ToJson(new InputDto { seq = seq, mx = moveX, mz = moveZ, act = act, grab = grab, hold = hold, use = use ?? "", hand = hand ?? "", ry = yaw, dbg = dbg ?? "" });
+            var json = JsonUtility.ToJson(new InputDto { seq = seq, mx = moveX, mz = moveZ, act = act, grab = grab, hold = hold, use = use ?? "", hand = hand ?? "", ry = yaw, dbg = dbg ?? "", rdy = ready });
             var bytes = Encoding.UTF8.GetBytes(json);
             Interlocked.Add(ref _bytesSent, bytes.Length);
             _ = SendAsync(bytes);
@@ -152,10 +154,17 @@ namespace SousTension.Spikes.MovingFrame
             }
             var grid = dto.pw != null && dto.pw.br != null ? new GridState(dto.pw.v, dto.pw.b, dto.pw.em == 1, dto.pw.br, dto.pw.lt, dto.pw.dm, dto.pw.su) : default;
             var propulsion = dto.pr != null ? new PropulsionState(dto.pr.p, dto.pr.s, dto.pr.d, dto.pr.n) : default;
+            MissionState mission = default;
+            if (dto.ms != null && !string.IsNullOrEmpty(dto.ms.ph))
+            {
+                var st = dto.ms.st ?? new MissionStatsDto();
+                mission = new MissionState(dto.ms.ph, dto.ms.g, dto.ms.d, dto.ms.t, dto.ms.bt, dto.ms.r, dto.ms.n, dto.ms.mp, dto.ms.pz == 1, dto.ms.res, dto.ms.why, dto.ms.stars,
+                                           st.t, st.d, st.f, st.a, st.mf, st.sc);
+            }
             var manual = dto.mn != null && dto.mn.n > 0 ? new ManualState(dto.mn.p, dto.mn.n) : default;
             var lever = dto.sc != null ? new ScramLeverState(dto.sc.cv == 1, dto.sc.pl == 1) : default;
             var boat = dto.boat != null ? new BoatDepthState(dto.boat.d, dto.boat.vz) : default;
-            _queue.Enqueue(new StateSnapshot(dto.tick, dto.t, players, il, cargo, reactor, lever, boat, coupled, restart, water, leaks, bilge, grid, propulsion, manual, dto.al));
+            _queue.Enqueue(new StateSnapshot(dto.tick, dto.t, players, il, cargo, reactor, lever, boat, coupled, restart, water, leaks, bilge, grid, propulsion, manual, dto.al, mission));
         }
 
         public void Poll()

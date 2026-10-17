@@ -20,7 +20,7 @@ namespace SousTension.Spikes.MovingFrame
 
         private const float Sensitivity = 0.0025f;
 
-        public bool UseHeld => Mouse.current != null && Mouse.current.leftButton.isPressed;
+        public bool UseHeld => !ScreensView.IsOpen && Mouse.current != null && Mouse.current.leftButton.isPressed;   // a click on a screen is not a use of the world
         public bool TakeHeld => Keyboard.current != null && Keyboard.current.fKey.isPressed;
         public bool DropHeld => Keyboard.current != null && Keyboard.current.gKey.isPressed;
         public bool StowHeld => Keyboard.current != null && Keyboard.current.hKey.isPressed;
@@ -54,7 +54,7 @@ namespace SousTension.Spikes.MovingFrame
         public void UpdateLook()
         {
             var mouse = Mouse.current;
-            if (mouse == null) return;
+            if (mouse == null || ScreensView.IsOpen) return;                  // a screen is open: the cursor is free, the camera does not turn
             var d = mouse.delta.ReadValue();
             Yaw += d.x * Sensitivity;
             Pitch = Mathf.Clamp(Pitch - d.y * Sensitivity, -1.2f, 1.2f);

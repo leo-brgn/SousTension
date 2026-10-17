@@ -28,6 +28,13 @@ namespace SousTension.Spikes.MovingFrame
 
         public IEnumerable<string> RemoteIds => _remotes.Keys;
 
+        /// <summary>The local player first, then the others (the lobby list).</summary>
+        public IEnumerable<string> AllPlayerIds()
+        {
+            if (!string.IsNullOrEmpty(LocalId)) yield return LocalId;
+            foreach (var id in _remotes.Keys) if (id != LocalId) yield return id;
+        }
+
         // ---- Cargo (authoritative; interpolated like remote players, but locally-carried items use the prediction) ----
         private readonly Dictionary<string, List<Sample>> _cargoHistory = new Dictionary<string, List<Sample>>();
         private readonly Dictionary<string, CargoState> _cargoLatest = new Dictionary<string, CargoState>();
@@ -185,6 +192,12 @@ namespace SousTension.Spikes.MovingFrame
                 _alarms[ack ? raw.Substring(1) : raw] = ack;
             }
         }
+
+        /// <summary>The mission flow (lobby, briefing, run, debrief). Before the first state it reads as a run: older servers have no lobby.</summary>
+        public MissionState Mission { get; private set; }
+        public void SetMission(MissionState state) { if (state.Valid) Mission = state; }
+        /// <summary>Is the local player marked ready by the server?</summary>
+        public bool LocalIsReady() { if (!Mission.Valid || string.IsNullOrEmpty(LocalId)) return false; foreach (var id in Mission.ReadyIds) if (id == LocalId) return true; return false; }
 
         public ManualState Manual { get; private set; }
         public void SetManual(ManualState state) { if (state.Valid) Manual = state; }

@@ -20,9 +20,10 @@ namespace SousTension.Spikes.MovingFrame
         }
 
         public void SetStatus(string status) => _status = status;
+        public string Status => _status;
 
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
-        private bool _visible = true;
+        private bool _visible;                                                         // hidden by default (zero HUD): F2 shows the developer overlay
 
         private void Update()
         {

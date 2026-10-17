@@ -159,6 +159,28 @@ namespace SousTension.Spikes.MovingFrame
         { Valid = true; Telegraph = telegraph; Speed = speed; Distance = distance; Noise = noise; }
     }
 
+    /// <summary>The mission flow (server/src/mission.js): lobby, briefing, run, debrief.</summary>
+    public readonly struct MissionState
+    {
+        public readonly bool Valid;
+        public readonly string Phase;            // "lobby" | "briefing" | "run" | "debrief"
+        public readonly int GoalMetres, DistanceMetres, RunSeconds, BriefingSeconds;
+        public readonly string[] ReadyIds;       // players that said they are ready
+        public readonly int Players, MinPlayers;
+        public readonly bool Paused;             // a run with fewer than MinPlayers: the world is frozen
+        public readonly string Result, Why;      // debrief: "success" | "failure"; "arrived" | "flooded" | "depth"
+        public readonly int Stars;
+        public readonly int StatSeconds, StatMetres, StatFaults, StatAlarms, StatScrams;
+        public readonly float StatMaxFill;
+        public MissionState(string phase, int goal, int distance, int runSeconds, int briefingSeconds, string[] ready, int players, int minPlayers, bool paused,
+            string result, string why, int stars, int statSeconds, int statMetres, int statFaults, int statAlarms, float statMaxFill, int statScrams)
+        {
+            Valid = true; Phase = phase ?? "run"; GoalMetres = goal; DistanceMetres = distance; RunSeconds = runSeconds; BriefingSeconds = briefingSeconds;
+            ReadyIds = ready ?? new string[0]; Players = players; MinPlayers = minPlayers; Paused = paused; Result = result ?? ""; Why = why ?? ""; Stars = stars;
+            StatSeconds = statSeconds; StatMetres = statMetres; StatFaults = statFaults; StatAlarms = statAlarms; StatMaxFill = statMaxFill; StatScrams = statScrams;
+        }
+    }
+
     /// <summary>The OK-114 Operating Manual (E5-02): the page it is open at (shared by everybody) and how many pages it has.</summary>
     public readonly struct ManualState
     {
@@ -195,12 +217,14 @@ namespace SousTension.Spikes.MovingFrame
         public readonly PropulsionState Propulsion;
         public readonly ManualState Manual;
         public readonly LeakState[] Leaks;   // null = the server sent no leak list (older server); empty = no leak
+        public readonly MissionState Mission;
         public readonly string[] Alarms;     // active alarm ids in catalogue order, "!" prefix = acknowledged (E3-09); null = the server sent none (older server)
 
         public StateSnapshot(int tick, double serverTime, PlayerState[] players, InterlockState interlock = default, CargoState[] cargo = null, ReactorState reactor = default,
             ScramLeverState lever = default, BoatDepthState boat = default, CoupledActionState[] coupled = null,
-            RestartState restart = default, WaterState water = default, LeakState[] leaks = null, BilgeState bilge = default, GridState grid = default, PropulsionState propulsion = default, ManualState manual = default, string[] alarms = null)
+            RestartState restart = default, WaterState water = default, LeakState[] leaks = null, BilgeState bilge = default, GridState grid = default, PropulsionState propulsion = default, ManualState manual = default, string[] alarms = null, MissionState mission = default)
         {
+            Mission = mission;
             Alarms = alarms;
             Manual = manual;
             Propulsion = propulsion;

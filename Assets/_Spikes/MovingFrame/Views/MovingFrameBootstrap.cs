@@ -85,7 +85,10 @@ namespace SousTension.Spikes.MovingFrame
             if (!string.IsNullOrEmpty(tourDir)) new GameObject("ShotTour").AddComponent<ShotTourView>().Bind(model, console, input, tourDir);
             _hud = new GameObject("MetricsHud").AddComponent<MetricsHudView>();
             _hud.Bind(model, network, _controller, clock);
-            Cursor.lockState = CursorLockMode.Locked;
+            var screens = new GameObject("Screens").AddComponent<ScreensView>();
+            screens.Bind(model, () => _hud.Status);
+            screens.ReadyChanged += _controller.RequestReady;
+            screens.QuitRequested += () => Application.Quit();
 
             try
             {

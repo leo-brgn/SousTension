@@ -53,12 +53,42 @@ namespace SousTension.Spikes.MovingFrame
             return sb.ToString();
         }
 
+        private IEnumerator Shot(string name)
+        {
+            yield return new WaitForEndOfFrame();
+            ScreenCapture.CaptureScreenshot(Path.Combine(_dir, name + ".png"));
+            yield return new WaitForSecondsRealtime(0.4f);
+        }
+
         private IEnumerator Run()
         {
             float waited = 0f;
             while ((string.IsNullOrEmpty(_model.LocalId) || !_model.HasServerTime) && waited < 40f) { waited += Time.unscaledDeltaTime; yield return null; }
             if (string.IsNullOrEmpty(_model.LocalId) || !_model.HasServerTime) { File.WriteAllText(Path.Combine(_dir, "failed.txt"), "not connected to the server"); Application.Quit(); yield return new WaitForSecondsRealtime(3f); System.Diagnostics.Process.GetCurrentProcess().Kill(); yield break; }
             yield return new WaitForSecondsRealtime(3f);
+            // the screens around the game: title, waiting room (alone, then with a partner), mission order; then the run starts
+            yield return Shot("S1_title");
+            ScreensView.Instance?.StartGame();
+            yield return new WaitForSecondsRealtime(1f);
+            yield return Shot("S2_lobby_alone");
+            _console.Submit("partner on");
+            yield return new WaitForSecondsRealtime(1.5f);
+            yield return Shot("S3_lobby_two");
+            _console.Submit("mission start");
+            yield return new WaitForSecondsRealtime(1.5f);
+            yield return Shot("S4_briefing");
+            yield return new WaitForSecondsRealtime(11f);
+            if (System.Array.IndexOf(System.Environment.GetCommandLineArgs(), "--tour-screens") >= 0)          // only the screens: the debrief right after the briefing
+            {
+                _console.Submit("mission win");
+                yield return new WaitForSecondsRealtime(2f);
+                yield return Shot("S5_debrief");
+                File.WriteAllText(Path.Combine(_dir, "done.txt"), "ok");
+                Application.Quit();
+                yield return new WaitForSecondsRealtime(3f);
+                System.Diagnostics.Process.GetCurrentProcess().Kill();
+                yield break;
+            }
             // the state at the start of a patrol: veille, the grid is dark and the red emergency lamps are on
             for (float t = 0f; t < 1f; t += Time.unscaledDeltaTime) { _look.Look(0f, 0.1f); yield return null; }
             yield return new WaitForEndOfFrame();
@@ -77,6 +107,9 @@ namespace SousTension.Spikes.MovingFrame
                 Debug.Log("[Tour] " + v.name + " " + LightingReport());
                 yield return new WaitForSecondsRealtime(0.4f);
             }
+            _console.Submit("mission win");                                                 // the debrief screen
+            yield return new WaitForSecondsRealtime(2f);
+            yield return Shot("S5_debrief");
             File.WriteAllText(Path.Combine(_dir, "done.txt"), "ok");
             Application.Quit();
             yield return new WaitForSecondsRealtime(3f);
