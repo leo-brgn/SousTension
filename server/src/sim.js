@@ -18,7 +18,8 @@
 //   9. propulsion  the boat's speed follows the telegraph set-point x bus voltage
 //  10. lever       the SCRAM cover falls shut
 //  11. boat        buoyancy: descent speed and depth follow the SCRAM latch
-//  12. alarms      the catalogue of alarms (alarms.js) is evaluated on the state the previous steps produced
+//  12. faults      the fault generator (faults.js) may start a new fault if the crew is under its attention budget
+//  13. alarms      the catalogue of alarms (alarms.js) is evaluated on the state the previous steps produced
 function simStep(state, tick) {
   // 1. inputs: +1 per tick per player (the nominal input rate), capped at MAX_ALLOWANCE. In steady state this is exactly one input per tick;
   //    after a network stall (TCP retransmission) the backlog drains in a few ticks instead of lagging forever. The long-term rate can never
@@ -56,6 +57,7 @@ function simStep(state, tick) {
   propulsionStep(state);
   leverStep(state.lever);
   boatStep(state.boat, state.reactor);
+  faultsStep(state, tick);
   alarmsStep(state, tick);
   state.tick = tick;
 }

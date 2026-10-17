@@ -1201,7 +1201,7 @@ function boatView(boat) {
 //   severity : "warn" (amber) | "crit" (red: reserved for real emergencies, GDD design rules)
 //   page     : the OK-114 manual page that handles it (E5-04 will open the manual there; ids of manual.js, placeholders until E5-05 writes the procedures)
 // Acknowledging (silencing) an alarm is alarmAck(); it never changes the simulation.
-function reactorMeanValve(r) { return (r.valves[0] + r.valves[1] + r.valves[2] + r.valves[3]) / 4; }
+function reactorMinValve(r) { return Math.min(r.valves[0], r.valves[1], r.valves[2], r.valves[3]); }
 
 var ALARMS = [
   { id: "rx_temp_warn", system: "reactor", severity: "warn", page: "scram",
@@ -1210,8 +1210,8 @@ var ALARMS = [
     when: function (s) { return s.reactor.T >= REACTOR_K.tCrit; }, clear: function (s) { return s.reactor.T < REACTOR_K.tCrit - 3; } },
   { id: "rx_temp_low", system: "reactor", severity: "warn", page: "index",                     // the core runs colder than its inlet allows: the primary is over-cooled
     when: function (s) { return !s.reactor.scram && s.reactor.T < REACTOR_K.tIn + 8; }, clear: function (s) { return s.reactor.scram || s.reactor.T >= REACTOR_K.tIn + 12; } },
-  { id: "rx_valve_low", system: "reactor", severity: "warn", page: "restart",                  // the valves have drifted shut: less cooling
-    when: function (s) { return !s.reactor.scram && reactorMeanValve(s.reactor) < 0.5; }, clear: function (s) { return s.reactor.scram || reactorMeanValve(s.reactor) >= 0.6; } },
+  { id: "rx_valve_low", system: "reactor", severity: "warn", page: "restart",                  // a valve has drifted shut (any one): less cooling
+    when: function (s) { return !s.reactor.scram && reactorMinValve(s.reactor) < 0.4; }, clear: function (s) { return s.reactor.scram || reactorMinValve(s.reactor) >= 0.5; } },
   { id: "rx_flow_low", system: "reactor", severity: "warn", page: "restart",
     when: function (s) { return !s.reactor.scram && s.reactor.flow < 0.6; }, clear: function (s) { return s.reactor.scram || s.reactor.flow >= 0.7; } },
   { id: "rx_pump0_broken", system: "reactor", severity: "warn", page: "restart", when: function (s) { return s.reactor.pumpBroken[0]; } },
@@ -1299,6 +1299,81 @@ function alarmsView(alarms) {
   var out = [];
   for (var i = 0; i < ALARMS.length; i++) if (alarms.list[i].on) out.push((alarms.list[i].ack ? "!" : "") + ALARMS[i].id);
   return out;
+}
+
+// ---- Fault generator with an attention budget (E3-09d, docs/design/alarm-system.md) -------------------------------------------------------------
+// "Plus de systèmes que de joueurs": the game keeps the crew busy by letting faults pile up to a BUDGET. A fault is an entry of FAULTS: how many of its
+// instances are currently unresolved (count), and how to start one (start). Every fault listed here can be resolved by the players TODAY (a hull
+// patch, re-arming a breaker, opening a valve); faults that need a repair mechanic (a broken pump) join when that mechanic exists (E5 / E9).
+// The generator is deterministic: a seeded generator stored in the state, never Math.random. It only runs when the match asks for it (state.faults.enabled:
+// match parameter faults:true, which the real server sets, or the debug command `faults on`), so tests and tools that script their own faults are unaffected.
+//   budget(tick) = min(players + 1, 1 + floor(seconds / FAULT_RAMP_SECONDS)): one fault at a time at first, then as many as there are players plus one.
+//   A new fault starts when the unresolved ones are under the budget and the pause since the last start is over; it comes from a system different
+//   from the last one whenever another is possible.
+var FAULT_FIRST_SECONDS = 60;      // grace period at the start of a patrol
+var FAULT_RAMP_SECONDS = 150;      // one more simultaneous fault every 2 min 30 s
+var FAULT_GAP_MIN = 20, FAULT_GAP_MAX = 60;   // seconds between two starts (when under the budget)
+
+function faultRand(f) {
+  f.rng = (f.rng + 0x6D2B79F5) | 0;
+  var t = Math.imul(f.rng ^ (f.rng >>> 15), 1 | f.rng);
+  t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+  return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+}
+
+var FAULTS = [
+  { id: "leak", system: "water",
+    count: function (s) { return s.leaks.list.length; },
+    can: function (s) { return s.leaks.list.length < 3; },
+    start: function (s, f) {
+      var c = Math.min(WATER_COMPARTMENTS.length - 1, Math.floor(faultRand(f) * WATER_COMPARTMENTS.length)), comp = WATER_COMPARTMENTS[c];
+      var z = comp.z0 + 0.5 + faultRand(f) * (comp.z1 - comp.z0 - 1);
+      leakCreate(s.leaks, z, faultRand(f) < 0.5 ? -1 : 1, faultRand(f) < 0.7 ? 1 : 2);
+    } },
+  { id: "breaker", system: "power",
+    count: function (s) { var n = 0; for (var i = 0; i < s.power.br.length; i++) if (s.power.br[i].tripped) n++; return n; },
+    can: function (s) { return faultClosedBreakers(s).length > 0; },
+    start: function (s, f) { var list = faultClosedBreakers(s); breakerTrip(s.power, list[Math.floor(faultRand(f) * list.length)]); } },
+  { id: "valve", system: "reactor",
+    count: function (s) { var n = 0; for (var i = 0; i < 4; i++) if (s.reactor.valves[i] < 0.5) n++; return n; },
+    can: function (s) { if (s.reactor.scram) return false; var open = []; for (var i = 0; i < 4; i++) if (s.reactor.valves[i] >= 0.5) open.push(i); return open.length > 0; },
+    start: function (s, f) { var open = []; for (var i = 0; i < 4; i++) if (s.reactor.valves[i] >= 0.5) open.push(i); s.reactor.valves[open[Math.floor(faultRand(f) * open.length)]] = 0.15; } }
+];
+
+// The breakers that can trip without taking the lights of a compartment away (a fault, not a blackout): everything but the light breakers.
+function faultClosedBreakers(s) {
+  var out = [];
+  for (var i = 0; i < s.power.br.length; i++) if (s.power.br[i].closed && BREAKERS[i].use !== "light") out.push(i);
+  return out;
+}
+
+function newFaults(enabled) {
+  return { enabled: !!enabled, rng: (REACTOR_SEED ^ 0x9E3779B9) | 0, nextTick: FAULT_FIRST_SECONDS * TICK_RATE, last: "", started: 0 };
+}
+
+function faultUnresolved(state) {
+  var n = 0;
+  for (var i = 0; i < FAULTS.length; i++) n += FAULTS[i].count(state);
+  return n;
+}
+
+function faultBudget(state, tick) {
+  var players = Math.max(1, state.order.length);
+  return Math.min(players + 1, 1 + Math.floor(tick / TICK_RATE / FAULT_RAMP_SECONDS));
+}
+
+function faultsStep(state, tick) {
+  var f = state.faults;
+  if (!f.enabled || tick < f.nextTick || state.order.length === 0) return;
+  if (faultUnresolved(state) >= faultBudget(state, tick)) return;                         // the crew is busy enough: try again next tick
+  var usable = [], other = [];
+  for (var i = 0; i < FAULTS.length; i++) if (FAULTS[i].can(state)) { usable.push(FAULTS[i]); if (FAULTS[i].system !== f.last) other.push(FAULTS[i]); }
+  if (usable.length === 0) return;
+  var pool = other.length > 0 ? other : usable;
+  var fault = pool[Math.floor(faultRand(f) * pool.length)];
+  fault.start(state, f);
+  f.last = fault.system; f.started += 1;
+  f.nextTick = tick + Math.round((FAULT_GAP_MIN + faultRand(f) * (FAULT_GAP_MAX - FAULT_GAP_MIN)) * TICK_RATE);
 }
 
 // ---- Interactive controls (boat-local) ---------------------------------------------------------------------
@@ -1531,7 +1606,7 @@ function restartView(state) {
 //
 // Commands:  help | state | tp <x> <z> | tp <1-6|torpilles|central|radio|reacteur|machines|vie> | regime <veille|croisiere|pleine> | scram | restart | leak <1-6> <1-3> [g|d] | unleak
 //            break <pump|bilge> <1-2> | repair <pump|bilge> <1-2> | trip <breaker id> | water <1-6> <m3> | bring <item id>
-//            get <param> | set <param> <value|default> | ff <seconds> | partner <on|off|status>
+//            get <param> | set <param> <value|default> | ff <seconds> | partner <on|off|status> | faults <on|off|now|status>
 var DEBUG_FF_MAX_SECONDS = 300;
 
 function debugEnabled(ctx, params) {
@@ -1642,7 +1717,7 @@ function debugCommand(state, id, pl, line, tick) {
   var i, n, v;
   if (cmd === "help") {
     reply("help | state | tp x z | regime veille|croisiere|pleine | scram | restart | leak 1-6 1-3 [g|d] | unleak | break pump|bilge 1-2 | repair pump|bilge 1-2");
-    reply("trip <breaker> | water 1-6 m3 | bring <item> | get <param> | set <param> <value|default> | ff <seconds> | partner on|off|status");
+    reply("trip <breaker> | water 1-6 m3 | bring <item> | get <param> | set <param> <value|default> | ff <seconds> | partner on|off|status | faults on|off|now|status");
   } else if (cmd === "state") {
     var lines = debugState(state);
     for (i = 0; i < lines.length; i++) reply(lines[i]);
@@ -1710,6 +1785,13 @@ function debugCommand(state, id, pl, line, tick) {
     else if (tok[1] === "off") reply(ghostRemove(state) ? "ghost partner left" : "no ghost partner");
     else if (tok[1] === "status") reply(state.players[GHOST_ID] ? "ghost partner present" : "no ghost partner");
     else reply("usage: partner on|off|status");
+  } else if (cmd === "faults") {                                                      // the fault generator (E3-09d)
+    var fg = state.faults;
+    if (tok[1] === "on") { fg.enabled = true; reply("fault generator on (budget " + faultBudget(state, tick) + ")"); }
+    else if (tok[1] === "off") { fg.enabled = false; reply("fault generator off"); }
+    else if (tok[1] === "now") { fg.enabled = true; fg.nextTick = tick; reply("a fault starts as soon as the budget allows (budget " + faultBudget(state, tick) + ", unresolved " + faultUnresolved(state) + ")"); }
+    else if (tok[1] === "status") reply((fg.enabled ? "on" : "off") + " | budget " + faultBudget(state, tick) + " | unresolved " + faultUnresolved(state) + " | started " + fg.started + " | next at tick " + fg.nextTick);
+    else reply("usage: faults on|off|now|status");
   } else if (cmd === "ff") {
     v = dbgNum(tok[1]);
     if (!(v > 0) || v > DEBUG_FF_MAX_SECONDS) { reply("usage: ff <seconds, 0-" + DEBUG_FF_MAX_SECONDS + ">"); return; }
@@ -1740,7 +1822,8 @@ function debugCommand(state, id, pl, line, tick) {
 //   9. propulsion  the boat's speed follows the telegraph set-point x bus voltage
 //  10. lever       the SCRAM cover falls shut
 //  11. boat        buoyancy: descent speed and depth follow the SCRAM latch
-//  12. alarms      the catalogue of alarms (alarms.js) is evaluated on the state the previous steps produced
+//  12. faults      the fault generator (faults.js) may start a new fault if the crew is under its attention budget
+//  13. alarms      the catalogue of alarms (alarms.js) is evaluated on the state the previous steps produced
 function simStep(state, tick) {
   // 1. inputs: +1 per tick per player (the nominal input rate), capped at MAX_ALLOWANCE. In steady state this is exactly one input per tick;
   //    after a network stall (TCP retransmission) the backlog drains in a few ticks instead of lagging forever. The long-term rate can never
@@ -1778,6 +1861,7 @@ function simStep(state, tick) {
   propulsionStep(state);
   leverStep(state.lever);
   boatStep(state.boat, state.reactor);
+  faultsStep(state, tick);
   alarmsStep(state, tick);
   state.tick = tick;
 }
@@ -1832,7 +1916,7 @@ function stableStringify(v) {
 var matchInit = function (ctx, logger, nk, params) {
   logger.info("moving_frame match init");
   return {
-    state: { tick: 0, players: {}, order: [], cp: newCoupled(), cargo: newCargo(), reactor: newReactor(REACTOR_SEED, "veille"), lever: newLever(), boat: newBoat(), restart: newRestart(), water: newWater(), leaks: newLeaks(), bilge: newBilge(), power: newPower(), prop: newPropulsion(), manual: newManual(), alarms: newAlarms(), debug: newDebug(debugEnabled(ctx, params)) },
+    state: { tick: 0, players: {}, order: [], cp: newCoupled(), cargo: newCargo(), reactor: newReactor(REACTOR_SEED, "veille"), lever: newLever(), boat: newBoat(), restart: newRestart(), water: newWater(), leaks: newLeaks(), bilge: newBilge(), power: newPower(), prop: newPropulsion(), manual: newManual(), alarms: newAlarms(), faults: newFaults(params && params.faults === true), debug: newDebug(debugEnabled(ctx, params)) },
     tickRate: TICK_RATE,
     label: JSON.stringify({ name: MATCH_NAME })
   };
@@ -1926,7 +2010,7 @@ var SYSTEM_USER = "00000000-0000-0000-0000-000000000000";
 var STORAGE = { collection: "system", key: "moving_frame_match" };
 
 function publishMatch(nk) {
-  var matchId = nk.matchCreate(MATCH_NAME, {});
+  var matchId = nk.matchCreate(MATCH_NAME, { faults: true });                  // the real server runs the fault generator (E3-09d)
   nk.storageWrite([{ collection: STORAGE.collection, key: STORAGE.key, userId: SYSTEM_USER,
                      value: { matchId: matchId }, permissionRead: 2, permissionWrite: 0 }]);
   return matchId;
@@ -1959,7 +2043,7 @@ if (typeof module !== "undefined" && module.exports) {
   module.exports = {
     InitModule: InitModule, stepPlayer: stepPlayer, simStep: simStep, queueInput: queueInput, stateDigest: stateDigest,
     TICK_RATE: TICK_RATE, DT: DT, STATIONS: STATIONS, STATION_REACH: STATION_REACH, INTERLOCK_WINDOW_TICKS: INTERLOCK_WINDOW_TICKS, MAX_ALLOWANCE: MAX_ALLOWANCE, MOVE_SPEED: MOVE_SPEED, HALF_X: HALF_X, HALF_Z: HALF_Z,
-    OP_INPUT: OP_INPUT, OP_STATE: OP_STATE, ALARMS: ALARMS, ANNUNCIATOR: ANNUNCIATOR, newAlarms: newAlarms, alarmsStep: alarmsStep, alarmAck: alarmAck, alarmsView: alarmsView,
+    OP_INPUT: OP_INPUT, OP_STATE: OP_STATE, FAULTS: FAULTS, newFaults: newFaults, faultsStep: faultsStep, faultBudget: faultBudget, faultUnresolved: faultUnresolved, ALARMS: ALARMS, ANNUNCIATOR: ANNUNCIATOR, newAlarms: newAlarms, alarmsStep: alarmsStep, alarmAck: alarmAck, alarmsView: alarmsView,
     PLAYER_RADIUS: PLAYER_RADIUS, BULKHEAD_Z: BULKHEAD_Z, HATCH_X: HATCH_X, HATCH_HALF: HATCH_HALF, WALL_HALF: WALL_HALF, BAFFLE_HALF_X: BAFFLE_HALF_X, BAFFLE_HALF_Z: BAFFLE_HALF_Z, BAFFLE_OFFSET: BAFFLE_OFFSET,
     LAYOUT_OBSTACLES: LAYOUT_OBSTACLES, cargoBlocked: cargoBlocked, CARGO_RADIUS: CARGO_RADIUS, layoutBlocked: layoutBlocked, hatchToggle: hatchToggle, hatchOccupied: hatchOccupied, CONTROLS: CONTROLS,
     LEVER_COVER_TICKS: LEVER_COVER_TICKS, SINK_RATE_MAX: SINK_RATE_MAX, SINK_RAMP_SECONDS: SINK_RAMP_SECONDS, newBoat: newBoat, boatStep: boatStep,

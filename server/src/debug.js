@@ -7,7 +7,7 @@
 //
 // Commands:  help | state | tp <x> <z> | tp <1-6|torpilles|central|radio|reacteur|machines|vie> | regime <veille|croisiere|pleine> | scram | restart | leak <1-6> <1-3> [g|d] | unleak
 //            break <pump|bilge> <1-2> | repair <pump|bilge> <1-2> | trip <breaker id> | water <1-6> <m3> | bring <item id>
-//            get <param> | set <param> <value|default> | ff <seconds> | partner <on|off|status>
+//            get <param> | set <param> <value|default> | ff <seconds> | partner <on|off|status> | faults <on|off|now|status>
 var DEBUG_FF_MAX_SECONDS = 300;
 
 function debugEnabled(ctx, params) {
@@ -118,7 +118,7 @@ function debugCommand(state, id, pl, line, tick) {
   var i, n, v;
   if (cmd === "help") {
     reply("help | state | tp x z | regime veille|croisiere|pleine | scram | restart | leak 1-6 1-3 [g|d] | unleak | break pump|bilge 1-2 | repair pump|bilge 1-2");
-    reply("trip <breaker> | water 1-6 m3 | bring <item> | get <param> | set <param> <value|default> | ff <seconds> | partner on|off|status");
+    reply("trip <breaker> | water 1-6 m3 | bring <item> | get <param> | set <param> <value|default> | ff <seconds> | partner on|off|status | faults on|off|now|status");
   } else if (cmd === "state") {
     var lines = debugState(state);
     for (i = 0; i < lines.length; i++) reply(lines[i]);
@@ -186,6 +186,13 @@ function debugCommand(state, id, pl, line, tick) {
     else if (tok[1] === "off") reply(ghostRemove(state) ? "ghost partner left" : "no ghost partner");
     else if (tok[1] === "status") reply(state.players[GHOST_ID] ? "ghost partner present" : "no ghost partner");
     else reply("usage: partner on|off|status");
+  } else if (cmd === "faults") {                                                      // the fault generator (E3-09d)
+    var fg = state.faults;
+    if (tok[1] === "on") { fg.enabled = true; reply("fault generator on (budget " + faultBudget(state, tick) + ")"); }
+    else if (tok[1] === "off") { fg.enabled = false; reply("fault generator off"); }
+    else if (tok[1] === "now") { fg.enabled = true; fg.nextTick = tick; reply("a fault starts as soon as the budget allows (budget " + faultBudget(state, tick) + ", unresolved " + faultUnresolved(state) + ")"); }
+    else if (tok[1] === "status") reply((fg.enabled ? "on" : "off") + " | budget " + faultBudget(state, tick) + " | unresolved " + faultUnresolved(state) + " | started " + fg.started + " | next at tick " + fg.nextTick);
+    else reply("usage: faults on|off|now|status");
   } else if (cmd === "ff") {
     v = dbgNum(tok[1]);
     if (!(v > 0) || v > DEBUG_FF_MAX_SECONDS) { reply("usage: ff <seconds, 0-" + DEBUG_FF_MAX_SECONDS + ">"); return; }

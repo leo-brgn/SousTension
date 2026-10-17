@@ -46,6 +46,10 @@ const SCENARIOS = {
       1800: (s) => { for (let i = 0; i < 4; i++) m.reactorSetValve(s.reactor, i, 0.6); m.reactorSetPump(s.reactor, 0, true); m.reactorSetPump(s.reactor, 1, true); m.reactorRestart(s.reactor); },
     },
   },
+  "fault-generator": {
+    about: "croisiere with the fault generator (attention budget) and a crew that never reacts: how fast the faults pile up and what the alarms say",
+    setup: (s, seed) => { s.reactor = m.newReactor(seed, "croisiere"); s.leaks.nextTick = 1e9; s.faults.enabled = true; s.faults.rng = seed; },
+  },
   "scheduled-leaks": {
     about: "croisiere with the game's own leak schedule and nobody repairing: how long before the boat is in trouble",
     setup: (s, seed) => { s.reactor = m.newReactor(seed, "croisiere"); },
@@ -83,6 +87,7 @@ function run(name, seed) {
   };
   simulate(state, TICKS, script);
   finite(state, "state", r.violations);
+  r.faultsStarted = state.faults.started; r.unresolvedAtEnd = m.faultUnresolved(state);
   r.digest = m.stateDigest(state);
   r.finalT = state.reactor.T; r.finalV = state.power.V; r.scram = !!state.reactor.scram;
   return r;
@@ -117,6 +122,7 @@ else {
     for (const r of rows) for (const [id, sec] of Object.entries(r.alarms)) (first[id] = first[id] || []).push(sec);
     const rang = Object.keys(first).sort((a, b) => Math.min(...first[a]) - Math.min(...first[b]));
     console.log("alarms: " + (rang.length ? rang.map((id) => id + " " + first[id].length + "/" + rows.length + " from " + f(Math.min(...first[id]), 0) + " s").join(" | ") : "none"));
+    if (rows.some((r) => r.faultsStarted > 0)) console.log("faults started: " + rows.map((r) => r.faultsStarted).join(", ") + " | unresolved at the end: " + rows.map((r) => r.unresolvedAtEnd).join(", "));
     console.log("-> " + scrams + "/" + rows.length + " runs went to SCRAM; max temperature " + f(Math.max(...rows.map((r) => r.maxT)), 0) + " C; max water " + f(Math.max(...rows.map((r) => r.maxWaterM3)), 1) + " m3");
   }
   const bad = report.flatMap((r) => r.violations.map((v) => r.scenario + " seed " + r.seed + ": " + v));
