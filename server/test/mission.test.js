@@ -181,3 +181,28 @@ test("the debug ghost partner is always ready: one tester can start a game (lobb
   ready(c, ["a"]);
   assert.strictEqual(c.state.mission.phase, "briefing", "the ghost is ready for the next game too");
 });
+
+test("when the last real player leaves the match is reset: no ghost in a seat, back to the lobby, a fresh boat", () => {
+  const c = lobby(["a"]);
+  tick(c, [input(c, "a", { dbg: "partner on" })]);
+  ready(c, ["a"]);
+  ticks(c, secs(m.MISSION_BRIEFING_SECONDS) + 50);
+  assert.strictEqual(c.state.mission.phase, "run");
+  c.state.reactor.regime = "pleine"; c.state.prop.dist = 700;
+  c.state = h.matchLeave({}, logger, nk, null, 0, c.state, [pr("a")]).state;
+  assert.strictEqual(c.state.order.length, 0, "the ghost left with the last human");
+  assert.strictEqual(c.state.players.ghost, undefined);
+  assert.strictEqual(c.state.mission.phase, "lobby");
+  assert.strictEqual(c.state.mission.minPlayers, 2, "still a lobby match");
+  assert.strictEqual(c.state.reactor.regime, "veille"); assert.strictEqual(c.state.prop.dist, 0);
+  c.state = h.matchJoin({}, logger, nk, null, 0, c.state, [pr("b")]).state;
+  assert.deepStrictEqual(c.state.order, ["b"]);
+  assert.deepStrictEqual([c.state.players.b.x, c.state.players.b.z], [-1.5, 2]);
+});
+
+test("a bare match is not reset to a lobby when its players leave (tests and tools keep their rules)", () => {
+  const s = h.matchInit({}, logger, nk, {}).state;
+  let st = h.matchJoin({}, logger, nk, null, 0, s, [pr("a")]).state;
+  st = h.matchLeave({}, logger, nk, null, 0, st, [pr("a")]).state;
+  assert.strictEqual(st.mission.phase, "run"); assert.strictEqual(st.mission.minPlayers, 0);
+});
