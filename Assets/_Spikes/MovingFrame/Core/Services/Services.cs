@@ -24,6 +24,14 @@ namespace SousTension.Spikes.MovingFrame
         void Poll();
     }
 
+    /// <summary>The voice channel of the match (E8-07): opaque packets out, packets of the other players in. Implemented by the Nakama service; <see cref="VoicePacket"/> is the format.</summary>
+    public interface IVoiceTransport
+    {
+        void SendVoice(byte[] packet);
+        /// <summary>(sender user id, packet), raised from <c>Poll</c> on the main thread.</summary>
+        event Action<string, byte[]> VoiceReceived;
+    }
+
     /// <summary>Monotonic clock in seconds.</summary>
     public interface IClockService
     {

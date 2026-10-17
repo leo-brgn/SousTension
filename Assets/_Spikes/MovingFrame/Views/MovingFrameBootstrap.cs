@@ -56,6 +56,7 @@ namespace SousTension.Spikes.MovingFrame
             // Services
             var clock = new UnityClockService();
             INetworkService network = new NakamaNetworkService(device, host, port);
+            var voiceTransport = network as IVoiceTransport;                                  // before any latency decorator wraps it
             if (simulatedLatencyMs > 0 || simulatedLossPercent > 0)
                 network = new SimulatedLatencyNetworkService(network, clock, simulatedLatencyMs / 1000.0, simulatedJitterMs / 1000.0, simulatedLossPercent / 100.0);
             var settings = new GameSettings();
@@ -82,6 +83,7 @@ namespace SousTension.Spikes.MovingFrame
             new GameObject("Manual").AddComponent<ManualView>().Bind(model, cam);
             new GameObject("Flashlight").AddComponent<FlashlightView>().Bind(model, cam);
             _audio = new AudioController(model, new GameObject("Audio").AddComponent<ProceduralAudioService>());
+            if (VoiceChatView.Requested && voiceTransport != null) new GameObject("VoiceChat").AddComponent<VoiceChatView>().Bind(voiceTransport, model);       // --voice (E8-07c)
             if (VoiceLoopbackView.Requested) new GameObject("VoiceLoopback").AddComponent<VoiceLoopbackView>();       // voice chain test (E8-07b): --voice-loopback
             var characters = new GameObject("Characters").AddComponent<CharactersView>();
             characters.Bind(model, clock, input, boat.transform, cam);
