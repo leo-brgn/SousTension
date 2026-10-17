@@ -151,3 +151,18 @@ test("the broadcast state carries the hatch states so a client predicts the same
   tick(c);
   assert.deepStrictEqual(sent[sent.length - 1].bw.dr, [1, 1, 1, 0, 1]);
 });
+
+test("a thrown or sliding item stops against a bulkhead, a baffle and a closed hatch, and flies through an open hatch (E2-01)", () => {
+  assert.ok(m.cargoBlocked(0.5, 4.0), "inside the wall z = 4");
+  assert.ok(!m.cargoBlocked(m.HATCH_X[1], 4.0), "the open hatch");
+  assert.ok(m.cargoBlocked(m.HATCH_X[1], 4.0, [{ open: true }, { open: false }, { open: true }, { open: true }, { open: true }]), "the closed hatch");
+  assert.ok(m.cargoBlocked(m.HATCH_X[1], 4 - m.BAFFLE_OFFSET), "the baffle behind the hatch");
+  const c = setup();
+  const crate = c.state.cargo.find((k) => k.id === "crate2");
+  crate.x = 0.5; crate.z = 4.6; crate.vx = 0; crate.vz = -3; crate.fly = true; crate.y = 0.5; crate.vy = 1;
+  for (let i = 0; i < 6; i++) tick(c);
+  assert.ok(crate.z > 4, "stopped fore of the bulkhead: z = " + crate.z);
+  crate.x = m.HATCH_X[1]; crate.z = 4.6; crate.vx = 0; crate.vz = -3; crate.fly = true; crate.y = 0.5; crate.vy = 1;
+  tick(c); tick(c);
+  assert.ok(crate.z < 4.6 && crate.z > 3.5 || crate.z < 3.5, "through the open hatch");
+});

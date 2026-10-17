@@ -61,3 +61,20 @@ function hatchToggle(state, d) {
   }
   return waterSetDoor(state.water, d, true);
 }
+
+// Loose cargo (E2-01): a point of radius CARGO_RADIUS against the same walls, baffles and closed hatches as the players.
+var CARGO_RADIUS = 0.15;
+function cargoBlocked(x, z, doors) {
+  var r = CARGO_RADIUS;
+  for (var i = 0; i < LAYOUT_OBSTACLES.length; i++) {
+    var o = LAYOUT_OBSTACLES[i];
+    if (x > o[0] - r && x < o[1] + r && z > o[2] - r && z < o[3] + r) return true;
+  }
+  if (doors) {
+    for (var d = 0; d < BULKHEAD_Z.length && d < doors.length; d++) {
+      if (doors[d].open) continue;
+      if (x > HATCH_X[d] - HATCH_HALF - r && x < HATCH_X[d] + HATCH_HALF + r && z > BULKHEAD_Z[d] - WALL_HALF - r && z < BULKHEAD_Z[d] + WALL_HALF + r) return true;
+    }
+  }
+  return false;
+}

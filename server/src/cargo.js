@@ -45,8 +45,11 @@ function newCargo() {
 
 // A thrown item (E2-04): ballistic in the boat's frame (gravity only, no boat inertia), bounces on the walls, lands on the floor and then
 // slides like any loose cargo. Deterministic: plain arithmetic on the tick.
-function flyStep(c) {
+function flyStep(c, doors) {
+  var ox = c.x, oz = c.z;
   c.x += c.vx * DT; c.z += c.vz * DT;
+  if (cargoBlocked(c.x, oz, doors)) { c.x = ox; c.vx = -c.vx * THROW_BOUNCE; }          // E2-01: bulkheads, baffles and closed hatches stop a thrown item
+  if (cargoBlocked(c.x, c.z, doors)) { c.z = oz; c.vz = -c.vz * THROW_BOUNCE; }
   c.vy -= GRAVITY * DT;
   c.y += c.vy * DT;
   if (c.x < -HALF_X || c.x > HALF_X) { c.x = clamp(c.x, -HALF_X, HALF_X); c.vx = -c.vx * THROW_BOUNCE; }
@@ -54,7 +57,7 @@ function flyStep(c) {
   if (c.y <= 0) { c.y = 0; c.vy = 0; c.fly = false; c.vx *= THROW_LAND_KEEP; c.vz *= THROW_LAND_KEEP; }
 }
 
-function slideStep(c, up) {
+function slideStep(c, up, doors) {
   var ax = -GRAVITY * up.x, az = -GRAVITY * up.z, amag = Math.sqrt(ax * ax + az * az);
   var vmag = Math.sqrt(c.vx * c.vx + c.vz * c.vz);
   var dirx, dirz;
@@ -66,7 +69,10 @@ function slideStep(c, up) {
   var nvz = c.vz + (az - FRICTION * GRAVITY * dirz) * DT;
   if (vmag >= 1e-6 && (nvx * c.vx + nvz * c.vz) <= 0) { nvx = 0; nvz = 0; } // friction stopped it
   c.vx = nvx; c.vz = nvz;
+  var ox = c.x, oz = c.z;
   c.x += c.vx * DT; c.z += c.vz * DT;
+  if (cargoBlocked(c.x, oz, doors)) { c.x = ox; c.vx = 0; }                          // E2-01: a sliding crate stops against a bulkhead
+  if (cargoBlocked(c.x, c.z, doors)) { c.z = oz; c.vz = 0; }
   if (c.x < -HALF_X || c.x > HALF_X) { c.x = clamp(c.x, -HALF_X, HALF_X); c.vx = 0; }
   if (c.z < -HALF_Z || c.z > HALF_Z) { c.z = clamp(c.z, -HALF_Z, HALF_Z); c.vz = 0; }
 }
@@ -80,7 +86,7 @@ function updateCargo(state, tick) {
       if (tick >= c.respawnTick) { c.active = true; c.x = c.homeX; c.z = c.homeZ; c.vx = 0; c.vz = 0; }
       continue;
     }
-    if (c.fly) { flyStep(c); continue; }                          // thrown: in the air until it lands
+    if (c.fly) { flyStep(c, state.water.doors); continue; }                          // thrown: in the air until it lands
     if (c.pend !== "" && tick - c.pendTick >= INTERLOCK_WINDOW_TICKS) c.pend = ""; // second carrier too late
     // A carrier that left the match releases the cargo
     var alive = [];
@@ -93,7 +99,7 @@ function updateCargo(state, tick) {
       var pa = state.players[c.carriers[0]], pb = state.players[c.carriers[1]];
       c.x = (pa.x + pb.x) / 2; c.z = (pa.z + pb.z) / 2; c.vx = 0; c.vz = 0;
     } else {
-      slideStep(c, up);
+      slideStep(c, up, state.water.doors);
     }
   }
 }

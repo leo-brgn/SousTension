@@ -11,7 +11,7 @@ const { route } = require("./route.js");
 
 const IDS = ["a", "b", "c"];
 const TICKS = 3000;                         // 5 minutes of play
-const GOLDEN_DIGEST = "bc44026615671518";
+const GOLDEN_DIGEST = "474c93b44e983872";
 
 // A small deterministic generator for the scripted "monkey" players (never Math.random).
 function lcg(seed) { let s = seed >>> 0; return () => { s = (Math.imul(s, 1664525) + 1013904223) >>> 0; return s / 4294967296; }; }

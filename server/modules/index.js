@@ -105,6 +105,23 @@ function hatchToggle(state, d) {
   return waterSetDoor(state.water, d, true);
 }
 
+// Loose cargo (E2-01): a point of radius CARGO_RADIUS against the same walls, baffles and closed hatches as the players.
+var CARGO_RADIUS = 0.15;
+function cargoBlocked(x, z, doors) {
+  var r = CARGO_RADIUS;
+  for (var i = 0; i < LAYOUT_OBSTACLES.length; i++) {
+    var o = LAYOUT_OBSTACLES[i];
+    if (x > o[0] - r && x < o[1] + r && z > o[2] - r && z < o[3] + r) return true;
+  }
+  if (doors) {
+    for (var d = 0; d < BULKHEAD_Z.length && d < doors.length; d++) {
+      if (doors[d].open) continue;
+      if (x > HATCH_X[d] - HATCH_HALF - r && x < HATCH_X[d] + HATCH_HALF + r && z > BULKHEAD_Z[d] - WALL_HALF - r && z < BULKHEAD_Z[d] + WALL_HALF + r) return true;
+    }
+  }
+  return false;
+}
+
 // ---- Coupled actions: the Rule of Two Players framework (E4-02) ----------------------------------------------------
 // A critical action needs TWO commands, far apart, activated by two DIFFERENT players within a window of 3 s (GDD 3.4). Actions are
 // DATA (COUPLED_ACTIONS); the engine below is generic: it tracks each action independently (several can be pending at once), validates
@@ -259,8 +276,11 @@ function newCargo() {
 
 // A thrown item (E2-04): ballistic in the boat's frame (gravity only, no boat inertia), bounces on the walls, lands on the floor and then
 // slides like any loose cargo. Deterministic: plain arithmetic on the tick.
-function flyStep(c) {
+function flyStep(c, doors) {
+  var ox = c.x, oz = c.z;
   c.x += c.vx * DT; c.z += c.vz * DT;
+  if (cargoBlocked(c.x, oz, doors)) { c.x = ox; c.vx = -c.vx * THROW_BOUNCE; }          // E2-01: bulkheads, baffles and closed hatches stop a thrown item
+  if (cargoBlocked(c.x, c.z, doors)) { c.z = oz; c.vz = -c.vz * THROW_BOUNCE; }
   c.vy -= GRAVITY * DT;
   c.y += c.vy * DT;
   if (c.x < -HALF_X || c.x > HALF_X) { c.x = clamp(c.x, -HALF_X, HALF_X); c.vx = -c.vx * THROW_BOUNCE; }
@@ -268,7 +288,7 @@ function flyStep(c) {
   if (c.y <= 0) { c.y = 0; c.vy = 0; c.fly = false; c.vx *= THROW_LAND_KEEP; c.vz *= THROW_LAND_KEEP; }
 }
 
-function slideStep(c, up) {
+function slideStep(c, up, doors) {
   var ax = -GRAVITY * up.x, az = -GRAVITY * up.z, amag = Math.sqrt(ax * ax + az * az);
   var vmag = Math.sqrt(c.vx * c.vx + c.vz * c.vz);
   var dirx, dirz;
@@ -280,7 +300,10 @@ function slideStep(c, up) {
   var nvz = c.vz + (az - FRICTION * GRAVITY * dirz) * DT;
   if (vmag >= 1e-6 && (nvx * c.vx + nvz * c.vz) <= 0) { nvx = 0; nvz = 0; } // friction stopped it
   c.vx = nvx; c.vz = nvz;
+  var ox = c.x, oz = c.z;
   c.x += c.vx * DT; c.z += c.vz * DT;
+  if (cargoBlocked(c.x, oz, doors)) { c.x = ox; c.vx = 0; }                          // E2-01: a sliding crate stops against a bulkhead
+  if (cargoBlocked(c.x, c.z, doors)) { c.z = oz; c.vz = 0; }
   if (c.x < -HALF_X || c.x > HALF_X) { c.x = clamp(c.x, -HALF_X, HALF_X); c.vx = 0; }
   if (c.z < -HALF_Z || c.z > HALF_Z) { c.z = clamp(c.z, -HALF_Z, HALF_Z); c.vz = 0; }
 }
@@ -294,7 +317,7 @@ function updateCargo(state, tick) {
       if (tick >= c.respawnTick) { c.active = true; c.x = c.homeX; c.z = c.homeZ; c.vx = 0; c.vz = 0; }
       continue;
     }
-    if (c.fly) { flyStep(c); continue; }                          // thrown: in the air until it lands
+    if (c.fly) { flyStep(c, state.water.doors); continue; }                          // thrown: in the air until it lands
     if (c.pend !== "" && tick - c.pendTick >= INTERLOCK_WINDOW_TICKS) c.pend = ""; // second carrier too late
     // A carrier that left the match releases the cargo
     var alive = [];
@@ -307,7 +330,7 @@ function updateCargo(state, tick) {
       var pa = state.players[c.carriers[0]], pb = state.players[c.carriers[1]];
       c.x = (pa.x + pb.x) / 2; c.z = (pa.z + pb.z) / 2; c.vx = 0; c.vz = 0;
     } else {
-      slideStep(c, up);
+      slideStep(c, up, state.water.doors);
     }
   }
 }
@@ -1810,7 +1833,7 @@ if (typeof module !== "undefined" && module.exports) {
     TICK_RATE: TICK_RATE, DT: DT, STATIONS: STATIONS, STATION_REACH: STATION_REACH, INTERLOCK_WINDOW_TICKS: INTERLOCK_WINDOW_TICKS, MAX_ALLOWANCE: MAX_ALLOWANCE, MOVE_SPEED: MOVE_SPEED, HALF_X: HALF_X, HALF_Z: HALF_Z,
     OP_INPUT: OP_INPUT, OP_STATE: OP_STATE,
     PLAYER_RADIUS: PLAYER_RADIUS, BULKHEAD_Z: BULKHEAD_Z, HATCH_X: HATCH_X, HATCH_HALF: HATCH_HALF, WALL_HALF: WALL_HALF, BAFFLE_HALF_X: BAFFLE_HALF_X, BAFFLE_HALF_Z: BAFFLE_HALF_Z, BAFFLE_OFFSET: BAFFLE_OFFSET,
-    LAYOUT_OBSTACLES: LAYOUT_OBSTACLES, layoutBlocked: layoutBlocked, hatchToggle: hatchToggle, hatchOccupied: hatchOccupied, CONTROLS: CONTROLS,
+    LAYOUT_OBSTACLES: LAYOUT_OBSTACLES, cargoBlocked: cargoBlocked, CARGO_RADIUS: CARGO_RADIUS, layoutBlocked: layoutBlocked, hatchToggle: hatchToggle, hatchOccupied: hatchOccupied, CONTROLS: CONTROLS,
     LEVER_COVER_TICKS: LEVER_COVER_TICKS, SINK_RATE_MAX: SINK_RATE_MAX, SINK_RAMP_SECONDS: SINK_RAMP_SECONDS, newBoat: newBoat, boatStep: boatStep,
     VALVE_TURN_RATE: VALVE_TURN_RATE, reactorBreakPump: reactorBreakPump, reactorRepairPump: reactorRepairPump,
     RESTART_VALVE_MIN: RESTART_VALVE_MIN,
