@@ -9,13 +9,13 @@ const BOW = 0, STERN = NC - 1;
 const run = (w, secs) => { for (let i = 0; i < Math.round(secs * m.TICK_RATE); i++) m.waterStep(w); };
 const close = (a, b, eps, msg) => assert.ok(Math.abs(a - b) <= eps, (msg || "") + " " + a + " vs " + b);
 
-test("six compartments in a line, from the bow (+z) to the stern (-z), covering the 20 m of the boat without gaps", () => {
+test("six compartments in a line, from the bow (+z) to the stern (-z), covering the 28 m of the boat without gaps", () => {
   assert.strictEqual(NC, 6);
   for (let i = 0; i < NC; i++) assert.ok(m.WATER_COMPARTMENTS[i].z0 < m.WATER_COMPARTMENTS[i].z1 && m.WATER_COMPARTMENTS[i].volume > 0);
   for (let i = 0; i < NC - 1; i++) close(m.WATER_COMPARTMENTS[i].z0, m.WATER_COMPARTMENTS[i + 1].z1, 1e-9, "contiguous");
   close(m.WATER_COMPARTMENTS[0].z1, m.HALF_Z, 1e-9); close(m.WATER_COMPARTMENTS[NC - 1].z0, -m.HALF_Z, 1e-9);
-  assert.strictEqual(m.compartmentAt(9), 0); assert.strictEqual(m.compartmentAt(-1.7), 3);   // the RK-1 panel is in the reactor compartment
-  assert.strictEqual(m.compartmentAt(-9), NC - 1);
+  assert.strictEqual(m.compartmentAt(12), 0); assert.strictEqual(m.compartmentAt(7), 1); assert.strictEqual(m.compartmentAt(-1.7), 3);   // the RK-1 panel is in the reactor compartment
+  assert.strictEqual(m.compartmentAt(-9), NC - 1); assert.strictEqual(m.compartmentAt(-5), 4);
 });
 
 test("an empty boat has no trim and no list", () => {
@@ -47,7 +47,8 @@ test("with every opening open the water spreads along the whole boat", () => {
   const w = m.newWater();
   m.waterAdd(w, BOW, 36, 0);
   run(w, 600);
-  for (let i = 0; i < NC; i++) close(w.comps[i].w, 6, 0.05, "compartment " + i);
+  const totalVolume = m.WATER_COMPARTMENTS.reduce((a, c) => a + c.volume, 0);                     // the level equalises: water is shared in proportion to the volume
+  for (let i = 0; i < NC; i++) close(w.comps[i].w, 36 * m.WATER_COMPARTMENTS[i].volume / totalVolume, 0.05, "compartment " + i);
   close(m.waterTotal(w), 36, 1e-9);
 });
 
@@ -89,7 +90,7 @@ test("trim: water at the bow puts the bow down, at the stern puts it up, and the
   assert.ok(m.waterTilt(a).trim > 1, "bow down is positive pitch: " + m.waterTilt(a).trim);
   assert.ok(m.waterTilt(b).trim < -1);
   assert.ok(m.waterTilt(c).trim > m.waterTilt(a).trim);
-  close(m.waterTilt(a).trim, -m.waterTilt(b).trim, 1e-9, "symmetric");
+  close(m.waterTilt(a).trim * 11, -m.waterTilt(b).trim * 12, 1e-6, "the moment follows the lever arm (the compartments centres are at z = +12 and -11)");
 });
 
 test("trim: water amidships (symmetric around the centre) does not trim the boat", () => {
@@ -135,7 +136,7 @@ test("the broadcast view carries every compartment, the tilt offsets and the ope
   m.waterSetDoor(w, 1, false);
   const v = m.waterView(w);
   assert.strictEqual(v.l.length, NC); assert.strictEqual(v.dr.length, NC - 1);
-  close(v.l[BOW], 0.5, 1e-9);
+  close(v.l[BOW], 20 / m.WATER_COMPARTMENTS[BOW].volume, 1e-3);
   close(v.m, 20, 0.05);
   assert.ok(v.tr > 0 && v.li < 0);
   assert.deepStrictEqual(v.dr, [1, 0, 1, 1, 1]);

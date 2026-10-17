@@ -7,10 +7,11 @@ const assert = require("node:assert");
 const fs = require("node:fs");
 const path = require("node:path");
 const { createMatch, simulate, m } = require("./sim-harness.js");
+const { route } = require("./route.js");
 
 const IDS = ["a", "b", "c"];
 const TICKS = 3000;                         // 5 minutes of play
-const GOLDEN_DIGEST = "19a73f11c9e3f37b";
+const GOLDEN_DIGEST = "bc44026615671518";
 
 // A small deterministic generator for the scripted "monkey" players (never Math.random).
 function lcg(seed) { let s = seed >>> 0; return () => { s = (Math.imul(s, 1664525) + 1013904223) >>> 0; return s / 4294967296; }; }
@@ -21,7 +22,7 @@ function waypoints() {
   for (const c of m.CONTROLS) pts.push({ x: c.x - 0.4, z: c.z });
   for (const a of m.COUPLED_ACTIONS) { pts.push({ x: a.a.x, z: a.a.z }); pts.push({ x: a.b.x, z: a.b.z }); }
   for (const p of m.BILGE_PUMPS) pts.push({ x: p.x * 0.8, z: p.z });
-  pts.push({ x: 1.0, z: 5.5 }, { x: 0, z: 0 }, { x: -2, z: -5 }, { x: 2, z: 3 });                // toolbox, centre, cargo areas
+  pts.push({ x: -0.8, z: 4.9 }, { x: 0, z: 2 }, { x: -2, z: -7.2 }, { x: 2, z: 3 });                // toolbox, spawn area, cargo areas
   return pts;
 }
 
@@ -36,10 +37,13 @@ function monkeyScript(seed) {
       const out = [];
       for (const id of IDS) {
         if (tick % 80 === 0) target[id] = pts[Math.floor(rnd() * pts.length)];
-        const p = state.players[id], dx = target[id].x - p.x, dz = target[id].z - p.z, d = Math.hypot(dx, dz);
-        const near = d < 0.3;
+        const p = state.players[id], goal = route(m, p, target[id]);                      // through the hatches and around the baffles (E10-01)
+        let w = goal[0];
+        if (goal.length > 1 && Math.hypot(w.x - p.x, w.z - p.z) < 0.12) w = goal[1];
+        const dx = w.x - p.x, dz = w.z - p.z, d = Math.hypot(dx, dz);
+        const near = Math.hypot(target[id].x - p.x, target[id].z - p.z) < 0.3;
         const r = rnd();
-        out.push({ id, input: { seq: ++seq[id], mx: near ? 0 : dx / d, mz: near ? 0 : dz / d, act: near && r < 0.25, hold: near && r > 0.6, grab: r > 0.97 } });
+        out.push({ id, input: { seq: ++seq[id], mx: near || d < 1e-9 ? 0 : dx / d, mz: near || d < 1e-9 ? 0 : dz / d, act: near && r < 0.25, hold: near && r > 0.6, grab: r > 0.97 } });
       }
       return out;
     },

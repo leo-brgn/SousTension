@@ -48,21 +48,20 @@ namespace SousTension.Spikes.MovingFrame.Tests
         [Test]
         public void Step_MatchesServerConstants()
         {
-            float x = 0, z = 0;
+            float x = 0, z = 2;                                    // the radio compartment: no wall around
             CharacterMotion.Step(ref x, ref z, 1, 0);
             Assert.AreEqual(0.3f, x, 1e-6f);
-            Assert.AreEqual(0f, z, 1e-6f);
+            Assert.AreEqual(2f, z, 1e-6f);
         }
 
         [Test]
         public void Step_NormalisesDiagonalAndClampsToInterior()
         {
-            float x = 0, z = 0;
+            float x = 0, z = 2;
             CharacterMotion.Step(ref x, ref z, 1, 1);
-            Assert.AreEqual(0.3f, (float)Math.Sqrt(x * x + z * z), 1e-5f);
-            for (int i = 0; i < 500; i++) CharacterMotion.Step(ref x, ref z, 1, 1);
-            Assert.AreEqual(CharacterMotion.HalfX, x, 1e-5f);
-            Assert.AreEqual(CharacterMotion.HalfZ, z, 1e-5f);
+            Assert.AreEqual(0.3f, (float)Math.Sqrt(x * x + (z - 2) * (z - 2)), 1e-5f);
+            for (int i = 0; i < 500; i++) CharacterMotion.Step(ref x, ref z, 1, 0);
+            Assert.AreEqual(CharacterMotion.HalfX - BoatLayout.PlayerRadius, x, 1e-5f);         // the interior minus the player's radius (walls: see BoatLayoutTests)
         }
     }
 
@@ -118,7 +117,25 @@ namespace SousTension.Spikes.MovingFrame.Tests
             c.Tick(0.35f);                 // 3 whole ticks of 0.1 s
             Assert.AreEqual(3, net.Sent.Count);
             Assert.AreEqual(new[] { 1, 2, 3 }, new[] { net.Sent[0].seq, net.Sent[1].seq, net.Sent[2].seq });
-            Assert.AreEqual(0.9f, model.LocalX, 1e-5f);
+            Assert.AreEqual(1.05f, model.LocalX, 1e-5f, "3 whole steps (0.9) + the half step of the 0.05 s that has elapsed since the last tick: the camera moves every frame");
+        }
+
+        [Test]
+        public void ASmallServerCorrectionIsNotSnappedOnScreen_AndALargeOneIs()
+        {
+            var net = new FakeNetwork(); var clock = new FakeClock(); var model = new MovingFrameModel();
+            var c = new MovingFrameController(net, new ConstantInput { Mx = 1 }, clock, model);
+            net.Enqueue(Snapshot(1, new PlayerState("me", 0, 0, 0)));
+            c.Tick(0.0f);
+            c.Tick(0.3f);                                                      // 3 steps: drawn at 0.9
+            float before = model.LocalX;
+            net.Enqueue(Snapshot(2, new PlayerState("me", 0.6f, 0, 3)));       // the server disagrees by 0.3 m
+            c.Tick(0.0f);
+            Assert.AreEqual(before, model.LocalX, 1e-4f, "what is drawn does not jump: the offset fades out over a few frames");
+            for (int i = 0; i < 60; i++) c.Tick(0.016f);
+            net.Enqueue(Snapshot(3, new PlayerState("me", 20f, 0, 3)));        // a teleport: shown at once
+            c.Tick(0.0f);
+            Assert.GreaterOrEqual(model.LocalX, 19.9f);
         }
 
         [Test]
@@ -164,7 +181,7 @@ namespace SousTension.Spikes.MovingFrame.Tests
             c.Tick(0f);
             c.Tick(0.35f);                                       // local prediction moves 3 steps: x = 0.9
             Assert.IsTrue(model.TryGetCargoRenderPosition("mine", 0.1, out float x, out float z));
-            Assert.AreEqual(0.9f, x, 1e-5f);                     // follows the prediction, not the stale snapshot
+            Assert.AreEqual(1.05f, x, 1e-5f);                    // follows the drawn prediction (0.9 + half a step), not the stale snapshot
             Assert.IsTrue(model.TryGetCargoRenderPosition("loose", 0.1, out x, out z));
             Assert.AreEqual(2f, x); Assert.AreEqual(3f, z);
         }
@@ -492,7 +509,7 @@ namespace SousTension.Spikes.MovingFrame.Tests
             Assert.AreEqual(1f - 0.012f * 3f, CarryLoad.SpeedFactor(CarryLoad.ItemMass("patch") + CarryLoad.ItemMass("bucket")), 1e-6f);
             Assert.AreEqual(1f - 0.012f * 20f, CarryLoad.SpeedFactor(CarryLoad.ItemMass("fuel") / 2f), 1e-6f);   // the flask is shared by two
             Assert.AreEqual(0.5f, CarryLoad.SpeedFactor(500f), 1e-6f);
-            float x = 0, z = 0, x2 = 0, z2 = 0;
+            float x = 0, z = 2, x2 = 0, z2 = 2;
             CharacterMotion.Step(ref x, ref z, 1, 0);
             CharacterMotion.Step(ref x2, ref z2, 1, 0, 0.5f);
             Assert.AreEqual(x * 0.5f, x2, 1e-6f);

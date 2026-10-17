@@ -28,7 +28,7 @@ function simStep(state, tick) {
     while (pl.allowance >= 1 && pl.queue.length > 0) {
       var next = pl.queue.shift();
       if (next.ry !== null) pl.yaw = next.ry;
-      stepPlayer(pl, next.mx, next.mz, carrySpeedFactor(state, state.order[k]));
+      stepPlayer(pl, next.mx, next.mz, carrySpeedFactor(state, state.order[k]), state.water.doors);
       if (next.act) { if (next.use) useTarget(state, state.order[k], pl, tick, next.use); else tryAct(state, state.order[k], pl, tick); }
       if (next.hold) { if (next.use) holdTarget(state, pl, next.use); else tryHold(state, pl); }
       if (next.dbg) debugCommand(state, state.order[k], pl, next.dbg, tick);

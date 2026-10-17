@@ -19,6 +19,9 @@ namespace SousTension.Sim
         public float Z { get; private set; }
         public int PendingCount => _pending.Count;
 
+        /// <summary>Hatch states of the latest server snapshot (null: all open): closed hatches block the prediction as they do on the server.</summary>
+        public bool[] DoorsOpen { get; set; }
+
         public void Reset(float x, float z)
         {
             X = x; Z = z; _pending.Clear();
@@ -29,7 +32,7 @@ namespace SousTension.Sim
         {
             int seq = _nextSeq++;
             float x = X, z = Z;
-            CharacterMotion.Step(ref x, ref z, mx, mz, speedFactor);
+            CharacterMotion.Step(ref x, ref z, mx, mz, speedFactor, DoorsOpen);
             X = x; Z = z;
             _pending.Add(new Pending { Seq = seq, Mx = mx, Mz = mz, Factor = speedFactor });
             return seq;
@@ -41,7 +44,7 @@ namespace SousTension.Sim
             float oldX = X, oldZ = Z;
             _pending.RemoveAll(p => p.Seq <= ackedSeq);
             float x = serverX, z = serverZ;
-            foreach (var p in _pending) CharacterMotion.Step(ref x, ref z, p.Mx, p.Mz, p.Factor);
+            foreach (var p in _pending) CharacterMotion.Step(ref x, ref z, p.Mx, p.Mz, p.Factor, DoorsOpen);
             X = x; Z = z;
             float dx = X - oldX, dz = Z - oldZ;
             return (float)Math.Sqrt(dx * dx + dz * dz);

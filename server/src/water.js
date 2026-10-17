@@ -1,16 +1,16 @@
 // ---- Water by volume per compartment and the boat's trim / list (E6-01) -----------------------------------------------------
 // GDD 8: water is simulated as a VOLUME per compartment plus a centre of mass (no fluid). Six compartments in a line from the bow (+z)
-// to the stern (-z) over the 20 m of the spike. Water never appears or disappears except through the explicit API (waterAdd for
+// to the stern (-z) over the 28 m of the 3D boat (E10-01: 4/6/4/4/4/6 m, layout.js). Water never appears or disappears except through the explicit API (waterAdd for
 // leaks, waterRemove for bilge pumps: E6-02 / E6-03); it flows between neighbouring compartments through OPEN bulkhead openings in
 // proportion to the level difference. Its weight shifts the centre of mass, which adds a trim (pitch) and a list (roll) to the scripted
 // swell of the boat (BoatMotion). Deterministic: pure arithmetic on the tick, no randomness.
 var WATER_COMPARTMENTS = [
-  { id: "torpilles", z0: 20 / 3, z1: 10, volume: 40 },            // 1 bow
-  { id: "central", z0: 10 / 3, z1: 20 / 3, volume: 40 },          // 2
-  { id: "radio", z0: 0, z1: 10 / 3, volume: 40 },                 // 3
-  { id: "reacteur", z0: -10 / 3, z1: 0, volume: 40 },             // 4
-  { id: "machines", z0: -20 / 3, z1: -10 / 3, volume: 40 },       // 5
-  { id: "vie", z0: -10, z1: -20 / 3, volume: 40 }                 // 6 stern
+  { id: "torpilles", z0: 10, z1: 14, volume: 48 },                 // 1 bow          (volume = length x 6 m wide x 2 m deep)
+  { id: "central", z0: 4, z1: 10, volume: 72 },                   // 2
+  { id: "radio", z0: 0, z1: 4, volume: 48 },                      // 3
+  { id: "reacteur", z0: -4, z1: 0, volume: 48 },                  // 4
+  { id: "machines", z0: -8, z1: -4, volume: 48 },                 // 5
+  { id: "vie", z0: -14, z1: -8, volume: 72 }                      // 6 stern
 ];
 var WATER_HEIGHT = 2.0;            // m: a full compartment is 2 m deep, so level = volume / (capacity / 2)
 var WATER_FLOW = 2.0;              // m3/s per metre of level difference through an open bulkhead opening (time constant ~5 s)

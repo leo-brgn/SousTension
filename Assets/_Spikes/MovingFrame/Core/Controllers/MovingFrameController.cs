@@ -26,6 +26,9 @@ namespace SousTension.Spikes.MovingFrame
         private readonly Dictionary<int, double> _sendTimes = new Dictionary<int, double>();
 
         private double _accumulator;
+        private float _offsetX, _offsetZ;          // visual offset left by a server correction: it fades out instead of snapping the camera
+        private const float CorrectionHalfLife = 0.08f;    // s: the smoothing of a correction
+        private const float SnapDistance = 1.5f;           // m: a larger correction (teleport, respawn) is shown at once
         private bool _initialized;
         private int _lastAcked;
         private bool _prevAct, _prevGrab, _prevUse, _prevTake, _prevDrop, _prevStow, _prevThrow, _prevNext, _prevPrev;
@@ -81,7 +84,18 @@ namespace SousTension.Spikes.MovingFrame
                 _net.SendInput(seq, mx, mz, act, grab, actHeld, use, hand, _look != null ? _look.Yaw : 0f, _console?.TakeCommand());   // one debug command per tick   // hold = key still down: valve wheels turn while it is held
             }
             if (ticks == MaxCatchUpTicks) _accumulator = 0; // drop backlog after a long stall
-            _model.SetLocal(_prediction.X, _prediction.Z);
+            // What is drawn: the predicted position of the last tick plus the part of the next step that has already elapsed (the input is sampled every
+            // frame), plus the fading offset of the last correction. The simulation stays at 10 Hz; the camera moves at the frame rate.
+            float fade = (float)Math.Exp(-deltaTime * 0.6931f / CorrectionHalfLife);
+            _offsetX *= fade; _offsetZ *= fade;
+            float rx = _prediction.X, rz = _prediction.Z;
+            if (_accumulator > 0.0)
+            {
+                _input.Read(out float imx, out float imz, out _, out _);
+                float alpha = (float)(_accumulator / SimClock.TickSeconds);
+                CharacterMotion.Step(ref rx, ref rz, imx, imz, _model.LocalCarryFactor() * alpha, _prediction.DoorsOpen);
+            }
+            _model.SetLocal(rx + _offsetX, rz + _offsetZ);
         }
 
         private void OnState(StateSnapshot snapshot)
@@ -96,6 +110,7 @@ namespace SousTension.Spikes.MovingFrame
             _model.SetBoat(snapshot.Boat);
             _model.SetRestart(snapshot.Restart);
             _model.SetWater(snapshot.Water);
+            if (snapshot.Water.Valid) _prediction.DoorsOpen = snapshot.Water.DoorOpen;       // closed hatches are walls for the prediction too (E10-01)
             _model.SetLeaks(snapshot.Leaks);
             _model.SetBilge(snapshot.Bilge);
             _model.SetGrid(snapshot.Grid);
@@ -112,12 +127,15 @@ namespace SousTension.Spikes.MovingFrame
                 }
                 else
                 {
+                    float beforeX = _prediction.X, beforeZ = _prediction.Z;
                     float correction = _prediction.Reconcile(p.X, p.Z, p.Seq);
+                    if (correction < SnapDistance) { _offsetX += beforeX - _prediction.X; _offsetZ += beforeZ - _prediction.Z; }     // keep what is drawn, fade to the corrected place
+                    else { _offsetX = 0f; _offsetZ = 0f; }
                     _model.LastCorrection = correction;
                     if (correction > _model.MaxCorrection) _model.MaxCorrection = correction;
                 }
                 RecordAckLatency(p.Seq);
-                _model.SetLocal(_prediction.X, _prediction.Z);
+                _model.SetLocal(_prediction.X + _offsetX, _prediction.Z + _offsetZ);
                 break;
             }
         }

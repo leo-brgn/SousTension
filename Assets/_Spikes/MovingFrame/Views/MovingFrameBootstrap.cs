@@ -60,6 +60,8 @@ namespace SousTension.Spikes.MovingFrame
             // Views
             var boat = BuildBoat();
             boat.Bind(model, clock, new BoatMotion());
+            var environment = BoatEnvironmentView.TryCreate(boat.transform, model);             // the 3D boat; null without the art: the primitive blockout stays
+            if (environment == null) BuildBlockout(boat.transform);
             var cam = BuildCamera();
             aim.Bind(cam);
             new GameObject("Hands").AddComponent<HandsView>().Bind(model, cam);
@@ -77,6 +79,8 @@ namespace SousTension.Spikes.MovingFrame
             new GameObject("BreakerPanel").AddComponent<BreakerPanelView>().Bind(model, boat.transform);
             new GameObject("Telegraph").AddComponent<TelegraphView>().Bind(model, boat.transform);
             new GameObject("GridLighting").AddComponent<GridLightingView>().Bind(model);
+            string tourDir = CommandLineValue("--tour=");
+            if (!string.IsNullOrEmpty(tourDir)) new GameObject("ShotTour").AddComponent<ShotTourView>().Bind(model, console, input, tourDir);
             _hud = new GameObject("MetricsHud").AddComponent<MetricsHudView>();
             _hud.Bind(model, network, _controller, clock);
             Cursor.lockState = CursorLockMode.Locked;
@@ -105,18 +109,28 @@ namespace SousTension.Spikes.MovingFrame
         private static BoatView BuildBoat()
         {
             var root = new GameObject("Boat");
-            Piece(root.transform, "Floor", new Vector3(0, -0.1f, 0), new Vector3(2 * CharacterMotion.HalfX + 0.4f, 0.2f, 2 * CharacterMotion.HalfZ + 0.4f), new Color(0.35f, 0.4f, 0.35f));
-            Piece(root.transform, "WallL", new Vector3(-CharacterMotion.HalfX - 0.2f, 1.25f, 0), new Vector3(0.2f, 2.5f, 2 * CharacterMotion.HalfZ + 0.4f), new Color(0.45f, 0.55f, 0.45f));
-            Piece(root.transform, "WallR", new Vector3(CharacterMotion.HalfX + 0.2f, 1.25f, 0), new Vector3(0.2f, 2.5f, 2 * CharacterMotion.HalfZ + 0.4f), new Color(0.45f, 0.55f, 0.45f));
-            Piece(root.transform, "WallBow", new Vector3(0, 1.25f, CharacterMotion.HalfZ + 0.2f), new Vector3(2 * CharacterMotion.HalfX + 0.4f, 2.5f, 0.2f), new Color(0.6f, 0.45f, 0.35f));
-            Piece(root.transform, "WallStern", new Vector3(0, 1.25f, -CharacterMotion.HalfZ - 0.2f), new Vector3(2 * CharacterMotion.HalfX + 0.4f, 2.5f, 0.2f), new Color(0.75f, 0.2f, 0.2f));
-            // Fixed reference cubes inside the boat: they must not slide relative to the floor.
-            for (int i = -2; i <= 2; i++) Piece(root.transform, "Marker" + i, new Vector3(i * 1.2f, 0.3f, i * 4f), Vector3.one * 0.6f, Color.HSVToRGB((i + 2) / 5f, 0.7f, 0.9f));
             // A static "world" reference outside the boat to feel the motion.
             var world = SpikePrimitives.Create(PrimitiveType.Plane);
             world.name = "WorldGround"; world.transform.position = new Vector3(0, -6f, 0); world.transform.localScale = Vector3.one * 10f;
             world.GetComponent<Renderer>().material.color = new Color(0.15f, 0.25f, 0.5f);
             return root.AddComponent<BoatView>();
+        }
+
+        /// <summary>Primitive blockout of the boat (floor, hull, bulkheads with their hatches and baffles), used only when the 3D art is not available.</summary>
+        private static void BuildBlockout(Transform boat)
+        {
+            var root = new GameObject("Blockout").transform;
+            root.SetParent(boat, false);
+            Piece(root, "Floor", new Vector3(0, -0.1f, 0), new Vector3(2 * CharacterMotion.HalfX + 0.4f, 0.2f, 2 * CharacterMotion.HalfZ + 0.4f), new Color(0.35f, 0.4f, 0.35f));
+            Piece(root, "WallL", new Vector3(-CharacterMotion.HalfX - 0.2f, 1.25f, 0), new Vector3(0.2f, 2.5f, 2 * CharacterMotion.HalfZ + 0.4f), new Color(0.45f, 0.55f, 0.45f));
+            Piece(root, "WallR", new Vector3(CharacterMotion.HalfX + 0.2f, 1.25f, 0), new Vector3(0.2f, 2.5f, 2 * CharacterMotion.HalfZ + 0.4f), new Color(0.45f, 0.55f, 0.45f));
+            Piece(root, "WallBow", new Vector3(0, 1.25f, CharacterMotion.HalfZ + 0.2f), new Vector3(2 * CharacterMotion.HalfX + 0.4f, 2.5f, 0.2f), new Color(0.6f, 0.45f, 0.35f));
+            Piece(root, "WallStern", new Vector3(0, 1.25f, -CharacterMotion.HalfZ - 0.2f), new Vector3(2 * CharacterMotion.HalfX + 0.4f, 2.5f, 0.2f), new Color(0.75f, 0.2f, 0.2f));
+            for (int i = 0; i < BoatLayout.ObstacleCount; i++)                       // the bulkhead walls and the baffles, the very rectangles that block the players
+            {
+                BoatLayout.GetObstacle(i, out float x0, out float x1, out float z0, out float z1);
+                Piece(root, "Wall" + i, new Vector3((x0 + x1) / 2f, 1.25f, (z0 + z1) / 2f), new Vector3(x1 - x0, 2.5f, z1 - z0), new Color(0.45f, 0.55f, 0.45f));
+            }
         }
 
         private static void Piece(Transform parent, string name, Vector3 localPos, Vector3 scale, Color color)
@@ -133,6 +147,12 @@ namespace SousTension.Spikes.MovingFrame
             var cam = existing != null ? existing : new GameObject("Main Camera", typeof(Camera), typeof(AudioListener)).GetComponent<Camera>();
             cam.tag = "MainCamera"; cam.nearClipPlane = 0.05f;
             return cam;
+        }
+
+        private static string CommandLineValue(string prefix)
+        {
+            foreach (var a in Environment.GetCommandLineArgs()) if (a.StartsWith(prefix)) return a.Substring(prefix.Length);
+            return null;
         }
 
         private static void ParseArgs(out string device, out float latency, out float jitter, out float loss, out string host, out int port)

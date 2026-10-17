@@ -123,18 +123,18 @@ test("a broken pump cannot be started, shows broken, and a repaired one stays of
 test("one pump holds a medium leak (and bails the water already aboard), two pumps in two compartments still cannot hold a large one", () => {
   const medium = setup();
   closeAllDoors(medium);
-  m.leakCreate(medium.state.leaks, m.WATER_COMPARTMENTS[1].z0 + 1, 1, 2);          // 0.08 m3/s in the compartment of pump 0
-  m.waterAdd(medium.state.water, 1, 5, 0);
+  m.leakCreate(medium.state.leaks, m.WATER_COMPARTMENTS[m.BILGE_PUMPS[0].comp].z0 + 1, 1, 2);          // 0.08 m3/s in the compartment of pump 0
+  m.waterAdd(medium.state.water, m.BILGE_PUMPS[0].comp, 5, 0);
   pumpOn(medium, 0);
   ticks(medium, 1500);                                                          // 150 s
-  assert.ok(medium.state.water.comps[1].w < 0.05, "the pump (0.15) outruns the medium leak (0.08): " + medium.state.water.comps[1].w);
+  assert.ok(medium.state.water.comps[m.BILGE_PUMPS[0].comp].w < 0.05, "the pump (0.15) outruns the medium leak (0.08): " + medium.state.water.comps[m.BILGE_PUMPS[0].comp].w);
 
   const large = setup();
   closeAllDoors(large);
-  m.leakCreate(large.state.leaks, m.WATER_COMPARTMENTS[1].z0 + 1, 1, 3);           // 0.25 m3/s against one 0.15 m3/s pump
+  m.leakCreate(large.state.leaks, m.WATER_COMPARTMENTS[m.BILGE_PUMPS[0].comp].z0 + 1, 1, 3);           // 0.25 m3/s against one 0.15 m3/s pump
   pumpOn(large, 0); pumpOn(large, 1);
   ticks(large, 300);                                                            // 30 s
-  close(large.state.water.comps[1].w, 30 * (m.LEAK_RATES[3] - m.BILGE_CAPACITY), 1e-6, "net +0.1 m3/s");
+  close(large.state.water.comps[m.BILGE_PUMPS[0].comp].w, 30 * (m.LEAK_RATES[3] - m.BILGE_CAPACITY), 1e-6, "net +0.1 m3/s");
 });
 
 test("bucket: a player carrying it scoops 15 L from the flooded compartment per press, not faster than the cooldown", () => {

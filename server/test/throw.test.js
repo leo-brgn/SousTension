@@ -34,7 +34,7 @@ test("every item has a mass in data, and an empty-handed player walks at full sp
   for (const k of Object.keys(m.ITEM_KINDS)) assert.ok(m.ITEM_KINDS[k].mass > 0, k);
   const c = setup();
   assert.strictEqual(m.carrySpeedFactor(c.state, "a"), 1);
-  at(c, "a", -2, 0);
+  at(c, "a", -2, 2);
   close(walkDistance(c, "a", 10), 10 * m.MOVE_SPEED * m.DT, 1e-9);
 });
 
@@ -54,7 +54,7 @@ test("carrying slows you down: 1 - 0.012 per kg, a crate costs 14 %, a patch plu
 test("the distance walked per tick follows the factor on the server (what the client predicts)", () => {
   const c = setup();
   take(c, "a", "crate1");
-  at(c, "a", -2.5, 0);
+  at(c, "a", -2.5, 2);
   const f = m.carrySpeedFactor(c.state, "a");
   close(walkDistance(c, "a", 10), 10 * m.MOVE_SPEED * f * m.DT, 1e-9);
   assert.ok(f < 1);

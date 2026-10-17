@@ -1,28 +1,65 @@
+using SousTension.Sim;
 using UnityEngine;
 
 namespace SousTension.Spikes.MovingFrame
 {
     /// <summary>
-    /// Passive, diegetic SCRAM station (no HUD): a big red lever under a sealed cover, on the left wall of compartment 4, 1 m from the
-    /// RK-1 selector (boat-local x = -2.9, z = -2.7; the interaction point is in server/src/controls.js), plus a depth needle gauge and the
-    /// restart procedure lamps. Cover, lever and depth come from the authoritative state. The blackout after a SCRAM is no longer faked here:
+    /// Passive, diegetic SCRAM station (no HUD): a big lever under a sealed cover, on the left wall of compartment 4 (reactor), 1 m from the RK-1 selector
+    /// (boat-local x = -2.7, z = -0.8; the interaction point is in server/src/controls.js, mirrored by <see cref="ControlLayout"/>), plus a depth needle
+    /// gauge and the restart procedure lamps. Cover, lever and depth come from the authoritative state. The blackout after a SCRAM is no longer faked here:
     /// the lights follow the electrical network's bus voltage (GridLightingView, E3-07), which the SCRAM drops to zero.
-    /// Built from primitives for the spike; the real lever art is E11-08 (Models/Reactor/ScramLever.fbx).
+    /// With the 3D boat (BoatEnvironmentView) the lever and the cover are the art's (Models/Reactor/ScramLever.fbx), animated about their hinges;
+    /// without it the station is built from primitives.
     /// </summary>
     public sealed class ScramLeverView : MonoBehaviour
     {
         private const float WallX = -2.88f;
-        private static readonly Vector3 Centre = new Vector3(WallX, 1.2f, -2.7f);
+        private static readonly Vector3 Centre = new Vector3(WallX, 1.2f, ControlLayout.ScramZ);
         private const float DepthDialMax = 10f;        // m, full-scale of the depth needle
 
         private MovingFrameModel _model;
-        private Transform _cover, _lever, _depthNeedle;
+        private Transform _cover, _lever, _depthNeedle;          // primitive mode
+        private PartRig _artCover, _artLever, _artNeedle;        // art mode
         private readonly Renderer[] _stepLamps = new Renderer[3];
         private float _coverAngle, _leverAngle;
 
         public void Bind(MovingFrameModel model, Transform boat)
         {
             _model = model;
+            var env = BoatEnvironmentView.Current;
+            var wrapper = env != null ? env.Nearest("ScramLever", ControlLayout.ScramX, ControlLayout.ScramZ) : null;
+            if (wrapper != null) BindArt(wrapper); else BindPrimitives(boat);
+        }
+
+        // ---- the 3D lever ------------------------------------------------------------------------------------------------------------------
+
+        private void BindArt(Transform wrapper)
+        {
+            var cover = SpikeArt.Find(wrapper, "Cover");
+            var lever = SpikeArt.Find(wrapper, "Lever");
+            var seal = SpikeArt.Find(wrapper, "Seal");
+            _artCover = new PartRig(cover, SpikeArt.BoundsPoint(cover, new Vector3(0f, 1f, -1f)));       // hinged at its top edge, on the wall side
+            _artLever = new PartRig(lever, SpikeArt.BoundsPoint(lever, new Vector3(0f, 1f, 0f)));        // pivots at its top end
+            foreach (var part in new[] { SpikeArt.Find(wrapper, "Base"), cover, lever, seal }) SpikeArt.MakeAimable(part, "scram");
+
+            // the depth gauge above and the three restart lamps below (small instruments the art does not model on the lever itself)
+            var dial = SpikeArt.Spawn("GaugeRound_S", wrapper);
+            if (dial != null)
+            {
+                dial.transform.localPosition = new Vector3(0f, 0.95f, 0.06f);
+                _artNeedle = new PartRig(SpikeArt.Find(dial.transform, "Needle"));
+            }
+            for (int i = 0; i < 3; i++)
+            {
+                var lamp = Block(wrapper, "StepLamp" + i, new Vector3(0.07f, 0.07f, 0.03f), new Vector3(-0.15f + 0.15f * i, -0.5f, 0.1f), Color.gray);
+                _stepLamps[i] = lamp.GetComponent<Renderer>();
+            }
+        }
+
+        // ---- primitives (no art) -----------------------------------------------------------------------------------------------------------
+
+        private void BindPrimitives(Transform boat)
+        {
             var root = new GameObject("ScramStation").transform;
             root.SetParent(boat, false);
             root.localPosition = Centre;
@@ -59,19 +96,23 @@ namespace SousTension.Spikes.MovingFrame
             if (lv.Valid)
             {
                 _coverAngle = Mathf.MoveTowards(_coverAngle, lv.CoverOpen ? 80f : 0f, 240f * Time.deltaTime);
-                _cover.localRotation = Quaternion.AngleAxis(_coverAngle, Vector3.forward);
                 // pulled down during a SCRAM, raised again once the restart procedure's first step (lever back) is done
                 bool down = lv.Pulled && !_model.Restart.LeverBack;
                 _leverAngle = Mathf.MoveTowards(_leverAngle, down ? -85f : 0f, 400f * Time.deltaTime);
-                _lever.localRotation = Quaternion.AngleAxis(_leverAngle, Vector3.right);
+                if (_cover != null) _cover.localRotation = Quaternion.AngleAxis(_coverAngle, Vector3.forward);
+                if (_lever != null) _lever.localRotation = Quaternion.AngleAxis(_leverAngle, Vector3.right);
+                if (_artCover != null && _artCover.Valid) _artCover.Set(Vector3.right, -_coverAngle);
+                if (_artLever != null && _artLever.Valid) _artLever.Set(Vector3.right, _leverAngle);
             }
             var rs = _model.Restart;
             bool[] steps = { rs.LeverBack, rs.ValvesOpen, rs.PumpsRunning };
             for (int i = 0; i < 3; i++)
-                _stepLamps[i].material.color = lv.Pulled && steps[i] ? new Color(0.3f, 0.85f, 0.35f) : new Color(0.25f, 0.25f, 0.25f);
+                if (_stepLamps[i] != null) _stepLamps[i].material.color = lv.Pulled && steps[i] ? new Color(0.3f, 0.85f, 0.35f) : new Color(0.25f, 0.25f, 0.25f);
             var boat = _model.Boat;
-            if (boat.Valid)
-                _depthNeedle.localRotation = Quaternion.AngleAxis(Mathf.Lerp(-120f, 120f, Mathf.Clamp01(boat.Depth / DepthDialMax)), Vector3.right);
+            if (!boat.Valid) return;
+            float depthDeg = Mathf.Lerp(-120f, 120f, Mathf.Clamp01(boat.Depth / DepthDialMax));
+            if (_depthNeedle != null) _depthNeedle.localRotation = Quaternion.AngleAxis(depthDeg, Vector3.right);
+            if (_artNeedle != null && _artNeedle.Valid) _artNeedle.Set(Vector3.forward, -depthDeg);
         }
 
         private static GameObject Block(Transform parent, string name, Vector3 scale, Vector3 localPos, Color color)

@@ -14,9 +14,9 @@ var OP_DEBUG = 3;      // server -> one client: the reply to a debug command, {l
 var OP_STATE = 2;      // server -> clients: {tick, t, players:[{id, x, z, seq}]}
 var MOVE_SPEED = 3.0;  // m/s
 var HALF_X = 3.0;      // boat interior half width (m)
-var HALF_Z = 10.0;     // boat interior half length (m)
+var HALF_Z = 14.0;     // boat interior half length (m): the 28 m of the 3D boat (blender/kit_environment.py, boat_layout.json)
 var MAX_QUEUED_INPUTS = 6;
-var STATIONS = [{ x: 0, z: -9 }, { x: 0, z: 9 }]; // two-player interlock keys (boat-local), one at each end
+var STATIONS = [{ x: 0, z: -12 }, { x: 0, z: 12 }]; // two-player interlock keys (boat-local), one at each end
 var STATION_REACH = 2.0;       // m
 var INTERLOCK_WINDOW_TICKS = 30; // 3 s at 10 Hz (GDD: Rule of Two Players)
 var MAX_ALLOWANCE = 4; // max inputs a player may apply in one tick to catch up after a network stall
@@ -28,11 +28,15 @@ function clamp(v, lo, hi) { return v < lo ? lo : (v > hi ? hi : v); }
 // One fixed-step integration, shared by server and (identically re-implemented) by the client prediction.
 // `factor` (E2-04, default 1) scales the walking speed: what a player carries slows them down (hands.js carrySpeedFactor, mirrored in
 // CharacterMotion.cs for the client's prediction).
-function stepPlayer(p, mx, mz, factor) {
+// E10-01: the bulkheads, the privacy baffles and the closed hatches block the player (layout.js); `doors` = water.doors (undefined: all open).
+function stepPlayer(p, mx, mz, factor, doors) {
   var len = Math.sqrt(mx * mx + mz * mz);
   if (len > 1) { mx /= len; mz /= len; }
   var f = factor === undefined ? 1 : factor;
-  p.x = clamp(p.x + mx * MOVE_SPEED * f * DT, -HALF_X, HALF_X);
-  p.z = clamp(p.z + mz * MOVE_SPEED * f * DT, -HALF_Z, HALF_Z);
+  var nx = clamp(p.x + mx * MOVE_SPEED * f * DT, -HALF_X + PLAYER_RADIUS, HALF_X - PLAYER_RADIUS);
+  var nz = clamp(p.z + mz * MOVE_SPEED * f * DT, -HALF_Z + PLAYER_RADIUS, HALF_Z - PLAYER_RADIUS);
+  if (layoutBlocked(p.x, p.z, doors)) { p.x = nx; p.z = nz; return; }       // already inside a wall (teleport, debug): walk out freely
+  if (!layoutBlocked(nx, p.z, doors)) p.x = nx;                              // axis by axis: a wall stops one component and the player slides along it
+  if (!layoutBlocked(p.x, nz, doors)) p.z = nz;
 }
 

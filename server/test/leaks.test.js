@@ -36,7 +36,7 @@ function takePatch(c, id, patchId, x, z) {
 
 test("a leak is on the hull wall of the compartment that contains it, left or right", () => {
   const L = { list: [], nextId: 1, rng: 1, nextTick: 0 };
-  const a = m.leakCreate(L, -1.7, 1, 2), b = m.leakCreate(L, 8, -1, 1);
+  const a = m.leakCreate(L, -1.7, 1, 2), b = m.leakCreate(L, 12, -1, 1);
   assert.strictEqual(a.comp, 3); assert.strictEqual(a.x, m.HALF_X); assert.strictEqual(a.side, 1);
   assert.strictEqual(b.comp, 0); assert.strictEqual(b.x, -m.HALF_X); assert.strictEqual(b.side, -1);
   assert.strictEqual(a.type, "plate"); assert.strictEqual(b.type, "rivet");
@@ -164,7 +164,7 @@ test("flooding a compartment through an unrepaired leak ends with the compartmen
   c.state.leaks.nextTick = 1e9;
   closeAllDoors(c);
   m.leakCreate(c.state.leaks, 2, 1, 3);
-  ticks(c, 2000);                                                              // 200 s at 0.25 m3/s = 50 m3 into a 40 m3 compartment
+  ticks(c, 3000);                                                              // 300 s at 0.25 m3/s = 75 m3 into a 48 m3 compartment
   close(c.state.water.comps[2].w, m.WATER_COMPARTMENTS[2].volume, 1e-9);
   assert.ok(c.state.water.rejected > 9);
 });

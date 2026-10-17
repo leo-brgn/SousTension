@@ -52,7 +52,7 @@ var GHOST_DELAY_TICKS = 10;                                          // 1 s
 
 function ghostAdd(state) {
   if (state.players[GHOST_ID]) return false;
-  state.players[GHOST_ID] = { x: 0, z: 0, seq: 0, lastQueued: 0, allowance: 0, applied: 0, queue: [], hands: newHands(), yaw: 0, presence: null };
+  state.players[GHOST_ID] = { x: 0, z: 2, seq: 0, lastQueued: 0, allowance: 0, applied: 0, queue: [], hands: newHands(), yaw: 0, presence: null };
   state.order.push(GHOST_ID);
   return true;
 }
