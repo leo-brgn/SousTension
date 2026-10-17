@@ -112,18 +112,18 @@ test("a thrown one-hand item leaves the hand, flies along the heading in a small
 
 test("the heading decides the direction: a quarter turn sends it to the right (+x), a half turn back (-z)", () => {
   const right = setup();
-  holdAndFace(right, "patch1", Math.PI / 2, -2.5, 0);
+  holdAndFace(right, "patch1", Math.PI / 2, -2.5, 2);
   throwIt(right);
   const p = cargo(right, "patch1");
   while (p.fly) tick(right);                                                     // compare at the landing: the flight is a straight line
   
-  assert.ok(p.x > -2.5 + 1 && Math.abs(p.z) < 1e-6, "went to +x: " + p.x + "," + p.z);
+  assert.ok(p.x > -2.5 + 1 && Math.abs(p.z - 2) < 1e-6, "went to +x: " + p.x + "," + p.z);
   const back = setup();
-  holdAndFace(back, "patch1", Math.PI, 0, 0);
+  holdAndFace(back, "patch1", Math.PI, 0, 3.6);
   throwIt(back);
   const q = cargo(back, "patch1");
   while (q.fly) tick(back);
-  assert.ok(q.z < -1 && Math.abs(q.x) < 1e-6, "went to -z: " + q.z);
+  assert.ok(q.z < 3.6 - 1 && Math.abs(q.x) < 1e-6, "went to -z: " + q.z);
 });
 
 test("a thrown item bounces on the wall of the boat (30 % of its speed) and never leaves the boat", () => {
