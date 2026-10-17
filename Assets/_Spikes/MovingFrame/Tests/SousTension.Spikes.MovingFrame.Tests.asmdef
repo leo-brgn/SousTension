@@ -7,7 +7,8 @@
         "SousTension.Sim",
         "SousTension.Spikes.MovingFrame.Core",
         "SousTension.Spikes.MovingFrame.Views",
-        "SousTension.Spikes.MovingFrame.Editor"
+        "SousTension.Spikes.MovingFrame.Editor",
+        "Adrenak.UniVoice.Runtime"
     ],
     "includePlatforms": [
         "Editor"

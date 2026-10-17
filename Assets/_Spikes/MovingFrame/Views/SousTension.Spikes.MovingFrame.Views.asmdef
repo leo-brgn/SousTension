@@ -5,7 +5,9 @@
         "SousTension.Sim",
         "SousTension.Spikes.MovingFrame.Core",
         "SousTension.Spikes.MovingFrame.Nakama",
-        "Unity.InputSystem"
+        "Unity.InputSystem",
+        "Adrenak.UniVoice.Runtime",
+        "Adrenak.UniMic.Runtime"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
