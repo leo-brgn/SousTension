@@ -47,6 +47,9 @@ namespace SousTension.Spikes.MovingFrame
             moveZ = f * cos - r * sin;
         }
 
+        /// <summary>Points the camera (the screenshot tour of ShotTourView, tests).</summary>
+        public void Look(float yaw, float pitch) { Yaw = yaw; Pitch = Mathf.Clamp(pitch, -1.2f, 1.2f); }
+
         /// <summary>Called every frame by the view layer to update the look angles.</summary>
         public void UpdateLook()
         {

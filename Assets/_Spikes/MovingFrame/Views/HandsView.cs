@@ -12,6 +12,7 @@ namespace SousTension.Spikes.MovingFrame
     {
         private MovingFrameModel _model;
         private readonly Transform[] _slots = new Transform[3];
+        private readonly System.Collections.Generic.Dictionary<string, GameObject>[] _artHeld = { new System.Collections.Generic.Dictionary<string, GameObject>(), new System.Collections.Generic.Dictionary<string, GameObject>(), new System.Collections.Generic.Dictionary<string, GameObject>() };
         private static readonly Vector3[] Positions = { new Vector3(-0.28f, -0.24f, 0.5f), new Vector3(0.28f, -0.24f, 0.5f), new Vector3(0f, -0.34f, 0.42f) };
         private static readonly Vector3[] Scales = { new Vector3(0.2f, 0.2f, 0.2f), new Vector3(0.2f, 0.2f, 0.2f), new Vector3(0.1f, 0.1f, 0.1f) };
 
@@ -39,8 +40,28 @@ namespace SousTension.Spikes.MovingFrame
             {
                 bool any = held.Length > i && !string.IsNullOrEmpty(held[i]);
                 if (_slots[i].gameObject.activeSelf != any) _slots[i].gameObject.SetActive(any);
-                if (any) _slots[i].GetComponent<Renderer>().material.color = ColorOf(KindOf(held[i]));
+                if (!any) continue;
+                string kind = KindOf(held[i]);
+                var art = ArtFor(i, kind);
+                foreach (var kv in _artHeld[i]) kv.Value.SetActive(art != null && kv.Value == art);          // the held item is the 3D one when the art has it
+                _slots[i].GetComponent<Renderer>().enabled = art == null;
+                if (art == null) _slots[i].GetComponent<Renderer>().material.color = ColorOf(kind);
             }
+        }
+
+        private GameObject ArtFor(int slot, string kind)
+        {
+            if (_artHeld[slot].TryGetValue(kind, out var existing)) return existing;
+            bool heavy = kind == "fuel";
+            var go = SpikeArt.Spawn(SpikeArt.KeyForCargo(kind, heavy), _slots[slot]);
+            if (go != null)
+            {
+                var inv = new Vector3(1f / Mathf.Max(_slots[slot].localScale.x, 1e-3f), 1f / Mathf.Max(_slots[slot].localScale.y, 1e-3f), 1f / Mathf.Max(_slots[slot].localScale.z, 1e-3f));
+                go.transform.localScale = Vector3.Scale(inv, Vector3.one * (heavy ? 0.5f : 0.7f));      // the slot cube is scaled: undo it, then shrink the item to the hand
+                go.transform.localPosition = new Vector3(0f, -0.5f, 0f);
+            }
+            _artHeld[slot][kind] = go;                                                                    // null is remembered: no art for this kind
+            return go;
         }
 
         private string KindOf(string cargoId)

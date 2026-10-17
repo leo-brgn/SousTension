@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using SousTension.Sim;
 using UnityEngine;
 
 namespace SousTension.Spikes.MovingFrame
@@ -11,12 +12,16 @@ namespace SousTension.Spikes.MovingFrame
     /// </summary>
     public sealed class StationsView : MonoBehaviour
     {
-        private static readonly (string id, Vector3 a, Vector3 b)[] Actions =
+        private static readonly (string id, Vector3 a, Vector3 b)[] Actions = BuildActions();
+
+        private static (string id, Vector3 a, Vector3 b)[] BuildActions()
         {
-            ("demo", new Vector3(0f, 0f, -9f), new Vector3(0f, 0f, 9f)),
-            ("demo2", new Vector3(-2.5f, 0f, 6f), new Vector3(2.5f, 0f, -7f)),
-            ("reactor_restart", new Vector3(-2.5f, 0f, -5f), new Vector3(2.5f, 0f, 8.5f)),
-        };
+            var table = ControlLayout.Coupled;
+            var actions = new (string id, Vector3 a, Vector3 b)[table.Length];
+            for (int i = 0; i < table.Length; i++)
+                actions[i] = (table[i].id, new Vector3(table[i].ax, 0f, table[i].az), new Vector3(table[i].bx, 0f, table[i].bz));
+            return actions;
+        }
 
         private sealed class Pair
         {

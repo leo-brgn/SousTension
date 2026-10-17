@@ -6,19 +6,19 @@ var GRAB_REACH = 1.5;       // m
 var GRAVITY = 9.81;         // m/s^2
 var FRICTION = 0.25;        // Coulomb coefficient: loose cargo starts sliding past ~14 deg of tilt
 var CARGO_DEFS = [
-  { id: "crate1", heavy: false, x: 2.0, z: -3.0 },
-  { id: "crate2", heavy: false, x: -2.0, z: 4.0 },
-  { id: "fuel", kind: "fuel", heavy: true, x: -2.0, z: -5.0 },
+  { id: "crate1", heavy: false, x: 1.2, z: -2.0 },
+  { id: "crate2", heavy: false, x: -2.0, z: 5.0 },
+  { id: "fuel", kind: "fuel", heavy: true, x: -2.0, z: -7.2 },
   // Hull patches (E6-02): the toolbox of compartment 2. Light, used up on a leak, back in the toolbox 30 s later.
-  { id: "patch1", kind: "patch", heavy: false, x: 0.6, z: 5.5 },
-  { id: "patch2", kind: "patch", heavy: false, x: 1.0, z: 5.5 },
-  { id: "patch3", kind: "patch", heavy: false, x: 1.4, z: 5.5 },
+  { id: "patch1", kind: "patch", heavy: false, x: -1.6, z: 4.9 },
+  { id: "patch2", kind: "patch", heavy: false, x: -1.2, z: 4.9 },
+  { id: "patch3", kind: "patch", heavy: false, x: -0.8, z: 4.9 },
   // Bucket (E6-03): same toolbox, never used up.
-  { id: "bucket", kind: "bucket", heavy: false, x: 1.8, z: 5.5 },
+  { id: "bucket", kind: "bucket", heavy: false, x: -0.4, z: 4.9 },
   // Torch (E2-03): the restart "à la lampe torche" (GDD 3.3); one hand, or the chest pocket.
-  { id: "flashlight", kind: "flashlight", heavy: false, x: 0.2, z: 5.5 },
+  { id: "flashlight", kind: "flashlight", heavy: false, x: 0.0, z: 4.9 },
   // The OK-114 Operating Manual (E5-02): one copy, on the table of the central post.
-  { id: "manual", kind: "manual", heavy: false, x: -2.0, z: 6.0 }
+  { id: "manual", kind: "manual", heavy: false, x: 1.8, z: 6.1 }
 ];
 // Boat tilt (must match BoatMotion.cs defaults: pitch 15 deg / 7 s, roll 20 deg / 5 s + 1 rad phase).
 var PITCH_AMP = 15 * Math.PI / 180, PITCH_PERIOD = 7;

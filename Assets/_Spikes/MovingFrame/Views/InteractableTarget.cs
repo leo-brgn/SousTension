@@ -48,6 +48,7 @@ namespace SousTension.Spikes.MovingFrame
         {
             // IDS-OTHERS-BEGIN
             "item", "regime", "scram", "valve0", "valve1", "valve2", "valve3", "pump0", "pump1", "bilge0", "bilge1", "tele_up", "tele_down",
+            "hatch0", "hatch1", "hatch2", "hatch3", "hatch4",
             "cc:demo:0", "cc:demo:1", "cc:demo2:0", "cc:demo2:1", "cc:reactor_restart:0", "cc:reactor_restart:1",
             // IDS-OTHERS-END
         };
@@ -55,6 +56,7 @@ namespace SousTension.Spikes.MovingFrame
         public static string Valve(int i) => "valve" + i;
         public static string Pump(int i) => "pump" + i;
         public static string Bilge(int i) => "bilge" + i;
+        public static string Hatch(int d) => "hatch" + d;
         public static string Leak(int id) => "leak:" + id;
         public static string Command(string action, int side) => "cc:" + action + ":" + side;
     }

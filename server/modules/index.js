@@ -15,9 +15,9 @@ var OP_DEBUG = 3;      // server -> one client: the reply to a debug command, {l
 var OP_STATE = 2;      // server -> clients: {tick, t, players:[{id, x, z, seq}]}
 var MOVE_SPEED = 3.0;  // m/s
 var HALF_X = 3.0;      // boat interior half width (m)
-var HALF_Z = 10.0;     // boat interior half length (m)
+var HALF_Z = 14.0;     // boat interior half length (m): the 28 m of the 3D boat (blender/kit_environment.py, boat_layout.json)
 var MAX_QUEUED_INPUTS = 6;
-var STATIONS = [{ x: 0, z: -9 }, { x: 0, z: 9 }]; // two-player interlock keys (boat-local), one at each end
+var STATIONS = [{ x: 0, z: -12 }, { x: 0, z: 12 }]; // two-player interlock keys (boat-local), one at each end
 var STATION_REACH = 2.0;       // m
 var INTERLOCK_WINDOW_TICKS = 30; // 3 s at 10 Hz (GDD: Rule of Two Players)
 var MAX_ALLOWANCE = 4; // max inputs a player may apply in one tick to catch up after a network stall
@@ -29,12 +29,80 @@ function clamp(v, lo, hi) { return v < lo ? lo : (v > hi ? hi : v); }
 // One fixed-step integration, shared by server and (identically re-implemented) by the client prediction.
 // `factor` (E2-04, default 1) scales the walking speed: what a player carries slows them down (hands.js carrySpeedFactor, mirrored in
 // CharacterMotion.cs for the client's prediction).
-function stepPlayer(p, mx, mz, factor) {
+// E10-01: the bulkheads, the privacy baffles and the closed hatches block the player (layout.js); `doors` = water.doors (undefined: all open).
+function stepPlayer(p, mx, mz, factor, doors) {
   var len = Math.sqrt(mx * mx + mz * mz);
   if (len > 1) { mx /= len; mz /= len; }
   var f = factor === undefined ? 1 : factor;
-  p.x = clamp(p.x + mx * MOVE_SPEED * f * DT, -HALF_X, HALF_X);
-  p.z = clamp(p.z + mz * MOVE_SPEED * f * DT, -HALF_Z, HALF_Z);
+  var nx = clamp(p.x + mx * MOVE_SPEED * f * DT, -HALF_X + PLAYER_RADIUS, HALF_X - PLAYER_RADIUS);
+  var nz = clamp(p.z + mz * MOVE_SPEED * f * DT, -HALF_Z + PLAYER_RADIUS, HALF_Z - PLAYER_RADIUS);
+  if (layoutBlocked(p.x, p.z, doors)) { p.x = nx; p.z = nz; return; }       // already inside a wall (teleport, debug): walk out freely
+  if (!layoutBlocked(nx, p.z, doors)) p.x = nx;                              // axis by axis: a wall stops one component and the player slides along it
+  if (!layoutBlocked(p.x, nz, doors)) p.z = nz;
+}
+
+// ---- Boat layout: bulkheads, hatches, privacy baffles (E10-01) ------------------------------------------------------------------------
+// The geometry of the 3D boat (blender/kit_environment.py -> Assets/_Project/Art/Models/Environment/boat_layout.json), in BOAT-LOCAL space
+// (x = right, z = forward, bow = +z): 28 m x 6 m, six compartments 4/6/4/4/4/6 m. Five bulkheads separate them; each has ONE hatch 0.9 m wide,
+// staggered left / right, and a privacy baffle 0.95 m behind it (towards the stern) that hides the next post. A hatch is the bulkhead opening that
+// lets WATER through (water.doors[d].open); when it is closed it blocks the water and the players.
+// Collisions are circle (radius PLAYER_RADIUS) against axis-aligned rectangles. Mirrored in Assets/_Project/Scripts/Sim/BoatLayout.cs.
+var PLAYER_RADIUS = 0.25;
+var BULKHEAD_Z = [10, 4, 0, -4, -8];          // door d joins compartment d and d+1 (0 = torpedo room, 5 = living quarters)
+var HATCH_X = [-1.45, 1.45, -1.45, 1.45, -1.45];
+var HATCH_HALF = 0.45;                         // half width of the opening
+var WALL_HALF = 0.07;                          // half thickness of a bulkhead
+var BAFFLE_HALF_X = 0.8, BAFFLE_HALF_Z = 0.06, BAFFLE_OFFSET = 0.95;
+
+// Static obstacles [x0, x1, z0, z1]: the bulkhead walls on each side of the hatch and the baffles.
+var LAYOUT_OBSTACLES = (function () {
+  var out = [];
+  for (var d = 0; d < BULKHEAD_Z.length; d++) {
+    var z = BULKHEAD_Z[d], cx = HATCH_X[d];
+    out.push([-HALF_X, cx - HATCH_HALF, z - WALL_HALF, z + WALL_HALF]);
+    out.push([cx + HATCH_HALF, HALF_X, z - WALL_HALF, z + WALL_HALF]);
+    out.push([cx - BAFFLE_HALF_X, cx + BAFFLE_HALF_X, z - BAFFLE_OFFSET - BAFFLE_HALF_Z, z - BAFFLE_OFFSET + BAFFLE_HALF_Z]);
+  }
+  return out;
+})();
+
+function circleHitsRect(x, z, r) {
+  var cx = x < r[0] ? r[0] : (x > r[1] ? r[1] : x), cz = z < r[2] ? r[2] : (z > r[3] ? r[3] : z);
+  var dx = x - cx, dz = z - cz;
+  return dx * dx + dz * dz < PLAYER_RADIUS * PLAYER_RADIUS;
+}
+
+// Is a player's circle at (x, z) inside a wall? `doors` = water.doors: a closed hatch is a wall too.
+function layoutBlocked(x, z, doors) {
+  for (var i = 0; i < LAYOUT_OBSTACLES.length; i++) if (circleHitsRect(x, z, LAYOUT_OBSTACLES[i])) return true;
+  if (doors) {
+    for (var d = 0; d < BULKHEAD_Z.length && d < doors.length; d++) {
+      if (doors[d].open) continue;
+      if (circleHitsRect(x, z, [HATCH_X[d] - HATCH_HALF, HATCH_X[d] + HATCH_HALF, BULKHEAD_Z[d] - WALL_HALF, BULKHEAD_Z[d] + WALL_HALF])) return true;
+    }
+  }
+  return false;
+}
+
+// Is somebody standing in (or touching) the opening of hatch d? Closing it on them is refused.
+function hatchOccupied(state, d) {
+  var cx = HATCH_X[d], z = BULKHEAD_Z[d];
+  var r = [cx - HATCH_HALF, cx + HATCH_HALF, z - WALL_HALF, z + WALL_HALF];
+  for (var k = 0; k < state.order.length; k++) {
+    var pl = state.players[state.order[k]];
+    if (circleHitsRect(pl.x, pl.z, r)) return true;
+  }
+  return false;
+}
+
+// One press on the wheel of hatch d: open <-> closed. Closing is refused while a player is in the opening. Returns true when it changed.
+function hatchToggle(state, d) {
+  if (d < 0 || d >= state.water.doors.length) return false;
+  if (state.water.doors[d].open) {
+    if (hatchOccupied(state, d)) return false;
+    return waterSetDoor(state.water, d, false);
+  }
+  return waterSetDoor(state.water, d, true);
 }
 
 // ---- Coupled actions: the Rule of Two Players framework (E4-02) ----------------------------------------------------
@@ -56,12 +124,12 @@ var COUPLED_ACTIONS = [
     b: { x: STATIONS[1].x, z: STATIONS[1].z, reach: STATION_REACH, kind: "press" } },
   // Second demo pair on the opposite diagonal: lets two pairs of players work independently at the same time.
   { id: "demo2", windowTicks: INTERLOCK_WINDOW_TICKS,
-    a: { x: -2.5, z: 6.0, reach: STATION_REACH, kind: "press" },
-    b: { x: 2.5, z: -7.0, reach: STATION_REACH, kind: "press" } },
-  // Restart of the reactor after a SCRAM (E3-05): near the RK-1 panel and at the bow, 13 m apart.
+    a: { x: -0.8, z: 7.0, reach: STATION_REACH, kind: "press" },
+    b: { x: 0.8, z: -6.5, reach: STATION_REACH, kind: "press" } },
+  // Restart of the reactor after a SCRAM (E3-05): near the RK-1 console (compartment 4) and in the central post, 11 m apart.
   { id: "reactor_restart", windowTicks: INTERLOCK_WINDOW_TICKS,
-    a: { x: -2.5, z: -5.0, reach: STATION_REACH, kind: "press" },
-    b: { x: 2.5, z: 8.5, reach: STATION_REACH, kind: "press" } }
+    a: { x: 1.2, z: -3.6, reach: STATION_REACH, kind: "press" },
+    b: { x: 1.2, z: 8.0, reach: STATION_REACH, kind: "press" } }
 ];
 
 // Effects of successful actions: id -> function(state, actionId, tick). Registered by the systems that own the action (E3-05 restart...).
@@ -152,19 +220,19 @@ var GRAB_REACH = 1.5;       // m
 var GRAVITY = 9.81;         // m/s^2
 var FRICTION = 0.25;        // Coulomb coefficient: loose cargo starts sliding past ~14 deg of tilt
 var CARGO_DEFS = [
-  { id: "crate1", heavy: false, x: 2.0, z: -3.0 },
-  { id: "crate2", heavy: false, x: -2.0, z: 4.0 },
-  { id: "fuel", kind: "fuel", heavy: true, x: -2.0, z: -5.0 },
+  { id: "crate1", heavy: false, x: 1.2, z: -2.0 },
+  { id: "crate2", heavy: false, x: -2.0, z: 5.0 },
+  { id: "fuel", kind: "fuel", heavy: true, x: -2.0, z: -7.2 },
   // Hull patches (E6-02): the toolbox of compartment 2. Light, used up on a leak, back in the toolbox 30 s later.
-  { id: "patch1", kind: "patch", heavy: false, x: 0.6, z: 5.5 },
-  { id: "patch2", kind: "patch", heavy: false, x: 1.0, z: 5.5 },
-  { id: "patch3", kind: "patch", heavy: false, x: 1.4, z: 5.5 },
+  { id: "patch1", kind: "patch", heavy: false, x: -1.6, z: 4.9 },
+  { id: "patch2", kind: "patch", heavy: false, x: -1.2, z: 4.9 },
+  { id: "patch3", kind: "patch", heavy: false, x: -0.8, z: 4.9 },
   // Bucket (E6-03): same toolbox, never used up.
-  { id: "bucket", kind: "bucket", heavy: false, x: 1.8, z: 5.5 },
+  { id: "bucket", kind: "bucket", heavy: false, x: -0.4, z: 4.9 },
   // Torch (E2-03): the restart "à la lampe torche" (GDD 3.3); one hand, or the chest pocket.
-  { id: "flashlight", kind: "flashlight", heavy: false, x: 0.2, z: 5.5 },
+  { id: "flashlight", kind: "flashlight", heavy: false, x: 0.0, z: 4.9 },
   // The OK-114 Operating Manual (E5-02): one copy, on the table of the central post.
-  { id: "manual", kind: "manual", heavy: false, x: -2.0, z: 6.0 }
+  { id: "manual", kind: "manual", heavy: false, x: 1.8, z: 6.1 }
 ];
 // Boat tilt (must match BoatMotion.cs defaults: pitch 15 deg / 7 s, roll 20 deg / 5 s + 1 rad phase).
 var PITCH_AMP = 15 * Math.PI / 180, PITCH_PERIOD = 7;
@@ -488,17 +556,17 @@ function manualView(manual) { return { p: manual.page, n: MANUAL_PAGES.length };
 
 // ---- Water by volume per compartment and the boat's trim / list (E6-01) -----------------------------------------------------
 // GDD 8: water is simulated as a VOLUME per compartment plus a centre of mass (no fluid). Six compartments in a line from the bow (+z)
-// to the stern (-z) over the 20 m of the spike. Water never appears or disappears except through the explicit API (waterAdd for
+// to the stern (-z) over the 28 m of the 3D boat (E10-01: 4/6/4/4/4/6 m, layout.js). Water never appears or disappears except through the explicit API (waterAdd for
 // leaks, waterRemove for bilge pumps: E6-02 / E6-03); it flows between neighbouring compartments through OPEN bulkhead openings in
 // proportion to the level difference. Its weight shifts the centre of mass, which adds a trim (pitch) and a list (roll) to the scripted
 // swell of the boat (BoatMotion). Deterministic: pure arithmetic on the tick, no randomness.
 var WATER_COMPARTMENTS = [
-  { id: "torpilles", z0: 20 / 3, z1: 10, volume: 40 },            // 1 bow
-  { id: "central", z0: 10 / 3, z1: 20 / 3, volume: 40 },          // 2
-  { id: "radio", z0: 0, z1: 10 / 3, volume: 40 },                 // 3
-  { id: "reacteur", z0: -10 / 3, z1: 0, volume: 40 },             // 4
-  { id: "machines", z0: -20 / 3, z1: -10 / 3, volume: 40 },       // 5
-  { id: "vie", z0: -10, z1: -20 / 3, volume: 40 }                 // 6 stern
+  { id: "torpilles", z0: 10, z1: 14, volume: 48 },                 // 1 bow          (volume = length x 6 m wide x 2 m deep)
+  { id: "central", z0: 4, z1: 10, volume: 72 },                   // 2
+  { id: "radio", z0: 0, z1: 4, volume: 48 },                      // 3
+  { id: "reacteur", z0: -4, z1: 0, volume: 48 },                  // 4
+  { id: "machines", z0: -8, z1: -4, volume: 48 },                 // 5
+  { id: "vie", z0: -14, z1: -8, volume: 72 }                      // 6 stern
 ];
 var WATER_HEIGHT = 2.0;            // m: a full compartment is 2 m deep, so level = volume / (capacity / 2)
 var WATER_FLOW = 2.0;              // m3/s per metre of level difference through an open bulkhead opening (time constant ~5 s)
@@ -693,8 +761,8 @@ function leaksView(L) {
 // is high enough (power.js, E3-07): a SCRAM drops the voltage to zero and stops them, and the boat is bailed by hand. Bucket: a light cargo item (the toolbox of compartment 2); carried into a flooded compartment, one press
 // scoops BUCKET_VOLUME out, at most once per BUCKET_COOLDOWN_TICKS per player. The mop waits for the spills of E6-05.
 var BILGE_PUMPS = [
-  { id: "bilge0", comp: 1, x: -2.5, z: 4.5, reach: 1.0 },     // compartment 2, left wall
-  { id: "bilge1", comp: 4, x: 2.5, z: -5.0, reach: 0.9 }      // compartment 5, right wall
+  { id: "bilge0", comp: 3, x: 0.0, z: -3.45, reach: 1.0 },    // compartment 4 (reactor), on the floor in the middle: the 3D BilgePump
+  { id: "bilge1", comp: 4, x: 0.0, z: -7.35, reach: 1.0 }     // compartment 5 (machines)
 ];
 var BILGE_CAPACITY = 0.15;         // m3/s per pump
 var BUCKET_VOLUME = 0.015;         // m3 (15 L) per scoop
@@ -775,8 +843,8 @@ var BATTERY_CHARGE_S = 900;      // s to charge it from empty while the voltage 
 var BATTERY_CHARGE_V = 0.9;
 var BILGE_MIN_V = 0.5;           // the bilge pumps need this voltage (and their breaker closed)
 
-// 20 breakers, one consumer each. Spike layout: floor tiles 0.5 m apart (3 columns x 7 rows) at the stern, left wall, because the spike's
-// interaction works on position, not on aim (E2-02 will replace this by a real panel: the positions are data).
+// 20 breakers, one consumer each, on the ElectricalPanel of compartment 5 (machines, left wall): 5 columns x 4 rows as in the 3D model.
+// Position-wise a column is 0.2 m apart (the aimed interaction, E2-02, tells them apart; the position path uses a 0.15 m reach).
 var BREAKERS = [
   { id: "light1", demand: 0.15, use: "light", comp: 0 }, { id: "light2", demand: 0.15, use: "light", comp: 1 },
   { id: "light3", demand: 0.15, use: "light", comp: 2 }, { id: "light4", demand: 0.15, use: "light", comp: 3 },
@@ -788,9 +856,10 @@ var BREAKERS = [
 ];
 (function placeBreakers() {
   for (var i = 0; i < BREAKERS.length; i++) {
-    BREAKERS[i].x = -2.5 + 0.5 * (i % 3);
-    BREAKERS[i].z = -9.75 + 0.5 * Math.floor(i / 3);
-    BREAKERS[i].reach = 0.3;
+    BREAKERS[i].row = Math.floor(i / 5);                           // 0 = lowest row (height 0.54 m) .. 3 = highest (1.23 m)
+    BREAKERS[i].x = -2.44 + 0.03 * BREAKERS[i].row;                // the rows differ by height only: a 3 cm shift keeps every position distinct
+    BREAKERS[i].z = -6.0 + 0.2 * (i % 5) + 0.03 * BREAKERS[i].row;
+    BREAKERS[i].reach = 0.15;
   }
 })();
 
@@ -1104,6 +1173,7 @@ function boatView(boat) {
 // One interaction key ("act") serves every control: the server picks the nearest interactable within reach, so the
 // client never has to say what it is pressing (and cannot cheat about it). Coupled-action commands live in coupled.js;
 // the other controls are listed here.
+//   (E10-01: positions follow the 3D boat, boat_layout.json. hatch0..4 = the wheel of the bulkhead hatch d, which opens / closes it.)
 //   regime : the RK-1 three-position selector (compartment 4, left wall). One press turns it to the next position
 //            (Veille -> Croisiere -> Pleine -> Veille). A single player is enough: the Rule of Two Players covers
 //            starting/stopping the reactor, not choosing a regime (GDD 3.3/3.4).
@@ -1114,23 +1184,24 @@ function boatView(boat) {
 //            second); drift closes them, only players open them. One player is enough.
 //   pump0..1  : the two primary pumps' switches (E3-06). One press toggles run/stop; a broken pump cannot be started (repair is E5/E9).
 var CONTROLS = [
-  { id: "regime", x: -2.5, z: -1.7, reach: 2.0 },
-  { id: "scram", x: -2.5, z: -2.7, reach: 1.5 },
-  { id: "valve0", x: 2.5, z: -3.0, reach: 1.0, valve: 0 },
-  { id: "valve1", x: 2.5, z: -1.5, reach: 1.0, valve: 1 },
-  { id: "valve2", x: 2.5, z: 0.0, reach: 1.0, valve: 2 },
-  { id: "valve3", x: 2.5, z: 1.5, reach: 1.0, valve: 3 },
-  { id: "pump0", x: 2.5, z: 3.5, reach: 1.2, pump: 0 },
-  { id: "pump1", x: 2.5, z: 5.0, reach: 1.2, pump: 1 },
-  { id: "bilge0", x: -2.5, z: 4.5, reach: 1.0, bilge: 0 },
-  { id: "bilge1", x: 2.5, z: -5.0, reach: 0.9, bilge: 1 }
+  { id: "regime", x: -2.3, z: -2.0, reach: 2.0 },
+  { id: "scram", x: -2.7, z: -0.8, reach: 1.5 },
+  { id: "valve0", x: 2.6, z: -3.3, reach: 0.8, valve: 0 },
+  { id: "valve1", x: 2.6, z: -2.5, reach: 0.8, valve: 1 },
+  { id: "valve2", x: 2.6, z: -1.7, reach: 0.8, valve: 2 },
+  { id: "valve3", x: 2.6, z: -0.9, reach: 0.8, valve: 3 },
+  { id: "pump0", x: 2.0, z: -2.9, reach: 1.0, pump: 0 },
+  { id: "pump1", x: 2.0, z: -1.1, reach: 1.0, pump: 1 },
+  { id: "bilge0", x: 0.0, z: -3.45, reach: 1.0, bilge: 0 },
+  { id: "bilge1", x: 0.0, z: -7.35, reach: 1.0, bilge: 1 }
 ];
 var VALVE_TURN_RATE = 0.25;        // valve opening per second while the wheel is held (4 s from closed to open)
 (function addBreakerControls() {                        // the 20 breakers of the main panel (E3-07): floor tiles at the stern, left wall
   for (var i = 0; i < BREAKERS.length; i++)
     CONTROLS.push({ id: "breaker_" + BREAKERS[i].id, x: BREAKERS[i].x, z: BREAKERS[i].z, reach: BREAKERS[i].reach, breaker: i });
 })();
-CONTROLS.push({ id: "tele_up", x: -0.5, z: 4.2, reach: 0.3, tele: 1 }, { id: "tele_down", x: -0.5, z: 3.6, reach: 0.3, tele: -1 });   // machine telegraph (E3-08)
+CONTROLS.push({ id: "tele_up", x: -2.3, z: 6.15, reach: 0.3, tele: 1 }, { id: "tele_down", x: -2.3, z: 5.35, reach: 0.3, tele: -1 });   // machine telegraph (E3-08), central post
+for (var hd = 0; hd < BULKHEAD_Z.length; hd++) CONTROLS.push({ id: "hatch" + hd, x: HATCH_X[hd], z: BULKHEAD_Z[hd], reach: 1.0, hatch: hd });   // bulkhead hatch wheels (E10-01)
 var LEVER_COVER_TICKS = 60;        // 6 s at 10 Hz
 var REGIME_ORDER = ["veille", "croisiere", "pleine"];
 
@@ -1199,6 +1270,7 @@ function activateControl(state, c) {
   else if (c.bilge !== undefined) bilgeToggle(state.bilge, c.bilge);
   else if (c.breaker !== undefined) breakerToggle(state.power, c.breaker);
   else if (c.tele !== undefined) telegraphStep(state.prop, c.tele);
+  else if (c.hatch !== undefined) hatchToggle(state, c.hatch);
 }
 
 // The interaction key was pressed by player `id`: dispatch to the nearest interactable in reach (the position-based path: bots, tests, the
@@ -1367,7 +1439,7 @@ var GHOST_DELAY_TICKS = 10;                                          // 1 s
 
 function ghostAdd(state) {
   if (state.players[GHOST_ID]) return false;
-  state.players[GHOST_ID] = { x: 0, z: 0, seq: 0, lastQueued: 0, allowance: 0, applied: 0, queue: [], hands: newHands(), yaw: 0, presence: null };
+  state.players[GHOST_ID] = { x: 0, z: 2, seq: 0, lastQueued: 0, allowance: 0, applied: 0, queue: [], hands: newHands(), yaw: 0, presence: null };
   state.order.push(GHOST_ID);
   return true;
 }
@@ -1529,7 +1601,7 @@ function simStep(state, tick) {
     while (pl.allowance >= 1 && pl.queue.length > 0) {
       var next = pl.queue.shift();
       if (next.ry !== null) pl.yaw = next.ry;
-      stepPlayer(pl, next.mx, next.mz, carrySpeedFactor(state, state.order[k]));
+      stepPlayer(pl, next.mx, next.mz, carrySpeedFactor(state, state.order[k]), state.water.doors);
       if (next.act) { if (next.use) useTarget(state, state.order[k], pl, tick, next.use); else tryAct(state, state.order[k], pl, tick); }
       if (next.hold) { if (next.use) holdTarget(state, pl, next.use); else tryHold(state, pl); }
       if (next.dbg) debugCommand(state, state.order[k], pl, next.dbg, tick);
@@ -1627,7 +1699,7 @@ var matchJoin = function (ctx, logger, nk, dispatcher, tick, state, presences) {
     var id = presences[i].userId;
     if (!state.players[id]) {
       var slot = state.order.length;
-      state.players[id] = { x: -1.5 + slot, z: 0, seq: 0, lastQueued: 0, allowance: 0, applied: 0, queue: [], hands: newHands(), yaw: 0, presence: presences[i] };
+      state.players[id] = { x: -1.5 + slot, z: 2, seq: 0, lastQueued: 0, allowance: 0, applied: 0, queue: [], hands: newHands(), yaw: 0, presence: presences[i] };
       state.order.push(id);
     }
   }
@@ -1737,6 +1809,8 @@ if (typeof module !== "undefined" && module.exports) {
     InitModule: InitModule, stepPlayer: stepPlayer, simStep: simStep, queueInput: queueInput, stateDigest: stateDigest,
     TICK_RATE: TICK_RATE, DT: DT, STATIONS: STATIONS, STATION_REACH: STATION_REACH, INTERLOCK_WINDOW_TICKS: INTERLOCK_WINDOW_TICKS, MAX_ALLOWANCE: MAX_ALLOWANCE, MOVE_SPEED: MOVE_SPEED, HALF_X: HALF_X, HALF_Z: HALF_Z,
     OP_INPUT: OP_INPUT, OP_STATE: OP_STATE,
+    PLAYER_RADIUS: PLAYER_RADIUS, BULKHEAD_Z: BULKHEAD_Z, HATCH_X: HATCH_X, HATCH_HALF: HATCH_HALF, WALL_HALF: WALL_HALF, BAFFLE_HALF_X: BAFFLE_HALF_X, BAFFLE_HALF_Z: BAFFLE_HALF_Z, BAFFLE_OFFSET: BAFFLE_OFFSET,
+    LAYOUT_OBSTACLES: LAYOUT_OBSTACLES, layoutBlocked: layoutBlocked, hatchToggle: hatchToggle, hatchOccupied: hatchOccupied, CONTROLS: CONTROLS,
     LEVER_COVER_TICKS: LEVER_COVER_TICKS, SINK_RATE_MAX: SINK_RATE_MAX, SINK_RAMP_SECONDS: SINK_RAMP_SECONDS, newBoat: newBoat, boatStep: boatStep,
     VALVE_TURN_RATE: VALVE_TURN_RATE, reactorBreakPump: reactorBreakPump, reactorRepairPump: reactorRepairPump,
     RESTART_VALVE_MIN: RESTART_VALVE_MIN,

@@ -4,8 +4,8 @@
 // is high enough (power.js, E3-07): a SCRAM drops the voltage to zero and stops them, and the boat is bailed by hand. Bucket: a light cargo item (the toolbox of compartment 2); carried into a flooded compartment, one press
 // scoops BUCKET_VOLUME out, at most once per BUCKET_COOLDOWN_TICKS per player. The mop waits for the spills of E6-05.
 var BILGE_PUMPS = [
-  { id: "bilge0", comp: 1, x: -2.5, z: 4.5, reach: 1.0 },     // compartment 2, left wall
-  { id: "bilge1", comp: 4, x: 2.5, z: -5.0, reach: 0.9 }      // compartment 5, right wall
+  { id: "bilge0", comp: 3, x: 0.0, z: -3.45, reach: 1.0 },    // compartment 4 (reactor), on the floor in the middle: the 3D BilgePump
+  { id: "bilge1", comp: 4, x: 0.0, z: -7.35, reach: 1.0 }     // compartment 5 (machines)
 ];
 var BILGE_CAPACITY = 0.15;         // m3/s per pump
 var BUCKET_VOLUME = 0.015;         // m3 (15 L) per scoop

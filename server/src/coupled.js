@@ -17,12 +17,12 @@ var COUPLED_ACTIONS = [
     b: { x: STATIONS[1].x, z: STATIONS[1].z, reach: STATION_REACH, kind: "press" } },
   // Second demo pair on the opposite diagonal: lets two pairs of players work independently at the same time.
   { id: "demo2", windowTicks: INTERLOCK_WINDOW_TICKS,
-    a: { x: -2.5, z: 6.0, reach: STATION_REACH, kind: "press" },
-    b: { x: 2.5, z: -7.0, reach: STATION_REACH, kind: "press" } },
-  // Restart of the reactor after a SCRAM (E3-05): near the RK-1 panel and at the bow, 13 m apart.
+    a: { x: -0.8, z: 7.0, reach: STATION_REACH, kind: "press" },
+    b: { x: 0.8, z: -6.5, reach: STATION_REACH, kind: "press" } },
+  // Restart of the reactor after a SCRAM (E3-05): near the RK-1 console (compartment 4) and in the central post, 11 m apart.
   { id: "reactor_restart", windowTicks: INTERLOCK_WINDOW_TICKS,
-    a: { x: -2.5, z: -5.0, reach: STATION_REACH, kind: "press" },
-    b: { x: 2.5, z: 8.5, reach: STATION_REACH, kind: "press" } }
+    a: { x: 1.2, z: -3.6, reach: STATION_REACH, kind: "press" },
+    b: { x: 1.2, z: 8.0, reach: STATION_REACH, kind: "press" } }
 ];
 
 // Effects of successful actions: id -> function(state, actionId, tick). Registered by the systems that own the action (E3-05 restart...).

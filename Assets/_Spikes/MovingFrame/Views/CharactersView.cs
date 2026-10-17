@@ -18,6 +18,8 @@ namespace SousTension.Spikes.MovingFrame
         private Transform _boat;
         private Transform _cameraRig;
         private readonly Dictionary<string, Transform> _characters = new Dictionary<string, Transform>();
+        private readonly HashSet<string> _artCharacters = new HashSet<string>();               // remotes drawn with the 3D sailor (origin at the feet)
+        private readonly Dictionary<string, Vector3> _lastPosition = new Dictionary<string, Vector3>();
 
         public void Bind(MovingFrameModel model, IClockService clock, KeyboardInputSource look, Transform boat, Camera camera)
         {
@@ -43,8 +45,17 @@ namespace SousTension.Spikes.MovingFrame
             foreach (var id in _model.RemoteIds)
             {
                 seen.Add(id);
-                if (_model.TrySampleRemote(id, renderTime, out float x, out float z))
-                    Get(id, isLocal: false).localPosition = new Vector3(x, 0.9f, z);
+                if (!_model.TrySampleRemote(id, renderTime, out float x, out float z)) continue;
+                var remote = Get(id, isLocal: false);
+                if (_artCharacters.Contains(id))
+                {
+                    var now = new Vector3(x, 0f, z);
+                    if (_lastPosition.TryGetValue(id, out var before) && (now - before).sqrMagnitude > 1e-6f)
+                        remote.localRotation = Quaternion.Slerp(remote.localRotation, Quaternion.LookRotation(now - before), 10f * Time.deltaTime);   // faces where it walks
+                    _lastPosition[id] = now;
+                    remote.localPosition = now;
+                }
+                else remote.localPosition = new Vector3(x, 0.9f, z);
             }
             var stale = new List<string>();
             foreach (var kv in _characters) if (kv.Key != _model.LocalId && !seen.Contains(kv.Key)) stale.Add(kv.Key);
@@ -54,6 +65,17 @@ namespace SousTension.Spikes.MovingFrame
         private Transform Get(string id, bool isLocal)
         {
             if (_characters.TryGetValue(id, out var t)) return t;
+            if (!isLocal)
+            {
+                var sailor = SpikeArt.Spawn(id.GetHashCode() % 2 == 0 ? "SailorBase" : "SailorFemale", _boat) ?? SpikeArt.Spawn("SailorBase", _boat);
+                if (sailor != null)
+                {
+                    sailor.name = "Remote_" + id.Substring(0, Mathf.Min(6, id.Length));
+                    _characters[id] = sailor.transform;
+                    _artCharacters.Add(id);
+                    return sailor.transform;
+                }
+            }
             var go = SpikePrimitives.Create(PrimitiveType.Capsule);
             go.name = (isLocal ? "Local_" : "Remote_") + id.Substring(0, Mathf.Min(6, id.Length));
             Destroy(go.GetComponent<Collider>());

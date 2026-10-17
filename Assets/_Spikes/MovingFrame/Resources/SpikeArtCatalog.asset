@@ -1,0 +1,45 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f6ae998b2edb1474f8b47b1e3f9fbae3, type: 3}
+  m_Name: SpikeArtCatalog
+  m_EditorClassIdentifier: SousTension.Spikes.MovingFrame.Views::SousTension.Spikes.MovingFrame.SpikeArtCatalog
+  Entries:
+  - Key: Environment
+    Prefab: {fileID: 2929632891154736426, guid: a0105e66070805f4e9a713195a4d93bb, type: 3}
+  - Key: CargoCrate_S
+    Prefab: {fileID: 8534975888704790798, guid: a9637c474b4e45646b046a47ab475cb0, type: 3}
+  - Key: CargoCrate_M
+    Prefab: {fileID: 4375636319910750743, guid: b5c689b456a728d4fad2cb9d223ee460, type: 3}
+  - Key: CargoCrate_L
+    Prefab: {fileID: 1985991931945694348, guid: 30ba64244b222ff4c84e45de64009932, type: 3}
+  - Key: FuelDrum
+    Prefab: {fileID: 5787598108456601156, guid: da5b3c8cdc341d94d9ab5e2c6a589a09, type: 3}
+  - Key: HullPatch
+    Prefab: {fileID: 7837463711573652824, guid: 95fd3fc7526d2884194bd21a757e8af2, type: 3}
+  - Key: Bucket
+    Prefab: {fileID: 2909691851459784229, guid: b31f0e3e798aea349a80e11d7b25a1fb, type: 3}
+  - Key: Flashlight
+    Prefab: {fileID: 4360823596214899628, guid: 24e2043a61d31044fb0c2e1e4a41dea7, type: 3}
+  - Key: ManualOK114OpenBinder
+    Prefab: {fileID: 879346876293390632, guid: 786772be505dee84ca98f72f2cb42e8b, type: 3}
+  - Key: SailorBase
+    Prefab: {fileID: 7013770853082856630, guid: 09df2e066de90f94d82d8985ce7d8ffa, type: 3}
+  - Key: SailorFemale
+    Prefab: {fileID: 6042414906649027800, guid: a659431edbd5f554292577ef9ac1a057, type: 3}
+  - Key: LampDome
+    Prefab: {fileID: 5749344961124931062, guid: 3e532f581646f7348affe4a72d9584a1, type: 3}
+  - Key: MachineBreaker
+    Prefab: {fileID: 86886930576356215, guid: 792a7a59b149ee34e9131c6e22599715, type: 3}
+  - Key: GaugeRound_S
+    Prefab: {fileID: 731214908513748213, guid: 2e6020f8402dee547b9ab50914dc3778, type: 3}
+  - Key: GaugeRound_M
+    Prefab: {fileID: 3307682405472107034, guid: 2705b576d5905004f8d0a69888749854, type: 3}

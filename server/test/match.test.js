@@ -3,6 +3,7 @@ const test = require("node:test");
 const assert = require("node:assert");
 const m = require("../modules/index.js");
 const h = m.handlers;
+const { route } = require("./route.js");
 
 const nk = { binaryToString: (d) => d };
 const logger = { info() {} };
@@ -114,7 +115,7 @@ function place(ctx, id, x, z) { ctx.state.players[id].x = x; ctx.state.players[i
 
 test("interlock: two different players at the two stations within the window succeed", () => {
   const c = lockSetup(["a", "b"]);
-  place(c, "a", 0, -9); place(c, "b", 0, 9);
+  place(c, "a", 0, -12); place(c, "b", 0, 12);
   tickWith(c, [inputAct(c, "a", true)]);
   for (let i = 0; i < 10; i++) tickWith(c, []);           // 1 s later
   const il = tickWith(c, [inputAct(c, "b", true)]);
@@ -126,7 +127,7 @@ test("interlock: two different players at the two stations within the window suc
 test("interlock: the window is 3 s, the server tolerates 0.3 s more (latency grace), and expires after", () => {
   const press = (delayTicks) => {                                           // second press arrives `delayTicks` after the first
     const c = lockSetup(["a", "b"]);
-    place(c, "a", 0, -9); place(c, "b", 0, 9);
+    place(c, "a", 0, -12); place(c, "b", 0, 12);
     tickWith(c, [inputAct(c, "a", true)]);
     for (let i = 0; i < delayTicks - 1; i++) tickWith(c, []);
     return tickWith(c, [inputAct(c, "b", true)]);
@@ -140,9 +141,9 @@ test("interlock: the window is 3 s, the server tolerates 0.3 s more (latency gra
 
 test("interlock: one player can never hold both stations", () => {
   const c = lockSetup(["a", "b"]);
-  place(c, "a", 0, -9);
+  place(c, "a", 0, -12);
   tickWith(c, [inputAct(c, "a", true)]);
-  place(c, "a", 0, 9);                                                         // runs to the other end
+  place(c, "a", 0, 12);                                                         // runs to the other end
   const il = tickWith(c, [inputAct(c, "a", true)]);
   assert.notStrictEqual(il.result, "success");
   assert.strictEqual(il.bb, "");
@@ -150,17 +151,17 @@ test("interlock: one player can never hold both stations", () => {
 
 test("interlock: out-of-reach presses are ignored; reach is 2 m", () => {
   const c = lockSetup(["a", "b"]);
-  place(c, "a", 0, -6.5); place(c, "b", 0, 9);                                 // 2.5 m from station A
+  place(c, "a", 0, -9.5); place(c, "b", 0, 12);                                 // 2.5 m from station A
   let il = tickWith(c, [inputAct(c, "a", true)]);
   assert.strictEqual(il.ab, "");
-  place(c, "a", 0, -7.1);                                                      // 1.9 m
+  place(c, "a", 0, -10.1);                                                      // 1.9 m
   il = tickWith(c, [inputAct(c, "a", true)]);
   assert.strictEqual(il.ab, "a");
 });
 
 test("interlock: remaining time counts down and leaving the match releases the station", () => {
   const c = lockSetup(["a", "b"]);
-  place(c, "a", 0, -9);
+  place(c, "a", 0, -12);
   tickWith(c, [inputAct(c, "a", true)]);
   let il = tickWith(c, []);
   assert.ok(il.a > 0 && il.a < m.INTERLOCK_WINDOW_TICKS);
@@ -188,7 +189,7 @@ function calmTick(maxTilt) { // first tick whose tilt keeps loose cargo pinned b
 test("cargo: grab within reach, follows the carrier, drop leaves it where released", () => {
   const c = lockSetup(["a"]);
   c.tick = calmTick(m.FRICTION * m.GRAVITY * 0.5);
-  place(c, "a", 2.0, -3.0);                                 // on top of crate1
+  place(c, "a", 1.2, -2.0);                                 // on top of crate1
   tickWith(c, [inputGrab(c, "a")]);
   assert.deepStrictEqual(cargoOf(c, "crate1").c, ["a"]);
   place(c, "a", -1, 1);
@@ -200,10 +201,10 @@ test("cargo: grab within reach, follows the carrier, drop leaves it where releas
 
 test("cargo: out of reach cannot be grabbed (reach 1.5 m)", () => {
   const c = lockSetup(["a"]);
-  place(c, "a", 2.0, -1.0);                                 // 2 m from crate1
+  place(c, "a", -0.8, -2.0);                                // 2 m from crate1
   tickWith(c, [inputGrab(c, "a")]);
   assert.deepStrictEqual(cargoOf(c, "crate1").c, []);
-  place(c, "a", 2.0, -1.8);                                 // 1.2 m
+  place(c, "a", 0.0, -2.0);                                 // 1.2 m
   tickWith(c, [inputGrab(c, "a")]);
   assert.deepStrictEqual(cargoOf(c, "crate1").c, ["a"]);
 });
@@ -244,7 +245,7 @@ test("cargo: static friction pins loose cargo on a nearly flat floor", () => {
 test("cargo: the heavy flask needs two players grabbing within 3 s", () => {
   const c = lockSetup(["a", "b"]);
   c.tick = calmTick(m.FRICTION * m.GRAVITY * 0.5);
-  place(c, "a", -2.0, -5.0); place(c, "b", -1.0, -5.0);
+  place(c, "a", -2.0, -7.2); place(c, "b", -1.0, -7.2);
   tickWith(c, [inputGrab(c, "a")]);
   assert.strictEqual(cargoOf(c, "fuel").p, "a");
   assert.deepStrictEqual(cargoOf(c, "fuel").c, []);          // one player alone cannot lift it
@@ -261,7 +262,7 @@ test("cargo: the heavy flask needs two players grabbing within 3 s", () => {
 test("cargo: a second carrier arriving after the window does not lift the heavy flask", () => {
   const c = lockSetup(["a", "b"]);
   c.tick = calmTick(m.FRICTION * m.GRAVITY * 0.5);
-  place(c, "a", -2.0, -5.0); place(c, "b", -1.0, -5.0);
+  place(c, "a", -2.0, -7.2); place(c, "b", -1.0, -7.2);
   tickWith(c, [inputGrab(c, "a")]);
   tickN(c, m.INTERLOCK_WINDOW_TICKS);
   assert.strictEqual(cargoOf(c, "fuel").p, "");              // first grab expired
@@ -274,7 +275,7 @@ test("cargo: a second carrier arriving after the window does not lift the heavy 
 test("cargo: a carrier leaving the match releases the cargo", () => {
   const c = lockSetup(["a", "b"]);
   c.tick = calmTick(m.FRICTION * m.GRAVITY * 0.5);
-  place(c, "a", 2.0, -3.0);
+  place(c, "a", 1.2, -2.0);
   tickWith(c, [inputGrab(c, "a")]);
   c.state = h.matchLeave({}, logger, nk, null, 0, c.state, [presence("a")]).state;
   tickN(c, 1);
@@ -295,7 +296,7 @@ test("cargo: tilt projection golden values (same numbers asserted in C#: BoatMot
 });
 
 // ---- RK-1 regime selector (E3-03) ----
-const REGIME_POS = { x: -2.5, z: -1.7 };
+const REGIME_POS = { x: -2.3, z: -2.0 };
 function regimeOf(ctx) { return ctx.state.reactor.regime; }
 
 test("selector: each press within reach turns it one position, with wrap-around (Veille -> Croisiere -> Pleine -> Veille)", () => {
@@ -335,14 +336,14 @@ test("selector: a single player is enough and the change is visible in the broad
 
 test("interaction key goes to the nearest interactable: the interlock keeps working away from the selector", () => {
   const c = lockSetup(["a"]);
-  place(c, "a", 0, -9);                                             // next to interlock station A, far from the selector
+  place(c, "a", 0, -12);                                             // next to interlock station A, far from the selector
   const il = tickWith(c, [inputAct(c, "a", true)]);
   assert.strictEqual(il.ab, "a");
   assert.strictEqual(regimeOf(c), "veille");
 });
 
 // ---- SCRAM lever (E3-04): sealed cover, two presses, one player, and the boat sinks afterwards ----
-const LEVER_POS = { x: -2.5, z: -2.7 };
+const LEVER_POS = { x: -2.7, z: -0.8 };
 function lastView(c) { return c.d.sent[c.d.sent.length - 1].data; }
 
 test("scram lever: the first press only lifts the cover, the second one pulls the lever (single player, no vote)", () => {
@@ -457,7 +458,7 @@ function rxOf(c) { return lastView(c).rx; }
 test("valve: holding the key near a wheel opens it at VALVE_TURN_RATE per second, then stops at fully open", () => {
   const c = lockSetup(["a"]);
   c.state.reactor.valves = [0, 0, 0, 0];
-  place(c, "a", ctl("valve1").x - 0.5, ctl("valve1").z);
+  place(c, "a", ctl("valve1").x + 0.2, ctl("valve1").z);
   for (let i = 0; i < 20; i++) tickWith(c, [inputHold(c, "a")]);              // 2 s
   assert.ok(Math.abs(c.state.reactor.valves[1] - 2 * m.VALVE_TURN_RATE) < 1e-9, "valve1=" + c.state.reactor.valves[1]);
   for (let i = 0; i < 100; i++) tickWith(c, [inputHold(c, "a")]);
@@ -468,10 +469,10 @@ test("valve: holding the key near a wheel opens it at VALVE_TURN_RATE per second
 test("valve: out of reach (1.0 m) holding does nothing; a single press (no hold) does nothing either", () => {
   const c = lockSetup(["a"]);
   c.state.reactor.valves = [0, 0, 0, 0];
-  place(c, "a", ctl("valve2").x - 1.1, ctl("valve2").z);
+  place(c, "a", ctl("valve2").x - 1.9, ctl("valve2").z);
   for (let i = 0; i < 10; i++) tickWith(c, [inputHold(c, "a")]);
   assert.strictEqual(c.state.reactor.valves[2], 0);
-  place(c, "a", ctl("valve2").x - 0.5, ctl("valve2").z);
+  place(c, "a", ctl("valve2").x + 0.2, ctl("valve2").z);
   tickWith(c, [inputAct(c, "a", true)]);
   assert.strictEqual(c.state.reactor.valves[2], 0);
 });
@@ -531,7 +532,7 @@ test("valve and pump state is always in the broadcast (reconnection resync)", ()
 });
 
 test("valve: holding sets a deterministic opening (same inputs, same valves, with the seeded drift)", () => {
-  const run = () => { const c = lockSetup(["a"]); place(c, "a", ctl("valve0").x - 0.5, ctl("valve0").z); for (let i = 0; i < 300; i++) tickWith(c, [inputHold(c, "a")]); return JSON.stringify(c.state.reactor.valves); };
+  const run = () => { const c = lockSetup(["a"]); place(c, "a", ctl("valve0").x + 0.2, ctl("valve0").z); for (let i = 0; i < 300; i++) tickWith(c, [inputHold(c, "a")]); return JSON.stringify(c.state.reactor.valves); };
   assert.strictEqual(run(), run());
 });
 
@@ -549,7 +550,7 @@ test("coupled: every action is listed in the broadcast with its id (resync after
 
 test("coupled: two actions run independently and at the same time with four players", () => {
   const c = lockSetup(["a", "b", "c", "d"]);
-  place(c, "a", 0, -9); place(c, "b", 0, 9);                                    // demo pair
+  place(c, "a", 0, -12); place(c, "b", 0, 12);                                    // demo pair
   place(c, "c", DEMO2.a.x, DEMO2.a.z); place(c, "d", DEMO2.b.x, DEMO2.b.z);     // demo2 pair
   tickWith(c, [inputAct(c, "a", true), inputAct(c, "c", true)]);
   assert.strictEqual(cpOf(c, "demo").ab, "a"); assert.strictEqual(cpOf(c, "demo2").ab, "c");
@@ -751,10 +752,14 @@ test("restart: the procedure state is always in the broadcast (reconnection resy
 test("restart: two scripted players complete the whole procedure in under 90 s (GDD balance target)", () => {
   const c = scrammedSetup(["a", "b"]);
   c.state.reactor.valves = [0.4, 0.4, 0.4, 0.4];
-  const walk = (id, x, z) => {
+  const walk = (id, x, z) => {                                         // through the hatches and around the baffles (E10-01)
     const p = c.state.players[id];
-    const dx = x - p.x, dz = z - p.z, d = Math.hypot(dx, dz);
-    return d < 0.15 ? null : moveInput(c, id, dx / d, dz / d, false, false);
+    const target = route(m, p, { x, z });
+    let w = target[0];
+    if (Math.hypot(x - p.x, z - p.z) < 0.15) return null;
+    if (Math.hypot(w.x - p.x, w.z - p.z) < 0.12 && target.length > 1) w = target[1];
+    const dx = w.x - p.x, dz = w.z - p.z, d = Math.hypot(dx, dz);
+    return d < 0.02 ? null : moveInput(c, id, dx / d, dz / d, false, false);
   };
   const valveAt = (i) => m.CONTROLS.find((k) => k.id === "valve" + i);
   const lever = m.CONTROLS.find((k) => k.id === "scram");
@@ -770,7 +775,7 @@ test("restart: two scripted players complete the whole procedure in under 90 s (
       if (w) msgs.push(w); else { msgs.push(inputAct(c, "a", true)); phase = 1; }
     } else if (phase === 1) {
       if (c.state.reactor.valves[valve] >= m.RESTART_VALVE_MIN) { valve++; if (valve === 4) phase = 2; }
-      else { const v = valveAt(valve); msgs.push(walk("a", v.x - 0.5, v.z) || moveInput(c, "a", 0, 0, false, true)); }
+      else { const v = valveAt(valve); msgs.push(walk("a", v.x + 0.2, v.z) || moveInput(c, "a", 0, 0, false, true)); }
     } else if (phase === 2) {
       const w = walk("a", RESTART.a.x, RESTART.a.z);
       if (w) msgs.push(w); else { msgs.push(inputAct(c, "a", true)); phase = 3; }

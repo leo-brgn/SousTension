@@ -19,7 +19,7 @@ var matchJoin = function (ctx, logger, nk, dispatcher, tick, state, presences) {
     var id = presences[i].userId;
     if (!state.players[id]) {
       var slot = state.order.length;
-      state.players[id] = { x: -1.5 + slot, z: 0, seq: 0, lastQueued: 0, allowance: 0, applied: 0, queue: [], hands: newHands(), yaw: 0, presence: presences[i] };
+      state.players[id] = { x: -1.5 + slot, z: 2, seq: 0, lastQueued: 0, allowance: 0, applied: 0, queue: [], hands: newHands(), yaw: 0, presence: presences[i] };
       state.order.push(id);
     }
   }
@@ -129,6 +129,8 @@ if (typeof module !== "undefined" && module.exports) {
     InitModule: InitModule, stepPlayer: stepPlayer, simStep: simStep, queueInput: queueInput, stateDigest: stateDigest,
     TICK_RATE: TICK_RATE, DT: DT, STATIONS: STATIONS, STATION_REACH: STATION_REACH, INTERLOCK_WINDOW_TICKS: INTERLOCK_WINDOW_TICKS, MAX_ALLOWANCE: MAX_ALLOWANCE, MOVE_SPEED: MOVE_SPEED, HALF_X: HALF_X, HALF_Z: HALF_Z,
     OP_INPUT: OP_INPUT, OP_STATE: OP_STATE,
+    PLAYER_RADIUS: PLAYER_RADIUS, BULKHEAD_Z: BULKHEAD_Z, HATCH_X: HATCH_X, HATCH_HALF: HATCH_HALF, WALL_HALF: WALL_HALF, BAFFLE_HALF_X: BAFFLE_HALF_X, BAFFLE_HALF_Z: BAFFLE_HALF_Z, BAFFLE_OFFSET: BAFFLE_OFFSET,
+    LAYOUT_OBSTACLES: LAYOUT_OBSTACLES, layoutBlocked: layoutBlocked, hatchToggle: hatchToggle, hatchOccupied: hatchOccupied, CONTROLS: CONTROLS,
     LEVER_COVER_TICKS: LEVER_COVER_TICKS, SINK_RATE_MAX: SINK_RATE_MAX, SINK_RAMP_SECONDS: SINK_RAMP_SECONDS, newBoat: newBoat, boatStep: boatStep,
     VALVE_TURN_RATE: VALVE_TURN_RATE, reactorBreakPump: reactorBreakPump, reactorRepairPump: reactorRepairPump,
     RESTART_VALVE_MIN: RESTART_VALVE_MIN,

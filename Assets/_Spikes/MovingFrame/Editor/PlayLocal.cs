@@ -56,11 +56,47 @@ namespace SousTension.Spikes.MovingFrame.EditorTools
             AssetDatabase.SaveAssets();
         }
 
+        public const string ArtCatalogPath = "Assets/_Spikes/MovingFrame/Resources/SpikeArtCatalog.asset";
+        private const string Prefabs = "Assets/_Project/Art/Prefabs/";
+
+        /// <summary>The art the spike spawns, by key (see SpikeArt): the whole boat and the loose items. Missing prefabs are skipped (the views fall back).</summary>
+        public static readonly (string key, string path)[] ArtEntries =
+        {
+            ("Environment", "BoatEnvironment.prefab"),
+            ("CargoCrate_S", "Environment/CargoCrate_S.prefab"), ("CargoCrate_M", "Environment/CargoCrate_M.prefab"), ("CargoCrate_L", "Environment/CargoCrate_L.prefab"),
+            ("FuelDrum", "Cargo/FuelDrum.prefab"),
+            ("HullPatch", "Tools/HullPatch.prefab"), ("Bucket", "Tools/Bucket.prefab"), ("Flashlight", "Tools/Flashlight.prefab"),
+            ("ManualOK114OpenBinder", "Central/ManualOK114OpenBinder.prefab"),
+            ("SailorBase", "Crew/SailorBase.prefab"), ("SailorFemale", "Crew/SailorFemale.prefab"),
+            ("LampDome", "Instruments/LampDome.prefab"), ("MachineBreaker", "Machines/MachineBreaker.prefab"), ("GaugeRound_S", "Instruments/GaugeRound_S.prefab"), ("GaugeRound_M", "Instruments/GaugeRound_M.prefab"),
+        };
+
+        /// <summary>Rebuilds the catalog of art prefabs the spike spawns at runtime (Resources, so the player build includes them).</summary>
+        [MenuItem("SousTension/Spike/Refresh the art catalog")]
+        public static void EnsureArtCatalog()
+        {
+            Directory.CreateDirectory(Path.Combine(ProjectRoot, Path.GetDirectoryName(ArtCatalogPath)));
+            var catalog = AssetDatabase.LoadAssetAtPath<SpikeArtCatalog>(ArtCatalogPath);
+            bool created = catalog == null;
+            if (created) catalog = ScriptableObject.CreateInstance<SpikeArtCatalog>();
+            var entries = new System.Collections.Generic.List<SpikeArtCatalog.Entry>();
+            foreach (var (key, path) in ArtEntries)
+            {
+                var prefab = AssetDatabase.LoadAssetAtPath<GameObject>(Prefabs + path);
+                if (prefab == null) { Debug.LogWarning("[PlayLocal] art prefab missing, the view will fall back to primitives: " + path); continue; }
+                entries.Add(new SpikeArtCatalog.Entry { Key = key, Prefab = prefab });
+            }
+            catalog.Entries = entries.ToArray();
+            if (created) AssetDatabase.CreateAsset(catalog, ArtCatalogPath); else EditorUtility.SetDirty(catalog);
+            AssetDatabase.SaveAssets();
+        }
+
         [MenuItem("SousTension/Spike/1. Create the MovingFrame scene")]
         public static void CreateScene()
         {
             if (EditorApplication.isPlaying) { Debug.LogWarning("[PlayLocal] stop Play mode first"); return; }
             EnsureMaterials();
+            EnsureArtCatalog();
             Directory.CreateDirectory(Path.Combine(ProjectRoot, Path.GetDirectoryName(ScenePath)));
             var scene = EditorSceneManager.NewScene(NewSceneSetup.DefaultGameObjects, NewSceneMode.Single);
             var root = new GameObject("MovingFrameBootstrap");
@@ -130,6 +166,8 @@ namespace SousTension.Spikes.MovingFrame.EditorTools
         [MenuItem("SousTension/Spike/4. Build the Windows development client (player 2)")]
         public static void BuildDevClient()
         {
+            EnsureMaterials();
+            EnsureArtCatalog();
             if (!File.Exists(Path.Combine(ProjectRoot, ScenePath))) CreateScene();
             string output = Path.Combine(ProjectRoot, BuildPath);
             Directory.CreateDirectory(Path.GetDirectoryName(output));

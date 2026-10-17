@@ -18,8 +18,8 @@ var BATTERY_CHARGE_S = 900;      // s to charge it from empty while the voltage 
 var BATTERY_CHARGE_V = 0.9;
 var BILGE_MIN_V = 0.5;           // the bilge pumps need this voltage (and their breaker closed)
 
-// 20 breakers, one consumer each. Spike layout: floor tiles 0.5 m apart (3 columns x 7 rows) at the stern, left wall, because the spike's
-// interaction works on position, not on aim (E2-02 will replace this by a real panel: the positions are data).
+// 20 breakers, one consumer each, on the ElectricalPanel of compartment 5 (machines, left wall): 5 columns x 4 rows as in the 3D model.
+// Position-wise a column is 0.2 m apart (the aimed interaction, E2-02, tells them apart; the position path uses a 0.15 m reach).
 var BREAKERS = [
   { id: "light1", demand: 0.15, use: "light", comp: 0 }, { id: "light2", demand: 0.15, use: "light", comp: 1 },
   { id: "light3", demand: 0.15, use: "light", comp: 2 }, { id: "light4", demand: 0.15, use: "light", comp: 3 },
@@ -31,9 +31,10 @@ var BREAKERS = [
 ];
 (function placeBreakers() {
   for (var i = 0; i < BREAKERS.length; i++) {
-    BREAKERS[i].x = -2.5 + 0.5 * (i % 3);
-    BREAKERS[i].z = -9.75 + 0.5 * Math.floor(i / 3);
-    BREAKERS[i].reach = 0.3;
+    BREAKERS[i].row = Math.floor(i / 5);                           // 0 = lowest row (height 0.54 m) .. 3 = highest (1.23 m)
+    BREAKERS[i].x = -2.44 + 0.03 * BREAKERS[i].row;                // the rows differ by height only: a 3 cm shift keeps every position distinct
+    BREAKERS[i].z = -6.0 + 0.2 * (i % 5) + 0.03 * BREAKERS[i].row;
+    BREAKERS[i].reach = 0.15;
   }
 })();
 

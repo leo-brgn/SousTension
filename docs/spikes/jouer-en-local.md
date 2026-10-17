@@ -42,16 +42,25 @@ La touche **E** garde l'ancien comportement par position (la commande la plus pr
 | `scram` / `restart` | SCRAM / redémarrage forcé (sans procédure) |
 | `regime pleine` | passe à la pleine puissance |
 | `break pump 1`, `break bilge 2`, `trip galley` | pompe cassée, pompe de cale cassée, disjoncteur qui saute |
-| `tp 0 -9` | se téléporter |
+| `tp 0 -9` | se téléporter (le bateau fait 28 m : z de -14 à +14) |
 | `ff 60` | avance la simulation de 60 s d'un coup |
 | `state` | résumé de l'état du jeu |
 | `partner on` / `partner off` | joueur fantôme (E1-12) |
 
+## Le bateau (E10-01)
+Le bateau est le modèle 3D de `Assets/_Project/Art` : 28 m, six compartiments de l'avant à l'arrière — torpilles, poste central, radio, réacteur, machines, vie. Cinq cloisons, chacune avec **une écoutille** (décalée à gauche / à droite) et un **écran** derrière. Cloisons, écrans et écoutilles fermées **bloquent** les joueurs ; une écoutille fermée bloque aussi l'eau. On apparaît dans la radio.
+
+- Écoutille : viser la porte ou son volant, clic = ouvrir / fermer (refusé si quelqu'un est dans l'ouverture).
+- Réacteur (compartiment 4) : console RK-1 et levier SCRAM à gauche, 4 vannes et 2 pompes primaires à droite, pompe de cale au milieu. Machines (5) : tableau de 20 disjoncteurs à gauche, pompe de cale au milieu. Poste central (2) : télégraphe à gauche (deux pédales au sol).
+- Au départ (régime *veille*) le réseau est **sombre** : lampes rouges de secours. Passer le RK-1 en *croisière* (`regime croisiere`, puis `ff 120`) fait monter la tension : les lampes de chaque compartiment s'allument.
+- Vérifier le bateau sans jouer : `powershell -File tools/shot-tour.ps1` (client de dev + serveur) laisse 13 captures dans `BuildsShots`.
+- Déplacement : la simulation reste à 10 Hz mais la caméra bouge à la cadence de l'écran (la partie déjà écoulée du pas est prédite) et une correction du serveur s'efface en ~0,1 s au lieu de téléporter la vue.
+
 ## Ce qu'il faut tester d'abord (5 minutes)
 1. Marcher dans le bateau qui tangue : pas de glissement bizarre, la caméra suit.
-2. Viser le **sélecteur de régime** (RK-1, mur gauche du compartiment 4) : il s'éclaire, un clic tourne le sélecteur.
+2. Viser le **sélecteur de régime** (console RK-1, mur gauche du compartiment 4 réacteur) : il s'éclaire, un clic tourne le sélecteur.
 3. `partner on`, puis armer la clé `demo` à un bout du bateau : le fantôme arme l'autre bout, les deux clés passent au vert.
-4. `leak 3 2 d`, prendre un patch dans la caisse à outils (compartiment 2, `F`), cliquer sur la fuite : un cran de moins.
+4. `leak 3 2 d`, prendre un patch dans la caisse à outils (poste central, mur de gauche, `F`), cliquer sur la fuite : un cran de moins.
 5. `scram` : le noir se fait, le bateau coule doucement ; redémarrer par la procédure (levier, vannes, pompes, puis les deux clés).
 6. Prendre le **Manuel** sur la table du poste central, tourner les pages avec les flèches : tant qu'on le tient, aucune commande ne répond.
 

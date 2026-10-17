@@ -2,6 +2,7 @@
 // One interaction key ("act") serves every control: the server picks the nearest interactable within reach, so the
 // client never has to say what it is pressing (and cannot cheat about it). Coupled-action commands live in coupled.js;
 // the other controls are listed here.
+//   (E10-01: positions follow the 3D boat, boat_layout.json. hatch0..4 = the wheel of the bulkhead hatch d, which opens / closes it.)
 //   regime : the RK-1 three-position selector (compartment 4, left wall). One press turns it to the next position
 //            (Veille -> Croisiere -> Pleine -> Veille). A single player is enough: the Rule of Two Players covers
 //            starting/stopping the reactor, not choosing a regime (GDD 3.3/3.4).
@@ -12,23 +13,24 @@
 //            second); drift closes them, only players open them. One player is enough.
 //   pump0..1  : the two primary pumps' switches (E3-06). One press toggles run/stop; a broken pump cannot be started (repair is E5/E9).
 var CONTROLS = [
-  { id: "regime", x: -2.5, z: -1.7, reach: 2.0 },
-  { id: "scram", x: -2.5, z: -2.7, reach: 1.5 },
-  { id: "valve0", x: 2.5, z: -3.0, reach: 1.0, valve: 0 },
-  { id: "valve1", x: 2.5, z: -1.5, reach: 1.0, valve: 1 },
-  { id: "valve2", x: 2.5, z: 0.0, reach: 1.0, valve: 2 },
-  { id: "valve3", x: 2.5, z: 1.5, reach: 1.0, valve: 3 },
-  { id: "pump0", x: 2.5, z: 3.5, reach: 1.2, pump: 0 },
-  { id: "pump1", x: 2.5, z: 5.0, reach: 1.2, pump: 1 },
-  { id: "bilge0", x: -2.5, z: 4.5, reach: 1.0, bilge: 0 },
-  { id: "bilge1", x: 2.5, z: -5.0, reach: 0.9, bilge: 1 }
+  { id: "regime", x: -2.3, z: -2.0, reach: 2.0 },
+  { id: "scram", x: -2.7, z: -0.8, reach: 1.5 },
+  { id: "valve0", x: 2.6, z: -3.3, reach: 0.8, valve: 0 },
+  { id: "valve1", x: 2.6, z: -2.5, reach: 0.8, valve: 1 },
+  { id: "valve2", x: 2.6, z: -1.7, reach: 0.8, valve: 2 },
+  { id: "valve3", x: 2.6, z: -0.9, reach: 0.8, valve: 3 },
+  { id: "pump0", x: 2.0, z: -2.9, reach: 1.0, pump: 0 },
+  { id: "pump1", x: 2.0, z: -1.1, reach: 1.0, pump: 1 },
+  { id: "bilge0", x: 0.0, z: -3.45, reach: 1.0, bilge: 0 },
+  { id: "bilge1", x: 0.0, z: -7.35, reach: 1.0, bilge: 1 }
 ];
 var VALVE_TURN_RATE = 0.25;        // valve opening per second while the wheel is held (4 s from closed to open)
 (function addBreakerControls() {                        // the 20 breakers of the main panel (E3-07): floor tiles at the stern, left wall
   for (var i = 0; i < BREAKERS.length; i++)
     CONTROLS.push({ id: "breaker_" + BREAKERS[i].id, x: BREAKERS[i].x, z: BREAKERS[i].z, reach: BREAKERS[i].reach, breaker: i });
 })();
-CONTROLS.push({ id: "tele_up", x: -0.5, z: 4.2, reach: 0.3, tele: 1 }, { id: "tele_down", x: -0.5, z: 3.6, reach: 0.3, tele: -1 });   // machine telegraph (E3-08)
+CONTROLS.push({ id: "tele_up", x: -2.3, z: 6.15, reach: 0.3, tele: 1 }, { id: "tele_down", x: -2.3, z: 5.35, reach: 0.3, tele: -1 });   // machine telegraph (E3-08), central post
+for (var hd = 0; hd < BULKHEAD_Z.length; hd++) CONTROLS.push({ id: "hatch" + hd, x: HATCH_X[hd], z: BULKHEAD_Z[hd], reach: 1.0, hatch: hd });   // bulkhead hatch wheels (E10-01)
 var LEVER_COVER_TICKS = 60;        // 6 s at 10 Hz
 var REGIME_ORDER = ["veille", "croisiere", "pleine"];
 
@@ -97,6 +99,7 @@ function activateControl(state, c) {
   else if (c.bilge !== undefined) bilgeToggle(state.bilge, c.bilge);
   else if (c.breaker !== undefined) breakerToggle(state.power, c.breaker);
   else if (c.tele !== undefined) telegraphStep(state.prop, c.tele);
+  else if (c.hatch !== undefined) hatchToggle(state, c.hatch);
 }
 
 // The interaction key was pressed by player `id`: dispatch to the nearest interactable in reach (the position-based path: bots, tests, the

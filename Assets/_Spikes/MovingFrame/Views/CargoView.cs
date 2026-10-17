@@ -16,6 +16,7 @@ namespace SousTension.Spikes.MovingFrame
         private IClockService _clock;
         private Transform _boat;
         private readonly Dictionary<string, Transform> _items = new Dictionary<string, Transform>();
+        private readonly Dictionary<string, Renderer[]> _artRenderers = new Dictionary<string, Renderer[]>();      // items drawn with the 3D art
 
         public void Bind(MovingFrameModel model, IClockService clock, Transform boat)
         {
@@ -33,6 +34,12 @@ namespace SousTension.Spikes.MovingFrame
                 if (t.gameObject.activeSelf != c.Active) t.gameObject.SetActive(c.Active);   // a used hull patch is away until it respawns
                 if (!c.Active) continue;
                 bool carried = c.Carriers.Length > 0;
+                if (_artRenderers.TryGetValue(c.Id, out var art))
+                {
+                    t.localPosition = new Vector3(x, (carried ? 1.0f : 0f) + c.Y, z);                  // the art's origin is its base
+                    SpikeArt.GlowAll(art, new Color(0.95f, 0.7f, 0.1f), c.Pending != "");              // waiting for a second carrier
+                    continue;
+                }
                 t.localPosition = new Vector3(x, (c.Heavy ? 0.4f : 0.25f) + (carried ? 1.0f : 0f) + c.Y, z);   // c.Y: thrown items fly (E2-04)
                 var r = t.GetComponent<Renderer>();
                 r.material.color = c.Kind == "manual" ? new Color(0.93f, 0.9f, 0.78f) : c.Kind == "bucket" ? new Color(0.2f, 0.55f, 0.75f) : c.Kind == "patch" ? new Color(0.55f, 0.65f, 0.72f) : c.Pending != "" ? new Color(0.95f, 0.7f, 0.1f) : c.Heavy ? new Color(0.35f, 0.35f, 0.4f) : new Color(0.6f, 0.4f, 0.2f);
@@ -42,6 +49,15 @@ namespace SousTension.Spikes.MovingFrame
         private Transform Get(CargoState c)
         {
             if (_items.TryGetValue(c.Id, out var t)) return t;
+            var artItem = SpikeArt.Spawn(SpikeArt.KeyForCargo(c.Kind, c.Heavy), _boat);
+            if (artItem != null)
+            {
+                artItem.name = "Cargo_" + c.Id;
+                foreach (var light in artItem.GetComponentsInChildren<Light>(true)) light.enabled = false;        // the torch lies there dark
+                _items[c.Id] = artItem.transform;
+                _artRenderers[c.Id] = artItem.GetComponentsInChildren<Renderer>(true);
+                return artItem.transform;
+            }
             var go = SpikePrimitives.Create(c.Heavy ? PrimitiveType.Cylinder : PrimitiveType.Cube);
             go.name = "Cargo_" + c.Id;
             Destroy(go.GetComponent<Collider>());
