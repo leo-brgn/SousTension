@@ -32,3 +32,9 @@ test("the crew bot is deterministic: the same seed plays the same game", () => {
   const a = playMission(newCrew({ seed: 4 }), 14), b = playMission(newCrew({ seed: 4 }), 14);
   assert.deepStrictEqual(a, b);
 });
+
+test("a crew recovers from a SCRAM two minutes in (lever, valves, pumps, two keys within 3 s) and still reaches the goal", () => {
+  const r = playMission(newCrew({ seed: 1, scramAt: 120 }), 20);
+  assert.strictEqual(r.result, "success", JSON.stringify(r));
+  assert.strictEqual(r.scram, false);
+});
