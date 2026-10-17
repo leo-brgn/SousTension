@@ -18,7 +18,10 @@ function route(m, from, to) {
       const zf = zone(d, from.z), zt = zone(d, to.z);
       if (zf <= zt) continue;
       if (zf === 2) pts.push({ x: sx(d), z: B[d] - 1.4 }, { x: sx(d), z: B[d] - 0.48 }, { x: H[d], z: B[d] - 0.48 });
-      else if (Math.abs(from.x - H[d]) > 0.3) pts.push({ x: H[d], z: B[d] - 0.48 });
+      else {
+        if (zf === 1 && from.z < B[d] - 0.7) pts.push({ x: sx(d), z: B[d] - 0.48 });        // beside the baffle tip: leave by the open side first
+        if (Math.abs(from.x - H[d]) > 0.3) pts.push({ x: H[d], z: B[d] - 0.48 });
+      }
       if (zt === 0) pts.push({ x: H[d], z: B[d] + 0.7 });
     }
   }
