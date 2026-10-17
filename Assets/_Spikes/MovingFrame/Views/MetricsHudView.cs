@@ -25,8 +25,18 @@ namespace SousTension.Spikes.MovingFrame
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
         private bool _visible;                                                         // hidden by default (zero HUD): F2 shows the developer overlay
 
+        private float _perfTime; private int _perfFrames; private float _perfWorst;
+
         private void Update()
         {
+            // Frame time statistics in the log (a smooth camera needs a steady frame rate): every 5 s, the average and the worst frame.
+            float dt = Time.unscaledDeltaTime;
+            _perfTime += dt; _perfFrames++; _perfWorst = Mathf.Max(_perfWorst, dt);
+            if (_perfTime >= 5f)
+            {
+                Debug.Log("[Perf] " + (_perfFrames / _perfTime).ToString("F0") + " fps average, worst frame " + (_perfWorst * 1000f).ToString("F0") + " ms");
+                _perfTime = 0f; _perfFrames = 0; _perfWorst = 0f;
+            }
             var kb = UnityEngine.InputSystem.Keyboard.current;
             if (kb != null && kb.f2Key.wasPressedThisFrame) _visible = !_visible;      // F2 toggles the network overlay
         }

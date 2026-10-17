@@ -711,6 +711,31 @@ namespace SousTension.Spikes.MovingFrame.Tests
             Assert.AreEqual(30, StationFeedback.WindowTicks);
         }
 
+        // ---- Smooth clock ----
+        [Test]
+        public void TheEstimatedServerClockDoesNotJumpWhenSnapshotsArriveEarlyOrLate_ButResyncsOnARealGap()
+        {
+            var model = new MovingFrameModel { LocalId = "me" };
+            double jitterSeed = 12345; double Rnd() { jitterSeed = (jitterSeed * 1103515245 + 12345) % 2147483648; return jitterSeed / 2147483648.0; }
+            double now = 100.0, last = double.NaN, maxJump = 0;
+            for (int tick = 1; tick <= 200; tick++)
+            {
+                double serverTime = tick * 0.1;
+                double arrival = 100.0 + serverTime + (Rnd() - 0.5) * 0.06;                  // +-30 ms of network and tick-loop jitter
+                for (; now < arrival; now += 1.0 / 144.0)                                    // frames in between
+                {
+                    if (model.HasServerTime) { double e = model.EstimateServerTime(now); if (!double.IsNaN(last)) maxJump = Math.Max(maxJump, Math.Abs((e - last) - 1.0 / 144.0)); last = e; }
+                }
+                model.ApplyServerState(new StateSnapshot(tick, serverTime, new[] { new PlayerState("me", 0, 0, tick) }), arrival);
+            }
+            Assert.Less(maxJump, 0.004, "from one frame to the next the clock moves by the frame time, +-4 ms at most (a raw copy of the snapshot time jumps by up to 30 ms)");
+            // a real gap (a long stall, fast-forward): resync at once
+            double before = model.EstimateServerTime(now);
+            model.ApplyServerState(new StateSnapshot(500, 50.0 + 1000, new[] { new PlayerState("me", 0, 0, 500) }), now);
+            Assert.AreEqual(50.0 + 1000, model.EstimateServerTime(now), 1e-6);
+            Assert.AreNotEqual(before, model.EstimateServerTime(now));
+        }
+
         // ---- Mission flow and screens (MVP) ----
         [Test]
         public void TheScreensTextsExistInEveryLanguageWithTheSameKeys()
